@@ -1,0 +1,25 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+LAYOUT_LEFT_RIGHT()
+
+title "Container Diagram for Activity Sampling System"
+
+Person(softwareDeveloper, "Software Developer", "Wants to track his/her activities.")
+Person(productOwner, "Product Owner", "Wants to analyze the effort.")
+
+System_Boundary(activitySampling, "Activity Sampling System") {
+  Container(webApp, "Static Web App", "TypeScript, React", "Provides a graphical user interface for the API.")
+  Container(apiApp, "API App", "Java, Spring", "Handles all the business logic and data storage.")
+}
+
+ContainerDb_Ext(database, "Database", "Filesystem, CSV", "Stores the logged activities.")
+
+Rel(softwareDeveloper, webApp, "Log activity", "HTTPS")
+Rel(productOwner, webApp, "Analyze effort", "HTTPS")
+Rel_L(webApp, apiApp, "Uses", "JSON/HTTPS")
+Rel(apiApp, database, "Record activities", "SQL/TCP")
+
+SHOW_FLOATING_LEGEND()
+Lay_Right(LEGEND(), database)
+@enduml
