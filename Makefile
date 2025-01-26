@@ -1,44 +1,36 @@
-all: dist check
+SUBDIRS = web-app api-app
+
+all: $(SUBDIRS)
 
 clean:
+	@for dir in $(SUBDIRS); do \
+		$(MAKE) -C $$dir clean; \
+	done
 
-distclean: clean
+distclean:
+	@for dir in $(SUBDIRS); do \
+		$(MAKE) -C $$dir distclean; \
+	done
 
-dist: build
-
-start: build
-
-check: test
-	npx prettier . --check
+check:
+	@for dir in $(SUBDIRS); do \
+		$(MAKE) -C $$dir check; \
+	done
 
 format:
-	npx prettier . --write
+	@for dir in $(SUBDIRS); do \
+		$(MAKE) -C $$dir format; \
+	done
 
-doc:
-	plantuml doc/*.puml
+test:
+	@for dir in $(SUBDIRS); do \
+		$(MAKE) -C $$dir test; \
+	done
 
-dev: build
+$(SUBDIRS):
+	$(MAKE) -C $@
 
-test: build
-
-unit-tests: build
-
-integration-tests: build
-
-e2e-tests: build
-
-build: prepare
-
-prepare: version
-
-version:
-	@echo "Use Java $(shell java --version)"
-	@echo "Use Node.js $(shell node --version)"
-	@echo "Use NPM $(shell npm --version)"
-
-.PHONY: \
-	all clean distclean dist start \
+.PHONY: all clean distclean \
 	check format \
-	doc \
-	dev test unit-tests integration-tests e2e-tests \
-	build prepare version
+	test \
+	$(SUBDIRS)
