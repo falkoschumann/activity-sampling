@@ -36,7 +36,7 @@ charset = latin1
 end_of_line = crlf
 
 [*.{html,xml,jsx,tsx}]
-max_line_length = 200
+max_line_length = 120
 
 [{Makefile,*.mk,*.go}]
 indent_style = tab
