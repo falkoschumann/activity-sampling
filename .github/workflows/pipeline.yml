@@ -19,7 +19,7 @@ jobs:
       - name: Build
         run: make check-root
 
-  web-api:
+  web-app:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -32,7 +32,7 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
       - name: Build
-        run: make -C web-api
+        run: make -C web-app
 
   api-app:
     runs-on: ubuntu-latest
