@@ -1,3 +1,4 @@
+export NPM_CONFIG_YES=true
 SUBDIRS = web-app api-app
 
 all: dist check
@@ -22,7 +23,7 @@ check: check-root
 	done
 
 check-root:
-	npx prettier --check .github/ doc/ README.md
+	@npx prettier --check .github/ doc/ README.md
 
 format: format-root
 	@for dir in $(SUBDIRS); do \
@@ -30,7 +31,15 @@ format: format-root
 	done
 
 format-root:
-	npx prettier --write .github/ doc/ README.md
+	@npx prettier --write .github/ doc/ README.md
+
+dev:
+	@npx concurrently \
+		--kill-others \
+		--names "WEB,API" \
+		--prefix-colors "bgBlue.bold,bgGreen.bold" \
+		"$(MAKE) -C web-app dev" \
+		"$(MAKE) -C api-app dev"
 
 test:
 	@for dir in $(SUBDIRS); do \
@@ -44,5 +53,5 @@ build:
 
 .PHONY: all clean distclean dist start \
 	check check-root format format-root \
-	test \
+	dev test \
 	build

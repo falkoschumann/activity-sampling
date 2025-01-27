@@ -1,3 +1,5 @@
+export NPM_CONFIG_YES=true
+
 all: dist check
 
 clean:
