@@ -1,36 +1,37 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
-export default function RecentActivities() {
-  return (
-    <div>
-      <h6 className="bg-body-tertiary p-2 sticky-top">Tuesday, 14. January 2025</h6>
+import { WorkingDay } from "@/lib/domain";
+
+interface RecentActivitiesProps {
+  workingDays: WorkingDay[];
+}
+
+export default function RecentActivities({ workingDays }: RecentActivitiesProps) {
+  return workingDays.map((workingDay) => (
+    <div key={workingDay.date.toISOString()}>
+      <h6 className="bg-body-tertiary p-2 sticky-top">
+        {workingDay.date.toLocaleDateString(undefined, { dateStyle: "full" })}
+      </h6>
       <div className="list-group list-group-flush">
-        <button className="list-group-item list-group-item-action d-flex justify-content-start align-items-start">
-          <div style={{ width: "3em" }}>10:00</div>
-          <div>
-            <div className="ms-2 me-auto">
-              <div>Project (Client) Task</div>
-              <small className="text-body-tertiary">Notes</small>
+        {workingDay.activities.map((activity) => (
+          <button
+            key={activity.timestamp.toISOString()}
+            className="list-group-item list-group-item-action d-flex justify-content-start align-items-start"
+          >
+            <div style={{ width: "3em" }}>
+              {activity.timestamp.toLocaleTimeString(undefined, { timeStyle: "short", hour12: false })}
             </div>
-          </div>
-        </button>
-        <button className="list-group-item list-group-item-action d-flex justify-content-start align-items-start">
-          <div style={{ width: "3em" }}>09:30</div>
-          <div>
-            <div className="ms-2 me-auto">
-              <div>Project (Client) Task</div>
+            <div>
+              <div className="ms-2 me-auto">
+                <div>
+                  {activity.project} ({activity.client}) {activity.task}
+                </div>
+                {activity.notes && <small className="text-body-tertiary">{activity.notes}</small>}
+              </div>
             </div>
-          </div>
-        </button>
-        <button className="list-group-item list-group-item-action d-flex justify-content-start align-items-start">
-          <div style={{ width: "3em" }}>09:00</div>
-          <div>
-            <div className="ms-2 me-auto">
-              <div>Project (Client) Task</div>
-            </div>
-          </div>
-        </button>
+          </button>
+        ))}
       </div>
     </div>
-  );
+  ));
 }
