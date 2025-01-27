@@ -1,3 +1,5 @@
+// Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
+
 import Countdown from "@/components/countdown";
 import CurrentActivity from "@/components/current_activity";
 import RecentActivities from "@/components/recent_activities";

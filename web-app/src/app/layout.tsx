@@ -1,3 +1,5 @@
+// Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
+
 import type { Metadata } from "next";
 import "bootstrap/dist/css/bootstrap.css";
 
