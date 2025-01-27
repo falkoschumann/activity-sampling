@@ -1,23 +1,23 @@
 import type { NextConfig } from "next";
-import { PHASE_DEVELOPMENT_SERVER } from 'next/constants'
+import { PHASE_DEVELOPMENT_SERVER } from "next/constants";
 
- function nextConfig(phase: string):NextConfig{
+function nextConfig(phase: string): NextConfig {
   if (phase === PHASE_DEVELOPMENT_SERVER) {
     return {
       rewrites: async () => {
         return [
           {
-            source: '/api/:path*',
-            destination: 'http://localhost:8080/api/:path*'
+            source: "/api/:path*",
+            destination: "http://localhost:8080/api/:path*",
           },
         ];
-      }
-    }
+      },
+    };
   }
 
   return {
     output: "export",
-  }
+  };
 }
 
 export default nextConfig;
