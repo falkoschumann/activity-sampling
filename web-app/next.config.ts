@@ -4,8 +4,11 @@ import type { NextConfig } from "next";
 import { PHASE_DEVELOPMENT_SERVER } from "next/constants";
 
 function nextConfig(phase: string): NextConfig {
+  const defaultConfig: NextConfig = {};
+
   if (phase === PHASE_DEVELOPMENT_SERVER) {
     return {
+      ...defaultConfig,
       rewrites: async () => {
         return [
           {
@@ -18,6 +21,7 @@ function nextConfig(phase: string): NextConfig {
   }
 
   return {
+    ...defaultConfig,
     output: "export",
   };
 }

@@ -28,11 +28,17 @@ dev:
 test:
 	npm test
 
+watch:
+	npm run test:watch
+
 unit-tests:
+	npm test -- --testPathPattern=/.*unit.*/
 
 integration-tests:
+	npm test -- --testPathPattern=/.*integration.*/
 
 e2e-tests:
+	npm test -- --testPathPattern=/.*e2e.*/
 
 build: prepare
 	npm run build
