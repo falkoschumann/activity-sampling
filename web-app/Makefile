@@ -7,6 +7,7 @@ clean:
 
 distclean: clean
 	rm -rf .next
+	rm -rf coverage
 	rm -rf node_modules
 
 dist: build
