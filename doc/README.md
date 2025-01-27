@@ -45,7 +45,7 @@ analysis.
 - Takes holidays into account.
 - Takes vacation into account.
 
-## Activities
+## Events
 
 ```mermaid
 classDiagram
