@@ -3,65 +3,30 @@
 import { RecentActivitiesQueryResult } from "@/lib/domain";
 import { Duration } from "@/lib/duration";
 
-const recentActivities: RecentActivitiesQueryResult = {
-  lastActivity: {
-    timestamp: new Date("2025-01-17T09:30"),
-    duration: Duration.ofMinutes(30),
-    client: "ACME Inc.",
-    project: "Foobar",
-    task: "Do something",
-  },
-  workingDays: [
-    {
-      date: new Date("2025-01-17"),
-      activities: [
-        {
-          timestamp: new Date("2025-01-17T09:30"),
-          duration: Duration.ofMinutes(30),
-          client: "ACME Inc.",
-          project: "Foobar",
-          task: "Do something",
-        },
-      ],
-    },
-    {
-      date: new Date("2025-01-16"),
-      activities: [
-        {
-          timestamp: new Date("2025-01-16T17:00"),
-          duration: Duration.ofMinutes(30),
-          client: "ACME Inc.",
-          project: "Foobar",
-          task: "Do something",
-        },
-        {
-          timestamp: new Date("2025-01-16T16:30"),
-          duration: Duration.ofMinutes(30),
-          client: "ACME Inc.",
-          project: "Foobar",
-          task: "Do something",
-        },
-        {
-          timestamp: new Date("2025-01-16T16:00"),
-          duration: Duration.ofMinutes(30),
-          client: "ACME Inc.",
-          project: "Foobar",
-          task: "Make things",
-          notes: "This is a note",
-        },
-      ],
-    },
-  ],
-  timeSummary: {
-    hoursToday: Duration.parse("PT30M"),
-    hoursYesterday: Duration.parse("PT1H30M"),
-    hoursThisWeek: Duration.parse("PT2H"),
-    hoursThisMonth: Duration.parse("PT2H"),
-  },
-};
-
 export class ActivitiesApi {
   async queryRecentActivities(): Promise<RecentActivitiesQueryResult> {
-    return recentActivities;
+    const response = await fetch(
+      "http://localhost:3000/api/activities/recent-activities",
+    );
+    const json = await response.text();
+    return JSON.parse(json, reviver);
   }
+}
+
+function reviver(key: string, value: unknown) {
+  if (key === "timestamp" || key === "date") {
+    return new Date(value as string);
+  }
+  if (
+    [
+      "duration",
+      "hoursToday",
+      "hoursYesterday",
+      "hoursThisWeek",
+      "hoursThisMonth",
+    ].includes(key)
+  ) {
+    return Duration.parse(value as string);
+  }
+  return value;
 }

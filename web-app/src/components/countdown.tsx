@@ -13,7 +13,7 @@ export default function Countdown() {
       >
         <div className="progress-bar" style={{ width: "75%" }}></div>
       </div>
-      <div className="text-center">00:30:00</div>
+      <div className="text-center">00:07:30</div>
     </div>
   );
 }
