@@ -13,20 +13,22 @@ export class ActivitiesApi {
   }
 }
 
+const DATE_KEYS = ["timestamp", "date"];
+
+const DURATION_KEYS = [
+  "duration",
+  "hoursToday",
+  "hoursYesterday",
+  "hoursThisWeek",
+  "hoursThisMonth",
+];
+
 function reviver(key: string, value: unknown) {
-  if (key === "timestamp" || key === "date") {
+  if (DATE_KEYS.includes(key)) {
     return new Date(value as string);
-  }
-  if (
-    [
-      "duration",
-      "hoursToday",
-      "hoursYesterday",
-      "hoursThisWeek",
-      "hoursThisMonth",
-    ].includes(key)
-  ) {
+  } else if (DURATION_KEYS.includes(key)) {
     return Duration.parse(value as string);
+  } else {
+    return value;
   }
-  return value;
 }

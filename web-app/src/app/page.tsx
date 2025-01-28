@@ -4,7 +4,7 @@ import Countdown from "@/components/countdown";
 import CurrentActivity from "@/components/current_activity";
 import RecentActivities from "@/components/recent_activities";
 import TimeSummary from "@/components/time_summary";
-import { ActivitiesApi } from "@/lib/activities-api";
+import { ActivitiesApi } from "@/lib/activities_api";
 
 const activitiesApi = new ActivitiesApi();
 
