@@ -10,8 +10,11 @@ analysis.
 ### Ask periodically
 
 - Starts countdown with given interval.
-- Notifies user when interval is elapsed.
 - Starts countdown with the default interval when the application starts.
+
+### Current Interval
+
+- Notifies user when interval is elapsed.
 
 ### Log Activity
 
