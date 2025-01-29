@@ -40,7 +40,7 @@ dev:
 	@npx concurrently \
 		--kill-others \
 		--names "WEB,API" \
-		--prefix-colors "bgBlue.bold,bgGreen.bold" \
+		--prefix-colors "bgMagenta.bold,bgGreen.bold" \
 		"$(MAKE) -C web-app dev" \
 		"$(MAKE) -C api-app dev"
 
