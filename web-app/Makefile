@@ -3,11 +3,11 @@ export NPM_CONFIG_YES=true
 all: dist check
 
 clean:
-	rm -rf out
-
-distclean: clean
 	rm -rf .next
 	rm -rf coverage
+
+distclean: clean
+	rm -rf out
 	rm -rf node_modules
 
 dist: build
