@@ -4,10 +4,10 @@ all: dist check
 
 clean:
 	rm -rf .next
+	rm -rf out
 	rm -rf coverage
 
 distclean: clean
-	rm -rf out
 	rm -rf node_modules
 
 dist: build
