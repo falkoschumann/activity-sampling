@@ -1,7 +1,7 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
 import type { NextConfig } from "next";
-import { PHASE_DEVELOPMENT_SERVER, PHASE_EXPORT } from "next/constants";
+import { PHASE_DEVELOPMENT_SERVER } from "next/constants";
 
 function nextConfig(phase: string): NextConfig {
   let config: NextConfig = {};
@@ -16,9 +16,7 @@ function nextConfig(phase: string): NextConfig {
         },
       ],
     };
-  }
-
-  if (phase === PHASE_EXPORT) {
+  } else {
     config = {
       ...config,
       output: "export",
