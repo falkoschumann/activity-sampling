@@ -59,6 +59,5 @@ version:
 .PHONY: \
 	all clean distclean dist start \
 	check format \
-	doc \
 	dev test unit-tests integration-tests e2e-tests \
 	build prepare version

@@ -8,8 +8,7 @@ distclean: clean
 
 dist: build
 
-start:
-	./gradlew bootRun
+start: dev
 
 check: test
 	./gradlew check
@@ -40,6 +39,5 @@ version:
 .PHONY: \
 	all clean distclean dist start \
 	check format \
-	doc \
 	dev test unit-tests integration-tests e2e-tests \
 	build prepare version
