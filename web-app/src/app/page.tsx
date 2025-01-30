@@ -2,42 +2,14 @@
 
 "use client";
 
-import { useEffect, useState } from "react";
-
 import Countdown from "@/components/countdown";
 import CurrentActivity from "@/components/current_activity";
 import RecentActivities from "@/components/recent_activities";
 import TimeSummary from "@/components/time_summary";
-import { ActivitiesApi } from "@/lib/activities_api";
-import { RecentActivitiesQueryResult } from "@/lib/domain";
-import { Duration } from "@/lib/duration";
-
-const activitiesApi = new ActivitiesApi();
+import { useRecentActivities } from "@/lib/activities_services";
 
 export default function Home() {
-  const [recentActivities, setRecentActivities] = useState<RecentActivitiesQueryResult>({
-    workingDays: [],
-    timeSummary: {
-      hoursToday: Duration.ZERO,
-      hoursYesterday: Duration.ZERO,
-      hoursThisWeek: Duration.ZERO,
-      hoursThisMonth: Duration.ZERO,
-    },
-  });
-
-  useEffect(() => {
-    console.log("query recent activities");
-    let ignore = false;
-    (async () => {
-      const result = await activitiesApi.queryRecentActivities();
-      if (!ignore) {
-        setRecentActivities(result);
-      }
-    })();
-    return () => {
-      ignore = true;
-    };
-  }, []);
+  const recentActivities = useRecentActivities();
 
   return (
     <>
