@@ -7,14 +7,13 @@ import static org.junit.jupiter.api.Assertions.*;
 import de.muspellheim.activitysampling.api.application.ActivitiesService;
 import de.muspellheim.activitysampling.api.domain.RecentActivitiesQuery;
 import de.muspellheim.activitysampling.api.domain.RecentActivitiesQueryResult;
-import de.muspellheim.activitysampling.api.infrastructure.ActivitiesRepository;
 import org.junit.jupiter.api.Test;
 
 class ActivitiesServiceTests {
 
   @Test
   void queriesRecentActivities() {
-    var repository = new ActivitiesRepository();
+    var repository = new MemoryActivitiesRepository();
     var service = new ActivitiesService(repository);
 
     var result = service.getRecentActivities(RecentActivitiesQuery.createTestInstance());

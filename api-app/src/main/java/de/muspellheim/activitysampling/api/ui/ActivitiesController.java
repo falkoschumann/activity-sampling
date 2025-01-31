@@ -22,7 +22,8 @@ public class ActivitiesController {
   }
 
   @GetMapping("/recent-activities")
-  public RecentActivitiesQueryResult recentActivities(@RequestParam LocalDate today) {
+  public RecentActivitiesQueryResult recentActivities(
+      @RequestParam(required = false) LocalDate today) {
     return this.service.getRecentActivities(new RecentActivitiesQuery(today));
   }
 }

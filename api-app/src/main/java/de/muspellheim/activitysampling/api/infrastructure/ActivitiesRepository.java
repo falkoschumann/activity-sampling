@@ -2,41 +2,11 @@
 
 package de.muspellheim.activitysampling.api.infrastructure;
 
-import de.muspellheim.activitysampling.api.domain.Activity;
-import java.time.Duration;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
-import org.springframework.stereotype.Component;
+import org.springframework.data.repository.CrudRepository;
 
-@Component
-public class ActivitiesRepository {
+public interface ActivitiesRepository extends CrudRepository<ActivityDto, Instant> {
 
-  public List<Activity> findTimestampGreaterThanOrderByTimestampDesc(LocalDateTime start) {
-    return List.of(
-        new Activity(
-            LocalDateTime.parse("2025-01-17T09:30"),
-            Duration.parse("PT30M"),
-            "ACME Inc.",
-            "Foobar",
-            "Do something"),
-        new Activity(
-            LocalDateTime.parse("2025-01-16T17:00"),
-            Duration.parse("PT30M"),
-            "ACME Inc.",
-            "Foobar",
-            "Do something"),
-        new Activity(
-            LocalDateTime.parse("2025-01-16T16:30"),
-            Duration.parse("PT30M"),
-            "ACME Inc.",
-            "Foobar",
-            "Do something"),
-        new Activity(
-            LocalDateTime.parse("2025-01-16T16:00"),
-            Duration.parse("PT30M"),
-            "ACME Inc.",
-            "Foobar",
-            "Make things",
-            "This is a note"));
-  }
+  List<ActivityDto> findTimestampGreaterThanOrderByTimestamp(Instant start);
 }
