@@ -16,12 +16,16 @@ start: dev
 doc:
 	plantuml doc/*.puml
 
-check: $(SUBDIRS)
+check: $(SUBDIRS) check-root
+
+check-root:
 	npx prettier --check .github/ doc/ README.md
 
 check: TARGET=check
 
-format: $(SUBDIRS)
+format: $(SUBDIRS) format-root
+
+format-root:
 	npx prettier --write .github/ doc/ README.md
 
 format: TARGET=format
@@ -48,6 +52,6 @@ force: ;
 .PHONY: \
 	all clean distclean dist start \
 	doc \
-	check format \
+	check check-root format format-root \
 	dev test \
 	build
