@@ -2,8 +2,11 @@
 
 import { useEffect, useState } from "react";
 
-import { RecentActivitiesQueryResult } from "./messages";
+import { RecentActivitiesQueryResult } from "../domain/messages.ts";
 import { Duration } from "../domain/duration";
+import { ActivitiesApi } from "../infrastructure/activities_api.ts";
+
+const activitiesApi = new ActivitiesApi();
 
 export function useRecentActivities(): RecentActivitiesQueryResult {
   const [data, setData] = useState<RecentActivitiesQueryResult>({
@@ -20,11 +23,7 @@ export function useRecentActivities(): RecentActivitiesQueryResult {
     console.log("query recent activities");
     let ignore = false;
     (async () => {
-      const response = await fetch(
-        "http://localhost:3000/api/activities/recent-activities",
-      );
-      const json = await response.text();
-      const result = JSON.parse(json, reviver);
+      const result = await activitiesApi.getRecentActivities();
 
       if (!ignore) {
         setData(result);
@@ -36,24 +35,4 @@ export function useRecentActivities(): RecentActivitiesQueryResult {
   }, []);
 
   return data;
-}
-
-const DATE_KEYS = ["timestamp", "date"];
-
-const DURATION_KEYS = [
-  "duration",
-  "hoursToday",
-  "hoursYesterday",
-  "hoursThisWeek",
-  "hoursThisMonth",
-];
-
-function reviver(key: string, value: unknown) {
-  if (DATE_KEYS.includes(key)) {
-    return new Date(value as string);
-  } else if (DURATION_KEYS.includes(key)) {
-    return Duration.parse(value as string);
-  } else {
-    return value;
-  }
 }
