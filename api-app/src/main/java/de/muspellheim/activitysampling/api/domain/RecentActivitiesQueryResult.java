@@ -6,6 +6,7 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 public record RecentActivitiesQueryResult(
@@ -15,7 +16,10 @@ public record RecentActivitiesQueryResult(
       new RecentActivitiesQueryResult(List.of(), TimeSummary.NULL);
 
   public static RecentActivitiesQueryResult from(List<Activity> recentActivities) {
-    // TODO Write tests
+    recentActivities =
+        recentActivities.stream()
+            .sorted(Comparator.comparing(Activity::timestamp).reversed())
+            .toList();
     var today = LocalDate.parse("2025-01-17");
     var yesterday = today.minusDays(1);
     var thisWeekStart = today.minusDays(today.getDayOfWeek().getValue() - 1);
@@ -28,12 +32,8 @@ public record RecentActivitiesQueryResult(
     var hoursYesterday = Duration.ZERO;
     var hoursThisWeek = Duration.ZERO;
     var hoursLastWeek = Duration.ZERO;
-    Activity lastActivity = null;
+    var lastActivity = !recentActivities.isEmpty() ? recentActivities.getFirst() : null;
     for (var activity : recentActivities) {
-      if (lastActivity == null) {
-        lastActivity = activity;
-      }
-
       if (!activity.timestamp().toLocalDate().equals(date)) {
         if (date != null) {
           workingDays.add(new WorkingDay(date, List.copyOf(activities)));
@@ -74,44 +74,44 @@ public record RecentActivitiesQueryResult(
     return new RecentActivitiesQueryResult(
         List.of(
             new WorkingDay(
-                LocalDate.parse("2025-01-17"),
+                LocalDate.of(2025, 1, 17),
                 List.of(
                     new Activity(
-                        LocalDateTime.parse("2025-01-17T09:30"),
-                        Duration.parse("PT30M"),
+                        LocalDateTime.of(2025, 1, 17, 9, 30),
+                        Duration.ofMinutes(30),
                         "ACME Inc.",
                         "Foobar",
                         "Do something"))),
             new WorkingDay(
-                LocalDate.parse("2025-01-16"),
+                LocalDate.of(2025, 1, 16),
                 List.of(
                     new Activity(
-                        LocalDateTime.parse("2025-01-16T17:00"),
-                        Duration.parse("PT30M"),
+                        LocalDateTime.of(2025, 1, 16, 17, 0),
+                        Duration.ofMinutes(30),
                         "ACME Inc.",
                         "Foobar",
                         "Do something"),
                     new Activity(
-                        LocalDateTime.parse("2025-01-16T16:30"),
-                        Duration.parse("PT30M"),
+                        LocalDateTime.of(2025, 1, 16, 16, 30),
+                        Duration.ofMinutes(30),
                         "ACME Inc.",
                         "Foobar",
                         "Do something"),
                     new Activity(
-                        LocalDateTime.parse("2025-01-16T16:00"),
-                        Duration.parse("PT30M"),
+                        LocalDateTime.of(2025, 1, 16, 16, 0),
+                        Duration.ofMinutes(30),
                         "ACME Inc.",
                         "Foobar",
                         "Make things",
                         "This is a note")))),
         new TimeSummary(
-            Duration.parse("PT30M"),
-            Duration.parse("PT1H30M"),
-            Duration.parse("PT2H"),
-            Duration.parse("PT2H")),
+            Duration.ofMinutes(30),
+            Duration.ofMinutes(90),
+            Duration.ofMinutes(120),
+            Duration.ofMinutes(120)),
         new Activity(
-            LocalDateTime.parse("2025-01-17T09:30"),
-            Duration.parse("PT30M"),
+            LocalDateTime.of(2025, 1, 17, 9, 30),
+            Duration.ofMinutes(30),
             "ACME Inc.",
             "Foobar",
             "Do something"));

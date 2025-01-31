@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class ActivitiesRepository {
 
-  public List<Activity> findOrderByTimestampDesc() {
+  public List<Activity> findTimestampGreaterThanOrderByTimestampDesc(LocalDateTime start) {
     return List.of(
         new Activity(
             LocalDateTime.parse("2025-01-17T09:30"),

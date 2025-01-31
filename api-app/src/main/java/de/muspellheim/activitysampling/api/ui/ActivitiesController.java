@@ -3,9 +3,12 @@
 package de.muspellheim.activitysampling.api.ui;
 
 import de.muspellheim.activitysampling.api.application.ActivitiesService;
+import de.muspellheim.activitysampling.api.domain.RecentActivitiesQuery;
 import de.muspellheim.activitysampling.api.domain.RecentActivitiesQueryResult;
+import java.time.LocalDate;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -19,7 +22,7 @@ public class ActivitiesController {
   }
 
   @GetMapping("/recent-activities")
-  public RecentActivitiesQueryResult queryRecentActivities() {
-    return this.service.queryRecentActivities();
+  public RecentActivitiesQueryResult recentActivities(@RequestParam LocalDate today) {
+    return this.service.getRecentActivities(new RecentActivitiesQuery(today));
   }
 }

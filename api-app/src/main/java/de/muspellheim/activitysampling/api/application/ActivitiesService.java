@@ -2,8 +2,10 @@
 
 package de.muspellheim.activitysampling.api.application;
 
+import de.muspellheim.activitysampling.api.domain.RecentActivitiesQuery;
 import de.muspellheim.activitysampling.api.domain.RecentActivitiesQueryResult;
 import de.muspellheim.activitysampling.api.infrastructure.ActivitiesRepository;
+import java.time.LocalDate;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -15,8 +17,10 @@ public class ActivitiesService {
     this.repository = repository;
   }
 
-  public RecentActivitiesQueryResult queryRecentActivities() {
-    var activities = repository.findOrderByTimestampDesc();
+  public RecentActivitiesQueryResult getRecentActivities(RecentActivitiesQuery query) {
+    var startDate = query.today() != null ? query.today() : LocalDate.now();
+    var start = startDate.atStartOfDay();
+    var activities = repository.findTimestampGreaterThanOrderByTimestampDesc(start);
     return RecentActivitiesQueryResult.from(activities);
   }
 }
