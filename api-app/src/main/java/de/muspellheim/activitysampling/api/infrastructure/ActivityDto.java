@@ -2,6 +2,8 @@
 
 package de.muspellheim.activitysampling.api.infrastructure;
 
+import static org.hibernate.type.SqlTypes.INTERVAL_SECOND;
+
 import de.muspellheim.activitysampling.api.domain.Activity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -14,6 +16,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.annotations.JdbcTypeCode;
 
 @Data
 @NoArgsConstructor
@@ -25,7 +28,9 @@ public class ActivityDto {
 
   @Id @NonNull private LocalDateTime timestamp;
 
-  @NonNull private Duration duration;
+  @JdbcTypeCode(INTERVAL_SECOND)
+  @NonNull
+  private Duration duration;
 
   @NonNull private String client;
 
