@@ -11,9 +11,6 @@ distclean: clean
 
 dist: build
 
-start:
-	npm start
-
 check: test
 	npx eslint .
 	npx prettier . --check
@@ -22,22 +19,22 @@ format:
 	npx eslint --fix .
 	npx prettier . --write
 
-dev:
+dev: prepare
 	npx vite
 
-test:
+test: prepare
 	npx vitest run
 
-watch:
+watch: prepare
 	npm test
 
-unit-tests:
+unit-tests: prepare
 	npx vitest run --testPathPattern=".*\/unit\/.*"
 
-integration-tests:
+integration-tests: prepare
 	npx vitest run --testPathPattern=".*\/integration\/.*"
 
-e2e-tests:
+e2e-tests: prepare
 	npx vitest run --testPathPattern=".*\/e2e\/.*"
 
 build: prepare
@@ -56,7 +53,7 @@ version:
 	@echo "Use NPM $(shell npm --version)"
 
 .PHONY: \
-	all clean distclean dist start \
+	all clean distclean dist \
 	check format \
 	dev test watch unit-tests integration-tests e2e-tests \
 	build prepare version
