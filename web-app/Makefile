@@ -26,19 +26,19 @@ dev:
 	npx vite
 
 test:
-	npm test
+	npx vitest run
 
 watch:
-	npm run test:watch
+	npm test
 
 unit-tests:
-	npm test -- --testPathPattern=/.*unit.*/
+	npx vitest run --testPathPattern=".*\/unit\/.*"
 
 integration-tests:
-	npm test -- --testPathPattern=/.*integration.*/
+	npx vitest run --testPathPattern=".*\/integration\/.*"
 
 e2e-tests:
-	npm test -- --testPathPattern=/.*e2e.*/
+	npx vitest run --testPathPattern=".*\/e2e\/.*"
 
 build: prepare
 	npm run build
@@ -58,5 +58,5 @@ version:
 .PHONY: \
 	all clean distclean dist start \
 	check format \
-	dev test unit-tests integration-tests e2e-tests \
+	dev test watch unit-tests integration-tests e2e-tests \
 	build prepare version
