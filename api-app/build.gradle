@@ -45,3 +45,15 @@ spotless {
     licenseHeader '/* Copyright (c) $YEAR Falko Schumann. All rights reserved. MIT license. */\n\n'
   }
 }
+
+tasks.register("processFrontendResources", Copy) {
+  group = "Frontend"
+  description = "Process frontend resources"
+
+  from(project.layout.projectDirectory.dir("../web-app/dist"))
+  into(project.layout.buildDirectory.dir("resources/main/public"))
+}
+
+tasks.named("processResources") {
+  dependsOn("processFrontendResources")
+}
