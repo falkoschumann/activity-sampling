@@ -3,7 +3,7 @@
 import { Activity, TimeSummary, WorkingDay } from "./model.ts";
 
 export interface RecentActivitiesQuery {
-  today: Date;
+  today?: Date;
 }
 
 export interface RecentActivitiesQueryResult {

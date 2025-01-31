@@ -7,7 +7,7 @@ import RecentActivities from "./recent_activities";
 import TimeSummary from "./time_summary";
 
 export default function App() {
-  const recentActivities = useRecentActivities();
+  const [recentActivities] = useRecentActivities();
 
   return (
     <>

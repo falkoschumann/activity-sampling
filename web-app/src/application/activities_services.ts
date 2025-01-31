@@ -2,13 +2,19 @@
 
 import { useEffect, useState } from "react";
 
-import { RecentActivitiesQueryResult } from "../domain/messages.ts";
 import { Duration } from "../domain/duration";
+import {
+  RecentActivitiesQuery,
+  RecentActivitiesQueryResult,
+} from "../domain/messages.ts";
 import { ActivitiesApi } from "../infrastructure/activities_api.ts";
 
 const activitiesApi = new ActivitiesApi();
 
-export function useRecentActivities(): RecentActivitiesQueryResult {
+export function useRecentActivities(
+  initialQuery: RecentActivitiesQuery = {},
+): [RecentActivitiesQueryResult, (query: RecentActivitiesQuery) => void] {
+  const [query, setQuery] = useState<RecentActivitiesQuery>(initialQuery);
   const [data, setData] = useState<RecentActivitiesQueryResult>({
     workingDays: [],
     timeSummary: {
@@ -20,19 +26,22 @@ export function useRecentActivities(): RecentActivitiesQueryResult {
   });
 
   useEffect(() => {
-    console.log("query recent activities");
     let ignore = false;
-    (async () => {
-      const result = await activitiesApi.getRecentActivities();
 
+    async function startFetching() {
+      const result = await activitiesApi.getRecentActivities(query);
       if (!ignore) {
+        console.log("set data", result);
         setData(result);
       }
-    })();
+    }
+
+    startFetching();
+
     return () => {
       ignore = true;
     };
-  }, []);
+  }, [query]);
 
-  return data;
+  return [data, setQuery];
 }

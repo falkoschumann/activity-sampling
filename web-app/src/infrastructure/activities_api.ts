@@ -8,13 +8,15 @@ import {
 
 export class ActivitiesApi {
   async getRecentActivities(
-    query: RecentActivitiesQuery = { today: new Date() },
+    query: RecentActivitiesQuery,
   ): Promise<RecentActivitiesQueryResult> {
     const url = new URL(
       "/api/activities/recent-activities",
       window.location.href,
     );
-    url.searchParams.append("today", query.today.toISOString());
+    if (query.today) {
+      url.searchParams.append("today", query.today.toISOString());
+    }
     const response = await fetch(url);
     const json = await response.text();
     return JSON.parse(json, reviver);
