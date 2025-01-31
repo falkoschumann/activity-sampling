@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from "react";
 
-import { RecentActivitiesQueryResult } from "@/lib/domain";
-import { Duration } from "@/lib/duration";
+import { RecentActivitiesQueryResult } from "./messages";
+import { Duration } from "../domain/duration";
 
 export function useRecentActivities(): RecentActivitiesQueryResult {
   const [data, setData] = useState<RecentActivitiesQueryResult>({

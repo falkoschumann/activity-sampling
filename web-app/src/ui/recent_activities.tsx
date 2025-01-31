@@ -1,6 +1,6 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
-import { WorkingDay } from "@/lib/domain";
+import { WorkingDay } from "../domain/model";
 
 interface RecentActivitiesProps {
   workingDays: WorkingDay[];

@@ -1,12 +1,6 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
-import type { Metadata } from "next";
 import "bootstrap/dist/css/bootstrap.css";
-
-export const metadata: Metadata = {
-  title: "Activity Sampling",
-  description: "Periodically asks the user about their current activity and logs it for analysis.",
-};
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (

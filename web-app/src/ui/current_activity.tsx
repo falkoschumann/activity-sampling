@@ -1,6 +1,6 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
-import { Activity } from "@/lib/domain";
+import { Activity } from "../domain/model";
 
 interface CurrentActivityProps {
   lastActivity?: Activity;

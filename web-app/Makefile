@@ -3,11 +3,10 @@ export NPM_CONFIG_YES=true
 all: dist check
 
 clean:
-	rm -rf .next
-	rm -rf out
 	rm -rf coverage
 
 distclean: clean
+	rm -rf dist
 	rm -rf node_modules
 
 dist: build
@@ -16,15 +15,15 @@ start:
 	npm start
 
 check: test
-	npx next lint
+	npx eslint .
 	npx prettier . --check
 
 format:
-	npx next lint --fix
+	npx eslint --fix .
 	npx prettier . --write
 
 dev:
-	npx next dev --turbopack
+	npx vite
 
 test:
 	npm test

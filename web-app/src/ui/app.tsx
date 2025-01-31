@@ -1,14 +1,12 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
-"use client";
+import { useRecentActivities } from "../application/activities_services";
+import Countdown from "./countdown";
+import CurrentActivity from "./current_activity";
+import RecentActivities from "./recent_activities";
+import TimeSummary from "./time_summary";
 
-import Countdown from "@/components/countdown";
-import CurrentActivity from "@/components/current_activity";
-import RecentActivities from "@/components/recent_activities";
-import TimeSummary from "@/components/time_summary";
-import { useRecentActivities } from "@/lib/activities_services";
-
-export default function Home() {
+export default function App() {
   const recentActivities = useRecentActivities();
 
   return (

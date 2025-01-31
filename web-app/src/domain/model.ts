@@ -2,12 +2,6 @@
 
 import { Duration } from "./duration";
 
-export interface RecentActivitiesQueryResult {
-  readonly lastActivity?: Activity;
-  readonly workingDays: WorkingDay[];
-  readonly timeSummary: TimeSummary;
-}
-
 export interface Activity {
   // TODO Rename to start?
   timestamp: Date;

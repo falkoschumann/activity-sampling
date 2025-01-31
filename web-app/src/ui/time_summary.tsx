@@ -1,6 +1,6 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
-import { Duration } from "@/lib/duration";
+import { Duration } from "../domain/duration";
 
 interface TimeSummaryProps {
   hoursToday: Duration;
