@@ -1,3 +1,5 @@
+export TZ="Europe/Berlin"
+
 all: dist check
 
 clean:
