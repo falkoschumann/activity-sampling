@@ -1,7 +1,7 @@
 export NPM_CONFIG_YES=true
 SUBDIRS = web-app api-app
 
-all: dist check
+all: $(SUBDIRS) check-root
 
 clean: $(SUBDIRS)
 clean: TARGET=clean
@@ -9,26 +9,20 @@ clean: TARGET=clean
 distclean: $(SUBDIRS)
 distclean: TARGET=distclean
 
-dist: build
-
-start: dev
-
 doc:
 	plantuml doc/*.puml
 
 check: $(SUBDIRS) check-root
+check: TARGET=check
 
 check-root:
 	npx prettier --check .github/ doc/ README.md
 
-check: TARGET=check
-
 format: $(SUBDIRS) format-root
+format: TARGET=format
 
 format-root:
 	npx prettier --write .github/ doc/ README.md
-
-format: TARGET=format
 
 dev:
 	npx concurrently \

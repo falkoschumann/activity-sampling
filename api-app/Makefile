@@ -10,7 +10,7 @@ dist: build
 
 start: dev
 
-check: test
+check:
 	./gradlew check
 
 format:
@@ -29,7 +29,7 @@ integration-tests:
 e2e-tests:
 
 build: prepare
-	./gradlew build -x test
+	./gradlew build -x test -x check
 
 prepare: version
 
