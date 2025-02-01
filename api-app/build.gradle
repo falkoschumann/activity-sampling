@@ -39,8 +39,13 @@ dependencies {
   testRuntimeOnly 'com.h2database:h2'
 }
 
-tasks.named('test') {
+test {
   useJUnitPlatform()
+  testLogging {
+    events 'passed', 'skipped', 'failed'
+    showExceptions = true
+    exceptionFormat 'full'
+  }
 }
 
 spotless {
