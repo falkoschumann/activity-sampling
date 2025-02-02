@@ -4,7 +4,7 @@ package de.muspellheim.activitysampling.api.e2e;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import de.muspellheim.activitysampling.api.domain.RecentActivitiesQueryResult;
+import de.muspellheim.activitysampling.api.application.RecentActivitiesQueryResult;
 import java.util.TimeZone;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Nested;

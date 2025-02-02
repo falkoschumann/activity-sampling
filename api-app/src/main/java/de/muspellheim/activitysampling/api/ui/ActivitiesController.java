@@ -3,8 +3,8 @@
 package de.muspellheim.activitysampling.api.ui;
 
 import de.muspellheim.activitysampling.api.application.ActivitiesService;
-import de.muspellheim.activitysampling.api.domain.RecentActivitiesQuery;
-import de.muspellheim.activitysampling.api.domain.RecentActivitiesQueryResult;
+import de.muspellheim.activitysampling.api.application.RecentActivitiesQuery;
+import de.muspellheim.activitysampling.api.application.RecentActivitiesQueryResult;
 import java.time.LocalDate;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;

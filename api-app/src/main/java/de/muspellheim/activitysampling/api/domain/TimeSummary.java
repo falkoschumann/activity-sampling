@@ -3,10 +3,52 @@
 package de.muspellheim.activitysampling.api.domain;
 
 import java.time.Duration;
+import java.time.LocalDate;
+import java.util.List;
+import lombok.Builder;
+import lombok.NonNull;
 
+@Builder
 public record TimeSummary(
-    Duration hoursToday, Duration hoursYesterday, Duration hoursThisWeek, Duration hoursThisMonth) {
+    @NonNull Duration hoursToday,
+    @NonNull Duration hoursYesterday,
+    @NonNull Duration hoursThisWeek,
+    @NonNull Duration hoursThisMonth) {
+
+  public static class TimeSummaryBuilder {
+    private Duration hoursToday = Duration.ZERO;
+    private Duration hoursYesterday = Duration.ZERO;
+    private Duration hoursThisWeek = Duration.ZERO;
+    private Duration hoursThisMonth = Duration.ZERO;
+  }
 
   public static final TimeSummary NULL =
       new TimeSummary(Duration.ZERO, Duration.ZERO, Duration.ZERO, Duration.ZERO);
+
+  public static TimeSummary from(LocalDate today, List<Activity> activities) {
+    var yesterday = today.minusDays(1);
+    var thisWeekStart = today.minusDays(today.getDayOfWeek().getValue() - 1);
+    var thisMonthStart = today.withDayOfMonth(1);
+
+    var hoursToday = Duration.ZERO;
+    var hoursYesterday = Duration.ZERO;
+    var hoursThisWeek = Duration.ZERO;
+    var hoursThisMonth = Duration.ZERO;
+    for (var activity : activities) {
+      var duration = activity.duration();
+      if (activity.timestamp().toLocalDate().equals(today)) {
+        hoursToday = hoursToday.plus(duration);
+      }
+      if (activity.timestamp().toLocalDate().equals(yesterday)) {
+        hoursYesterday = hoursYesterday.plus(duration);
+      }
+      if (!activity.timestamp().toLocalDate().isBefore(thisWeekStart)) {
+        hoursThisWeek = hoursThisWeek.plus(duration);
+      }
+      if (!activity.timestamp().toLocalDate().isBefore(thisMonthStart)) {
+        hoursThisMonth = hoursThisMonth.plus(duration);
+      }
+    }
+    return new TimeSummary(hoursToday, hoursYesterday, hoursThisWeek, hoursThisMonth);
+  }
 }
