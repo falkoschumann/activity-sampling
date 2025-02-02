@@ -24,8 +24,9 @@ public class ActivitiesService {
     var start = startDate.minusDays(31).atStartOfDay();
     var activities =
         StreamSupport.stream(repository.findAll().spliterator(), false)
+            .filter(activity -> activity.getTimestamp().isAfter(start))
             .map(ActivityDto::validate)
             .toList();
-    return RecentActivitiesQueryResult.from(activities);
+    return RecentActivitiesQueryResult.from(startDate, activities);
   }
 }

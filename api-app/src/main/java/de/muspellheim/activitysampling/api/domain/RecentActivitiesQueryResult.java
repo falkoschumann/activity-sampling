@@ -15,12 +15,11 @@ public record RecentActivitiesQueryResult(
   public static final RecentActivitiesQueryResult NULL =
       new RecentActivitiesQueryResult(List.of(), TimeSummary.NULL);
 
-  public static RecentActivitiesQueryResult from(List<Activity> recentActivities) {
+  public static RecentActivitiesQueryResult from(LocalDate today, List<Activity> recentActivities) {
     recentActivities =
         recentActivities.stream()
             .sorted(Comparator.comparing(Activity::timestamp).reversed())
             .toList();
-    var today = LocalDate.parse("2025-01-17");
     var yesterday = today.minusDays(1);
     var thisWeekStart = today.minusDays(today.getDayOfWeek().getValue() - 1);
     var thisMonthStart = today.withDayOfMonth(1);
@@ -74,31 +73,31 @@ public record RecentActivitiesQueryResult(
     return new RecentActivitiesQueryResult(
         List.of(
             new WorkingDay(
-                LocalDate.of(2025, 1, 17),
+                LocalDate.of(2024, 12, 18),
                 List.of(
                     new Activity(
-                        LocalDateTime.of(2025, 1, 17, 9, 30),
+                        LocalDateTime.of(2024, 12, 18, 9, 30),
                         Duration.ofMinutes(30),
                         "ACME Inc.",
                         "Foobar",
                         "Do something"))),
             new WorkingDay(
-                LocalDate.of(2025, 1, 16),
+                LocalDate.of(2024, 12, 17),
                 List.of(
                     new Activity(
-                        LocalDateTime.of(2025, 1, 16, 17, 0),
+                        LocalDateTime.of(2024, 12, 17, 17, 0),
                         Duration.ofMinutes(30),
                         "ACME Inc.",
                         "Foobar",
                         "Do something"),
                     new Activity(
-                        LocalDateTime.of(2025, 1, 16, 16, 30),
+                        LocalDateTime.of(2024, 12, 17, 16, 30),
                         Duration.ofMinutes(30),
                         "ACME Inc.",
                         "Foobar",
                         "Do something"),
                     new Activity(
-                        LocalDateTime.of(2025, 1, 16, 16, 0),
+                        LocalDateTime.of(2024, 12, 17, 16, 0),
                         Duration.ofMinutes(30),
                         "ACME Inc.",
                         "Foobar",
@@ -110,7 +109,7 @@ public record RecentActivitiesQueryResult(
             Duration.ofMinutes(120),
             Duration.ofMinutes(120)),
         new Activity(
-            LocalDateTime.of(2025, 1, 17, 9, 30),
+            LocalDateTime.of(2024, 12, 18, 9, 30),
             Duration.ofMinutes(30),
             "ACME Inc.",
             "Foobar",

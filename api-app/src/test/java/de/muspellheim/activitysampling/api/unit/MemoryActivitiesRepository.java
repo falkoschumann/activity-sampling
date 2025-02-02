@@ -17,28 +17,28 @@ public class MemoryActivitiesRepository extends ArrayList<ActivityDto>
   public MemoryActivitiesRepository() {
     add(
         new ActivityDto(
-            LocalDateTime.parse("2025-01-17T09:30"),
+            LocalDateTime.parse("2024-12-18T09:30"),
             Duration.parse("PT30M"),
             "ACME Inc.",
             "Foobar",
             "Do something"));
     add(
         new ActivityDto(
-            LocalDateTime.parse("2025-01-16T17:00"),
+            LocalDateTime.parse("2024-12-17T17:00"),
             Duration.parse("PT30M"),
             "ACME Inc.",
             "Foobar",
             "Do something"));
     add(
         new ActivityDto(
-            LocalDateTime.parse("2025-01-16T16:30"),
+            LocalDateTime.parse("2024-12-17T16:30"),
             Duration.parse("PT30M"),
             "ACME Inc.",
             "Foobar",
             "Do something"));
     add(
         new ActivityDto(
-            LocalDateTime.parse("2025-01-16T16:00"),
+            LocalDateTime.parse("2024-12-17T16:00"),
             Duration.parse("PT30M"),
             "ACME Inc.",
             "Foobar",

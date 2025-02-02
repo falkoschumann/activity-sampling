@@ -7,10 +7,6 @@ import java.time.LocalDate;
 public record RecentActivitiesQuery(LocalDate today) {
 
   public static RecentActivitiesQuery createTestInstance() {
-    return new RecentActivitiesQuery(LocalDate.of(2025, 1, 17));
-  }
-
-  public RecentActivitiesQuery() {
-    this(LocalDate.now());
+    return new RecentActivitiesQuery(LocalDate.of(2024, 12, 18));
   }
 }
