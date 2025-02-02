@@ -1,5 +1,6 @@
 plugins {
   id 'java'
+  id 'checkstyle'
   id 'pmd'
   id 'org.springframework.boot' version '3.4.2'
   id 'io.spring.dependency-management' version '1.1.7'
@@ -49,25 +50,36 @@ test {
   }
 }
 
+tasks.register('processFrontendResources', Copy) {
+  group = 'Frontend'
+  description = 'Process frontend resources'
+
+  from(project.layout.projectDirectory.dir('../web-app/dist'))
+  into(project.layout.buildDirectory.dir('resources/main/public'))
+}
+
+tasks.named('processResources') {
+  dependsOn('processFrontendResources')
+}
+
+checkstyle {
+  toolVersion = '10.21.2'
+  config = resources.text.fromArchiveEntry(configurations.checkstyle.find {
+    it.name.contains('checkstyle')
+  }, 'google_checks.xml')
+  configProperties = [
+    "org.checkstyle.google.suppressionfilter.config":
+      "${projectDir}/config/checkstyle/suppressions.xml",
+  ]
+}
+
+pmd {
+  toolVersion = '7.10.0'
+}
+
 spotless {
   java {
     googleJavaFormat()
     licenseHeader '/* Copyright (c) $YEAR Falko Schumann. All rights reserved. MIT license. */\n\n'
   }
-}
-
-tasks.register("processFrontendResources", Copy) {
-  group = "Frontend"
-  description = "Process frontend resources"
-
-  from(project.layout.projectDirectory.dir("../web-app/dist"))
-  into(project.layout.buildDirectory.dir("resources/main/public"))
-}
-
-tasks.named("processResources") {
-  dependsOn("processFrontendResources")
-}
-
-pmd {
-  toolVersion = "7.10.0"
 }

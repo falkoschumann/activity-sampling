@@ -2,7 +2,7 @@
 
 package de.muspellheim.activitysampling.api.unit;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import de.muspellheim.activitysampling.api.application.ActivitiesService;
 import de.muspellheim.activitysampling.api.domain.Activity;
