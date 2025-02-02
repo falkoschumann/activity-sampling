@@ -1,0 +1,12 @@
+@startuml
+[Application] <<..application..>>
+[Domain] <<..domain..>>
+[Infrastructure] <<..infrastructure..>>
+[UI] <<..ui..>>
+
+[Application] --> [Domain]
+[Application] --> [Infrastructure]
+[Infrastructure] --> [Domain]
+[UI] --> [Application]
+[UI] --> [Domain]
+@enduml
