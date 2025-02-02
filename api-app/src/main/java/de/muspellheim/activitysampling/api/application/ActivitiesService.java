@@ -22,9 +22,9 @@ public class ActivitiesService {
   public RecentActivitiesQueryResult getRecentActivities(RecentActivitiesQuery query) {
     var startDate = query.today() != null ? query.today() : LocalDate.now();
     var start = startDate.minusDays(31).atStartOfDay();
-    var timestamp = start.toInstant(ZoneOffset.UTC);
+    var startTimestamp = start.toInstant(ZoneOffset.UTC);
     var activities =
-        repository.findByTimestampGreaterThanOrderByTimestampDesc(timestamp).stream()
+        repository.findByTimestampGreaterThanOrderByTimestampDesc(startTimestamp).stream()
             .map(ActivityDto::validate)
             .toList();
     return RecentActivitiesQueryResult.from(startDate, activities);

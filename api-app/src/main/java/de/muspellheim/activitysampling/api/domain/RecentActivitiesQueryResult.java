@@ -13,7 +13,7 @@ public record RecentActivitiesQueryResult(
     List<WorkingDay> workingDays, TimeSummary timeSummary, Activity lastActivity) {
 
   public static final RecentActivitiesQueryResult NULL =
-      new RecentActivitiesQueryResult(List.of(), TimeSummary.NULL);
+      new RecentActivitiesQueryResult(List.of(), TimeSummary.NULL, null);
 
   public static RecentActivitiesQueryResult from(LocalDate today, List<Activity> recentActivities) {
     recentActivities =
@@ -63,10 +63,6 @@ public record RecentActivitiesQueryResult(
 
     var timeSummary = new TimeSummary(hoursToday, hoursYesterday, hoursThisWeek, hoursLastWeek);
     return new RecentActivitiesQueryResult(workingDays, timeSummary, lastActivity);
-  }
-
-  public RecentActivitiesQueryResult(List<WorkingDay> workingDays, TimeSummary timeSummary) {
-    this(workingDays, timeSummary, null);
   }
 
   public static RecentActivitiesQueryResult createTestInstance() {
