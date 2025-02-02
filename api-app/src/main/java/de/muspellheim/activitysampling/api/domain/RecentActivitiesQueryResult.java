@@ -6,7 +6,6 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 public record RecentActivitiesQueryResult(
@@ -16,10 +15,6 @@ public record RecentActivitiesQueryResult(
       new RecentActivitiesQueryResult(List.of(), TimeSummary.NULL, null);
 
   public static RecentActivitiesQueryResult from(LocalDate today, List<Activity> recentActivities) {
-    recentActivities =
-        recentActivities.stream()
-            .sorted(Comparator.comparing(Activity::timestamp).reversed())
-            .toList();
     var yesterday = today.minusDays(1);
     var thisWeekStart = today.minusDays(today.getDayOfWeek().getValue() - 1);
     var thisMonthStart = today.withDayOfMonth(1);
@@ -71,34 +66,17 @@ public record RecentActivitiesQueryResult(
             new WorkingDay(
                 LocalDate.of(2024, 12, 18),
                 List.of(
-                    new Activity(
-                        LocalDateTime.of(2024, 12, 18, 9, 30),
-                        Duration.ofMinutes(30),
-                        "ACME Inc.",
-                        "Foobar",
-                        "Do something"))),
+                    Activity.builder().timestamp(LocalDateTime.of(2024, 12, 18, 9, 30)).build())),
             new WorkingDay(
                 LocalDate.of(2024, 12, 17),
                 List.of(
-                    new Activity(
-                        LocalDateTime.of(2024, 12, 17, 17, 0),
-                        Duration.ofMinutes(30),
-                        "ACME Inc.",
-                        "Foobar",
-                        "Do something"),
-                    new Activity(
-                        LocalDateTime.of(2024, 12, 17, 16, 30),
-                        Duration.ofMinutes(30),
-                        "ACME Inc.",
-                        "Foobar",
-                        "Do something"),
-                    new Activity(
-                        LocalDateTime.of(2024, 12, 17, 16, 0),
-                        Duration.ofMinutes(30),
-                        "ACME Inc.",
-                        "Foobar",
-                        "Make things",
-                        "This is a note")))),
+                    Activity.builder().timestamp(LocalDateTime.of(2024, 12, 17, 17, 0)).build(),
+                    Activity.builder().timestamp(LocalDateTime.of(2024, 12, 17, 16, 30)).build(),
+                    Activity.builder()
+                        .timestamp(LocalDateTime.of(2024, 12, 17, 16, 0))
+                        .task("Make things")
+                        .notes("This is a note")
+                        .build()))),
         new TimeSummary(
             Duration.ofMinutes(30),
             Duration.ofMinutes(90),

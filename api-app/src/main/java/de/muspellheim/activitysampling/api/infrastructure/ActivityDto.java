@@ -12,6 +12,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
@@ -19,12 +20,22 @@ import lombok.RequiredArgsConstructor;
 import org.hibernate.annotations.JdbcTypeCode;
 
 @Data
+@Builder
 @NoArgsConstructor
 @RequiredArgsConstructor
 @AllArgsConstructor
 @Entity(name = "Activity")
 @Table(name = "activities")
 public class ActivityDto {
+
+  public static class ActivityDtoBuilder {
+    private Instant timestamp = Instant.parse("2024-12-18T08:30:00Z");
+    private Duration duration = Duration.ofMinutes(30);
+    private String client = "ACME Inc.";
+    private String project = "Foobar";
+    private String task = "Do something";
+    private String notes = "";
+  }
 
   @Id @NonNull private Instant timestamp;
 

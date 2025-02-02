@@ -1,5 +1,6 @@
 plugins {
   id 'java'
+  id 'pmd'
   id 'org.springframework.boot' version '3.4.2'
   id 'io.spring.dependency-management' version '1.1.7'
   id 'com.diffplug.spotless' version '7.0.2'
@@ -65,4 +66,8 @@ tasks.register("processFrontendResources", Copy) {
 
 tasks.named("processResources") {
   dependsOn("processFrontendResources")
+}
+
+pmd {
+  toolVersion = "7.10.0"
 }

@@ -4,41 +4,26 @@ package de.muspellheim.activitysampling.api.unit;
 
 import de.muspellheim.activitysampling.api.infrastructure.ActivitiesRepository;
 import de.muspellheim.activitysampling.api.infrastructure.ActivityDto;
-import java.time.Duration;
+import java.io.Serial;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
 class MemoryActivitiesRepository extends ArrayList<ActivityDto> implements ActivitiesRepository {
 
-  static MemoryActivitiesRepository createTestInstance() {
+  @Serial private static final long serialVersionUID = 1L;
+
+  static ActivitiesRepository createTestInstance() {
     return new MemoryActivitiesRepository(
         List.of(
-            new ActivityDto(
-                Instant.parse("2024-12-18T08:30:00Z"),
-                Duration.parse("PT30M"),
-                "ACME Inc.",
-                "Foobar",
-                "Do something"),
-            new ActivityDto(
-                Instant.parse("2024-12-17T16:00:00Z"),
-                Duration.parse("PT30M"),
-                "ACME Inc.",
-                "Foobar",
-                "Do something"),
-            new ActivityDto(
-                Instant.parse("2024-12-17T15:30:00Z"),
-                Duration.parse("PT30M"),
-                "ACME Inc.",
-                "Foobar",
-                "Do something"),
-            new ActivityDto(
-                Instant.parse("2024-12-17T15:00:00Z"),
-                Duration.parse("PT30M"),
-                "ACME Inc.",
-                "Foobar",
-                "Make things",
-                "This is a note")));
+            ActivityDto.builder().timestamp(Instant.parse("2024-12-18T08:30:00Z")).build(),
+            ActivityDto.builder().timestamp(Instant.parse("2024-12-17T16:00:00Z")).build(),
+            ActivityDto.builder().timestamp(Instant.parse("2024-12-17T15:30:00Z")).build(),
+            ActivityDto.builder()
+                .timestamp(Instant.parse("2024-12-17T15:00:00Z"))
+                .task("Make things")
+                .notes("This is a note")
+                .build()));
   }
 
   MemoryActivitiesRepository() {}
