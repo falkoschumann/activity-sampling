@@ -7,7 +7,7 @@ import de.muspellheim.activitysampling.api.domain.RecentActivitiesQueryResult;
 import de.muspellheim.activitysampling.api.infrastructure.ActivitiesRepository;
 import de.muspellheim.activitysampling.api.infrastructure.ActivityDto;
 import java.time.LocalDate;
-import java.util.stream.StreamSupport;
+import java.time.ZoneOffset;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -22,9 +22,9 @@ public class ActivitiesService {
   public RecentActivitiesQueryResult getRecentActivities(RecentActivitiesQuery query) {
     var startDate = query.today() != null ? query.today() : LocalDate.now();
     var start = startDate.minusDays(31).atStartOfDay();
+    var timestamp = start.toInstant(ZoneOffset.UTC);
     var activities =
-        StreamSupport.stream(repository.findAll().spliterator(), false)
-            .filter(activity -> activity.getTimestamp().isAfter(start))
+        repository.findByTimestampGreaterThanOrderByTimestampDesc(timestamp).stream()
             .map(ActivityDto::validate)
             .toList();
     return RecentActivitiesQueryResult.from(startDate, activities);

@@ -13,7 +13,7 @@ class ActivitiesServiceTests {
 
   @Test
   void queriesRecentActivities() {
-    var repository = new MemoryActivitiesRepository();
+    var repository = MemoryActivitiesRepository.createTestInstance();
     var service = new ActivitiesService(repository);
 
     var result = service.getRecentActivities(RecentActivitiesQuery.createTestInstance());

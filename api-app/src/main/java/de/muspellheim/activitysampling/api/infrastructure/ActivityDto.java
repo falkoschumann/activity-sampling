@@ -9,7 +9,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.time.Duration;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.time.ZoneId;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -26,7 +26,7 @@ import org.hibernate.annotations.JdbcTypeCode;
 @Table(name = "activities")
 public class ActivityDto {
 
-  @Id @NonNull private LocalDateTime timestamp;
+  @Id @NonNull private Instant timestamp;
 
   @JdbcTypeCode(INTERVAL_SECOND)
   @NonNull
