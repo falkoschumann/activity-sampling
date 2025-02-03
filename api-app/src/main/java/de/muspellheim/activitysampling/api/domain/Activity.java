@@ -24,9 +24,4 @@ public record Activity(
     private String task = "Do something";
     private String notes = "";
   }
-
-  public Activity(
-      LocalDateTime timestamp, Duration duration, String client, String project, String task) {
-    this(timestamp, duration, client, project, task, "");
-  }
 }

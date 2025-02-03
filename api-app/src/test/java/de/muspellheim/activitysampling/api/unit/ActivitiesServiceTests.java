@@ -56,13 +56,24 @@ class ActivitiesServiceTests {
 
       assertEquals(
           new RecentActivitiesQueryResult(
-              new Activity(now, Duration.ofMinutes(20), "client-1", "project-1", "task-1"),
+              Activity.builder()
+                  .timestamp(now)
+                  .duration(Duration.ofMinutes(20))
+                  .client("client-1")
+                  .project("project-1")
+                  .task("task-1")
+                  .build(),
               List.of(
                   new WorkingDay(
                       now.toLocalDate(),
                       List.of(
-                          new Activity(
-                              now, Duration.ofMinutes(20), "client-1", "project-1", "task-1")))),
+                          Activity.builder()
+                              .timestamp(now)
+                              .duration(Duration.ofMinutes(20))
+                              .client("client-1")
+                              .project("project-1")
+                              .task("task-1")
+                              .build()))),
               new TimeSummary(
                   Duration.ofMinutes(20),
                   Duration.ZERO,

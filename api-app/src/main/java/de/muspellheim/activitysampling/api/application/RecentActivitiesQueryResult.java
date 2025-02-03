@@ -18,12 +18,7 @@ public record RecentActivitiesQueryResult(
 
   public static RecentActivitiesQueryResult createTestInstance() {
     return new RecentActivitiesQueryResult(
-        new Activity(
-            LocalDateTime.of(2024, 12, 18, 9, 30),
-            Duration.ofMinutes(30),
-            "ACME Inc.",
-            "Foobar",
-            "Do something"),
+        Activity.builder().timestamp(LocalDateTime.of(2024, 12, 18, 9, 30)).build(),
         List.of(
             new WorkingDay(
                 LocalDate.of(2024, 12, 18),
