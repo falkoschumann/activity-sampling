@@ -19,6 +19,10 @@ public class ActivitiesService {
     this.repository = repository;
   }
 
+  public CommandStatus logActivity(LogActivityCommand command) {
+    return CommandStatus.createSuccess();
+  }
+
   public RecentActivitiesQueryResult getRecentActivities(RecentActivitiesQuery query) {
     var today = query.today() != null ? query.today() : LocalDate.now();
     var start = today.minusDays(31).atStartOfDay();

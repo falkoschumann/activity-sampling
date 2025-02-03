@@ -3,10 +3,14 @@
 package de.muspellheim.activitysampling.api.ui;
 
 import de.muspellheim.activitysampling.api.application.ActivitiesService;
+import de.muspellheim.activitysampling.api.application.CommandStatus;
+import de.muspellheim.activitysampling.api.application.LogActivityCommand;
 import de.muspellheim.activitysampling.api.application.RecentActivitiesQuery;
 import de.muspellheim.activitysampling.api.application.RecentActivitiesQueryResult;
 import java.time.LocalDate;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -19,6 +23,11 @@ public class ActivitiesController {
 
   public ActivitiesController(ActivitiesService service) {
     this.service = service;
+  }
+
+  @PostMapping("/log-activity")
+  public CommandStatus logActivity(@RequestBody LogActivityCommand command) {
+    return this.service.logActivity(command);
   }
 
   @GetMapping("/recent-activities")

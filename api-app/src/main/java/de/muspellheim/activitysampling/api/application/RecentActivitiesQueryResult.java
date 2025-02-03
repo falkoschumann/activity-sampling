@@ -9,16 +9,22 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import lombok.Builder;
+import lombok.NonNull;
 
+@Builder
 public record RecentActivitiesQueryResult(
-    Activity lastActivity, List<WorkingDay> workingDays, TimeSummary timeSummary) {
+    Activity lastActivity,
+    @NonNull List<WorkingDay> workingDays,
+    @NonNull TimeSummary timeSummary) {
 
   public static final RecentActivitiesQueryResult NULL =
       new RecentActivitiesQueryResult(null, List.of(), TimeSummary.NULL);
 
-  public static RecentActivitiesQueryResult createTestInstance() {
-    return new RecentActivitiesQueryResult(
-        Activity.builder().timestamp(LocalDateTime.of(2024, 12, 18, 9, 30)).build(),
+  public static class RecentActivitiesQueryResultBuilder {
+    Activity lastActivity =
+        Activity.builder().timestamp(LocalDateTime.of(2024, 12, 18, 9, 30)).build();
+    List<WorkingDay> workingDays =
         List.of(
             new WorkingDay(
                 LocalDate.of(2024, 12, 18),
@@ -33,11 +39,12 @@ public record RecentActivitiesQueryResult(
                         .timestamp(LocalDateTime.of(2024, 12, 17, 16, 0))
                         .task("Make things")
                         .notes("This is a note")
-                        .build()))),
+                        .build())));
+    TimeSummary timeSummary =
         new TimeSummary(
             Duration.ofMinutes(30),
             Duration.ofMinutes(90),
             Duration.ofMinutes(120),
-            Duration.ofMinutes(120)));
+            Duration.ofMinutes(120));
   }
 }

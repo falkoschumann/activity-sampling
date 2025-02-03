@@ -5,6 +5,8 @@ package de.muspellheim.activitysampling.api.unit;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import de.muspellheim.activitysampling.api.application.ActivitiesService;
+import de.muspellheim.activitysampling.api.application.CommandStatus;
+import de.muspellheim.activitysampling.api.application.LogActivityCommand;
 import de.muspellheim.activitysampling.api.application.RecentActivitiesQuery;
 import de.muspellheim.activitysampling.api.application.RecentActivitiesQueryResult;
 import de.muspellheim.activitysampling.api.domain.Activity;
@@ -15,10 +17,27 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.util.List;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 class ActivitiesServiceTests {
+
+  @Nested
+  class LogActivity {
+
+    @Test
+    @Disabled("Not yet implemented")
+    void logsActivity() {
+      var repository = new MemoryActivitiesRepository();
+      var service = new ActivitiesService(repository);
+
+      var result = service.logActivity(LogActivityCommand.builder().build());
+
+      assertEquals(CommandStatus.createSuccess(), result);
+      assertEquals(List.of(ActivityDto.builder().build()), repository);
+    }
+  }
 
   @Nested
   class RecentActivities {
@@ -28,9 +47,9 @@ class ActivitiesServiceTests {
       var repository = MemoryActivitiesRepository.createTestInstance();
       var service = new ActivitiesService(repository);
 
-      var result = service.getRecentActivities(RecentActivitiesQuery.createTestInstance());
+      var result = service.getRecentActivities(RecentActivitiesQuery.builder().build());
 
-      assertEquals(RecentActivitiesQueryResult.createTestInstance(), result);
+      assertEquals(RecentActivitiesQueryResult.builder().build(), result);
     }
 
     @Test
@@ -38,7 +57,7 @@ class ActivitiesServiceTests {
       var repository = new MemoryActivitiesRepository();
       var service = new ActivitiesService(repository);
 
-      var result = service.getRecentActivities(RecentActivitiesQuery.createTestInstance());
+      var result = service.getRecentActivities(RecentActivitiesQuery.builder().build());
 
       assertEquals(RecentActivitiesQueryResult.NULL, result);
     }
