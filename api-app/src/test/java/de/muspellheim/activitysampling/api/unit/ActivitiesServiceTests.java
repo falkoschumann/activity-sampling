@@ -17,7 +17,6 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.util.List;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
@@ -27,8 +26,7 @@ class ActivitiesServiceTests {
   class LogActivity {
 
     @Test
-    @Disabled("Not yet implemented")
-    void logsActivity() {
+    void logsActivityWithoutNotes() {
       var repository = new MemoryActivitiesRepository();
       var service = new ActivitiesService(repository);
 
@@ -36,6 +34,29 @@ class ActivitiesServiceTests {
 
       assertEquals(CommandStatus.createSuccess(), result);
       assertEquals(List.of(ActivityDto.builder().build()), repository);
+    }
+
+    @Test
+    void logsActivityWithNotes() {
+      var repository = new MemoryActivitiesRepository();
+      var service = new ActivitiesService(repository);
+
+      var result =
+          service.logActivity(LogActivityCommand.builder().notes("This is a note").build());
+
+      assertEquals(CommandStatus.createSuccess(), result);
+      assertEquals(List.of(ActivityDto.builder().notes("This is a note").build()), repository);
+    }
+
+    @Test
+    void failsWhenActivitiesTimestampIsDuplicated() {
+      var repository = new MemoryActivitiesRepository();
+      repository.add(ActivityDto.builder().build());
+      var service = new ActivitiesService(repository);
+
+      var result = service.logActivity(LogActivityCommand.builder().build());
+
+      assertEquals(CommandStatus.createFailure("Activity already exists."), result);
     }
   }
 

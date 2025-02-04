@@ -8,6 +8,7 @@ import de.muspellheim.activitysampling.api.infrastructure.ActivitiesRepository;
 import de.muspellheim.activitysampling.api.infrastructure.ActivityDto;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -20,7 +21,21 @@ public class ActivitiesService {
   }
 
   public CommandStatus logActivity(LogActivityCommand command) {
-    return CommandStatus.createSuccess();
+    try {
+      var dto =
+          ActivityDto.builder()
+              .timestamp(command.timestamp().atZone(ZoneOffset.systemDefault()).toInstant())
+              .duration(command.duration())
+              .client(command.client())
+              .project(command.project())
+              .task(command.task())
+              .notes(command.notes() != null ? command.notes() : "")
+              .build();
+      repository.save(dto);
+      return CommandStatus.createSuccess();
+    } catch (DuplicateKeyException e) {
+      return CommandStatus.createFailure(e.getMessage());
+    }
   }
 
   public RecentActivitiesQueryResult getRecentActivities(RecentActivitiesQuery query) {

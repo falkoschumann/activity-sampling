@@ -4,9 +4,9 @@ package de.muspellheim.activitysampling.api.infrastructure;
 
 import java.time.Instant;
 import java.util.List;
-import org.springframework.data.repository.Repository;
+import org.springframework.data.repository.CrudRepository;
 
-public interface ActivitiesRepository extends Repository<ActivityDto, Instant> {
+public interface ActivitiesRepository extends CrudRepository<ActivityDto, Instant> {
 
   List<ActivityDto> findByTimestampGreaterThanOrderByTimestampDesc(Instant start);
 }

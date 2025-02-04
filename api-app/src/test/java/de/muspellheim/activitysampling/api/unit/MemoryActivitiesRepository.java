@@ -8,6 +8,9 @@ import java.io.Serial;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.StreamSupport;
+import org.springframework.dao.DuplicateKeyException;
 
 class MemoryActivitiesRepository extends ArrayList<ActivityDto> implements ActivitiesRepository {
 
@@ -35,5 +38,71 @@ class MemoryActivitiesRepository extends ArrayList<ActivityDto> implements Activ
   @Override
   public List<ActivityDto> findByTimestampGreaterThanOrderByTimestampDesc(Instant start) {
     return this;
+  }
+
+  @Override
+  public <S extends ActivityDto> S save(S entity) {
+    if (existsById(entity.getTimestamp())) {
+      throw new DuplicateKeyException("Activity already exists.");
+    }
+    add(entity);
+    return entity;
+  }
+
+  @Override
+  public <S extends ActivityDto> Iterable<S> saveAll(Iterable<S> entities) {
+    entities.forEach(this::save);
+    return entities;
+  }
+
+  @Override
+  public Optional<ActivityDto> findById(Instant instant) {
+    return stream().filter(a -> a.getTimestamp().equals(instant)).findFirst();
+  }
+
+  @Override
+  public boolean existsById(Instant instant) {
+    return findById(instant).isPresent();
+  }
+
+  @Override
+  public Iterable<ActivityDto> findAll() {
+    return this;
+  }
+
+  @Override
+  public Iterable<ActivityDto> findAllById(Iterable<Instant> instants) {
+    var list = StreamSupport.stream(instants.spliterator(), false).toList();
+    return stream().filter(a -> list.contains(a.getTimestamp())).toList();
+  }
+
+  @Override
+  public long count() {
+    return this.size();
+  }
+
+  @Override
+  public void deleteById(Instant instant) {
+    findById(instant).ifPresent(this::delete);
+  }
+
+  @Override
+  public void delete(ActivityDto entity) {
+    remove(entity);
+  }
+
+  @Override
+  public void deleteAllById(Iterable<? extends Instant> instants) {
+    instants.forEach(this::deleteById);
+  }
+
+  @Override
+  public void deleteAll(Iterable<? extends ActivityDto> entities) {
+    entities.forEach(this::delete);
+  }
+
+  @Override
+  public void deleteAll() {
+    clear();
   }
 }
