@@ -7,11 +7,13 @@ import {
 } from "../domain/messages.ts";
 
 export class ActivitiesApi {
+  readonly #baseUrl = "/api/activities";
+
   async getRecentActivities(
     query: RecentActivitiesQuery,
   ): Promise<RecentActivitiesQueryResult> {
     const url = new URL(
-      "/api/activities/recent-activities",
+      `${this.#baseUrl}/recent-activities`,
       window.location.href,
     );
     if (query.today) {

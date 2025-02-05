@@ -4,7 +4,7 @@ import { Duration } from "./duration";
 
 export interface Activity {
   // TODO Rename to start?
-  timestamp: Date;
+  readonly timestamp: Date;
   readonly duration: Duration;
   readonly client: string;
   readonly project: string;

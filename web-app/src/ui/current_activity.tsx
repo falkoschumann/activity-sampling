@@ -1,6 +1,8 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
-import { Activity } from "../domain/model";
+import * as React from "react";
+
+import { Activity } from "../domain/activities.ts";
 
 interface CurrentActivityProps {
   lastActivity?: Activity;

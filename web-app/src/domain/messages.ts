@@ -1,9 +1,9 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
-import { Activity, TimeSummary, WorkingDay } from "./model.ts";
+import { Activity, TimeSummary, WorkingDay } from "./activities.ts";
 
 export interface RecentActivitiesQuery {
-  today?: Date;
+  readonly today?: Date;
 }
 
 export interface RecentActivitiesQueryResult {

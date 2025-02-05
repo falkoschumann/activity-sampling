@@ -36,7 +36,7 @@ export function useRecentActivities(
       }
     }
 
-    startFetching();
+    void startFetching();
 
     return () => {
       ignore = true;
