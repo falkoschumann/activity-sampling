@@ -115,6 +115,10 @@ export class Duration {
     return result;
   }
 
+  toJSON(): string {
+    return this.toString();
+  }
+
   valueOf(): number {
     return this.#millis;
   }

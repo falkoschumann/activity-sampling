@@ -2,6 +2,10 @@
 
 package de.muspellheim.activitysampling.api.application;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+
+@JsonInclude(Include.NON_NULL)
 public record CommandStatus(boolean success, String errorMessage) {
 
   public static CommandStatus createSuccess() {

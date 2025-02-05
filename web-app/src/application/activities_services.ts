@@ -11,6 +11,23 @@ import { ActivitiesApi } from "../infrastructure/activities_api.ts";
 
 const activitiesApi = new ActivitiesApi();
 
+export function useLogActivity() {
+  async function logActivity(activity: {
+    client: string;
+    project: string;
+    task: string;
+    notes: string;
+  }) {
+    await activitiesApi.logActivity({
+      ...activity,
+      timestamp: new Date(),
+      duration: Duration.ofMinutes(30),
+    });
+  }
+
+  return [logActivity];
+}
+
 export function useRecentActivities(
   initialQuery: RecentActivitiesQuery = {},
 ): [RecentActivitiesQueryResult, (query: RecentActivitiesQuery) => void] {

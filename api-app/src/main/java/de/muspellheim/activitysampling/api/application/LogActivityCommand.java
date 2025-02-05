@@ -2,12 +2,15 @@
 
 package de.muspellheim.activitysampling.api.application;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import lombok.Builder;
 import lombok.NonNull;
 
 @Builder
+@JsonInclude(Include.NON_NULL)
 public record LogActivityCommand(
     @NonNull LocalDateTime timestamp,
     @NonNull Duration duration,

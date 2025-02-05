@@ -1,18 +1,24 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
-import { useRecentActivities } from "../application/activities_services";
+import { useLogActivity, useRecentActivities } from "../application/activities_services";
 import Countdown from "./countdown";
 import CurrentActivity from "./current_activity";
 import RecentActivities from "./recent_activities";
 import TimeSummary from "./time_summary";
 
 export default function App() {
-  const [recentActivities] = useRecentActivities();
+  const [logActivity] = useLogActivity();
+  const [recentActivities, setRecentActivitiesQuery] = useRecentActivities();
+
+  async function handleLogActivity(activity: { client: string; project: string; task: string; notes: string }) {
+    await logActivity(activity);
+    setRecentActivitiesQuery({});
+  }
 
   return (
     <>
       <aside className="container-fluid fixed-top py-2 bg-body">
-        <CurrentActivity lastActivity={recentActivities.lastActivity} />
+        <CurrentActivity lastActivity={recentActivities.lastActivity} onLogActivity={handleLogActivity} />
         <Countdown />
       </aside>
       <main className="container-fluid flex-shrink-0" style={{ marginTop: "400px" }}>

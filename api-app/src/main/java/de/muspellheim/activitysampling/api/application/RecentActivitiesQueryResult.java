@@ -2,6 +2,8 @@
 
 package de.muspellheim.activitysampling.api.application;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import de.muspellheim.activitysampling.api.domain.Activity;
 import de.muspellheim.activitysampling.api.domain.TimeSummary;
 import de.muspellheim.activitysampling.api.domain.WorkingDay;
@@ -13,6 +15,7 @@ import lombok.Builder;
 import lombok.NonNull;
 
 @Builder
+@JsonInclude(Include.NON_NULL)
 public record RecentActivitiesQueryResult(
     Activity lastActivity,
     @NonNull List<WorkingDay> workingDays,

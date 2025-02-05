@@ -2,12 +2,26 @@
 
 import { Duration } from "../domain/duration.ts";
 import {
+  CommandStatus,
+  LogActivityCommand,
   RecentActivitiesQuery,
   RecentActivitiesQueryResult,
 } from "../domain/messages.ts";
 
 export class ActivitiesApi {
   readonly #baseUrl = "/api/activities";
+
+  async logActivity(command: LogActivityCommand): Promise<CommandStatus> {
+    const url = new URL(`${this.#baseUrl}/log-activity`, window.location.href);
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(command),
+    });
+    return response.json();
+  }
 
   async getRecentActivities(
     query: RecentActivitiesQuery,

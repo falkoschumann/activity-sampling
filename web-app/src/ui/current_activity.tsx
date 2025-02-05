@@ -6,11 +6,27 @@ import { Activity } from "../domain/activities.ts";
 
 interface CurrentActivityProps {
   lastActivity?: Activity;
+  onLogActivity?: (activity: { client: string; project: string; task: string; notes: string }) => void;
 }
 
-export default function CurrentActivity({ lastActivity }: CurrentActivityProps) {
+export default function CurrentActivity({ lastActivity, onLogActivity }: CurrentActivityProps) {
+  function submit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const client = form.elements.namedItem("client") as HTMLInputElement;
+    const project = form.elements.namedItem("project") as HTMLInputElement;
+    const task = form.elements.namedItem("task") as HTMLInputElement;
+    const notes = form.elements.namedItem("notes") as HTMLInputElement;
+    onLogActivity?.({
+      client: client.value,
+      project: project.value,
+      task: task.value,
+      notes: notes.value,
+    });
+  }
+
   return (
-    <form>
+    <form onSubmit={submit}>
       <div className="mb-2">
         <label htmlFor="client" className="form-label">
           Client:
