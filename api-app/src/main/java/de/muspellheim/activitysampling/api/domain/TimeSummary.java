@@ -4,6 +4,7 @@ package de.muspellheim.activitysampling.api.domain;
 
 import java.time.Duration;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.List;
 import lombok.Builder;
 import lombok.NonNull;
@@ -35,17 +36,19 @@ public record TimeSummary(
     var hoursThisWeek = Duration.ZERO;
     var hoursThisMonth = Duration.ZERO;
     for (var activity : activities) {
+      // TODO Handle time zone
+      var date = activity.timestamp().atZone(ZoneId.systemDefault()).toLocalDate();
       var duration = activity.duration();
-      if (activity.timestamp().toLocalDate().equals(today)) {
+      if (date.equals(today)) {
         hoursToday = hoursToday.plus(duration);
       }
-      if (activity.timestamp().toLocalDate().equals(yesterday)) {
+      if (date.equals(yesterday)) {
         hoursYesterday = hoursYesterday.plus(duration);
       }
-      if (!activity.timestamp().toLocalDate().isBefore(thisWeekStart)) {
+      if (!date.isBefore(thisWeekStart)) {
         hoursThisWeek = hoursThisWeek.plus(duration);
       }
-      if (!activity.timestamp().toLocalDate().isBefore(thisMonthStart)) {
+      if (!date.isBefore(thisMonthStart)) {
         hoursThisMonth = hoursThisMonth.plus(duration);
       }
     }

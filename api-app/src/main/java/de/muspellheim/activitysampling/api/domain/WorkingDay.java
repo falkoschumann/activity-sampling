@@ -3,6 +3,7 @@
 package de.muspellheim.activitysampling.api.domain;
 
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.NonNull;
@@ -14,12 +15,14 @@ public record WorkingDay(@NonNull LocalDate date, @NonNull List<Activity> activi
     LocalDate date = null;
     var activities = new ArrayList<Activity>();
     for (var activity : recentActivities) {
-      if (!activity.timestamp().toLocalDate().equals(date)) {
+      // TODO Handle time zone
+      var activityDate = activity.timestamp().atZone(ZoneId.systemDefault()).toLocalDate();
+      if (!activityDate.equals(date)) {
         if (date != null) {
           workingDays.add(new WorkingDay(date, List.copyOf(activities)));
         }
 
-        date = activity.timestamp().toLocalDate();
+        date = activityDate;
         activities.clear();
       }
       activities.add(activity);

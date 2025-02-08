@@ -97,7 +97,7 @@ class ActivitiesServiceTests {
       assertEquals(
           new RecentActivitiesQueryResult(
               Activity.builder()
-                  .timestamp(now)
+                  .timestamp(nowTimestamp)
                   .duration(Duration.ofMinutes(20))
                   .client("client-1")
                   .project("project-1")
@@ -108,7 +108,7 @@ class ActivitiesServiceTests {
                       now.toLocalDate(),
                       List.of(
                           Activity.builder()
-                              .timestamp(now)
+                              .timestamp(nowTimestamp)
                               .duration(Duration.ofMinutes(20))
                               .client("client-1")
                               .project("project-1")

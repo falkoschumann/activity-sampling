@@ -11,6 +11,8 @@ import lombok.Builder;
 @JsonInclude(Include.NON_NULL)
 public record RecentActivitiesQuery(LocalDate today) {
 
+  // TODO Handle time zone
+
   public static final RecentActivitiesQuery NULL = new RecentActivitiesQuery(null);
 
   public static class RecentActivitiesQueryBuilder {

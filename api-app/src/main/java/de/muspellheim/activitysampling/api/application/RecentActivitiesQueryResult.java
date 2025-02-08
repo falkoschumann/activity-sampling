@@ -8,8 +8,8 @@ import de.muspellheim.activitysampling.api.domain.Activity;
 import de.muspellheim.activitysampling.api.domain.TimeSummary;
 import de.muspellheim.activitysampling.api.domain.WorkingDay;
 import java.time.Duration;
+import java.time.Instant;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 import lombok.Builder;
 import lombok.NonNull;
@@ -26,20 +26,26 @@ public record RecentActivitiesQueryResult(
 
   public static class RecentActivitiesQueryResultBuilder {
     Activity lastActivity =
-        Activity.builder().timestamp(LocalDateTime.of(2024, 12, 18, 9, 30)).build();
+        Activity.builder().timestamp(Instant.parse("2024-12-18T09:30:00+01:00")).build();
     List<WorkingDay> workingDays =
         List.of(
             new WorkingDay(
                 LocalDate.of(2024, 12, 18),
                 List.of(
-                    Activity.builder().timestamp(LocalDateTime.of(2024, 12, 18, 9, 30)).build())),
+                    Activity.builder()
+                        .timestamp(Instant.parse("2024-12-18T09:30:00+01:00"))
+                        .build())),
             new WorkingDay(
                 LocalDate.of(2024, 12, 17),
                 List.of(
-                    Activity.builder().timestamp(LocalDateTime.of(2024, 12, 17, 17, 0)).build(),
-                    Activity.builder().timestamp(LocalDateTime.of(2024, 12, 17, 16, 30)).build(),
                     Activity.builder()
-                        .timestamp(LocalDateTime.of(2024, 12, 17, 16, 0))
+                        .timestamp(Instant.parse("2024-12-17T17:00:00+01:00"))
+                        .build(),
+                    Activity.builder()
+                        .timestamp(Instant.parse("2024-12-17T16:30:00+01:00"))
+                        .build(),
+                    Activity.builder()
+                        .timestamp(Instant.parse("2024-12-17T16:00:00+01:00"))
                         .task("Make things")
                         .notes("This is a note")
                         .build())));

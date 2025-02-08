@@ -6,11 +6,26 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import de.muspellheim.activitysampling.api.domain.Activity;
 import de.muspellheim.activitysampling.api.domain.WorkingDay;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
 class WorkingDayTests {
+
+  private static final LocalDate TODAY = LocalDate.of(2025, 2, 7);
+  private static final Activity TODAY_ACTIVITY_1 =
+      Activity.builder().timestamp(Instant.parse("2025-02-07T09:30:00+01:00")).build();
+  private static final Activity TODAY_ACTIVITY_2 =
+      Activity.builder().timestamp(Instant.parse("2025-02-07T10:00:00+01:00")).build();
+
+  private static final LocalDate YESTERDAY = LocalDate.of(2025, 2, 6);
+  private static final Activity YESTERDAY_ACTIVITY_3 =
+      Activity.builder().timestamp(Instant.parse("2025-02-06T17:00:00+01:00")).build();
+  private static final Activity YESTERDAY_ACTIVITY_2 =
+      Activity.builder().timestamp(Instant.parse("2025-02-06T16:30:00+01:00")).build();
+  private static final Activity YESTERDAY_ACTIVITY_1 =
+      Activity.builder().timestamp(Instant.parse("2025-02-06T16:00:00+01:00")).build();
 
   @Test
   void aggregateEmpty() {
@@ -21,51 +36,29 @@ class WorkingDayTests {
 
   @Test
   void aggregateOneDay() {
-    LocalDate today = LocalDate.now();
-
-    var workingDays =
-        WorkingDay.from(
-            List.of(
-                Activity.builder().timestamp(today.atTime(10, 0)).build(),
-                Activity.builder().timestamp(today.atTime(9, 30)).build()));
+    var workingDays = WorkingDay.from(List.of(TODAY_ACTIVITY_2, TODAY_ACTIVITY_1));
 
     assertEquals(
-        List.of(
-            new WorkingDay(
-                today,
-                List.of(
-                    Activity.builder().timestamp(today.atTime(10, 0)).build(),
-                    Activity.builder().timestamp(today.atTime(9, 30)).build()))),
-        workingDays);
+        List.of(new WorkingDay(TODAY, List.of(TODAY_ACTIVITY_2, TODAY_ACTIVITY_1))), workingDays);
   }
 
   @Test
   void aggregateTwoDay() {
-    LocalDate today = LocalDate.now();
-    LocalDate yesterday = today.minusDays(1);
-
     var workingDays =
         WorkingDay.from(
             List.of(
-                Activity.builder().timestamp(today.atTime(10, 0)).build(),
-                Activity.builder().timestamp(today.atTime(9, 30)).build(),
-                Activity.builder().timestamp(yesterday.atTime(17, 0)).build(),
-                Activity.builder().timestamp(yesterday.atTime(16, 30)).build(),
-                Activity.builder().timestamp(yesterday.atTime(16, 0)).build()));
+                TODAY_ACTIVITY_2,
+                TODAY_ACTIVITY_1,
+                YESTERDAY_ACTIVITY_3,
+                YESTERDAY_ACTIVITY_2,
+                YESTERDAY_ACTIVITY_1));
 
     assertEquals(
         List.of(
+            new WorkingDay(TODAY, List.of(TODAY_ACTIVITY_2, TODAY_ACTIVITY_1)),
             new WorkingDay(
-                today,
-                List.of(
-                    Activity.builder().timestamp(today.atTime(10, 0)).build(),
-                    Activity.builder().timestamp(today.atTime(9, 30)).build())),
-            new WorkingDay(
-                yesterday,
-                List.of(
-                    Activity.builder().timestamp(yesterday.atTime(17, 0)).build(),
-                    Activity.builder().timestamp(yesterday.atTime(16, 30)).build(),
-                    Activity.builder().timestamp(yesterday.atTime(16, 0)).build()))),
+                YESTERDAY,
+                List.of(YESTERDAY_ACTIVITY_3, YESTERDAY_ACTIVITY_2, YESTERDAY_ACTIVITY_1))),
         workingDays);
   }
 }

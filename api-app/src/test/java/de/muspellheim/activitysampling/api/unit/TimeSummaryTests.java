@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import de.muspellheim.activitysampling.api.domain.Activity;
 import de.muspellheim.activitysampling.api.domain.TimeSummary;
 import java.time.Duration;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -22,11 +23,11 @@ class TimeSummaryTests {
 
   @Test
   void sumsToday() {
-    var today = LocalDate.now();
+    var today = LocalDate.of(2025, 2, 7);
     var activities =
         List.of(
-            Activity.builder().timestamp(today.atTime(8, 30)).build(),
-            Activity.builder().timestamp(today.atTime(9, 30)).build());
+            Activity.builder().timestamp(Instant.parse("2025-02-07T08:30:00+01:00")).build(),
+            Activity.builder().timestamp(Instant.parse("2025-02-07T09:30:00+01:00")).build());
 
     var timeSummary = TimeSummary.from(today, activities);
 
@@ -35,12 +36,15 @@ class TimeSummaryTests {
 
   @Test
   void sumsYesterday() {
-    var today = LocalDate.now();
-    var yesterday = today.minusDays(1);
+    var today = LocalDate.of(2025, 2, 7);
     var activities =
         List.of(
-            Activity.builder().timestamp(yesterday.atTime(8, 30)).build(),
-            Activity.builder().timestamp(yesterday.atTime(9, 30)).build());
+            Activity.builder()
+                .timestamp(Instant.parse("2025-02-06T08:30:00+01:00")) // yesterday
+                .build(),
+            Activity.builder()
+                .timestamp(Instant.parse("2025-02-06T09:30:00+01:00")) // yesterday
+                .build());
 
     var timeSummary = TimeSummary.from(today, activities);
 
@@ -49,13 +53,15 @@ class TimeSummaryTests {
 
   @Test
   void sumsThisWeek() {
-    var monday = LocalDate.of(2025, 1, 27);
-    var wednesday = LocalDate.of(2025, 1, 29);
     var friday = LocalDate.of(2025, 1, 31);
     var activities =
         List.of(
-            Activity.builder().timestamp(wednesday.atTime(9, 30)).build(),
-            Activity.builder().timestamp(monday.atTime(9, 30)).build());
+            Activity.builder()
+                .timestamp(Instant.parse("2025-01-29T09:30:00+01:00")) // wednesday
+                .build(),
+            Activity.builder()
+                .timestamp(Instant.parse("2025-01-27T09:30:00+01:00")) // monday
+                .build());
 
     var timeSummary = TimeSummary.from(friday, activities);
 
@@ -64,37 +70,47 @@ class TimeSummaryTests {
 
   @Test
   void sumsThisMonth() {
-    var start = LocalDate.of(2025, 1, 2);
-    var mid = LocalDate.of(2025, 1, 15);
-    var end = LocalDate.of(2025, 1, 31);
+    var endOfMonth = LocalDate.of(2025, 1, 31);
     var activities =
         List.of(
-            Activity.builder().timestamp(mid.atTime(9, 30)).build(),
-            Activity.builder().timestamp(start.atTime(9, 30)).build());
+            Activity.builder()
+                .timestamp(Instant.parse("2025-01-15T09:30:00+01:00")) // mid of month
+                .build(),
+            Activity.builder()
+                .timestamp(Instant.parse("2025-01-02T09:30:00+01:00")) // start of month
+                .build());
 
-    var timeSummary = TimeSummary.from(end, activities);
+    var timeSummary = TimeSummary.from(endOfMonth, activities);
 
     assertEquals(Duration.ofMinutes(60), timeSummary.hoursThisMonth());
   }
 
   @Test
   void sumsComplexExample() {
-    var endOfLastMonth = LocalDate.of(2024, 12, 31);
-    var startOfThisMonth = LocalDate.of(2025, 1, 1);
-    var endOfLastWeek = LocalDate.of(2025, 1, 19);
-    var startOfThisWeek = LocalDate.of(2025, 1, 20);
-    var yesterday = LocalDate.of(2025, 1, 22);
     var today = LocalDate.of(2025, 1, 23);
-    var tomorrow = LocalDate.of(2025, 1, 24);
     var activities =
         List.of(
-            Activity.builder().timestamp(endOfLastMonth.atTime(9, 30)).build(),
-            Activity.builder().timestamp(startOfThisMonth.atTime(9, 30)).build(),
-            Activity.builder().timestamp(endOfLastWeek.atTime(9, 30)).build(),
-            Activity.builder().timestamp(startOfThisWeek.atTime(9, 30)).build(),
-            Activity.builder().timestamp(yesterday.atTime(9, 30)).build(),
-            Activity.builder().timestamp(today.atTime(9, 30)).build(),
-            Activity.builder().timestamp(tomorrow.atTime(9, 30)).build());
+            Activity.builder()
+                .timestamp(Instant.parse("2024-12-31T09:30:00+01:00")) // end of last month
+                .build(),
+            Activity.builder()
+                .timestamp(Instant.parse("2025-01-01T09:30:00+01:00")) // start of this month
+                .build(),
+            Activity.builder()
+                .timestamp(Instant.parse("2025-01-19T09:30:00+01:00")) // end of last week
+                .build(),
+            Activity.builder()
+                .timestamp(Instant.parse("2025-01-20T09:30:00+01:00")) // start of this week
+                .build(),
+            Activity.builder()
+                .timestamp(Instant.parse("2025-01-22T09:30:00+01:00")) // yesterday
+                .build(),
+            Activity.builder()
+                .timestamp(Instant.parse("2025-01-23T09:30:00+01:00")) // today
+                .build(),
+            Activity.builder()
+                .timestamp(Instant.parse("2025-01-24T09:30:00+01:00")) // tomorrow
+                .build());
 
     var timeSummary = TimeSummary.from(today, activities);
 
