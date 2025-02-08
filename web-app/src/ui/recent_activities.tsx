@@ -1,25 +1,25 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
-import { WorkingDay } from "../domain/activities.ts";
+import { useSelector } from "react-redux";
 
-interface RecentActivitiesProps {
-  workingDays: WorkingDay[];
-}
+import { selectWorkingDays } from "../application/activities_slice.ts";
 
-export default function RecentActivities({ workingDays }: RecentActivitiesProps) {
+export default function RecentActivities() {
+  const workingDays = useSelector(selectWorkingDays);
+
   return workingDays.map((workingDay) => (
-    <div key={workingDay.date.toISOString()}>
+    <div key={new Date(workingDay.date).toISOString()}>
       <h6 className="bg-body-tertiary p-2 sticky-top">
-        {workingDay.date.toLocaleDateString(undefined, { dateStyle: "full" })}
+        {new Date(workingDay.date).toLocaleDateString(undefined, { dateStyle: "full" })}
       </h6>
       <div className="list-group list-group-flush">
         {workingDay.activities.map((activity) => (
           <button
-            key={activity.timestamp.toISOString()}
+            key={new Date(activity.timestamp).toISOString()}
             className="list-group-item list-group-item-action d-flex justify-content-start align-items-start"
           >
             <div style={{ width: "3em" }}>
-              {activity.timestamp.toLocaleTimeString(undefined, { timeStyle: "short", hour12: false })}
+              {new Date(activity.timestamp).toLocaleTimeString(undefined, { timeStyle: "short", hour12: false })}
             </div>
             <div>
               <div className="ms-2 me-auto">

@@ -1,11 +1,9 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
-import { Duration } from "./duration";
-
 export interface Activity {
   // TODO Rename to start?
-  readonly timestamp: Date;
-  readonly duration: Duration;
+  readonly timestamp: string;
+  readonly duration: string;
   readonly client: string;
   readonly project: string;
   readonly task: string;
@@ -13,13 +11,13 @@ export interface Activity {
 }
 
 export interface WorkingDay {
-  readonly date: Date;
+  readonly date: string;
   readonly activities: Activity[];
 }
 
 export interface TimeSummary {
-  readonly hoursToday: Duration;
-  readonly hoursYesterday: Duration;
-  readonly hoursThisWeek: Duration;
-  readonly hoursThisMonth: Duration;
+  readonly hoursToday: string;
+  readonly hoursYesterday: string;
+  readonly hoursThisWeek: string;
+  readonly hoursThisMonth: string;
 }

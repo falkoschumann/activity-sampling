@@ -1,31 +1,33 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
-import { useLogActivity, useRecentActivities } from "../application/activities_services";
+import { useEffect } from "react";
+import { useDispatch } from "react-redux";
+
+import { getRecentActivities } from "../application/activities_slice.ts";
+import { AppDispatch } from "../application/store.ts";
 import Countdown from "./countdown";
 import CurrentActivity from "./current_activity";
 import RecentActivities from "./recent_activities";
 import TimeSummary from "./time_summary";
 
 export default function App() {
-  const [logActivity] = useLogActivity();
-  const [recentActivities, setRecentActivitiesQuery] = useRecentActivities();
+  const dispatch = useDispatch<AppDispatch>();
 
-  async function handleLogActivity(activity: { client: string; project: string; task: string; notes: string }) {
-    await logActivity(activity);
-    setRecentActivitiesQuery({});
-  }
+  useEffect(() => {
+    dispatch(getRecentActivities({}));
+  }, [dispatch]);
 
   return (
     <>
       <aside className="container-fluid fixed-top py-2 bg-body">
-        <CurrentActivity lastActivity={recentActivities.lastActivity} onLogActivity={handleLogActivity} />
+        <CurrentActivity />
         <Countdown />
       </aside>
       <main className="container-fluid flex-shrink-0" style={{ marginTop: "400px" }}>
-        <RecentActivities workingDays={recentActivities.workingDays} />
+        <RecentActivities />
       </main>
       <footer className="container-fluid fixed-bottom py-3 bg-body">
-        <TimeSummary {...recentActivities.timeSummary} />
+        <TimeSummary />
       </footer>
     </>
   );

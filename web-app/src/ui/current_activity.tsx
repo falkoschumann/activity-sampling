@@ -1,28 +1,24 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
 import * as React from "react";
+import { useDispatch, useSelector } from "react-redux";
 
-import { Activity } from "../domain/activities.ts";
+import { logActivity, selectLastActivity } from "../application/activities_slice.ts";
+import { AppDispatch } from "../application/store.ts";
 
-interface CurrentActivityProps {
-  lastActivity?: Activity;
-  onLogActivity?: (activity: { client: string; project: string; task: string; notes: string }) => void;
-}
+export default function CurrentActivity() {
+  const lastActivity = useSelector(selectLastActivity);
 
-export default function CurrentActivity({ lastActivity, onLogActivity }: CurrentActivityProps) {
+  const dispatch = useDispatch<AppDispatch>();
+
   function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const form = event.currentTarget;
-    const client = form.elements.namedItem("client") as HTMLInputElement;
-    const project = form.elements.namedItem("project") as HTMLInputElement;
-    const task = form.elements.namedItem("task") as HTMLInputElement;
-    const notes = form.elements.namedItem("notes") as HTMLInputElement;
-    onLogActivity?.({
-      client: client.value,
-      project: project.value,
-      task: task.value,
-      notes: notes.value,
-    });
+    const client = (form.elements.namedItem("client") as HTMLInputElement).value;
+    const project = (form.elements.namedItem("project") as HTMLInputElement).value;
+    const task = (form.elements.namedItem("task") as HTMLInputElement).value;
+    const notes = (form.elements.namedItem("notes") as HTMLInputElement).value;
+    dispatch(logActivity({ client, project, task, notes }));
   }
 
   return (

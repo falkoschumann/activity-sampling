@@ -1,33 +1,31 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
-import { Duration } from "../domain/duration";
+import { useSelector } from "react-redux";
 
-interface TimeSummaryProps {
-  hoursToday: Duration;
-  hoursYesterday: Duration;
-  hoursThisWeek: Duration;
-  hoursThisMonth: Duration;
-}
+import { selectTimeSummary } from "../application/activities_slice.ts";
+import { Duration } from "../domain/duration.ts";
 
-export default function TimeSummary({ hoursToday, hoursYesterday, hoursThisWeek, hoursThisMonth }: TimeSummaryProps) {
+export default function TimeSummary() {
+  const { hoursToday, hoursYesterday, hoursThisWeek, hoursThisMonth } = useSelector(selectTimeSummary);
+
   return (
     <div>
       <div className="d-flex justify-content-center flex-wrap text-center">
         <div className="flex-fill">
           <div>Hours Today</div>
-          <div className="fs-5">{hoursToday.toLocaleString()}</div>
+          <div className="fs-5">{Duration.parse(hoursToday).toLocaleString()}</div>
         </div>
         <div className="flex-fill">
           <div>Hours Yesterday</div>
-          <div className="fs-5">{hoursYesterday.toLocaleString()}</div>
+          <div className="fs-5">{Duration.parse(hoursYesterday).toLocaleString()}</div>
         </div>
         <div className="flex-fill">
           <div>Hours this Week</div>
-          <div className="fs-5">{hoursThisWeek.toLocaleString()}</div>
+          <div className="fs-5">{Duration.parse(hoursThisWeek).toLocaleString()}</div>
         </div>
         <div className="flex-fill">
           <div>Hours this Month</div>
-          <div className="fs-5">{hoursThisMonth.toLocaleString()}</div>
+          <div className="fs-5">{Duration.parse(hoursThisMonth).toLocaleString()}</div>
         </div>
       </div>
     </div>
