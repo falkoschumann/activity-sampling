@@ -3,13 +3,13 @@
 package de.muspellheim.activitysampling.api.domain;
 
 import java.time.Duration;
-import java.time.Instant;
+import java.time.LocalDateTime;
 import lombok.Builder;
 import lombok.NonNull;
 
 @Builder
 public record Activity(
-    @NonNull Instant timestamp,
+    @NonNull LocalDateTime timestamp,
     @NonNull Duration duration,
     @NonNull String client,
     @NonNull String project,
@@ -17,7 +17,7 @@ public record Activity(
     @NonNull String notes) {
 
   public static class ActivityBuilder {
-    private Instant timestamp = Instant.parse("2024-12-18T09:30:00+01:00");
+    private LocalDateTime timestamp = LocalDateTime.parse("2024-12-18T09:30");
     private Duration duration = Duration.ofMinutes(30);
     private String client = "ACME Inc.";
     private String project = "Foobar";

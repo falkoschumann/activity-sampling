@@ -22,6 +22,8 @@ import org.junit.jupiter.api.Test;
 
 class ActivitiesServiceTests {
 
+  private static final ZoneId TIME_ZONE = ZoneId.of("Europe/Berlin");
+
   @Nested
   class LogActivity {
 
@@ -86,7 +88,7 @@ class ActivitiesServiceTests {
     @Test
     void returnsRecentActivitiesForTodayWhenQueryIsNotGiven() {
       var nowTimestamp = Instant.now();
-      var now = nowTimestamp.atZone(ZoneId.systemDefault()).toLocalDateTime();
+      var now = nowTimestamp.atZone(TIME_ZONE).toLocalDateTime();
       var repository = new MemoryActivitiesRepository();
       repository.add(
           new ActivityDto(nowTimestamp, Duration.ofMinutes(20), "client-1", "project-1", "task-1"));
@@ -97,7 +99,7 @@ class ActivitiesServiceTests {
       assertEquals(
           new RecentActivitiesQueryResult(
               Activity.builder()
-                  .timestamp(nowTimestamp)
+                  .timestamp(now)
                   .duration(Duration.ofMinutes(20))
                   .client("client-1")
                   .project("project-1")
@@ -108,7 +110,7 @@ class ActivitiesServiceTests {
                       now.toLocalDate(),
                       List.of(
                           Activity.builder()
-                              .timestamp(nowTimestamp)
+                              .timestamp(now)
                               .duration(Duration.ofMinutes(20))
                               .client("client-1")
                               .project("project-1")
@@ -118,7 +120,8 @@ class ActivitiesServiceTests {
                   Duration.ofMinutes(20),
                   Duration.ZERO,
                   Duration.ofMinutes(20),
-                  Duration.ofMinutes(20))),
+                  Duration.ofMinutes(20)),
+              TIME_ZONE),
           result);
     }
   }

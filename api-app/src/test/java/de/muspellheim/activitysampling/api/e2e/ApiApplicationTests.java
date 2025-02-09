@@ -65,7 +65,7 @@ class ApiApplicationTests {
     void queriesRecentActivities(@Autowired TestRestTemplate restTemplate) {
       var response =
           restTemplate.getForEntity(
-              "/api/activities/recent-activities?today=2024-12-18",
+              "/api/activities/recent-activities?today=2024-12-18&timeZone=Europe/Berlin",
               RecentActivitiesQueryResult.class);
 
       assertEquals(200, response.getStatusCode().value());

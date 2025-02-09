@@ -8,6 +8,7 @@ import de.muspellheim.activitysampling.api.application.LogActivityCommand;
 import de.muspellheim.activitysampling.api.application.RecentActivitiesQuery;
 import de.muspellheim.activitysampling.api.application.RecentActivitiesQueryResult;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -32,7 +33,8 @@ public class ActivitiesController {
 
   @GetMapping("/recent-activities")
   public RecentActivitiesQueryResult recentActivities(
-      @RequestParam(required = false) LocalDate today) {
-    return this.service.getRecentActivities(new RecentActivitiesQuery(today));
+      @RequestParam(required = false) LocalDate today,
+      @RequestParam(required = false) ZoneId timeZone) {
+    return this.service.getRecentActivities(new RecentActivitiesQuery(today, timeZone));
   }
 }

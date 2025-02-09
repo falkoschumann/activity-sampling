@@ -17,6 +17,7 @@ export interface ActivitiesState {
   readonly duration: string;
   readonly workingDays: WorkingDay[];
   readonly timeSummary: TimeSummary;
+  readonly timeZone: string;
 }
 
 const initialState: ActivitiesState = {
@@ -28,6 +29,7 @@ const initialState: ActivitiesState = {
     hoursThisWeek: "PT0S",
     hoursThisMonth: "PT0S",
   },
+  timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
 };
 
 type ActivitiesThunkConfig = {
@@ -65,7 +67,10 @@ export const getRecentActivities = createAsyncThunk<
   ActivitiesThunkConfig
 >("activities/getRecentActivities", async (_query, thunkAPI) => {
   const { activitiesApi } = thunkAPI.extra;
-  return activitiesApi.getRecentActivities({});
+  return activitiesApi.getRecentActivities({
+    today: new Date().toISOString().substring(0, 10),
+    timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+  });
 });
 
 export const activitiesSlice = createSlice({
@@ -81,12 +86,17 @@ export const activitiesSlice = createSlice({
     selectLastActivity: (state) => state.lastActivity,
     selectTimeSummary: (state) => state.timeSummary,
     selectWorkingDays: (state) => state.workingDays,
+    selectTimeZone: (state) => state.timeZone,
   },
 });
 
 // export const {} = activitiesSlice.actions;
 
-export const { selectLastActivity, selectTimeSummary, selectWorkingDays } =
-  activitiesSlice.selectors;
+export const {
+  selectLastActivity,
+  selectTimeSummary,
+  selectTimeZone,
+  selectWorkingDays,
+} = activitiesSlice.selectors;
 
 export default activitiesSlice.reducer;

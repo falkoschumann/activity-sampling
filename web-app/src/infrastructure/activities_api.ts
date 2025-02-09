@@ -32,6 +32,9 @@ export class ActivitiesApi {
     if (query.today) {
       url.searchParams.append("today", query.today);
     }
+    if (query.timeZone) {
+      url.searchParams.append("timeZone", query.timeZone);
+    }
     const response = await fetch(url);
     const json = await response.text();
     return JSON.parse(json);

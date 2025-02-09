@@ -10,6 +10,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.time.Duration;
 import java.time.Instant;
+import java.time.ZoneId;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -50,7 +51,13 @@ public class ActivityDto {
 
   private String notes;
 
-  public Activity validate() {
-    return new Activity(timestamp, duration, client, project, task, notes != null ? notes : "");
+  public Activity validate(ZoneId timeZone) {
+    return new Activity(
+        timestamp.atZone(timeZone).toLocalDateTime(),
+        duration,
+        client,
+        project,
+        task,
+        notes != null ? notes : "");
   }
 }

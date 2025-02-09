@@ -6,8 +6,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import de.muspellheim.activitysampling.api.domain.Activity;
 import de.muspellheim.activitysampling.api.domain.WorkingDay;
-import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
@@ -15,17 +15,17 @@ class WorkingDayTests {
 
   private static final LocalDate TODAY = LocalDate.of(2025, 2, 7);
   private static final Activity TODAY_ACTIVITY_1 =
-      Activity.builder().timestamp(Instant.parse("2025-02-07T09:30:00+01:00")).build();
+      Activity.builder().timestamp(LocalDateTime.parse("2025-02-07T09:30")).build();
   private static final Activity TODAY_ACTIVITY_2 =
-      Activity.builder().timestamp(Instant.parse("2025-02-07T10:00:00+01:00")).build();
+      Activity.builder().timestamp(LocalDateTime.parse("2025-02-07T10:00")).build();
 
   private static final LocalDate YESTERDAY = LocalDate.of(2025, 2, 6);
   private static final Activity YESTERDAY_ACTIVITY_3 =
-      Activity.builder().timestamp(Instant.parse("2025-02-06T17:00:00+01:00")).build();
+      Activity.builder().timestamp(LocalDateTime.parse("2025-02-06T17:00")).build();
   private static final Activity YESTERDAY_ACTIVITY_2 =
-      Activity.builder().timestamp(Instant.parse("2025-02-06T16:30:00+01:00")).build();
+      Activity.builder().timestamp(LocalDateTime.parse("2025-02-06T16:30")).build();
   private static final Activity YESTERDAY_ACTIVITY_1 =
-      Activity.builder().timestamp(Instant.parse("2025-02-06T16:00:00+01:00")).build();
+      Activity.builder().timestamp(LocalDateTime.parse("2025-02-06T16:00")).build();
 
   @Test
   void aggregateEmpty() {

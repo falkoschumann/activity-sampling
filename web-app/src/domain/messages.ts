@@ -18,10 +18,12 @@ export interface CommandStatus {
 
 export interface RecentActivitiesQuery {
   readonly today?: string;
+  readonly timeZone?: string;
 }
 
 export interface RecentActivitiesQueryResult {
   readonly lastActivity?: Activity;
   readonly workingDays: WorkingDay[];
   readonly timeSummary: TimeSummary;
+  readonly timeZone?: string;
 }
