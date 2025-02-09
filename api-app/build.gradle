@@ -10,11 +10,9 @@ plugins {
 group = 'de.muspellheim.activitysampling'
 version = '0.0.1-SNAPSHOT'
 
-java {
-  toolchain {
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
-  }
+compileJava {
+  options.encoding = 'UTF-8'
+  options.release = 17
 }
 
 configurations {

@@ -51,7 +51,7 @@ public class ActivitiesService {
 
     var recentActivities = WorkingDay.from(activities);
     var timeSummary = TimeSummary.from(today, activities);
-    var lastActivity = activities.isEmpty() ? null : activities.getFirst();
+    var lastActivity = activities.isEmpty() ? null : activities.get(0);
     return new RecentActivitiesQueryResult(lastActivity, recentActivities, timeSummary, timeZone);
   }
 }
