@@ -155,6 +155,14 @@ describe("Duration", () => {
     });
   });
 
+  it("Serializes to JSON", () => {
+    const duration = Duration.ofMilliseconds(5);
+
+    const json = JSON.stringify(duration);
+
+    expect(json).toBe('"PT0.005S"');
+  });
+
   it("Gets primitive value", () => {
     const duration = Duration.ofMilliseconds(5);
 
