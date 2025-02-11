@@ -13,7 +13,7 @@ export class ConfigurableResponses<T> {
     this.#responses = Array.isArray(responses) ? [...responses] : responses;
   }
 
-  next(): T | null {
+  next(): T {
     const response = Array.isArray(this.#responses)
       ? this.#responses.shift()
       : this.#responses;

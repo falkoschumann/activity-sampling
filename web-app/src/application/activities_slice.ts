@@ -10,6 +10,7 @@ import {
   RecentActivitiesQueryResult,
 } from "../domain/messages.ts";
 import { ActivitiesApi } from "../infrastructure/activities_api.ts";
+import { Clock } from "../infrastructure/clock.ts";
 
 export interface ActivitiesState {
   readonly lastActivity?: Activity;
@@ -33,7 +34,7 @@ const initialState: ActivitiesState = {
 };
 
 type ActivitiesThunkConfig = {
-  extra: { readonly activitiesApi: ActivitiesApi };
+  extra: { readonly activitiesApi: ActivitiesApi; readonly clock: Clock };
   state: { readonly activities: ActivitiesState };
 };
 
@@ -47,9 +48,9 @@ export const logActivity = createAsyncThunk<
   },
   ActivitiesThunkConfig
 >("activities/logActivity", async (action, thunkAPI) => {
-  const { activitiesApi } = thunkAPI.extra;
+  const { activitiesApi, clock } = thunkAPI.extra;
   const command: LogActivityCommand = {
-    timestamp: new Date().toISOString(),
+    timestamp: clock.now().toISOString(),
     duration: thunkAPI.getState().activities.duration,
     client: action.client,
     project: action.project,
@@ -65,12 +66,17 @@ export const getRecentActivities = createAsyncThunk<
   RecentActivitiesQueryResult,
   RecentActivitiesQuery,
   ActivitiesThunkConfig
->("activities/getRecentActivities", async (_query, thunkAPI) => {
-  const { activitiesApi } = thunkAPI.extra;
-  return activitiesApi.getRecentActivities({
-    today: new Date().toISOString().substring(0, 10),
-    timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-  });
+>("activities/getRecentActivities", async (query, thunkAPI) => {
+  const { activitiesApi, clock } = thunkAPI.extra;
+  const today =
+    query.today != null
+      ? query.today
+      : clock.now().toISOString().substring(0, 10);
+  const timeZone =
+    query.timeZone != null
+      ? query.timeZone
+      : Intl.DateTimeFormat().resolvedOptions().timeZone;
+  return activitiesApi.getRecentActivities({ today, timeZone });
 });
 
 export const activitiesSlice = createSlice({
