@@ -24,6 +24,9 @@ dev:
 test:
 	./gradlew test
 
+coverage:
+	./gradlew test jacocoTestReport
+
 unit-tests:
 
 integration-tests:

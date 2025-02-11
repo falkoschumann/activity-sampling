@@ -28,6 +28,9 @@ test: prepare
 watch: prepare
 	npm test
 
+coverage: prepare
+	npx vitest run --coverage
+
 unit-tests: prepare
 	npx vitest run --testPathPattern=".*\/unit\/.*"
 
