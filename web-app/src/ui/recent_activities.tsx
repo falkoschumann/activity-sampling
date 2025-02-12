@@ -1,12 +1,19 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
-import { selectTimeZone, selectWorkingDays } from "../application/activities_slice.ts";
+import { lastActivitySelected, selectTimeZone, selectWorkingDays } from "../application/activities_slice.ts";
+import { AppDispatch } from "../application/store.ts";
+import { Activity } from "../domain/activities.ts";
 
 export default function RecentActivities() {
   const workingDays = useSelector(selectWorkingDays);
   const timeZone = useSelector(selectTimeZone);
+  const dispatch = useDispatch<AppDispatch>();
+
+  function handleClicked(activity: Activity) {
+    dispatch(lastActivitySelected(activity));
+  }
 
   return workingDays.map((workingDay) => (
     <div key={new Date(workingDay.date).toISOString()}>
@@ -17,6 +24,7 @@ export default function RecentActivities() {
         {workingDay.activities.map((activity) => (
           <button
             key={new Date(activity.timestamp).toISOString()}
+            onClick={() => handleClicked(activity)}
             className="list-group-item list-group-item-action d-flex justify-content-start align-items-start"
           >
             <div style={{ width: "3em" }}>

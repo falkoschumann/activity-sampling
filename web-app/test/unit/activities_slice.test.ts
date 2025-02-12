@@ -5,6 +5,7 @@ import { describe, expect, it } from "vitest";
 import { createStore } from "../../src/application/store";
 import {
   getRecentActivities,
+  lastActivitySelected,
   logActivity,
   selectLastActivity,
   selectTimeSummary,
@@ -29,6 +30,30 @@ describe("Activities", () => {
       hoursThisMonth: "PT0S",
     });
     expect(workingDays).toEqual([]);
+  });
+
+  it("Selects last activity", () => {
+    const { store } = configure();
+
+    store.dispatch(
+      lastActivitySelected({
+        timestamp: "2025-02-12T21:18",
+        duration: "PT30M",
+        client: "client-1",
+        project: "project-1",
+        task: "task-1",
+        notes: "notes-1",
+      }),
+    );
+
+    expect(selectLastActivity(store.getState())).toEqual({
+      timestamp: "2025-02-12T21:18",
+      duration: "PT30M",
+      client: "client-1",
+      project: "project-1",
+      task: "task-1",
+      notes: "notes-1",
+    });
   });
 
   it("Logs activity", async () => {

@@ -1,6 +1,6 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 import { Activity, TimeSummary, WorkingDay } from "../domain/activities.ts";
 import {
@@ -82,7 +82,11 @@ export const getRecentActivities = createAsyncThunk<
 export const activitiesSlice = createSlice({
   name: "activities",
   initialState,
-  reducers: {},
+  reducers: {
+    lastActivitySelected: (state, action: PayloadAction<Activity>) => {
+      state.lastActivity = action.payload;
+    },
+  },
   extraReducers: (builder) => {
     builder.addCase(getRecentActivities.fulfilled, (state, action) => {
       return { ...state, ...action.payload };
@@ -96,7 +100,7 @@ export const activitiesSlice = createSlice({
   },
 });
 
-// export const {} = activitiesSlice.actions;
+export const { lastActivitySelected } = activitiesSlice.actions;
 
 export const {
   selectLastActivity,

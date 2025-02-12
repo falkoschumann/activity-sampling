@@ -8,10 +8,9 @@ import { AppDispatch } from "../application/store.ts";
 
 export default function CurrentActivity() {
   const lastActivity = useSelector(selectLastActivity);
-
   const dispatch = useDispatch<AppDispatch>();
 
-  function submit(event: React.FormEvent<HTMLFormElement>) {
+  function handleSubmitted(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const form = event.currentTarget;
     const client = (form.elements.namedItem("client") as HTMLInputElement).value;
@@ -22,7 +21,7 @@ export default function CurrentActivity() {
   }
 
   return (
-    <form onSubmit={submit}>
+    <form onSubmit={handleSubmitted}>
       <div className="mb-2">
         <label htmlFor="client" className="form-label">
           Client:

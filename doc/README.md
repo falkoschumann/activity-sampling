@@ -19,7 +19,7 @@ analysis.
 ### Log Activity
 
 - [x] Logs the activity with client, project, task and optional notes.
-- [ ] Selects an activity from recent activities.
+- [x] Selects an activity from recent activities.
 - [x] Selects last activity when the application starts.
 
 ### Recent Activities
