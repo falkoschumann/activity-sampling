@@ -22,53 +22,61 @@ export default function CurrentActivity() {
 
   return (
     <form onSubmit={handleSubmitted}>
-      <div className="mb-2">
-        <label htmlFor="client" className="form-label">
+      <div className="row mb-2">
+        <label htmlFor="client" className="col-sm-2 col-form-label">
           Client:
         </label>
-        <input
-          type="text"
-          id="client"
-          name="client"
-          className="form-control form-control-sm"
-          defaultValue={lastActivity?.client}
-        />
+        <div className="col-sm-10">
+          <input
+            type="text"
+            id="client"
+            name="client"
+            className="form-control form-control-sm"
+            defaultValue={lastActivity?.client}
+          />
+        </div>
       </div>
-      <div className="mb-2">
-        <label htmlFor="project" className="form-label">
+      <div className="row mb-2">
+        <label htmlFor="project" className="col-sm-2 col-form-label">
           Project:
         </label>
-        <input
-          type="text"
-          id="project"
-          name="project"
-          className="form-control form-control-sm"
-          defaultValue={lastActivity?.project}
-        />
+        <div className="col-sm-10">
+          <input
+            type="text"
+            id="project"
+            name="project"
+            className="form-control form-control-sm"
+            defaultValue={lastActivity?.project}
+          />
+        </div>
       </div>
-      <div className="mb-2">
-        <label htmlFor="task" className="form-label">
+      <div className="row mb-2">
+        <label htmlFor="task" className="col-sm-2 col-form-label">
           Task:
         </label>
-        <input
-          type="text"
-          id="task"
-          name="task"
-          className="form-control form-control-sm"
-          defaultValue={lastActivity?.task}
-        />
+        <div className="col-sm-10">
+          <input
+            type="text"
+            id="task"
+            name="task"
+            className="form-control form-control-sm"
+            defaultValue={lastActivity?.task}
+          />
+        </div>
       </div>
-      <div className="mb-2">
-        <label htmlFor="notes" className="form-label">
+      <div className="row mb-2">
+        <label htmlFor="notes" className="col-sm-2 col-form-label">
           Notes:
         </label>
-        <input
-          type="text"
-          id="notes"
-          name="notes"
-          className="form-control form-control-sm"
-          defaultValue={lastActivity?.notes}
-        />
+        <div className="col-sm-10">
+          <input
+            type="text"
+            id="notes"
+            name="notes"
+            className="form-control form-control-sm"
+            defaultValue={lastActivity?.notes}
+          />
+        </div>
       </div>
       <button type="submit" className="btn btn-primary btn-sm w-100">
         Log
