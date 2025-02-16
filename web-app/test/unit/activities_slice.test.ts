@@ -4,9 +4,11 @@ import { describe, expect, it } from "vitest";
 
 import { createStore } from "../../src/application/store";
 import {
+  durationSelected,
   getRecentActivities,
   lastActivitySelected,
   logActivity,
+  selectDuration,
   selectLastActivity,
   selectTimeSummary,
   selectWorkingDays,
@@ -32,7 +34,19 @@ describe("Activities", () => {
     expect(workingDays).toEqual([]);
   });
 
-  it("Selects last activity", () => {
+  it("Handles duration selected", () => {
+    const { store } = configure();
+
+    store.dispatch(
+      durationSelected({
+        duration: "PT15M",
+      }),
+    );
+
+    expect(selectDuration(store.getState())).toEqual("PT15M");
+  });
+
+  it("Handles last activity selected", () => {
     const { store } = configure();
 
     store.dispatch(

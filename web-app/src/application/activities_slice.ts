@@ -14,7 +14,6 @@ import { Clock } from "../infrastructure/clock.ts";
 
 export interface ActivitiesState {
   readonly lastActivity?: Activity;
-  readonly startTimestamp?: string;
   readonly duration: string;
   readonly workingDays: WorkingDay[];
   readonly timeSummary: TimeSummary;
@@ -83,6 +82,9 @@ export const activitiesSlice = createSlice({
   name: "activities",
   initialState,
   reducers: {
+    durationSelected: (state, action: PayloadAction<{ duration: string }>) => {
+      state.duration = action.payload.duration;
+    },
     lastActivitySelected: (state, action: PayloadAction<Activity>) => {
       state.lastActivity = action.payload;
     },
@@ -94,16 +96,19 @@ export const activitiesSlice = createSlice({
   },
   selectors: {
     selectLastActivity: (state) => state.lastActivity,
+    selectDuration: (state) => state.duration,
     selectTimeSummary: (state) => state.timeSummary,
     selectWorkingDays: (state) => state.workingDays,
     selectTimeZone: (state) => state.timeZone,
   },
 });
 
-export const { lastActivitySelected } = activitiesSlice.actions;
+export const { durationSelected, lastActivitySelected } =
+  activitiesSlice.actions;
 
 export const {
   selectLastActivity,
+  selectDuration,
   selectTimeSummary,
   selectTimeZone,
   selectWorkingDays,
