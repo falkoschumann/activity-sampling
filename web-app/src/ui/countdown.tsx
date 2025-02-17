@@ -7,7 +7,7 @@ import { durationSelected, selectCountdown } from "../application/activities_sli
 import { Duration } from "../domain/duration.ts";
 
 export default function Countdown() {
-  const { duration } = useSelector(selectCountdown);
+  const { duration, remaining, percentage } = useSelector(selectCountdown);
 
   return (
     <div className="my-3 d-flex gap-3">
@@ -16,13 +16,13 @@ export default function Countdown() {
           className="progress"
           role="progressbar"
           aria-label="Interval progress"
-          aria-valuenow={75}
+          aria-valuenow={percentage}
           aria-valuemin={0}
           aria-valuemax={100}
         >
-          <div className="progress-bar" style={{ width: "75%" }}></div>
+          <div className="progress-bar" style={{ width: `${percentage}%` }}></div>
         </div>
-        <div className="text-center">00:07:30</div>
+        <div className="text-center">{Duration.parse(remaining).toLocaleString({ style: "medium" })}</div>
       </div>
       <div>
         <div className="btn-group btn-group-sm">

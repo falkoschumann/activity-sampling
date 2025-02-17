@@ -16,6 +16,8 @@ export interface ActivitiesState {
   readonly lastActivity?: Activity;
   readonly countdown: {
     readonly duration: string;
+    readonly remaining: string;
+    readonly percentage: number;
   };
   readonly workingDays: WorkingDay[];
   readonly timeSummary: TimeSummary;
@@ -25,6 +27,8 @@ export interface ActivitiesState {
 const initialState: ActivitiesState = {
   countdown: {
     duration: "PT30M",
+    remaining: "PT30M",
+    percentage: 0,
   },
   workingDays: [],
   timeSummary: {

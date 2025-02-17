@@ -5,8 +5,8 @@ export class ConfigurableResponses<T> {
     return new ConfigurableResponses<T>(responses, name);
   }
 
-  #description;
-  #responses;
+  readonly #description;
+  readonly #responses;
 
   constructor(responses?: T | T[], name?: string) {
     this.#description = name == null ? "" : ` in ${name}`;

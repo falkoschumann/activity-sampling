@@ -139,19 +139,31 @@ describe("Duration", () => {
     it("Formats seconds", () => {
       const duration = Duration.ofSeconds(1);
 
-      expect(duration.toLocaleString()).toBe("00:00:01");
+      expect(duration.toLocaleString({ style: "medium" })).toBe("00:00:01");
     });
 
     it("Formats milliseconds", () => {
       const duration = Duration.ofMilliseconds(1);
 
-      expect(duration.toLocaleString()).toBe("00:00:00.001");
+      expect(duration.toLocaleString({ style: "long" })).toBe("00:00:00.001");
     });
 
-    it("Formats all components", () => {
-      const duration = Duration.parse("PT4H3M2.001S");
+    it("Formats with long style", () => {
+      const duration = Duration.parse("PT12H34M56.789S");
 
-      expect(duration.toLocaleString()).toBe("04:03:02.001");
+      expect(duration.toLocaleString({ style: "long" })).toBe("12:34:56.789");
+    });
+
+    it("Formats with medium style", () => {
+      const duration = Duration.parse("PT12H34M56.789S");
+
+      expect(duration.toLocaleString({ style: "medium" })).toBe("12:34:56");
+    });
+
+    it("Formats with short style", () => {
+      const duration = Duration.parse("PT12H34M56.789S");
+
+      expect(duration.toLocaleString({ style: "short" })).toBe("12:34");
     });
   });
 

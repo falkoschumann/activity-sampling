@@ -104,14 +104,20 @@ export class Duration {
     return result;
   }
 
-  toLocaleString(): string {
+  toLocaleString({
+    style = "short",
+  }: {
+    style?: "short" | "medium" | "long";
+  } = {}): string {
     let result = "";
     result += `${String(this.hoursPart).padStart(2, "0")}:`;
     result += `${String(this.minutesPart).padStart(2, "0")}`;
-    if (this.secondsPart > 0 || this.millisecondsPart > 0)
+    if (style === "medium" || style === "long") {
       result += `:${String(this.secondsPart).padStart(2, "0")}`;
-    if (this.millisecondsPart > 0)
+    }
+    if (style === "long") {
       result += `.${String(this.millisecondsPart).padStart(3, "0")}`;
+    }
     return result;
   }
 
