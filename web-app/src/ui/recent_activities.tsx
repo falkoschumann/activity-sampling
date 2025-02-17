@@ -17,7 +17,7 @@ export default function RecentActivities() {
 
   return workingDays.map((workingDay) => (
     <div key={new Date(workingDay.date).toISOString()}>
-      <h6 className="bg-body-tertiary p-2 sticky-top">
+      <h6 className="bg-body-tertiary p-1 m-0 mt-2 sticky-top small">
         {new Date(workingDay.date).toLocaleDateString(undefined, { dateStyle: "full", timeZone })}
       </h6>
       <div className="list-group list-group-flush">
@@ -25,7 +25,7 @@ export default function RecentActivities() {
           <button
             key={new Date(activity.timestamp).toISOString()}
             onClick={() => handleClicked(activity)}
-            className="list-group-item list-group-item-action d-flex justify-content-start align-items-start"
+            className="list-group-item list-group-item-action py-1 d-flex justify-content-start align-items-start"
           >
             <div style={{ width: "3em" }}>
               {new Date(activity.timestamp).toLocaleTimeString(undefined, {

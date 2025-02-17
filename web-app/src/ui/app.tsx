@@ -19,14 +19,14 @@ export default function App() {
 
   return (
     <>
-      <aside className="container-fluid fixed-top py-2 bg-body">
+      <aside className="container fixed-top py-2 bg-body">
         <CurrentActivity />
         <Countdown />
       </aside>
-      <main className="container-fluid flex-shrink-0" style={{ marginTop: "400px" }}>
+      <main className="container flex-shrink-0" style={{ paddingTop: "290px", paddingBottom: "90px" }}>
         <RecentActivities />
       </main>
-      <footer className="container-fluid fixed-bottom py-3 bg-body">
+      <footer className="container fixed-bottom py-3 bg-body">
         <TimeSummary />
       </footer>
     </>
