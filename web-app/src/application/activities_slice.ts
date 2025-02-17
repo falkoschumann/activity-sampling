@@ -14,14 +14,18 @@ import { Clock } from "../infrastructure/clock.ts";
 
 export interface ActivitiesState {
   readonly lastActivity?: Activity;
-  readonly duration: string;
+  readonly countdown: {
+    readonly duration: string;
+  };
   readonly workingDays: WorkingDay[];
   readonly timeSummary: TimeSummary;
   readonly timeZone: string;
 }
 
 const initialState: ActivitiesState = {
-  duration: "PT30M",
+  countdown: {
+    duration: "PT30M",
+  },
   workingDays: [],
   timeSummary: {
     hoursToday: "PT0S",
@@ -50,7 +54,7 @@ export const logActivity = createAsyncThunk<
   const { activitiesApi, clock } = thunkAPI.extra;
   const command: LogActivityCommand = {
     timestamp: clock.now().toISOString(),
-    duration: thunkAPI.getState().activities.duration,
+    duration: thunkAPI.getState().activities.countdown.duration,
     client: action.client,
     project: action.project,
     task: action.task,
@@ -83,7 +87,7 @@ export const activitiesSlice = createSlice({
   initialState,
   reducers: {
     durationSelected: (state, action: PayloadAction<{ duration: string }>) => {
-      state.duration = action.payload.duration;
+      state.countdown.duration = action.payload.duration;
     },
     lastActivitySelected: (state, action: PayloadAction<Activity>) => {
       state.lastActivity = action.payload;
@@ -96,7 +100,7 @@ export const activitiesSlice = createSlice({
   },
   selectors: {
     selectLastActivity: (state) => state.lastActivity,
-    selectDuration: (state) => state.duration,
+    selectCountdown: (state) => state.countdown,
     selectTimeSummary: (state) => state.timeSummary,
     selectWorkingDays: (state) => state.workingDays,
     selectTimeZone: (state) => state.timeZone,
@@ -108,7 +112,7 @@ export const { durationSelected, lastActivitySelected } =
 
 export const {
   selectLastActivity,
-  selectDuration,
+  selectCountdown,
   selectTimeSummary,
   selectTimeZone,
   selectWorkingDays,

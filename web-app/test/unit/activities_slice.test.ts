@@ -8,7 +8,7 @@ import {
   getRecentActivities,
   lastActivitySelected,
   logActivity,
-  selectDuration,
+  selectCountdown,
   selectLastActivity,
   selectTimeSummary,
   selectWorkingDays,
@@ -43,7 +43,9 @@ describe("Activities", () => {
       }),
     );
 
-    expect(selectDuration(store.getState())).toEqual("PT15M");
+    expect(selectCountdown(store.getState())).toEqual({
+      duration: "PT15M",
+    });
   });
 
   it("Handles last activity selected", () => {
@@ -136,7 +138,9 @@ describe("Activities", () => {
     await store.dispatch(getRecentActivities({}));
 
     expect(store.getState().activities).toEqual({
-      duration: "PT30M",
+      countdown: {
+        duration: "PT30M",
+      },
       lastActivity: {
         timestamp: "2025-02-11T21:30",
         duration: "PT30M",

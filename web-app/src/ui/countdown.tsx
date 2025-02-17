@@ -3,11 +3,11 @@
 import { useDispatch, useSelector } from "react-redux";
 
 import { AppDispatch } from "../application/store.ts";
-import { durationSelected, selectDuration } from "../application/activities_slice.ts";
+import { durationSelected, selectCountdown } from "../application/activities_slice.ts";
 import { Duration } from "../domain/duration.ts";
 
 export default function Countdown() {
-  const duration = useSelector(selectDuration);
+  const { duration } = useSelector(selectCountdown);
 
   return (
     <div className="my-3 d-flex gap-3">
