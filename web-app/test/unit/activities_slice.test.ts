@@ -102,40 +102,39 @@ describe("Activities", () => {
   });
 
   it("Gets recent activities", async () => {
-    const { store } = configure({
-      responses: new Response(`{
-        "lastActivity": {
-          "timestamp": "2025-02-11T21:30",
-          "duration": "PT30M",
-          "client": "ACME Inc.",
-          "project": "Foobar",
-          "task": "Do something",
-          "notes": "Lorem ipsum"
+    const body = JSON.stringify({
+      lastActivity: {
+        timestamp: "2025-02-11T21:30",
+        duration: "PT30M",
+        client: "ACME Inc.",
+        project: "Foobar",
+        task: "Do something",
+        notes: "Lorem ipsum",
+      },
+      workingDays: [
+        {
+          date: "2025-02-11",
+          activities: [
+            {
+              timestamp: "2025-02-11T21:30",
+              duration: "PT30M",
+              client: "ACME Inc.",
+              project: "Foobar",
+              task: "Do something",
+              notes: "Lorem ipsum",
+            },
+          ],
         },
-        "workingDays": [
-          {
-            "date": "2025-02-11",
-            "activities": [
-                {
-                  "timestamp": "2025-02-11T21:30",
-                  "duration": "PT30M",
-                  "client": "ACME Inc.",
-                  "project": "Foobar",
-                  "task": "Do something",
-                  "notes": "Lorem ipsum"
-                }
-            ]
-          }
-        ],
-        "timeSummary": {
-          "hoursToday": "PT30M",
-          "hoursYesterday": "PT0S",
-          "hoursThisWeek": "PT30M",
-          "hoursThisMonth": "PT30M"
-        },
-        "timeZone": "Europe/Berlin"
-      }`),
+      ],
+      timeSummary: {
+        hoursToday: "PT30M",
+        hoursYesterday: "PT0S",
+        hoursThisWeek: "PT30M",
+        hoursThisMonth: "PT30M",
+      },
+      timeZone: "Europe/Berlin",
     });
+    const { store } = configure({ responses: new Response(body) });
 
     await store.dispatch(getRecentActivities({}));
 
