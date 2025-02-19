@@ -15,6 +15,14 @@ describe("Clock", () => {
   });
 
   describe("Nullable", () => {
+    it("Returns epoch", () => {
+      const clock = Clock.createNull();
+
+      const now = clock.now();
+
+      expect(now).toEqual(new Date(0));
+    });
+
     it("Returns fixed date", () => {
       const fixedDate = new Date("2025-02-19T19:44Z");
       const clock = Clock.createNull(fixedDate);

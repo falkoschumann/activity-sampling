@@ -5,7 +5,7 @@ export class Clock {
     return new Clock(() => new Date());
   }
 
-  static createNull(fixedDate = new Date("2025-02-11T19:28Z")) {
+  static createNull(fixedDate = new Date(0)) {
     return new Clock(() => fixedDate);
   }
 
