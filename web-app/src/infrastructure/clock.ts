@@ -11,7 +11,7 @@ export class Clock {
 
   readonly #now;
 
-  constructor(now: () => Date) {
+  private constructor(now: () => Date) {
     this.#now = now;
   }
 
