@@ -6,7 +6,7 @@ export class Clock {
   }
 
   static createNull(fixedDate = new Date(0)) {
-    return new Clock(() => fixedDate);
+    return new Clock(() => new Date(fixedDate));
   }
 
   readonly #now;
