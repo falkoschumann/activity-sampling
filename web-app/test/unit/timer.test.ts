@@ -22,10 +22,9 @@ describe("Timer", () => {
   it("Schedules repetitive task", async () => {
     const timer = Timer.create();
     let counter = 0;
-    let cancel: () => void;
 
     await new Promise<void>((resolve) => {
-      cancel = timer.schedule(
+      timer.schedule(
         () => {
           counter++;
           if (counter > 3) {
@@ -36,7 +35,7 @@ describe("Timer", () => {
         1,
       );
     });
-    cancel();
+    timer.cancel();
 
     expect(counter).toBe(4);
   });
@@ -71,6 +70,41 @@ describe("Timer", () => {
     expect(() => timer.schedule(testingTask, 0, 0)).toThrowError(
       "Period must be positive.",
     );
+  });
+
+  describe("Nullable", () => {
+    it("Simulates task run", () => {
+      const timer = Timer.createNull();
+      let counter = 0;
+
+      timer.schedule(
+        () => {
+          counter++;
+        },
+        1000,
+        1000,
+      );
+      timer.simulateTaskRun(5);
+
+      expect(counter).toBe(5);
+    });
+
+    it("Does not simulate run of cancelled task ", () => {
+      const timer = Timer.createNull();
+      let counter = 0;
+
+      timer.schedule(
+        () => {
+          counter++;
+        },
+        1000,
+        1000,
+      );
+      timer.cancel();
+      timer.simulateTaskRun(5);
+
+      expect(counter).toBe(0);
+    });
   });
 });
 

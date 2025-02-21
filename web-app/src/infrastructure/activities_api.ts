@@ -13,28 +13,25 @@ const ACTIVITY_LOGGED_EVENT = "activityLogged";
 
 export class ActivitiesApi extends EventTarget {
   static create(): ActivitiesApi {
-    return new ActivitiesApi(
-      "/api/activities",
-      globalThis.fetch.bind(globalThis),
-    );
+    return new ActivitiesApi("/api/activities", globalThis);
   }
 
   static createNull(responses: Response | Response[]): ActivitiesApi {
-    return new ActivitiesApi("/stub/activities", createFetchStub(responses));
+    return new ActivitiesApi("/stub/activities", new GlobalStubImpl(responses));
   }
 
   readonly #baseUrl: string;
-  readonly #fetch: typeof globalThis.fetch;
+  readonly #global: GlobalStub;
 
-  constructor(baseUrl: string, fetch: typeof globalThis.fetch) {
+  constructor(baseUrl: string, global: GlobalStub) {
     super();
     this.#baseUrl = baseUrl;
-    this.#fetch = fetch;
+    this.#global = global;
   }
 
   async logActivity(command: LogActivityCommand): Promise<CommandStatus> {
     const url = new URL(`${this.#baseUrl}/log-activity`, window.location.href);
-    const response = await this.#fetch(url, {
+    const response = await this.#global.fetch(url, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -65,16 +62,25 @@ export class ActivitiesApi extends EventTarget {
     if (query.timeZone) {
       url.searchParams.append("timeZone", query.timeZone);
     }
-    const response = await this.#fetch(url);
+    const response = await this.#global.fetch(url);
     const json = await response.text();
     return JSON.parse(json);
   }
 }
 
-function createFetchStub(responses: Response | Response[]) {
-  const configurableResponses = ConfigurableResponses.create(responses);
-  return () => {
-    const response = configurableResponses.next();
+interface GlobalStub {
+  fetch(input: RequestInfo | URL, init?: RequestInit): Promise<Response>;
+}
+
+class GlobalStubImpl implements GlobalStub {
+  #responses;
+
+  constructor(responses: Response | Response[]) {
+    this.#responses = ConfigurableResponses.create(responses);
+  }
+
+  fetch() {
+    const response = this.#responses.next();
     return Promise.resolve(response);
-  };
+  }
 }

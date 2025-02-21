@@ -44,7 +44,9 @@ export class Timer {
     }
 
     let timeoutId = this.#global.setTimeout(() => {
+      this.#tasks.delete(timeoutId);
       task();
+
       if (period != null) {
         timeoutId = this.#global.setInterval(task, period);
         this.#tasks.set(timeoutId, task);
@@ -60,9 +62,11 @@ export class Timer {
     }
   }
 
-  simulateTaskRun() {
-    for (const task of this.#tasks.values()) {
-      task();
+  simulateTaskRun(count = 1) {
+    while (count-- > 0) {
+      for (const task of this.#tasks.values()) {
+        task();
+      }
     }
   }
 
