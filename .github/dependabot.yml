@@ -3,12 +3,17 @@ updates:
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      interval: "weekly"
+      interval: "daily"
   - package-ecosystem: gradle
-    directory: "/"
+    directory: "/api-app"
     schedule:
-      interval: "weekly"
+      interval: "daily"
   - package-ecosystem: npm
-    directory: "/"
+    directory: "/web-app"
     schedule:
-      interval: "weekly"
+      interval: "daily"
+    groups:
+      vitest:
+        patterns:
+          - "vitest"
+          - "@vitest/*"
