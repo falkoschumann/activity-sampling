@@ -9,9 +9,11 @@ import de.muspellheim.activitysampling.api.infrastructure.ActivityDto;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 public class ActivitiesService {
 
@@ -22,10 +24,12 @@ public class ActivitiesService {
   }
 
   public CommandStatus logActivity(LogActivityCommand command) {
+    log.info("Log activity: {}", command);
+    var timestamp = command.timestamp().atZone(ZoneOffset.systemDefault()).toInstant();
     try {
       var dto =
           ActivityDto.builder()
-              .timestamp(command.timestamp().atZone(ZoneOffset.systemDefault()).toInstant())
+              .timestamp(timestamp)
               .duration(command.duration())
               .client(command.client())
               .project(command.project())
@@ -35,23 +39,34 @@ public class ActivitiesService {
       repository.save(dto);
       return CommandStatus.createSuccess();
     } catch (DuplicateKeyException e) {
+      log.error(
+          "Log activity failed because of duplicate timestamp (duplicate key): {}", timestamp, e);
       return CommandStatus.createFailure(e.getMessage());
+    } catch (Exception e) {
+      log.error("Log activity failed: {}", e.getMessage(), e);
+      throw e;
     }
   }
 
   public RecentActivitiesQueryResult getRecentActivities(RecentActivitiesQuery query) {
-    var timeZone = query.timeZone() != null ? query.timeZone() : ZoneId.systemDefault();
-    var today =
-        query.today() != null ? query.today() : Instant.now().atZone(timeZone).toLocalDate();
-    var start = today.minusDays(31).atStartOfDay().atZone(timeZone).toInstant();
-    var activities =
-        repository.findByTimestampGreaterThanOrderByTimestampDesc(start).stream()
-            .map(dto -> dto.validate(timeZone))
-            .toList();
+    try {
+      log.info("Get recent activities: {}", query);
+      var timeZone = query.timeZone() != null ? query.timeZone() : ZoneId.systemDefault();
+      var today =
+          query.today() != null ? query.today() : Instant.now().atZone(timeZone).toLocalDate();
+      var start = today.minusDays(31).atStartOfDay().atZone(timeZone).toInstant();
+      var activities =
+          repository.findByTimestampGreaterThanOrderByTimestampDesc(start).stream()
+              .map(dto -> dto.validate(timeZone))
+              .toList();
 
-    var recentActivities = WorkingDay.from(activities);
-    var timeSummary = TimeSummary.from(today, activities);
-    var lastActivity = activities.isEmpty() ? null : activities.get(0);
-    return new RecentActivitiesQueryResult(lastActivity, recentActivities, timeSummary, timeZone);
+      var recentActivities = WorkingDay.from(activities);
+      var timeSummary = TimeSummary.from(today, activities);
+      var lastActivity = activities.isEmpty() ? null : activities.get(0);
+      return new RecentActivitiesQueryResult(lastActivity, recentActivities, timeSummary, timeZone);
+    } catch (RuntimeException e) {
+      log.error("Get recent activities failed: {}", e.getMessage(), e);
+      throw e;
+    }
   }
 }
