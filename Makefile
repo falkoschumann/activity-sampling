@@ -6,11 +6,20 @@ all: $(SUBDIRS) root
 clean: $(SUBDIRS)
 clean: TARGET=clean
 
-distclean: $(SUBDIRS)
+distclean: $(SUBDIRS) distclean-root
 distclean: TARGET=distclean
+
+distclean-root:
+	docker compose down --volumes --remove-orphans --rmi local
 
 dist: $(SUBDIRS)
 dist: TARGET=dist
+
+start:
+	docker compose up --detach
+
+stop:
+	docker compose down
 
 root: check-root
 
@@ -51,7 +60,7 @@ $(SUBDIRS): force
 force: ;
 
 .PHONY: \
-	all clean distclean dist \
+	all clean distclean distclean-root dist start stop \
 	root doc \
 	check check-root format format-root \
 	dev test \
