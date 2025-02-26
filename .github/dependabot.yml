@@ -13,6 +13,15 @@ updates:
     schedule:
       interval: "daily"
     groups:
+      react:
+        patterns:
+          - "react"
+          - "react-dom"
+          - "@types/react"
+          - "@types/react-dom"
+        update-types:
+          - "major"
+          - "minor"
       vitest:
         patterns:
           - "vitest"
