@@ -29,8 +29,7 @@ dev:
 		--kill-others \
 		--names "WEB,API" \
 		--prefix-colors "bgMagenta.bold,bgGreen.bold" \
-		"$(MAKE) -C web-app dev" \
-		"$(MAKE) -C api-app dev"
+		$(foreach dir,$(SUBDIRS),"$(MAKE) -C $(dir) dev")
 
 test: $(SUBDIRS)
 test: TARGET=test
