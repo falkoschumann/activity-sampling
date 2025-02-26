@@ -15,9 +15,9 @@ jobs:
       - name: Use Node.js LTS
         uses: actions/setup-node@v4
         with:
-          node-version: 22.x
+          node-version: "lts/*"
       - name: Build
-        run: make check-root
+        run: make root
 
   web-app:
     runs-on: ubuntu-latest

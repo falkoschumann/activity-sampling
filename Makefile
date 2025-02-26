@@ -1,7 +1,7 @@
 export NPM_CONFIG_YES=true
 SUBDIRS = web-app api-app
 
-all: $(SUBDIRS)
+all: $(SUBDIRS) root
 
 clean: $(SUBDIRS)
 clean: TARGET=clean
