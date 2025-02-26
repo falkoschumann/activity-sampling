@@ -11,6 +11,9 @@ distclean: clean
 
 dist: build
 
+start:
+	npm preview
+
 check: test
 	npx eslint .
 	npx prettier . --check
@@ -52,11 +55,11 @@ prepare: version
   	fi
 
 version:
-	@echo "Use Node.js $(shell node --version)"
-	@echo "Use NPM $(shell npm --version)"
+	@echo "Node.js $(shell node --version)"
+	@echo "NPM $(shell npm --version)"
 
 .PHONY: \
-	all clean distclean dist \
+	all clean distclean dist start \
 	check format \
-	dev test watch unit-tests integration-tests e2e-tests \
+	dev test watch coverage unit-tests integration-tests e2e-tests \
 	build prepare version

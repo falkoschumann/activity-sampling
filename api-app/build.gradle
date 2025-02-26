@@ -44,7 +44,8 @@ tasks.withType(JavaCompile).configureEach {
 }
 
 
-test {
+tasks.withType(Test).configureEach {
+  jvmArgs += '-Duser.DtimeZone="Europe/Berlin"'
   useJUnitPlatform()
   testLogging {
     events 'passed', 'skipped', 'failed'
@@ -58,6 +59,7 @@ jacocoTestReport {
   dependsOn test
 }
 
+/*
 tasks.register('processFrontendResources', Copy) {
   group = 'Frontend'
   description = 'Process frontend resources'
@@ -69,6 +71,7 @@ tasks.register('processFrontendResources', Copy) {
 tasks.named('processResources') {
   dependsOn('processFrontendResources')
 }
+*/
 
 checkstyle {
   toolVersion = '10.21.2'

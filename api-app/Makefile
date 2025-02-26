@@ -1,5 +1,3 @@
-export TZ="Europe/Berlin"
-
 all: dist check
 
 clean:
@@ -24,6 +22,9 @@ dev:
 test:
 	./gradlew test
 
+watch:
+	./gradlew test --continuous
+
 coverage:
 	./gradlew test jacocoTestReport
 
@@ -39,10 +40,10 @@ build: prepare
 prepare: version
 
 version:
-	@echo "Use Java $(shell java --version | head -n 1)"
+	@echo "Java $(shell java --version | head -n 1)"
 
 .PHONY: \
 	all clean distclean dist start \
 	check format \
-	dev test unit-tests integration-tests e2e-tests \
+	dev test watch coverage unit-tests integration-tests e2e-tests \
 	build prepare version

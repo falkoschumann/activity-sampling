@@ -1,13 +1,18 @@
 export NPM_CONFIG_YES=true
 SUBDIRS = web-app api-app
 
-all: $(SUBDIRS) check-root
+all: $(SUBDIRS)
 
 clean: $(SUBDIRS)
 clean: TARGET=clean
 
 distclean: $(SUBDIRS)
 distclean: TARGET=distclean
+
+dist: $(SUBDIRS)
+dist: TARGET=dist
+
+root: check-root
 
 doc:
 	plantuml doc/*.puml
@@ -37,14 +42,17 @@ test: TARGET=test
 build: $(SUBDIRS)
 build: TARGET=build
 
+version: $(SUBDIRS)
+version: TARGET=version
+
 $(SUBDIRS): force
-	$(MAKE) -C $@ $(TARGET)
+	@$(MAKE) -C $@ $(TARGET)
 
 force: ;
 
 .PHONY: \
-	all clean distclean dist start \
-	doc \
+	all clean distclean dist \
+	root doc \
 	check check-root format format-root \
 	dev test \
-	build
+	build version
