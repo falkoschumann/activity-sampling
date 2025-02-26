@@ -11,11 +11,6 @@ plugins {
 group = 'de.muspellheim.activitysampling'
 version = '0.0.1-SNAPSHOT'
 
-compileJava {
-  options.encoding = 'UTF-8'
-  options.release = 17
-}
-
 configurations {
   compileOnly {
     extendsFrom annotationProcessor
@@ -42,6 +37,12 @@ dependencies {
   testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
   testRuntimeOnly 'com.h2database:h2'
 }
+
+tasks.withType(JavaCompile).configureEach {
+  options.encoding = 'UTF-8'
+  options.release = 17
+}
+
 
 test {
   useJUnitPlatform()
