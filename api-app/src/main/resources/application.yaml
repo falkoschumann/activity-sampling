@@ -1,0 +1,13 @@
+spring:
+  application:
+    name: api-app
+  datasource:
+    url: jdbc:postgresql://localhost:5432/activitysampling
+    username: activitysampling
+    password: activitysampling
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
