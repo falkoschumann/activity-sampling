@@ -10,7 +10,8 @@ distclean: clean
 
 dist: build
 
-start: dev
+start:
+	./gradlew bootRun
 
 check:
 	./gradlew check
@@ -18,8 +19,7 @@ check:
 format:
 	./gradlew spotlessApply
 
-dev:
-	./gradlew bootRun
+dev: start
 
 test:
 	./gradlew test

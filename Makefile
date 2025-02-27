@@ -1,5 +1,6 @@
 export NPM_CONFIG_YES=true
 SUBDIRS = web-app api-app
+ROOT_FILES = .github/ doc/ README.md
 
 all: $(SUBDIRS) root
 
@@ -16,7 +17,7 @@ dist: $(SUBDIRS)
 dist: TARGET=dist
 
 start:
-	docker compose up --detach
+	docker compose up --build --detach
 
 stop:
 	docker compose down
@@ -30,20 +31,23 @@ check: $(SUBDIRS) check-root
 check: TARGET=check
 
 check-root:
-	npx prettier --check .github/ doc/ README.md
+	npx prettier --check $(ROOT_FILES)
 
 format: $(SUBDIRS) format-root
 format: TARGET=format
 
 format-root:
-	npx prettier --write .github/ doc/ README.md
+	npx prettier --write $(ROOT_FILES)
 
-dev:
+dev: dev-root
 	npx concurrently \
 		--kill-others \
 		--names "WEB,API" \
 		--prefix-colors "bgMagenta.bold,bgGreen.bold" \
 		$(foreach dir,$(SUBDIRS),"$(MAKE) -C $(dir) dev")
+
+dev-root:
+	docker compose up --detach database
 
 test: $(SUBDIRS)
 test: TARGET=test

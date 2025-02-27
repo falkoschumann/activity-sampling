@@ -7,4 +7,4 @@ RUN npm run build
 FROM nginx:stable
 
 COPY --from=build /app/dist/ /usr/share/nginx/html/
-COPY spa.conf /etc/nginx/conf.d/spa.conf
+COPY nginx.conf /etc/nginx/conf.d/spa.conf
