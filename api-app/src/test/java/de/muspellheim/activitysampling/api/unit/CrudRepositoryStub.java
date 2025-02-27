@@ -1,5 +1,8 @@
+// Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
+
 package de.muspellheim.activitysampling.api.unit;
 
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Optional;
@@ -7,8 +10,10 @@ import java.util.stream.StreamSupport;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.lang.NonNull;
 
-public abstract class CrudRepositoryStub<T, ID> extends ArrayList<T>
-    implements CrudRepository<T, ID> {
+public abstract class CrudRepositoryStub<T, K> extends ArrayList<T>
+    implements CrudRepository<T, K> {
+
+  @Serial private static final long serialVersionUID = 1L;
 
   public CrudRepositoryStub() {}
 
@@ -16,7 +21,7 @@ public abstract class CrudRepositoryStub<T, ID> extends ArrayList<T>
     super(entities);
   }
 
-  protected abstract ID extractId(T entity);
+  protected abstract K extractId(T entity);
 
   @Override
   @NonNull
@@ -40,12 +45,12 @@ public abstract class CrudRepositoryStub<T, ID> extends ArrayList<T>
 
   @Override
   @NonNull
-  public Optional<T> findById(@NonNull ID id) {
+  public Optional<T> findById(@NonNull K id) {
     return stream().filter(a -> extractId(a).equals(id)).findFirst();
   }
 
   @Override
-  public boolean existsById(@NonNull ID id) {
+  public boolean existsById(@NonNull K id) {
     return findById(id).isPresent();
   }
 
@@ -57,7 +62,7 @@ public abstract class CrudRepositoryStub<T, ID> extends ArrayList<T>
 
   @Override
   @NonNull
-  public Iterable<T> findAllById(@NonNull Iterable<ID> ids) {
+  public Iterable<T> findAllById(@NonNull Iterable<K> ids) {
     return StreamSupport.stream(ids.spliterator(), false)
         .map(this::findById)
         .filter(Optional::isPresent)
@@ -71,7 +76,7 @@ public abstract class CrudRepositoryStub<T, ID> extends ArrayList<T>
   }
 
   @Override
-  public void deleteById(@NonNull ID id) {
+  public void deleteById(@NonNull K id) {
     findById(id).ifPresent(this::delete);
   }
 
@@ -81,7 +86,7 @@ public abstract class CrudRepositoryStub<T, ID> extends ArrayList<T>
   }
 
   @Override
-  public void deleteAllById(@NonNull Iterable<? extends ID> ids) {
+  public void deleteAllById(@NonNull Iterable<? extends K> ids) {
     ids.forEach(this::deleteById);
   }
 

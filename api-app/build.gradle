@@ -93,6 +93,6 @@ pmd {
 spotless {
   java {
     googleJavaFormat()
-    licenseHeader '/* Copyright (c) $YEAR Falko Schumann. All rights reserved. MIT license. */\n\n'
+    licenseHeader '// Copyright (c) $YEAR Falko Schumann. All rights reserved. MIT license.\n\n'
   }
 }
