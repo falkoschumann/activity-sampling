@@ -56,7 +56,7 @@ public class ActivitiesService {
           query.today() != null ? query.today() : Instant.now().atZone(timeZone).toLocalDate();
       var start = today.minusDays(31).atStartOfDay().atZone(timeZone).toInstant();
       var activities =
-          repository.findByTimestampGreaterThanOrderByTimestampDesc(start).stream()
+          repository.findByTimestampGreaterThanEqualOrderByTimestampDesc(start).stream()
               .map(dto -> dto.validate(timeZone))
               .toList();
 

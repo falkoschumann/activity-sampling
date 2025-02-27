@@ -6,20 +6,20 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.Builder;
-import lombok.NonNull;
+import lombok.With;
 
 @Builder
+@With
 public record TimeSummary(
-    @NonNull Duration hoursToday,
-    @NonNull Duration hoursYesterday,
-    @NonNull Duration hoursThisWeek,
-    @NonNull Duration hoursThisMonth) {
+    Duration hoursToday, Duration hoursYesterday, Duration hoursThisWeek, Duration hoursThisMonth) {
 
-  public static class TimeSummaryBuilder {
-    private Duration hoursToday = Duration.ZERO;
-    private Duration hoursYesterday = Duration.ZERO;
-    private Duration hoursThisWeek = Duration.ZERO;
-    private Duration hoursThisMonth = Duration.ZERO;
+  public static TimeSummary createTestInstance() {
+    return new TimeSummaryBuilder()
+        .hoursToday(Duration.ZERO)
+        .hoursYesterday(Duration.ZERO)
+        .hoursThisWeek(Duration.ZERO)
+        .hoursThisMonth(Duration.ZERO)
+        .build();
   }
 
   public static final TimeSummary NULL =

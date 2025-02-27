@@ -17,10 +17,12 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import lombok.With;
 import org.hibernate.annotations.JdbcTypeCode;
 
 @Data
 @Builder
+@With
 @NoArgsConstructor
 @RequiredArgsConstructor
 @AllArgsConstructor
@@ -28,19 +30,23 @@ import org.hibernate.annotations.JdbcTypeCode;
 @Table(name = "activities")
 public class ActivityDto {
 
-  public static class ActivityDtoBuilder {
-    private Instant timestamp = Instant.parse("2024-12-18T08:30:00Z");
-    private Duration duration = Duration.ofMinutes(30);
-    private String client = "ACME Inc.";
-    private String project = "Foobar";
-    private String task = "Do something";
-    private String notes = "";
+  public static ActivityDto createTestInstance() {
+    return new ActivityDtoBuilder()
+        .timestamp(Instant.parse("2024-12-18T08:30:00Z"))
+        .duration(Duration.ofMinutes(30))
+        .client("ACME Inc.")
+        .project("Foobar")
+        .task("Do something")
+        .notes("")
+        .build();
   }
 
-  @Id @NonNull private Instant timestamp;
+  // TODO Add technical id
 
-  @JdbcTypeCode(INTERVAL_SECOND)
+  @NonNull @Id private Instant timestamp;
+
   @NonNull
+  @JdbcTypeCode(INTERVAL_SECOND)
   private Duration duration;
 
   @NonNull private String client;

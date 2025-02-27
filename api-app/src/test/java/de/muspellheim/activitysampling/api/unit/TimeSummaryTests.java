@@ -26,8 +26,8 @@ class TimeSummaryTests {
     var today = LocalDate.of(2025, 2, 7);
     var activities =
         List.of(
-            Activity.builder().timestamp(LocalDateTime.parse("2025-02-07T08:30")).build(),
-            Activity.builder().timestamp(LocalDateTime.parse("2025-02-07T09:30")).build());
+            Activity.createTestInstance().withTimestamp(LocalDateTime.parse("2025-02-07T08:30")),
+            Activity.createTestInstance().withTimestamp(LocalDateTime.parse("2025-02-07T09:30")));
 
     var timeSummary = TimeSummary.from(today, activities);
 
@@ -39,12 +39,10 @@ class TimeSummaryTests {
     var today = LocalDate.of(2025, 2, 7);
     var activities =
         List.of(
-            Activity.builder()
-                .timestamp(LocalDateTime.parse("2025-02-06T08:30")) // yesterday
-                .build(),
-            Activity.builder()
-                .timestamp(LocalDateTime.parse("2025-02-06T09:30")) // yesterday
-                .build());
+            Activity.createTestInstance()
+                .withTimestamp(LocalDateTime.parse("2025-02-06T08:30")), // yesterday
+            Activity.createTestInstance()
+                .withTimestamp(LocalDateTime.parse("2025-02-06T09:30"))); // yesterday
 
     var timeSummary = TimeSummary.from(today, activities);
 
@@ -56,12 +54,10 @@ class TimeSummaryTests {
     var friday = LocalDate.of(2025, 1, 31);
     var activities =
         List.of(
-            Activity.builder()
-                .timestamp(LocalDateTime.parse("2025-01-29T09:30")) // wednesday
-                .build(),
-            Activity.builder()
-                .timestamp(LocalDateTime.parse("2025-01-27T09:30")) // monday
-                .build());
+            Activity.createTestInstance()
+                .withTimestamp(LocalDateTime.parse("2025-01-29T09:30")), // wednesday
+            Activity.createTestInstance()
+                .withTimestamp(LocalDateTime.parse("2025-01-27T09:30"))); // monday
 
     var timeSummary = TimeSummary.from(friday, activities);
 
@@ -73,12 +69,10 @@ class TimeSummaryTests {
     var endOfMonth = LocalDate.of(2025, 1, 31);
     var activities =
         List.of(
-            Activity.builder()
-                .timestamp(LocalDateTime.parse("2025-01-15T09:30")) // mid of month
-                .build(),
-            Activity.builder()
-                .timestamp(LocalDateTime.parse("2025-01-02T09:30")) // start of month
-                .build());
+            Activity.createTestInstance()
+                .withTimestamp(LocalDateTime.parse("2025-01-15T09:30")), // mid of month
+            Activity.createTestInstance()
+                .withTimestamp(LocalDateTime.parse("2025-01-02T09:30"))); // start of month
 
     var timeSummary = TimeSummary.from(endOfMonth, activities);
 
@@ -90,27 +84,20 @@ class TimeSummaryTests {
     var today = LocalDate.of(2025, 1, 23);
     var activities =
         List.of(
-            Activity.builder()
-                .timestamp(LocalDateTime.parse("2024-12-31T09:30")) // end of last month
-                .build(),
-            Activity.builder()
-                .timestamp(LocalDateTime.parse("2025-01-01T09:30")) // start of this month
-                .build(),
-            Activity.builder()
-                .timestamp(LocalDateTime.parse("2025-01-19T09:30")) // end of last week
-                .build(),
-            Activity.builder()
-                .timestamp(LocalDateTime.parse("2025-01-20T09:30")) // start of this week
-                .build(),
-            Activity.builder()
-                .timestamp(LocalDateTime.parse("2025-01-22T09:30")) // yesterday
-                .build(),
-            Activity.builder()
-                .timestamp(LocalDateTime.parse("2025-01-23T09:30")) // today
-                .build(),
-            Activity.builder()
-                .timestamp(LocalDateTime.parse("2025-01-24T09:30")) // tomorrow
-                .build());
+            Activity.createTestInstance()
+                .withTimestamp(LocalDateTime.parse("2024-12-31T09:30")), // end of last month
+            Activity.createTestInstance()
+                .withTimestamp(LocalDateTime.parse("2025-01-01T09:30")), // start of this month
+            Activity.createTestInstance()
+                .withTimestamp(LocalDateTime.parse("2025-01-19T09:30")), // end of last week
+            Activity.createTestInstance()
+                .withTimestamp(LocalDateTime.parse("2025-01-20T09:30")), // start of this week
+            Activity.createTestInstance()
+                .withTimestamp(LocalDateTime.parse("2025-01-22T09:30")), // yesterday
+            Activity.createTestInstance()
+                .withTimestamp(LocalDateTime.parse("2025-01-23T09:30")), // today
+            Activity.createTestInstance()
+                .withTimestamp(LocalDateTime.parse("2025-01-24T09:30"))); // tomorrow
 
     var timeSummary = TimeSummary.from(today, activities);
 

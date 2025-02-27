@@ -5,23 +5,26 @@ package de.muspellheim.activitysampling.api.domain;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import lombok.Builder;
-import lombok.NonNull;
+import lombok.With;
 
 @Builder
+@With
 public record Activity(
-    @NonNull LocalDateTime timestamp,
-    @NonNull Duration duration,
-    @NonNull String client,
-    @NonNull String project,
-    @NonNull String task,
-    @NonNull String notes) {
+    LocalDateTime timestamp,
+    Duration duration,
+    String client,
+    String project,
+    String task,
+    String notes) {
 
-  public static class ActivityBuilder {
-    private LocalDateTime timestamp = LocalDateTime.parse("2024-12-18T09:30");
-    private Duration duration = Duration.ofMinutes(30);
-    private String client = "ACME Inc.";
-    private String project = "Foobar";
-    private String task = "Do something";
-    private String notes = "";
+  public static Activity createTestInstance() {
+    return new ActivityBuilder()
+        .timestamp(LocalDateTime.parse("2024-12-18T09:30"))
+        .duration(Duration.ofMinutes(30))
+        .client("ACME Inc.")
+        .project("Foobar")
+        .task("Do something")
+        .notes("")
+        .build();
   }
 }

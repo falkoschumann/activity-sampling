@@ -13,44 +13,46 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
 import lombok.Builder;
-import lombok.NonNull;
+import lombok.With;
 
 @Builder
+@With
 @JsonInclude(Include.NON_NULL)
 public record RecentActivitiesQueryResult(
-    Activity lastActivity,
-    @NonNull List<WorkingDay> workingDays,
-    @NonNull TimeSummary timeSummary,
-    @NonNull ZoneId timeZone) {
+    Activity lastActivity, List<WorkingDay> workingDays, TimeSummary timeSummary, ZoneId timeZone) {
 
   public static final RecentActivitiesQueryResult NULL =
       new RecentActivitiesQueryResult(null, List.of(), TimeSummary.NULL, ZoneId.systemDefault());
 
-  public static class RecentActivitiesQueryResultBuilder {
-    private Activity lastActivity =
-        Activity.builder().timestamp(LocalDateTime.parse("2024-12-18T09:30")).build();
-    private List<WorkingDay> workingDays =
-        List.of(
-            new WorkingDay(
-                LocalDate.of(2024, 12, 18),
-                List.of(
-                    Activity.builder().timestamp(LocalDateTime.parse("2024-12-18T09:30")).build())),
-            new WorkingDay(
-                LocalDate.of(2024, 12, 17),
-                List.of(
-                    Activity.builder().timestamp(LocalDateTime.parse("2024-12-17T17:00")).build(),
-                    Activity.builder().timestamp(LocalDateTime.parse("2024-12-17T16:30")).build(),
-                    Activity.builder()
-                        .timestamp(LocalDateTime.parse("2024-12-17T16:00"))
-                        .task("Make things")
-                        .notes("This is a note")
-                        .build())));
-    private TimeSummary timeSummary =
-        new TimeSummary(
-            Duration.ofMinutes(30),
-            Duration.ofMinutes(90),
-            Duration.ofMinutes(120),
-            Duration.ofMinutes(120));
-    private ZoneId timeZone = ZoneId.of("Europe/Berlin");
+  public static RecentActivitiesQueryResult createTestInstance() {
+    return new RecentActivitiesQueryResultBuilder()
+        .lastActivity(
+            Activity.createTestInstance().withTimestamp(LocalDateTime.parse("2024-12-18T09:30")))
+        .workingDays(
+            List.of(
+                new WorkingDay(
+                    LocalDate.of(2024, 12, 18),
+                    List.of(
+                        Activity.createTestInstance()
+                            .withTimestamp(LocalDateTime.parse("2024-12-18T09:30")))),
+                new WorkingDay(
+                    LocalDate.of(2024, 12, 17),
+                    List.of(
+                        Activity.createTestInstance()
+                            .withTimestamp(LocalDateTime.parse("2024-12-17T17:00")),
+                        Activity.createTestInstance()
+                            .withTimestamp(LocalDateTime.parse("2024-12-17T16:30")),
+                        Activity.createTestInstance()
+                            .withTimestamp(LocalDateTime.parse("2024-12-17T16:00"))
+                            .withTask("Make things")
+                            .withNotes("This is a note")))))
+        .timeSummary(
+            new TimeSummary(
+                Duration.ofMinutes(30),
+                Duration.ofMinutes(90),
+                Duration.ofMinutes(120),
+                Duration.ofMinutes(120)))
+        .timeZone(ZoneId.of("Europe/Berlin"))
+        .build();
   }
 }

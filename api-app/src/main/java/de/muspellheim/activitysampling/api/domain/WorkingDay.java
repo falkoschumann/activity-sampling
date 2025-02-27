@@ -5,9 +5,8 @@ package de.muspellheim.activitysampling.api.domain;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import lombok.NonNull;
 
-public record WorkingDay(@NonNull LocalDate date, @NonNull List<Activity> activities) {
+public record WorkingDay(LocalDate date, List<Activity> activities) {
 
   public static List<WorkingDay> from(List<Activity> recentActivities) {
     var workingDays = new ArrayList<WorkingDay>();

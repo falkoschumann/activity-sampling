@@ -8,5 +8,5 @@ import org.springframework.data.repository.CrudRepository;
 
 public interface ActivitiesRepository extends CrudRepository<ActivityDto, Instant> {
 
-  List<ActivityDto> findByTimestampGreaterThanOrderByTimestampDesc(Instant start);
+  List<ActivityDto> findByTimestampGreaterThanEqualOrderByTimestampDesc(Instant start);
 }

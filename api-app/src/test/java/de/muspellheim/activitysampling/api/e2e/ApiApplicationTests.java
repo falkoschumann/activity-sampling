@@ -38,7 +38,7 @@ class ApiApplicationTests {
       var response =
           restTemplate.postForEntity(
               "/api/activities/log-activity",
-              LogActivityCommand.builder().build(),
+              LogActivityCommand.createTestInstance(),
               CommandStatus.class);
 
       assertEquals(200, response.getStatusCode().value());
@@ -69,7 +69,7 @@ class ApiApplicationTests {
               RecentActivitiesQueryResult.class);
 
       assertEquals(200, response.getStatusCode().value());
-      assertEquals(RecentActivitiesQueryResult.builder().build(), response.getBody());
+      assertEquals(RecentActivitiesQueryResult.createTestInstance(), response.getBody());
     }
 
     @Test
