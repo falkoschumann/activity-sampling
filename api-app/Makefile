@@ -1,3 +1,5 @@
+export SPRING_DATASOURCE_PASSWORD=activitysampling
+
 all: dist check
 
 clean:
