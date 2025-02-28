@@ -1,6 +1,6 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
-package de.muspellheim.activitysampling.api.unit;
+package de.muspellheim.activitysampling.api.util;
 
 import java.io.Serial;
 import java.util.ArrayList;
@@ -10,30 +10,39 @@ import java.util.stream.StreamSupport;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.lang.NonNull;
 
-public abstract class CrudRepositoryStub<T, K> extends ArrayList<T>
+public abstract class MemoryCrudRepository<T, K> extends ArrayList<T>
     implements CrudRepository<T, K> {
 
   @Serial private static final long serialVersionUID = 1L;
 
-  public CrudRepositoryStub() {}
+  public MemoryCrudRepository() {}
 
-  public CrudRepositoryStub(Collection<? extends T> entities) {
+  public MemoryCrudRepository(Collection<? extends T> entities) {
     super(entities);
   }
 
-  protected abstract K extractId(T entity);
+  protected abstract K getEntityId(T entity);
+
+  protected abstract void setEntityId(T entity, K id);
+
+  protected abstract K nextId();
 
   @Override
   @NonNull
   public <S extends T> S save(@NonNull S entity) {
-    findById(extractId(entity))
-        .ifPresentOrElse(
-            a -> {
-              var index = indexOf(a);
-              set(index, entity);
-            },
-            () -> add(entity));
+    findById(getEntityId(entity))
+        .ifPresentOrElse(a -> set(indexOf(a), entity), () -> add(merge(entity)));
     return entity;
+  }
+
+  private <S extends T> S merge(S entity) {
+    var id = getEntityId(entity);
+    if (id != null) {
+      return entity;
+    } else {
+      setEntityId(entity, nextId());
+      return entity;
+    }
   }
 
   @Override
@@ -46,7 +55,7 @@ public abstract class CrudRepositoryStub<T, K> extends ArrayList<T>
   @Override
   @NonNull
   public Optional<T> findById(@NonNull K id) {
-    return stream().filter(a -> extractId(a).equals(id)).findFirst();
+    return stream().filter(a -> getEntityId(a).equals(id)).findFirst();
   }
 
   @Override

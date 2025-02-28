@@ -4,12 +4,13 @@ package de.muspellheim.activitysampling.api.unit;
 
 import de.muspellheim.activitysampling.api.infrastructure.ActivitiesRepository;
 import de.muspellheim.activitysampling.api.infrastructure.ActivityDto;
+import de.muspellheim.activitysampling.api.util.MemoryCrudRepository;
 import java.io.Serial;
 import java.time.Instant;
 import java.util.Comparator;
 import java.util.List;
 
-class ActivitiesRepositoryStub extends CrudRepositoryStub<ActivityDto, Instant>
+class ActivitiesRepositoryStub extends MemoryCrudRepository<ActivityDto, Instant>
     implements ActivitiesRepository {
 
   @Serial private static final long serialVersionUID = 1L;
@@ -41,7 +42,17 @@ class ActivitiesRepositoryStub extends CrudRepositoryStub<ActivityDto, Instant>
   }
 
   @Override
-  protected Instant extractId(ActivityDto entity) {
+  protected Instant getEntityId(ActivityDto entity) {
     return entity.getTimestamp();
+  }
+
+  @Override
+  protected void setEntityId(ActivityDto entity, Instant id) {
+    entity.setTimestamp(id);
+  }
+
+  @Override
+  protected Instant nextId() {
+    return Instant.now();
   }
 }
