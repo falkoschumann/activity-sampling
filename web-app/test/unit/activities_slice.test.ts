@@ -49,7 +49,7 @@ describe("Activities", () => {
 
     expect(selectCountdown(store.getState())).toEqual({
       duration: "PT15M",
-      remaining: "PT30M",
+      remaining: "PT15M",
       percentage: 0,
       isRunning: false,
     });

@@ -38,6 +38,30 @@ describe("Duration", () => {
     expect(duration.milliseconds).toBe(20 * 1000);
   });
 
+  it("Checks negative duration", () => {
+    const duration = Duration.ofMilliseconds(-5);
+
+    expect(duration.isNegative()).toBe(true);
+    expect(duration.isPositive()).toBe(false);
+    expect(duration.isZero()).toBe(false);
+  });
+
+  it("Checks positive duration", () => {
+    const duration = Duration.ofMilliseconds(5);
+
+    expect(duration.isNegative()).toBe(false);
+    expect(duration.isPositive()).toBe(true);
+    expect(duration.isZero()).toBe(false);
+  });
+
+  it("Checks zero duration", () => {
+    const duration = Duration.ZERO;
+
+    expect(duration.isNegative()).toBe(false);
+    expect(duration.isPositive()).toBe(false);
+    expect(duration.isZero()).toBe(true);
+  });
+
   it("Subtracts duration", () => {
     const duration1 = Duration.ofHours(1);
     const duration2 = Duration.ofMinutes(30);

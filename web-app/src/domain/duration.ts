@@ -91,6 +91,18 @@ export class Duration {
     );
   }
 
+  isPositive(): boolean {
+    return this.#millis > 0;
+  }
+
+  isNegative(): boolean {
+    return this.#millis < 0;
+  }
+
+  isZero(): boolean {
+    return this.#millis === 0;
+  }
+
   minus(duration: Duration): Duration {
     return new Duration(this.#millis - duration.#millis);
   }

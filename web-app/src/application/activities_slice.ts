@@ -98,21 +98,42 @@ export const startCountdown = createAsyncThunk<
   unknown,
   unknown,
   ActivitiesThunkConfig
->("activities/countdownStarted", async (_, thunkAPI) => {
+>("activities/startCountdown", async (_, thunkAPI) => {
   const { timer } = thunkAPI.extra;
   timer.schedule(
-    () => thunkAPI.dispatch(countdownProgressed({ seconds: 1 })),
+    () => thunkAPI.dispatch(progressCountdown({ seconds: 1 })),
     0,
     1000,
   );
   thunkAPI.dispatch(countdownStarted());
+
+  if (Notification.permission === "default") {
+    void Notification.requestPermission();
+  }
+});
+
+const progressCountdown = createAsyncThunk<
+  unknown,
+  { seconds: number },
+  ActivitiesThunkConfig
+>("activities/progressCountdown", async ({ seconds }, thunkAPI) => {
+  thunkAPI.dispatch(countdownProgressed({ seconds }));
+  const remaining = Duration.parse(
+    thunkAPI.getState().activities.countdown.remaining,
+  ).minusSeconds(seconds);
+  if (Notification.permission === "granted" && !remaining.isPositive()) {
+    // TODO Show notification only once
+    new Notification("What are you working on?", {
+      icon: "/apple-touch-icon.png",
+    });
+  }
 });
 
 export const stopCountdown = createAsyncThunk<
   unknown,
   unknown,
   ActivitiesThunkConfig
->("activities/countdownStarted", async (_, thunkAPI) => {
+>("activities/stopCountdown", async (_, thunkAPI) => {
   const { timer } = thunkAPI.extra;
   timer.cancel();
   thunkAPI.dispatch(countdownStopped());
@@ -129,15 +150,13 @@ export const activitiesSlice = createSlice({
     },
     countdownProgressed: (
       state,
-      action: PayloadAction<{
-        seconds: number;
-      }>,
+      action: PayloadAction<{ seconds: number }>,
     ) => {
       const duration = Duration.parse(state.countdown.duration);
       let remaining = Duration.parse(state.countdown.remaining).minusSeconds(
         action.payload.seconds,
       );
-      if (remaining.seconds < 0) {
+      if (remaining.isNegative()) {
         remaining = duration.minusSeconds(action.payload.seconds);
       }
       state.countdown.remaining = remaining.toString();
@@ -150,6 +169,7 @@ export const activitiesSlice = createSlice({
     },
     durationSelected: (state, action: PayloadAction<{ duration: string }>) => {
       state.countdown.duration = action.payload.duration;
+      state.countdown.remaining = action.payload.duration;
     },
     lastActivitySelected: (state, action: PayloadAction<Activity>) => {
       state.lastActivity = action.payload;
@@ -169,13 +189,11 @@ export const activitiesSlice = createSlice({
   },
 });
 
-export const {
-  countdownProgressed,
-  countdownStarted,
-  countdownStopped,
-  durationSelected,
-  lastActivitySelected,
-} = activitiesSlice.actions;
+const { countdownStarted, countdownProgressed, countdownStopped } =
+  activitiesSlice.actions;
+
+export const { durationSelected, lastActivitySelected } =
+  activitiesSlice.actions;
 
 export const {
   selectLastActivity,
