@@ -45,7 +45,9 @@ export class ActivitiesApi extends EventTarget {
   }
 
   trackLoggedActivity() {
-    return new OutputTracker(this, ACTIVITY_LOGGED_EVENT);
+    return new OutputTracker<{
+      command: LogActivityCommand;
+    }>(this, ACTIVITY_LOGGED_EVENT);
   }
 
   async getRecentActivities(

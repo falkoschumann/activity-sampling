@@ -12,9 +12,13 @@ import {
   selectLastActivity,
   selectTimeSummary,
   selectWorkingDays,
+  startCountdown,
+  stopCountdown,
 } from "../../src/application/activities_slice";
 import { ActivitiesApi } from "../../src/infrastructure/activities_api";
-import { Clock } from "../../src/infrastructure/clock";
+import { Clock } from "../../src/util/clock";
+import { Timer } from "../../src/util/timer";
+import { Duration } from "../../src/domain/duration";
 
 describe("Activities", () => {
   it("Initial state", () => {
@@ -47,7 +51,96 @@ describe("Activities", () => {
       duration: "PT15M",
       remaining: "PT30M",
       percentage: 0,
+      isRunning: false,
     });
+  });
+
+  it("Handles countdown started", () => {
+    const { store, timer } = configure();
+    store.dispatch(durationSelected({ duration: "PT20M" }));
+    const scheduledTasks = timer.trackScheduledTasks();
+
+    store.dispatch(startCountdown({}));
+
+    expect(selectCountdown(store.getState())).toEqual({
+      duration: "PT20M",
+      remaining: "PT20M",
+      percentage: 0,
+      isRunning: true,
+    });
+    expect(scheduledTasks.data).toEqual([
+      {
+        timeoutId: expect.any(Number),
+        delayOrFirstTime: 0,
+        period: 1000,
+      },
+    ]);
+  });
+
+  describe("Progress countdown", () => {
+    it("Handles countdown progressed", () => {
+      const { store, timer } = configure();
+      store.dispatch(durationSelected({ duration: "PT20M" }));
+      store.dispatch(startCountdown({}));
+
+      timer.simulateTaskRun(Duration.parse("PT16M").seconds);
+
+      expect(selectCountdown(store.getState())).toEqual({
+        duration: "PT20M",
+        remaining: "PT4M",
+        percentage: 80,
+        isRunning: true,
+      });
+    });
+
+    it("Handles countdown elapsed", () => {
+      const { store, timer } = configure();
+      store.dispatch(durationSelected({ duration: "PT20M" }));
+      store.dispatch(startCountdown({}));
+      timer.simulateTaskRun(Duration.parse("PT16M").seconds);
+
+      timer.simulateTaskRun(Duration.parse("PT4M").seconds);
+
+      expect(selectCountdown(store.getState())).toEqual({
+        duration: "PT20M",
+        remaining: "PT0S",
+        percentage: 100,
+        isRunning: true,
+      });
+    });
+
+    it("Handles countdown restarted", () => {
+      const { store, timer } = configure();
+      store.dispatch(durationSelected({ duration: "PT20M" }));
+      store.dispatch(startCountdown({}));
+      timer.simulateTaskRun(Duration.parse("PT20M").seconds);
+
+      timer.simulateTaskRun(Duration.parse("PT1M").seconds);
+
+      expect(selectCountdown(store.getState())).toEqual({
+        duration: "PT20M",
+        remaining: "PT19M",
+        percentage: 5,
+        isRunning: true,
+      });
+    });
+  });
+
+  it("Handles countdown stopped", () => {
+    const { store, timer } = configure();
+    const cancelledTasks = timer.trackCancelledTasks();
+    store.dispatch(startCountdown({}));
+    timer.simulateTaskRun(Duration.parse("PT12M").seconds);
+
+    store.dispatch(stopCountdown({}));
+
+    expect(selectCountdown(store.getState())).toEqual({
+      duration: "PT30M",
+      remaining: "PT18M",
+      percentage: 40,
+      isRunning: false,
+    });
+    expect(cancelledTasks.data).toEqual([{ timeoutId: expect.any(Number) }]);
   });
 
   it("Handles last activity selected", () => {
@@ -143,6 +236,7 @@ describe("Activities", () => {
         duration: "PT30M",
         remaining: "PT30M",
         percentage: 0,
+        isRunning: false,
       },
       lastActivity: {
         timestamp: "2025-02-11T21:30",
@@ -178,9 +272,14 @@ describe("Activities", () => {
   });
 });
 
-function configure({ responses }: { responses?: Response | Response[] } = {}) {
+function configure({
+  responses,
+}: {
+  responses?: Response | Response[];
+} = {}) {
   const activitiesApi = ActivitiesApi.createNull(responses);
   const clock = Clock.createNull();
-  const store = createStore(activitiesApi, clock);
-  return { store, activitiesApi, clock };
+  const timer = Timer.createNull();
+  const store = createStore(activitiesApi, clock, timer);
+  return { store, activitiesApi, clock, timer };
 }

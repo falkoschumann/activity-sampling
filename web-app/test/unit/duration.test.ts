@@ -38,6 +38,47 @@ describe("Duration", () => {
     expect(duration.milliseconds).toBe(20 * 1000);
   });
 
+  it("Subtracts duration", () => {
+    const duration1 = Duration.ofHours(1);
+    const duration2 = Duration.ofMinutes(30);
+
+    const result = duration1.minus(duration2);
+
+    expect(result.minutes).toBe(30);
+  });
+
+  it("Subtracts milliseconds", () => {
+    const duration1 = Duration.ofSeconds(2);
+
+    const result = duration1.minusMilliseconds(3000);
+
+    expect(result.milliseconds).toBe(-1000);
+  });
+
+  it("Subtracts hours", () => {
+    const duration1 = Duration.ofHours(4);
+
+    const result = duration1.minusHours(3);
+
+    expect(result.minutes).toBe(60);
+  });
+
+  it("Subtracts minutes", () => {
+    const duration1 = Duration.ofHours(2);
+
+    const result = duration1.minusMinutes(30);
+
+    expect(result.minutes).toBe(90);
+  });
+
+  it("Subtracts seconds", () => {
+    const duration1 = Duration.ofMinutes(2);
+
+    const result = duration1.minusSeconds(30);
+
+    expect(result.milliseconds).toBe(90000);
+  });
+
   describe("Parse", () => {
     it("Parses hours", () => {
       const duration = Duration.parse("PT1H");
@@ -92,6 +133,12 @@ describe("Duration", () => {
   });
 
   describe("To string", () => {
+    it("Formats zero", () => {
+      const duration = Duration.ZERO;
+
+      expect(duration.toString()).toBe("PT0S");
+    });
+
     it("Formats hours", () => {
       const duration = Duration.ofHours(1);
 

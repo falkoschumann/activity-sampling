@@ -1,12 +1,13 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
 import { Clock } from "./clock.ts";
+import { OutputTracker } from "./output_tracker.ts";
 
 export type Task = () => void;
 
 export type Cancel = () => void;
 
-export class Timer {
+export class Timer extends EventTarget {
   static create() {
     return new Timer(Clock.create(), globalThis);
   }
@@ -19,6 +20,7 @@ export class Timer {
   #clock: Clock;
 
   private constructor(clock: Clock, global: GlobalStub) {
+    super();
     this.#clock = clock;
     this.#global = global;
   }
@@ -53,7 +55,28 @@ export class Timer {
       }
     }, delay);
     this.#tasks.set(timeoutId, task);
+    this.dispatchEvent(
+      new CustomEvent("TASK_SCHEDULED", {
+        detail: {
+          timeoutId,
+          delayOrFirstTime,
+          period,
+        },
+      }),
+    );
     return () => this.#cancel(timeoutId);
+  }
+
+  trackScheduledTasks() {
+    return OutputTracker.create<{
+      timeoutId: number;
+      delayOrFirstTime: number | Date;
+      period?: number;
+    }>(this, "TASK_SCHEDULED");
+  }
+
+  trackCancelledTasks() {
+    return OutputTracker.create<{ timeoutId: number }>(this, "TASK_CANCELLED");
   }
 
   cancel() {
@@ -73,6 +96,9 @@ export class Timer {
   #cancel(timeoutId: unknown) {
     this.#global.clearTimeout(timeoutId);
     this.#tasks.delete(timeoutId);
+    this.dispatchEvent(
+      new CustomEvent("TASK_CANCELLED", { detail: { timeoutId } }),
+    );
   }
 }
 

@@ -91,15 +91,42 @@ export class Duration {
     );
   }
 
+  minus(duration: Duration): Duration {
+    return new Duration(this.#millis - duration.#millis);
+  }
+
+  minusHours(hours: number): Duration {
+    return new Duration(this.#millis - hours * MILLIS_PER_HOUR);
+  }
+
+  minusMinutes(minutes: number): Duration {
+    return new Duration(this.#millis - minutes * MILLIS_PER_MINUTE);
+  }
+
+  minusSeconds(seconds: number): Duration {
+    return new Duration(this.#millis - seconds * MILLIS_PER_SECOND);
+  }
+
+  minusMilliseconds(milliseconds: number): Duration {
+    return new Duration(this.#millis - milliseconds);
+  }
+
   toString(): string {
     let result = "PT";
-    if (this.hoursPart > 0) result += `${this.hoursPart}H`;
-    if (this.minutesPart > 0) result += `${this.minutesPart}M`;
+    if (this.hoursPart > 0) {
+      result += `${this.hoursPart}H`;
+    }
+    if (this.minutesPart > 0) {
+      result += `${this.minutesPart}M`;
+    }
     if (this.secondsPart > 0 || this.millisecondsPart > 0) {
       result += `${this.secondsPart}`;
       if (this.millisecondsPart > 0)
         result += `.${String(this.millisecondsPart).padStart(3, "0")}`;
       result += "S";
+    }
+    if (this.milliseconds === 0) {
+      result += "0S";
     }
     return result;
   }

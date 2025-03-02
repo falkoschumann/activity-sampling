@@ -2,7 +2,7 @@
 
 import { describe, expect, it } from "vitest";
 
-import { Timer } from "../../src/infrastructure/timer";
+import { Timer } from "../../src/util/timer";
 
 describe("Timer", () => {
   it("Schedules task once", async () => {
@@ -73,6 +73,33 @@ describe("Timer", () => {
   });
 
   describe("Nullable", () => {
+    it("Tracks scheduled task", () => {
+      const timer = Timer.createNull();
+      const scheduledTasks = timer.trackScheduledTasks();
+
+      timer.schedule(testingTask, 1000, 2000);
+
+      expect(scheduledTasks.data).toEqual([
+        {
+          timeoutId: expect.any(Number),
+          delayOrFirstTime: 1000,
+          period: 2000,
+        },
+      ]);
+    });
+
+    it("Tracks cancelled task", () => {
+      const timer = Timer.createNull();
+      const scheduledTasks = timer.trackScheduledTasks();
+      const cancelledTasks = timer.trackCancelledTasks();
+
+      const cancel = timer.schedule(testingTask, 1000, 2000);
+      cancel();
+
+      const timeoutId = scheduledTasks.data[0].timeoutId;
+      expect(cancelledTasks.data).toEqual([{ timeoutId }]);
+    });
+
     it("Simulates task run", () => {
       const timer = Timer.createNull();
       let counter = 0;

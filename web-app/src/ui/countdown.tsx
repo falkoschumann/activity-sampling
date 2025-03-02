@@ -1,13 +1,23 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
+import * as React from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 import { AppDispatch } from "../application/store.ts";
-import { durationSelected, selectCountdown } from "../application/activities_slice.ts";
+import { durationSelected, selectCountdown, startCountdown, stopCountdown } from "../application/activities_slice.ts";
 import { Duration } from "../domain/duration.ts";
 
 export default function Countdown() {
-  const { duration, remaining, percentage } = useSelector(selectCountdown);
+  const { duration, remaining, percentage, isRunning } = useSelector(selectCountdown);
+  const dispatch = useDispatch<AppDispatch>();
+
+  function handleChanged(event: React.ChangeEvent<HTMLInputElement>) {
+    if (event.target.checked) {
+      dispatch(startCountdown({}));
+    } else {
+      dispatch(stopCountdown({}));
+    }
+  }
 
   return (
     <div className="my-3 d-flex gap-3">
@@ -26,9 +36,17 @@ export default function Countdown() {
       </div>
       <div>
         <div className="btn-group btn-group-sm">
-          <button type="button" className="btn btn-primary" data-bs-toggle="button">
-            Start
-          </button>
+          <input
+            id="start-stop-countdown"
+            type="checkbox"
+            className="btn-check"
+            autoComplete="off"
+            checked={isRunning}
+            onChange={handleChanged}
+          />
+          <label className="btn btn-primary" htmlFor="start-stop-countdown">
+            {isRunning ? "Stop" : "Start"}
+          </label>
           <button
             type="button"
             className="btn btn-primary dropdown-toggle dropdown-toggle-split"

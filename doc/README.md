@@ -9,7 +9,7 @@ analysis.
 
 ### Ask periodically
 
-- [ ] Starts countdown with given interval.
+- [x] Starts countdown with given interval.
 - [ ] Starts countdown with the default interval when the application starts.
 
 ### Current Interval

@@ -9,8 +9,10 @@ import {
   RecentActivitiesQuery,
   RecentActivitiesQueryResult,
 } from "../domain/messages.ts";
+import { Duration } from "../domain/duration.ts";
 import { ActivitiesApi } from "../infrastructure/activities_api.ts";
-import { Clock } from "../infrastructure/clock.ts";
+import { Clock } from "../util/clock.ts";
+import { Timer } from "../util/timer.ts";
 
 export interface ActivitiesState {
   readonly lastActivity?: Activity;
@@ -18,6 +20,7 @@ export interface ActivitiesState {
     readonly duration: string;
     readonly remaining: string;
     readonly percentage: number;
+    readonly isRunning: boolean;
   };
   readonly workingDays: WorkingDay[];
   readonly timeSummary: TimeSummary;
@@ -29,6 +32,7 @@ const initialState: ActivitiesState = {
     duration: "PT30M",
     remaining: "PT30M",
     percentage: 0,
+    isRunning: false,
   },
   workingDays: [],
   timeSummary: {
@@ -41,7 +45,11 @@ const initialState: ActivitiesState = {
 };
 
 type ActivitiesThunkConfig = {
-  extra: { readonly activitiesApi: ActivitiesApi; readonly clock: Clock };
+  extra: {
+    readonly activitiesApi: ActivitiesApi;
+    readonly clock: Clock;
+    readonly timer: Timer;
+  };
   state: { readonly activities: ActivitiesState };
 };
 
@@ -86,10 +94,60 @@ export const getRecentActivities = createAsyncThunk<
   return activitiesApi.getRecentActivities({ today, timeZone });
 });
 
+export const startCountdown = createAsyncThunk<
+  unknown,
+  unknown,
+  ActivitiesThunkConfig
+>("activities/countdownStarted", async (_, thunkAPI) => {
+  const { timer } = thunkAPI.extra;
+  timer.schedule(
+    () => thunkAPI.dispatch(countdownProgressed({ seconds: 1 })),
+    0,
+    1000,
+  );
+  thunkAPI.dispatch(countdownStarted());
+});
+
+export const stopCountdown = createAsyncThunk<
+  unknown,
+  unknown,
+  ActivitiesThunkConfig
+>("activities/countdownStarted", async (_, thunkAPI) => {
+  const { timer } = thunkAPI.extra;
+  timer.cancel();
+  thunkAPI.dispatch(countdownStopped());
+});
+
 export const activitiesSlice = createSlice({
   name: "activities",
   initialState,
   reducers: {
+    countdownStarted: (state) => {
+      state.countdown.remaining = state.countdown.duration;
+      state.countdown.percentage = 0;
+      state.countdown.isRunning = true;
+    },
+    countdownProgressed: (
+      state,
+      action: PayloadAction<{
+        seconds: number;
+      }>,
+    ) => {
+      const duration = Duration.parse(state.countdown.duration);
+      let remaining = Duration.parse(state.countdown.remaining).minusSeconds(
+        action.payload.seconds,
+      );
+      if (remaining.seconds < 0) {
+        remaining = duration.minusSeconds(action.payload.seconds);
+      }
+      state.countdown.remaining = remaining.toString();
+      state.countdown.percentage = Math.round(
+        (1 - remaining.seconds / duration.seconds) * 100,
+      );
+    },
+    countdownStopped: (state) => {
+      state.countdown.isRunning = false;
+    },
     durationSelected: (state, action: PayloadAction<{ duration: string }>) => {
       state.countdown.duration = action.payload.duration;
     },
@@ -111,8 +169,13 @@ export const activitiesSlice = createSlice({
   },
 });
 
-export const { durationSelected, lastActivitySelected } =
-  activitiesSlice.actions;
+export const {
+  countdownProgressed,
+  countdownStarted,
+  countdownStopped,
+  durationSelected,
+  lastActivitySelected,
+} = activitiesSlice.actions;
 
 export const {
   selectLastActivity,
