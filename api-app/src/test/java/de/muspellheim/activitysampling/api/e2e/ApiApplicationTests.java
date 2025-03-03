@@ -39,7 +39,7 @@ class ApiApplicationTests {
       var response =
           restTemplate.postForEntity(
               "/api/activities/log-activity",
-              LogActivityCommand.createTestInstance().withTimestamp(Instant.now()),
+              LogActivityCommand.createTestInstance().withStart(Instant.now()),
               CommandStatus.class);
 
       assertEquals(200, response.getStatusCode().value());
@@ -48,7 +48,7 @@ class ApiApplicationTests {
 
     @Test
     void failsWhenActivityIsNotValid(@Autowired TestRestTemplate restTemplate) throws Exception {
-      var command = new JSONObject().put("timestamp", "foobar");
+      var command = new JSONObject().put("start", "foobar");
       var headers = new HttpHeaders();
       headers.setContentType(MediaType.APPLICATION_JSON);
       var request = new HttpEntity<>(command.toString(), headers);

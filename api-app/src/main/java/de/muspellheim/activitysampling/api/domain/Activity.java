@@ -10,7 +10,7 @@ import lombok.With;
 @Builder
 @With
 public record Activity(
-    LocalDateTime timestamp,
+    LocalDateTime start,
     Duration duration,
     String client,
     String project,
@@ -19,7 +19,7 @@ public record Activity(
 
   public static Activity createTestInstance() {
     return new ActivityBuilder()
-        .timestamp(LocalDateTime.parse("2024-12-18T09:30"))
+        .start(LocalDateTime.parse("2024-12-18T09:30"))
         .duration(Duration.ofMinutes(30))
         .client("ACME Inc.")
         .project("Foobar")

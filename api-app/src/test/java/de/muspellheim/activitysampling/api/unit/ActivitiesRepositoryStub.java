@@ -19,11 +19,11 @@ class ActivitiesRepositoryStub extends MemoryCrudRepository<ActivityDto, Long>
   static ActivitiesRepository createTestInstance() {
     return new ActivitiesRepositoryStub(
         List.of(
-            ActivityDto.createTestInstance().withTimestamp(Instant.parse("2024-12-18T08:30:00Z")),
-            ActivityDto.createTestInstance().withTimestamp(Instant.parse("2024-12-17T16:00:00Z")),
-            ActivityDto.createTestInstance().withTimestamp(Instant.parse("2024-12-17T15:30:00Z")),
+            ActivityDto.createTestInstance().withStart(Instant.parse("2024-12-18T08:30:00Z")),
+            ActivityDto.createTestInstance().withStart(Instant.parse("2024-12-17T16:00:00Z")),
+            ActivityDto.createTestInstance().withStart(Instant.parse("2024-12-17T15:30:00Z")),
             ActivityDto.createTestInstance()
-                .withTimestamp(Instant.parse("2024-12-17T15:00:00Z"))
+                .withStart(Instant.parse("2024-12-17T15:00:00Z"))
                 .withTask("Make things")
                 .withNotes("This is a note")));
   }
@@ -35,10 +35,10 @@ class ActivitiesRepositoryStub extends MemoryCrudRepository<ActivityDto, Long>
   }
 
   @Override
-  public List<ActivityDto> findByTimestampGreaterThanEqualOrderByTimestampDesc(Instant start) {
+  public List<ActivityDto> findByStartGreaterThanEqualOrderByStartDesc(Instant start) {
     return stream()
-        .filter(e -> !e.getTimestamp().isBefore(start))
-        .sorted(Comparator.comparing(ActivityDto::getTimestamp).reversed())
+        .filter(e -> !e.getStart().isBefore(start))
+        .sorted(Comparator.comparing(ActivityDto::getStart).reversed())
         .toList();
   }
 
@@ -60,7 +60,7 @@ class ActivitiesRepositoryStub extends MemoryCrudRepository<ActivityDto, Long>
   @Override
   protected <S extends ActivityDto> void verifyConstraints(S entity) {
     stream()
-        .filter(e -> e.getTimestamp().equals(entity.getTimestamp()))
+        .filter(e -> e.getStart().equals(entity.getStart()))
         .findFirst()
         .ifPresent(
             e -> {

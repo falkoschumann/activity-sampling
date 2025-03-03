@@ -34,7 +34,7 @@ public class ActivityDto {
 
   public static ActivityDto createTestInstance() {
     return new ActivityDtoBuilder()
-        .timestamp(Instant.parse("2024-12-18T08:30:00Z"))
+        .start(Instant.parse("2024-12-18T08:30:00Z"))
         .duration(Duration.ofMinutes(30))
         .client("ACME Inc.")
         .project("Foobar")
@@ -47,7 +47,7 @@ public class ActivityDto {
   @Id
   private Long id;
 
-  @NonNull private Instant timestamp;
+  @NonNull private Instant start;
 
   @NonNull
   @JdbcTypeCode(INTERVAL_SECOND)
@@ -63,7 +63,7 @@ public class ActivityDto {
 
   public Activity validate(ZoneId timeZone) {
     return new Activity(
-        timestamp.atZone(timeZone).toLocalDateTime(),
+        start.atZone(timeZone).toLocalDateTime(),
         duration,
         client,
         project,

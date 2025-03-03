@@ -1,8 +1,7 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
 export interface Activity {
-  // TODO Rename to start?
-  readonly timestamp: string;
+  readonly start: string;
   readonly duration: string;
   readonly client: string;
   readonly project: string;

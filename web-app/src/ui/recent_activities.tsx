@@ -23,12 +23,12 @@ export default function RecentActivities() {
       <div className="list-group list-group-flush">
         {workingDay.activities.map((activity) => (
           <button
-            key={new Date(activity.timestamp).toISOString()}
+            key={new Date(activity.start).toISOString()}
             onClick={() => handleClicked(activity)}
             className="list-group-item list-group-item-action py-1 d-flex justify-content-start align-items-start"
           >
             <div style={{ width: "3em" }}>
-              {new Date(activity.timestamp).toLocaleTimeString(undefined, {
+              {new Date(activity.start).toLocaleTimeString(undefined, {
                 timeStyle: "short",
                 hour12: false,
                 timeZone,

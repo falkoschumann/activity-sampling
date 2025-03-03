@@ -26,7 +26,7 @@ public record TimeSummary(
     var hoursThisWeek = Duration.ZERO;
     var hoursThisMonth = Duration.ZERO;
     for (var activity : activities) {
-      var date = activity.timestamp().toLocalDate();
+      var date = activity.start().toLocalDate();
       var duration = activity.duration();
       if (date.equals(today)) {
         hoursToday = hoursToday.plus(duration);

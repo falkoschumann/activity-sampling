@@ -25,11 +25,11 @@ public class ActivitiesService {
 
   public CommandStatus logActivity(LogActivityCommand command) {
     log.info("Log activity: {}", command);
-    var timestamp = command.timestamp().atZone(ZoneOffset.systemDefault()).toInstant();
+    var timestamp = command.start().atZone(ZoneOffset.systemDefault()).toInstant();
     try {
       var dto =
           ActivityDto.builder()
-              .timestamp(timestamp)
+              .start(timestamp)
               .duration(command.duration())
               .client(command.client())
               .project(command.project())
@@ -59,7 +59,7 @@ public class ActivitiesService {
           query.today() != null ? query.today() : Instant.now().atZone(timeZone).toLocalDate();
       var start = today.minusDays(31).atStartOfDay().atZone(timeZone).toInstant();
       var activities =
-          repository.findByTimestampGreaterThanEqualOrderByTimestampDesc(start).stream()
+          repository.findByStartGreaterThanEqualOrderByStartDesc(start).stream()
               .map(dto -> dto.validate(timeZone))
               .toList();
 

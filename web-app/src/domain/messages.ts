@@ -3,7 +3,7 @@
 import { Activity, TimeSummary, WorkingDay } from "./activities.ts";
 
 export interface LogActivityCommand {
-  readonly timestamp: string;
+  readonly start: string;
   readonly duration: string;
   readonly client: string;
   readonly project: string;

@@ -13,7 +13,7 @@ public record WorkingDay(LocalDate date, List<Activity> activities) {
     LocalDate date = null;
     var activities = new ArrayList<Activity>();
     for (var activity : recentActivities) {
-      var activityDate = activity.timestamp().toLocalDate();
+      var activityDate = activity.start().toLocalDate();
       if (!activityDate.equals(date)) {
         if (date != null) {
           workingDays.add(new WorkingDay(date, List.copyOf(activities)));

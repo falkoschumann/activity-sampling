@@ -148,7 +148,7 @@ describe("Activities", () => {
 
     store.dispatch(
       lastActivitySelected({
-        timestamp: "2025-02-12T21:18",
+        start: "2025-02-12T21:18",
         duration: "PT30M",
         client: "client-1",
         project: "project-1",
@@ -158,7 +158,7 @@ describe("Activities", () => {
     );
 
     expect(selectLastActivity(store.getState())).toEqual({
-      timestamp: "2025-02-12T21:18",
+      start: "2025-02-12T21:18",
       duration: "PT30M",
       client: "client-1",
       project: "project-1",
@@ -184,7 +184,7 @@ describe("Activities", () => {
 
     expect(loggedActivity.data).toEqual([
       {
-        timestamp: clock.now().toISOString(),
+        start: clock.now().toISOString(),
         duration: "PT30M",
         client: "client-1",
         project: "project-1",
@@ -197,7 +197,7 @@ describe("Activities", () => {
   it("Gets recent activities", async () => {
     const body = JSON.stringify({
       lastActivity: {
-        timestamp: "2025-02-11T21:30",
+        start: "2025-02-11T21:30",
         duration: "PT30M",
         client: "ACME Inc.",
         project: "Foobar",
@@ -209,7 +209,7 @@ describe("Activities", () => {
           date: "2025-02-11",
           activities: [
             {
-              timestamp: "2025-02-11T21:30",
+              start: "2025-02-11T21:30",
               duration: "PT30M",
               client: "ACME Inc.",
               project: "Foobar",
@@ -239,7 +239,7 @@ describe("Activities", () => {
         isRunning: false,
       },
       lastActivity: {
-        timestamp: "2025-02-11T21:30",
+        start: "2025-02-11T21:30",
         duration: "PT30M",
         client: "ACME Inc.",
         project: "Foobar",
@@ -251,7 +251,7 @@ describe("Activities", () => {
           date: "2025-02-11",
           activities: [
             {
-              timestamp: "2025-02-11T21:30",
+              start: "2025-02-11T21:30",
               duration: "PT30M",
               client: "ACME Inc.",
               project: "Foobar",

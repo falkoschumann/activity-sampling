@@ -104,7 +104,7 @@ class ActivitiesServiceTests {
       assertEquals(
           new RecentActivitiesQueryResult(
               Activity.createTestInstance()
-                  .withTimestamp(now)
+                  .withStart(now)
                   .withDuration(Duration.ofMinutes(20))
                   .withClient("client-1")
                   .withProject("project-1")
@@ -114,7 +114,7 @@ class ActivitiesServiceTests {
                       now.toLocalDate(),
                       List.of(
                           Activity.createTestInstance()
-                              .withTimestamp(now)
+                              .withStart(now)
                               .withDuration(Duration.ofMinutes(20))
                               .withClient("client-1")
                               .withProject("project-1")

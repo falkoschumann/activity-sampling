@@ -65,7 +65,7 @@ export const logActivity = createAsyncThunk<
 >("activities/logActivity", async (action, thunkAPI) => {
   const { activitiesApi, clock } = thunkAPI.extra;
   const command: LogActivityCommand = {
-    timestamp: clock.now().toISOString(),
+    start: clock.now().toISOString(),
     duration: thunkAPI.getState().activities.countdown.duration,
     client: action.client,
     project: action.project,
