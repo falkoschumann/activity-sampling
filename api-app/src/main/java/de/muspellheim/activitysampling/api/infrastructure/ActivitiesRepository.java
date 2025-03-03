@@ -6,7 +6,7 @@ import java.time.Instant;
 import java.util.List;
 import org.springframework.data.repository.CrudRepository;
 
-public interface ActivitiesRepository extends CrudRepository<ActivityDto, Instant> {
+public interface ActivitiesRepository extends CrudRepository<ActivityDto, Long> {
 
   List<ActivityDto> findByTimestampGreaterThanEqualOrderByTimestampDesc(Instant start);
 }

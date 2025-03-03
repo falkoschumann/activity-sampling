@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import de.muspellheim.activitysampling.api.application.CommandStatus;
 import de.muspellheim.activitysampling.api.application.LogActivityCommand;
 import de.muspellheim.activitysampling.api.application.RecentActivitiesQueryResult;
+import java.time.Instant;
 import java.util.TimeZone;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeAll;
@@ -38,7 +39,7 @@ class ApiApplicationTests {
       var response =
           restTemplate.postForEntity(
               "/api/activities/log-activity",
-              LogActivityCommand.createTestInstance(),
+              LogActivityCommand.createTestInstance().withTimestamp(Instant.now()),
               CommandStatus.class);
 
       assertEquals(200, response.getStatusCode().value());

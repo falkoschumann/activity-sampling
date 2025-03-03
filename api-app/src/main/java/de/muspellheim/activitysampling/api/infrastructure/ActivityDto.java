@@ -6,6 +6,8 @@ import static org.hibernate.type.SqlTypes.INTERVAL_SECOND;
 
 import de.muspellheim.activitysampling.api.domain.Activity;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.time.Duration;
@@ -41,9 +43,11 @@ public class ActivityDto {
         .build();
   }
 
-  // TODO Add technical id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Id
+  private Long id;
 
-  @NonNull @Id private Instant timestamp;
+  @NonNull private Instant timestamp;
 
   @NonNull
   @JdbcTypeCode(INTERVAL_SECOND)

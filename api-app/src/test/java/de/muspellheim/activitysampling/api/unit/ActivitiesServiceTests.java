@@ -35,7 +35,7 @@ class ActivitiesServiceTests {
       var result = service.logActivity(LogActivityCommand.createTestInstance());
 
       assertEquals(CommandStatus.createSuccess(), result);
-      assertEquals(List.of(ActivityDto.createTestInstance()), repository);
+      assertEquals(List.of(ActivityDto.createTestInstance().withId(1L)), repository);
     }
 
     @Test
@@ -48,7 +48,8 @@ class ActivitiesServiceTests {
 
       assertEquals(CommandStatus.createSuccess(), result);
       assertEquals(
-          List.of(ActivityDto.createTestInstance().withNotes("This is a note")), repository);
+          List.of(ActivityDto.createTestInstance().withId(1L).withNotes("This is a note")),
+          repository);
     }
 
     @Test

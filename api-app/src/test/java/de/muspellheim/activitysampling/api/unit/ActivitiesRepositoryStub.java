@@ -11,7 +11,7 @@ import java.util.Comparator;
 import java.util.List;
 import org.springframework.dao.DuplicateKeyException;
 
-class ActivitiesRepositoryStub extends MemoryCrudRepository<ActivityDto, Instant>
+class ActivitiesRepositoryStub extends MemoryCrudRepository<ActivityDto, Long>
     implements ActivitiesRepository {
 
   @Serial private static final long serialVersionUID = 1L;
@@ -43,18 +43,18 @@ class ActivitiesRepositoryStub extends MemoryCrudRepository<ActivityDto, Instant
   }
 
   @Override
-  protected Instant getEntityId(ActivityDto entity) {
-    return entity.getTimestamp();
+  protected Long getEntityId(ActivityDto entity) {
+    return entity.getId();
   }
 
   @Override
-  protected void setEntityId(ActivityDto entity, Instant id) {
-    entity.setTimestamp(id);
+  protected void setEntityId(ActivityDto entity, Long id) {
+    entity.setId(id);
   }
 
   @Override
-  protected Instant nextId() {
-    return Instant.now();
+  protected Long nextId() {
+    return size() + 1L;
   }
 
   @Override
