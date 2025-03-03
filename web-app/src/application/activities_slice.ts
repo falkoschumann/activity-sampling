@@ -3,13 +3,13 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 import { Activity, TimeSummary, WorkingDay } from "../domain/activities.ts";
+import { Duration } from "../domain/duration.ts";
 import {
   CommandStatus,
   LogActivityCommand,
   RecentActivitiesQuery,
   RecentActivitiesQueryResult,
 } from "../domain/messages.ts";
-import { Duration } from "../domain/duration.ts";
 import { ActivitiesApi } from "../infrastructure/activities_api.ts";
 import { Clock } from "../util/clock.ts";
 import { Timer } from "../util/timer.ts";

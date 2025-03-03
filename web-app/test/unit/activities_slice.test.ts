@@ -2,7 +2,6 @@
 
 import { describe, expect, it } from "vitest";
 
-import { createStore } from "../../src/application/store";
 import {
   durationSelected,
   getRecentActivities,
@@ -15,10 +14,11 @@ import {
   startCountdown,
   stopCountdown,
 } from "../../src/application/activities_slice";
+import { createStore } from "../../src/application/store";
+import { Duration } from "../../src/domain/duration";
 import { ActivitiesApi } from "../../src/infrastructure/activities_api";
 import { Clock } from "../../src/util/clock";
 import { Timer } from "../../src/util/timer";
-import { Duration } from "../../src/domain/duration";
 
 describe("Activities", () => {
   it("Initial state", () => {

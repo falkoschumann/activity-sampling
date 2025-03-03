@@ -3,8 +3,8 @@
 import * as React from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-import { AppDispatch } from "../application/store.ts";
 import { durationSelected, selectCountdown, startCountdown, stopCountdown } from "../application/activities_slice.ts";
+import { AppDispatch } from "../application/store.ts";
 import { Duration } from "../domain/duration.ts";
 
 export default function Countdown() {

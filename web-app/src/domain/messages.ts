@@ -8,12 +8,22 @@ export interface LogActivityCommand {
   readonly client: string;
   readonly project: string;
   readonly task: string;
-  readonly notes: string;
+  readonly notes?: string;
 }
 
-export interface CommandStatus {
-  readonly success: boolean;
-  readonly errorMessage?: string;
+export class CommandStatus {
+  static success(): CommandStatus {
+    return new CommandStatus(true);
+  }
+
+  static failure(errorMessage: string): CommandStatus {
+    return new CommandStatus(false, errorMessage);
+  }
+
+  constructor(
+    public readonly success: boolean,
+    public readonly errorMessage?: string,
+  ) {}
 }
 
 export interface RecentActivitiesQuery {
@@ -26,4 +36,17 @@ export interface RecentActivitiesQueryResult {
   readonly workingDays: WorkingDay[];
   readonly timeSummary: TimeSummary;
   readonly timeZone?: string;
+  readonly errorMessage?: string;
+}
+
+export function createEmptyRecentActivitiesQueryResult(): RecentActivitiesQueryResult {
+  return {
+    workingDays: [],
+    timeSummary: {
+      hoursToday: "PT0S",
+      hoursYesterday: "PT0S",
+      hoursThisWeek: "PT0S",
+      hoursThisMonth: "PT0S",
+    },
+  };
 }
