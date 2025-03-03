@@ -17,7 +17,6 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.util.List;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
@@ -53,16 +52,17 @@ class ActivitiesServiceTests {
     }
 
     @Test
-    @Disabled
     void failsWhenActivitiesTimestampIsDuplicated() {
-      // FIXME: This test is disabled because the implementation is not yet correct.
       var repository = new ActivitiesRepositoryStub();
       repository.add(ActivityDto.createTestInstance());
       var service = new ActivitiesService(repository);
 
       var result = service.logActivity(LogActivityCommand.createTestInstance());
 
-      assertEquals(CommandStatus.createFailure("Activity already exists."), result);
+      assertEquals(
+          CommandStatus.createFailure(
+              "Activity not logged because another one already exists with timestamp 2024-12-18T08:30:00Z."),
+          result);
     }
   }
 

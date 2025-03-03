@@ -27,22 +27,25 @@ public abstract class MemoryCrudRepository<T, K> extends ArrayList<T>
 
   protected abstract K nextId();
 
+  protected <S extends T> void verifyConstraints(S entity) {}
+
   @Override
   @NonNull
   public <S extends T> S save(@NonNull S entity) {
-    findById(getEntityId(entity))
-        .ifPresentOrElse(a -> set(indexOf(a), entity), () -> add(merge(entity)));
-    return entity;
-  }
-
-  private <S extends T> S merge(S entity) {
+    verifyConstraints(entity);
     var id = getEntityId(entity);
-    if (id != null) {
-      return entity;
-    } else {
+    if (id == null) {
       setEntityId(entity, nextId());
-      return entity;
+      add(entity);
+    } else {
+      int index = findById(id).map(this::indexOf).orElse(-1);
+      if (index == -1) {
+        add(entity);
+      } else {
+        set(index, entity);
+      }
     }
+    return entity;
   }
 
   @Override
@@ -55,7 +58,7 @@ public abstract class MemoryCrudRepository<T, K> extends ArrayList<T>
   @Override
   @NonNull
   public Optional<T> findById(@NonNull K id) {
-    return stream().filter(a -> getEntityId(a).equals(id)).findFirst();
+    return stream().filter(a -> id.equals(getEntityId(a))).findFirst();
   }
 
   @Override

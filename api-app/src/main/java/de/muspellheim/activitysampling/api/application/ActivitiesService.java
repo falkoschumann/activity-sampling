@@ -41,7 +41,10 @@ public class ActivitiesService {
     } catch (DuplicateKeyException e) {
       log.error(
           "Log activity failed because of duplicate timestamp (duplicate key): {}", timestamp, e);
-      return CommandStatus.createFailure(e.getMessage());
+      return CommandStatus.createFailure(
+          "Activity not logged because another one already exists with timestamp "
+              + timestamp
+              + ".");
     } catch (Exception e) {
       log.error("Log activity failed: {}", e.getMessage(), e);
       throw e;

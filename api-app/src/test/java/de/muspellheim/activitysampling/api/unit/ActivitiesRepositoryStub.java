@@ -9,6 +9,7 @@ import java.io.Serial;
 import java.time.Instant;
 import java.util.Comparator;
 import java.util.List;
+import org.springframework.dao.DuplicateKeyException;
 
 class ActivitiesRepositoryStub extends MemoryCrudRepository<ActivityDto, Instant>
     implements ActivitiesRepository {
@@ -54,5 +55,16 @@ class ActivitiesRepositoryStub extends MemoryCrudRepository<ActivityDto, Instant
   @Override
   protected Instant nextId() {
     return Instant.now();
+  }
+
+  @Override
+  protected <S extends ActivityDto> void verifyConstraints(S entity) {
+    stream()
+        .filter(e -> e.getTimestamp().equals(entity.getTimestamp()))
+        .findFirst()
+        .ifPresent(
+            e -> {
+              throw new DuplicateKeyException("Duplicate timestamp");
+            });
   }
 }

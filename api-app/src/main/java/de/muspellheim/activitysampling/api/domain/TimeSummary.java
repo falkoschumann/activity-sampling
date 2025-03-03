@@ -13,15 +13,6 @@ import lombok.With;
 public record TimeSummary(
     Duration hoursToday, Duration hoursYesterday, Duration hoursThisWeek, Duration hoursThisMonth) {
 
-  public static TimeSummary createTestInstance() {
-    return new TimeSummaryBuilder()
-        .hoursToday(Duration.ZERO)
-        .hoursYesterday(Duration.ZERO)
-        .hoursThisWeek(Duration.ZERO)
-        .hoursThisMonth(Duration.ZERO)
-        .build();
-  }
-
   public static final TimeSummary NULL =
       new TimeSummary(Duration.ZERO, Duration.ZERO, Duration.ZERO, Duration.ZERO);
 

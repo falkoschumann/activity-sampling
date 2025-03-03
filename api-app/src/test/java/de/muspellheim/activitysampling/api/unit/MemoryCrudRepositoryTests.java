@@ -4,6 +4,7 @@ package de.muspellheim.activitysampling.api.unit;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import de.muspellheim.activitysampling.api.util.MemoryCrudRepository;
@@ -17,6 +18,7 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Test;
+import org.springframework.dao.DuplicateKeyException;
 
 @SuppressWarnings("PMD.AvoidDuplicateLiterals")
 class MemoryCrudRepositoryTests {
@@ -56,6 +58,14 @@ class MemoryCrudRepositoryTests {
 
     assertEquals(new EntityStub(2, "baz"), saved);
     assertEquals(List.of(new EntityStub(1, "foo"), new EntityStub(2, "baz")), repo);
+  }
+
+  @Test
+  void saveEntityWithConstraintViolation() {
+    var repo = new MemoryCrudRepositoryImpl();
+    repo.save(new EntityStub("foo"));
+
+    assertThrows(DuplicateKeyException.class, () -> repo.save(new EntityStub("foo")));
   }
 
   @Test
@@ -226,6 +236,17 @@ class MemoryCrudRepositoryTests {
     @Override
     protected Integer nextId() {
       return size() + 1;
+    }
+
+    @Override
+    protected <S extends EntityStub> void verifyConstraints(S entity) {
+      stream()
+          .filter(a -> a.getName().equals(entity.getName()))
+          .findAny()
+          .ifPresent(
+              a -> {
+                throw new DuplicateKeyException("Name must be unique.");
+              });
     }
   }
 
