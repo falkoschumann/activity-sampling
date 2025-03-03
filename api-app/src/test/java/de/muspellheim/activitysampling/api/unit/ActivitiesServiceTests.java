@@ -62,7 +62,8 @@ class ActivitiesServiceTests {
 
       assertEquals(
           CommandStatus.createFailure(
-              "Activity not logged because another one already exists with timestamp 2024-12-18T08:30:00Z."),
+              "Activity not logged because another one already exists"
+                  + " with timestamp 2024-12-18T08:30:00Z."),
           result);
     }
   }

@@ -80,6 +80,8 @@ tasks.named("processResources") {
 
 checkstyle {
   toolVersion = "10.21.2"
+  maxWarnings = 0
+  maxErrors = 0
   val archive = configurations.checkstyle.get().resolve().filter {
     it.name.startsWith("checkstyle")
   }
@@ -89,8 +91,8 @@ checkstyle {
 }
 
 pmd {
-  isConsoleOutput = true
   toolVersion = "7.10.0"
+  isConsoleOutput = true
 }
 
 spotless {
