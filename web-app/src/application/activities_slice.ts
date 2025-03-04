@@ -13,6 +13,7 @@ import {
 import { ActivitiesApi } from "../infrastructure/activities_api.ts";
 import { Clock } from "../util/clock.ts";
 import { Timer } from "../util/timer.ts";
+import { NotificationClient } from "../infrastructure/notification_client.ts";
 
 export interface ActivitiesState {
   readonly lastActivity?: Activity;
@@ -47,6 +48,7 @@ const initialState: ActivitiesState = {
 type ActivitiesThunkConfig = {
   extra: {
     readonly activitiesApi: ActivitiesApi;
+    readonly notificationClient: NotificationClient;
     readonly clock: Clock;
     readonly timer: Timer;
   };
@@ -99,17 +101,14 @@ export const startCountdown = createAsyncThunk<
   unknown,
   ActivitiesThunkConfig
 >("activities/startCountdown", async (_, thunkAPI) => {
-  const { timer } = thunkAPI.extra;
+  const { notificationClient, timer } = thunkAPI.extra;
   timer.schedule(
     () => thunkAPI.dispatch(progressCountdown({ seconds: 1 })),
     0,
     1000,
   );
   thunkAPI.dispatch(countdownStarted());
-
-  if (Notification.permission === "default") {
-    void Notification.requestPermission();
-  }
+  notificationClient.requestPermission();
 });
 
 const progressCountdown = createAsyncThunk<
@@ -117,15 +116,18 @@ const progressCountdown = createAsyncThunk<
   { seconds: number },
   ActivitiesThunkConfig
 >("activities/progressCountdown", async ({ seconds }, thunkAPI) => {
+  const { notificationClient } = thunkAPI.extra;
   thunkAPI.dispatch(countdownProgressed({ seconds }));
   const remaining = Duration.parse(
     thunkAPI.getState().activities.countdown.remaining,
   ).minusSeconds(seconds);
-  if (Notification.permission === "granted" && !remaining.isPositive()) {
-    // TODO Show notification only once
-    new Notification("What are you working on?", {
-      icon: "/apple-touch-icon.png",
-    });
+  if (notificationClient.isGranted && !remaining.isPositive()) {
+    // FIXME Show notification only once
+    notificationClient.show(
+      "What are you working on?",
+      thunkAPI.getState().activities.lastActivity?.task,
+      "/apple-touch-icon.png",
+    );
   }
 });
 

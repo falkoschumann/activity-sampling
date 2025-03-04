@@ -19,6 +19,7 @@ import { Duration } from "../../src/domain/duration";
 import { ActivitiesApi } from "../../src/infrastructure/activities_api";
 import { Clock } from "../../src/util/clock";
 import { Timer } from "../../src/util/timer";
+import { NotificationClient } from "../../src/infrastructure/notification_client";
 
 describe("Activities", () => {
   it("Initial state", () => {
@@ -278,8 +279,9 @@ function configure({
   responses?: Response | Response[];
 } = {}) {
   const activitiesApi = ActivitiesApi.createNull(responses);
+  const notificationsClient = NotificationClient.createNull();
   const clock = Clock.createNull();
   const timer = Timer.createNull();
-  const store = createStore(activitiesApi, clock, timer);
-  return { store, activitiesApi, clock, timer };
+  const store = createStore(activitiesApi, notificationsClient, clock, timer);
+  return { store, activitiesApi, notificationsClient, clock, timer };
 }
