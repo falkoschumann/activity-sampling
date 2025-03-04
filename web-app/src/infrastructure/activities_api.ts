@@ -2,7 +2,6 @@
 
 import {
   CommandStatus,
-  createEmptyRecentActivitiesQueryResult,
   LogActivityCommand,
   RecentActivitiesQuery,
   RecentActivitiesQueryResult,
@@ -69,6 +68,16 @@ export class ActivitiesApi extends EventTarget {
   async getRecentActivities(
     query: RecentActivitiesQuery,
   ): Promise<RecentActivitiesQueryResult> {
+    const nullObject = {
+      workingDays: [],
+      timeSummary: {
+        hoursToday: "PT0S",
+        hoursYesterday: "PT0S",
+        hoursThisWeek: "PT0S",
+        hoursThisMonth: "PT0S",
+      },
+    };
+
     try {
       const url = new URL(
         `${this.#baseUrl}/recent-activities`,
@@ -83,7 +92,7 @@ export class ActivitiesApi extends EventTarget {
       const response = await this.#global.fetch(url);
       if (!response.ok) {
         return {
-          ...createEmptyRecentActivitiesQueryResult(),
+          ...nullObject,
           errorMessage: `${response.status}: ${response.statusText}`,
         };
       }
@@ -92,7 +101,7 @@ export class ActivitiesApi extends EventTarget {
       return JSON.parse(json);
     } catch (error) {
       return {
-        ...createEmptyRecentActivitiesQueryResult(),
+        ...nullObject,
         errorMessage: String(error),
       };
     }

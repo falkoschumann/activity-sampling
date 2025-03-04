@@ -38,15 +38,3 @@ export interface RecentActivitiesQueryResult {
   readonly timeZone?: string;
   readonly errorMessage?: string;
 }
-
-export function createEmptyRecentActivitiesQueryResult(): RecentActivitiesQueryResult {
-  return {
-    workingDays: [],
-    timeSummary: {
-      hoursToday: "PT0S",
-      hoursYesterday: "PT0S",
-      hoursThisWeek: "PT0S",
-      hoursThisMonth: "PT0S",
-    },
-  };
-}
