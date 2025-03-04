@@ -10,7 +10,7 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.dao.DuplicateKeyException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -38,7 +38,7 @@ public class ActivitiesService {
               .build();
       repository.save(dto);
       return CommandStatus.createSuccess();
-    } catch (DuplicateKeyException e) {
+    } catch (DataIntegrityViolationException e) {
       log.error(
           "Log activity failed because of duplicate timestamp (duplicate key): {}", timestamp, e);
       return CommandStatus.createFailure(

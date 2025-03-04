@@ -29,7 +29,7 @@ class ActivitiesServiceTests {
 
     @Test
     void logsActivityWithoutNotes() {
-      var repository = new ActivitiesRepositoryStub();
+      var repository = new MemoryActivitiesRepository();
       var service = new ActivitiesService(repository);
 
       var result = service.logActivity(LogActivityCommand.createTestInstance());
@@ -40,7 +40,7 @@ class ActivitiesServiceTests {
 
     @Test
     void logsActivityWithNotes() {
-      var repository = new ActivitiesRepositoryStub();
+      var repository = new MemoryActivitiesRepository();
       var service = new ActivitiesService(repository);
 
       var result =
@@ -54,7 +54,7 @@ class ActivitiesServiceTests {
 
     @Test
     void failsWhenActivitiesTimestampIsDuplicated() {
-      var repository = new ActivitiesRepositoryStub();
+      var repository = new MemoryActivitiesRepository();
       repository.add(ActivityDto.createTestInstance());
       var service = new ActivitiesService(repository);
 
@@ -73,7 +73,7 @@ class ActivitiesServiceTests {
 
     @Test
     void returnsRecentActivities() {
-      var repository = ActivitiesRepositoryStub.createTestInstance();
+      var repository = MemoryActivitiesRepository.createTestInstance();
       var service = new ActivitiesService(repository);
 
       var result = service.getRecentActivities(RecentActivitiesQuery.createTestInstance());
@@ -83,7 +83,7 @@ class ActivitiesServiceTests {
 
     @Test
     void returnsNoRecentActivitiesWithoutActivities() {
-      var repository = new ActivitiesRepositoryStub();
+      var repository = new MemoryActivitiesRepository();
       var service = new ActivitiesService(repository);
 
       var result = service.getRecentActivities(RecentActivitiesQuery.createTestInstance());
@@ -95,7 +95,7 @@ class ActivitiesServiceTests {
     void returnsRecentActivitiesForTodayWhenQueryIsNotGiven() {
       var nowTimestamp = Instant.now();
       var now = nowTimestamp.atZone(TIME_ZONE).toLocalDateTime();
-      var repository = new ActivitiesRepositoryStub();
+      var repository = new MemoryActivitiesRepository();
       repository.add(
           new ActivityDto(nowTimestamp, Duration.ofMinutes(20), "client-1", "project-1", "task-1"));
       var service = new ActivitiesService(repository);

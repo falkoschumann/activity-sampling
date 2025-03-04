@@ -7,7 +7,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import de.muspellheim.activitysampling.api.util.MemoryCrudRepository;
 import java.io.Serial;
 import java.util.Collection;
 import java.util.List;
@@ -18,7 +17,7 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Test;
-import org.springframework.dao.DuplicateKeyException;
+import org.springframework.dao.DataIntegrityViolationException;
 
 @SuppressWarnings("PMD.AvoidDuplicateLiterals")
 class MemoryCrudRepositoryTests {
@@ -65,7 +64,7 @@ class MemoryCrudRepositoryTests {
     var repo = new MemoryCrudRepositoryImpl();
     repo.save(new EntityStub("foo"));
 
-    assertThrows(DuplicateKeyException.class, () -> repo.save(new EntityStub("foo")));
+    assertThrows(DataIntegrityViolationException.class, () -> repo.save(new EntityStub("foo")));
   }
 
   @Test
@@ -245,7 +244,7 @@ class MemoryCrudRepositoryTests {
           .findAny()
           .ifPresent(
               a -> {
-                throw new DuplicateKeyException("Name must be unique.");
+                throw new DataIntegrityViolationException("Name must be unique.");
               });
     }
   }

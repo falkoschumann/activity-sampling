@@ -4,20 +4,19 @@ package de.muspellheim.activitysampling.api.unit;
 
 import de.muspellheim.activitysampling.api.infrastructure.ActivitiesRepository;
 import de.muspellheim.activitysampling.api.infrastructure.ActivityDto;
-import de.muspellheim.activitysampling.api.util.MemoryCrudRepository;
 import java.io.Serial;
 import java.time.Instant;
 import java.util.Comparator;
 import java.util.List;
-import org.springframework.dao.DuplicateKeyException;
+import org.springframework.dao.DataIntegrityViolationException;
 
-class ActivitiesRepositoryStub extends MemoryCrudRepository<ActivityDto, Long>
+class MemoryActivitiesRepository extends MemoryCrudRepository<ActivityDto, Long>
     implements ActivitiesRepository {
 
   @Serial private static final long serialVersionUID = 1L;
 
   static ActivitiesRepository createTestInstance() {
-    return new ActivitiesRepositoryStub(
+    return new MemoryActivitiesRepository(
         List.of(
             ActivityDto.createTestInstance().withStart(Instant.parse("2024-12-18T08:30:00Z")),
             ActivityDto.createTestInstance().withStart(Instant.parse("2024-12-17T16:00:00Z")),
@@ -28,9 +27,9 @@ class ActivitiesRepositoryStub extends MemoryCrudRepository<ActivityDto, Long>
                 .withNotes("This is a note")));
   }
 
-  ActivitiesRepositoryStub() {}
+  MemoryActivitiesRepository() {}
 
-  ActivitiesRepositoryStub(List<ActivityDto> activities) {
+  MemoryActivitiesRepository(List<ActivityDto> activities) {
     super(activities);
   }
 
@@ -64,7 +63,7 @@ class ActivitiesRepositoryStub extends MemoryCrudRepository<ActivityDto, Long>
         .findFirst()
         .ifPresent(
             e -> {
-              throw new DuplicateKeyException("Duplicate timestamp");
+              throw new DataIntegrityViolationException("Duplicate timestamp");
             });
   }
 }

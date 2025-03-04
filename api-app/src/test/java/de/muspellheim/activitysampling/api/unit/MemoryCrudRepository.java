@@ -1,6 +1,6 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
-package de.muspellheim.activitysampling.api.util;
+package de.muspellheim.activitysampling.api.unit;
 
 import java.io.Serial;
 import java.util.ArrayList;
