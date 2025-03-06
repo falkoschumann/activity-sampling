@@ -14,7 +14,7 @@ analysis.
 
 ### Current Interval
 
-- [ ] Notifies user when interval is elapsed.
+- [x] Notifies user when interval is elapsed.
 
 ### Log Activity
 

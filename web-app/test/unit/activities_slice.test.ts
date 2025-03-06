@@ -80,7 +80,8 @@ describe("Activities", () => {
 
   describe("Progress countdown", () => {
     it("Handles countdown progressed", () => {
-      const { store, timer } = configure();
+      const { store, notificationsClient, timer } = configure();
+      const shownNotifications = notificationsClient.trackNotificationsShown();
       store.dispatch(durationSelected({ duration: "PT20M" }));
       store.dispatch(startCountdown({}));
 
@@ -92,10 +93,12 @@ describe("Activities", () => {
         percentage: 80,
         isRunning: true,
       });
+      expect(shownNotifications.data).toEqual([]);
     });
 
     it("Handles countdown elapsed", () => {
-      const { store, timer } = configure();
+      const { store, notificationsClient, timer } = configure();
+      const shownNotifications = notificationsClient.trackNotificationsShown();
       store.dispatch(durationSelected({ duration: "PT20M" }));
       store.dispatch(startCountdown({}));
       timer.simulateTaskRun(Duration.parse("PT16M").seconds);
@@ -108,10 +111,14 @@ describe("Activities", () => {
         percentage: 100,
         isRunning: true,
       });
+      expect(shownNotifications.data).toEqual([
+        { title: "What are you working on?" },
+      ]);
     });
 
     it("Handles countdown restarted", () => {
-      const { store, timer } = configure();
+      const { store, notificationsClient, timer } = configure();
+      const shownNotifications = notificationsClient.trackNotificationsShown();
       store.dispatch(durationSelected({ duration: "PT20M" }));
       store.dispatch(startCountdown({}));
       timer.simulateTaskRun(Duration.parse("PT20M").seconds);
@@ -124,6 +131,9 @@ describe("Activities", () => {
         percentage: 5,
         isRunning: true,
       });
+      expect(shownNotifications.data).toEqual([
+        { title: "What are you working on?" },
+      ]);
     });
   });
 

@@ -120,9 +120,8 @@ const progressCountdown = createAsyncThunk<
   thunkAPI.dispatch(countdownProgressed({ seconds }));
   const remaining = Duration.parse(
     thunkAPI.getState().activities.countdown.remaining,
-  ).minusSeconds(seconds);
+  );
   if (notificationClient.isGranted && !remaining.isPositive()) {
-    // FIXME Show notification only once
     notificationClient.show(
       "What are you working on?",
       thunkAPI.getState().activities.lastActivity?.task,
