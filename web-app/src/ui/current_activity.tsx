@@ -3,8 +3,8 @@
 import * as React from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-import { logActivity, selectLastActivity } from "../application/activities_slice.ts";
-import { AppDispatch } from "../application/store.ts";
+import { logActivity, selectLastActivity } from "../application/activities_slice";
+import { AppDispatch } from "../application/store";
 
 export default function CurrentActivity() {
   const lastActivity = useSelector(selectLastActivity);

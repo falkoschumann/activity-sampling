@@ -5,9 +5,9 @@ import {
   LogActivityCommand,
   RecentActivitiesQuery,
   RecentActivitiesQueryResult,
-} from "../domain/messages.ts";
-import { ConfigurableResponses } from "../util/configurable_responses.ts";
-import { OutputTracker } from "../util/output_tracker.ts";
+} from "../domain/messages";
+import { ConfigurableResponses } from "../util/configurable_responses";
+import { OutputTracker } from "../util/output_tracker";
 
 const ACTIVITY_LOGGED_EVENT = "activityLogged";
 

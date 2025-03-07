@@ -3,10 +3,10 @@
 import { configureStore } from "@reduxjs/toolkit";
 
 import activitiesReducer from "./activities_slice";
-import { ActivitiesApi } from "../infrastructure/activities_api.ts";
-import { Clock } from "../util/clock.ts";
-import { Timer } from "../util/timer.ts";
-import { NotificationClient } from "../infrastructure/notification_client.ts";
+import { ActivitiesApi } from "../infrastructure/activities_api";
+import { NotificationClient } from "../infrastructure/notification_client";
+import { Clock } from "../util/clock";
+import { Timer } from "../util/timer";
 
 export const store = createStore(
   ActivitiesApi.create(),

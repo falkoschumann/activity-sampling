@@ -2,9 +2,9 @@
 
 import { useDispatch, useSelector } from "react-redux";
 
-import { lastActivitySelected, selectTimeZone, selectWorkingDays } from "../application/activities_slice.ts";
-import { AppDispatch } from "../application/store.ts";
-import { Activity } from "../domain/activities.ts";
+import { lastActivitySelected, selectTimeZone, selectWorkingDays } from "../application/activities_slice";
+import { AppDispatch } from "../application/store";
+import { Activity } from "../domain/activities";
 
 export default function RecentActivities() {
   const workingDays = useSelector(selectWorkingDays);

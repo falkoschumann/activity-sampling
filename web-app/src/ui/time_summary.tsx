@@ -2,8 +2,8 @@
 
 import { useSelector } from "react-redux";
 
-import { selectTimeSummary } from "../application/activities_slice.ts";
-import { Duration } from "../domain/duration.ts";
+import { selectTimeSummary } from "../application/activities_slice";
+import { Duration } from "../domain/duration";
 
 export default function TimeSummary() {
   const { hoursToday, hoursYesterday, hoursThisWeek, hoursThisMonth } = useSelector(selectTimeSummary);

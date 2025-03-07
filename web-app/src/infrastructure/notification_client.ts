@@ -1,6 +1,6 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
-import { OutputTracker } from "../util/output_tracker.ts";
+import { OutputTracker } from "../util/output_tracker";
 
 export class NotificationClient extends EventTarget {
   static create() {
@@ -11,7 +11,7 @@ export class NotificationClient extends EventTarget {
     return new NotificationClient(NotificationStub);
   }
 
-  #notificationType;
+  readonly #notificationType;
   #notification?: NotificationStub;
 
   constructor(notificationType: typeof NotificationStub) {

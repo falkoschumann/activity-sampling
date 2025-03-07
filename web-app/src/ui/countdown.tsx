@@ -3,9 +3,9 @@
 import * as React from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-import { durationSelected, selectCountdown, startCountdown, stopCountdown } from "../application/activities_slice.ts";
-import { AppDispatch } from "../application/store.ts";
-import { Duration } from "../domain/duration.ts";
+import { durationSelected, selectCountdown, startCountdown, stopCountdown } from "../application/activities_slice";
+import { AppDispatch } from "../application/store";
+import { Duration } from "../domain/duration";
 
 export default function Countdown() {
   const { duration, remaining, percentage, isRunning } = useSelector(selectCountdown);

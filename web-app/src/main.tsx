@@ -6,8 +6,8 @@ import { Provider } from "react-redux";
 import "bootstrap/dist/css/bootstrap.css";
 import "bootstrap/dist/js/bootstrap.esm.js";
 
-import { store } from "./application/store.ts";
-import App from "./ui/app.tsx";
+import { store } from "./application/store";
+import App from "./ui/app";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>

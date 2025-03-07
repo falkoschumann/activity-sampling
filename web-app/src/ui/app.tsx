@@ -3,8 +3,8 @@
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 
-import { getRecentActivities } from "../application/activities_slice.ts";
-import { AppDispatch } from "../application/store.ts";
+import { getRecentActivities } from "../application/activities_slice";
+import { AppDispatch } from "../application/store";
 import Countdown from "./countdown";
 import CurrentActivity from "./current_activity";
 import RecentActivities from "./recent_activities";
