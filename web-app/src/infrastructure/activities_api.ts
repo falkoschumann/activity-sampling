@@ -13,22 +13,22 @@ const ACTIVITY_LOGGED_EVENT = "activityLogged";
 
 export class ActivitiesApi extends EventTarget {
   static create(): ActivitiesApi {
-    return new ActivitiesApi("/api/activities", globalThis);
+    return new ActivitiesApi("/api/activities", globalThis.fetch);
   }
 
   static createNull(
     responses: Response | Error | (Response | Error)[],
   ): ActivitiesApi {
-    return new ActivitiesApi("/stub/activities", new GlobalStubImpl(responses));
+    return new ActivitiesApi("/stub/activities", createFetchStub(responses));
   }
 
   readonly #baseUrl: string;
-  readonly #global: GlobalStub;
+  readonly #fetch: typeof window.fetch;
 
-  constructor(baseUrl: string, global: GlobalStub) {
+  constructor(baseUrl: string, fetch: typeof window.fetch) {
     super();
     this.#baseUrl = baseUrl;
-    this.#global = global;
+    this.#fetch = fetch;
   }
 
   async logActivity(command: LogActivityCommand): Promise<CommandStatus> {
@@ -37,7 +37,7 @@ export class ActivitiesApi extends EventTarget {
         `${this.#baseUrl}/log-activity`,
         window.location.href,
       );
-      const response = await this.#global.fetch(url, {
+      const response = await this.#fetch(url, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -89,7 +89,7 @@ export class ActivitiesApi extends EventTarget {
       if (query.timeZone) {
         url.searchParams.append("timeZone", query.timeZone);
       }
-      const response = await this.#global.fetch(url);
+      const response = await this.#fetch(url);
       if (!response.ok) {
         return {
           ...nullObject,
@@ -108,23 +108,14 @@ export class ActivitiesApi extends EventTarget {
   }
 }
 
-interface GlobalStub {
-  fetch(input: RequestInfo | URL, init?: RequestInit): Promise<Response>;
-}
-
-class GlobalStubImpl implements GlobalStub {
-  #responses;
-
-  constructor(responses: Response | Error | (Response | Error)[]) {
-    this.#responses = ConfigurableResponses.create(responses);
-  }
-
-  async fetch() {
-    const response = this.#responses.next();
+function createFetchStub(responses: Response | Error | (Response | Error)[]) {
+  const configurableResponses = ConfigurableResponses.create(responses);
+  return async () => {
+    const response = configurableResponses.next();
     if (response instanceof Error) {
       throw response;
     }
 
     return response;
-  }
+  };
 }

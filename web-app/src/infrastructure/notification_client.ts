@@ -7,40 +7,46 @@ export class NotificationClient extends EventTarget {
     return new NotificationClient(window.Notification);
   }
 
-  static createNull() {
-    return new NotificationClient(NotificationStub);
+  static createNull(
+    {
+      permission,
+    }: {
+      permission: NotificationPermission;
+    } = { permission: "granted" },
+  ) {
+    return new NotificationClient(createNotificationStub(permission));
   }
 
-  readonly #notificationType;
-  #notification?: NotificationStub;
+  readonly #notificationConstructor;
+  #notification?: Notification;
 
-  constructor(notificationType: typeof NotificationStub) {
+  constructor(notificationConstructor: typeof Notification) {
     super();
-    this.#notificationType = notificationType;
+    this.#notificationConstructor = notificationConstructor;
   }
 
   get isGranted() {
-    return this.#notificationType.permission === "granted";
+    return this.#notificationConstructor.permission === "granted";
   }
 
   get isDenied() {
-    return this.#notificationType.permission === "denied";
+    return this.#notificationConstructor.permission === "denied";
   }
 
   get isUnknown() {
-    return this.#notificationType.permission === "default";
+    return this.#notificationConstructor.permission === "default";
   }
 
   async requestPermission() {
     if (!this.isDenied) {
-      await this.#notificationType.requestPermission();
+      await this.#notificationConstructor.requestPermission();
     }
   }
 
   show(title: string, body?: string, iconUrl?: string) {
     if (this.isGranted) {
-      this.#notification?.close();
-      this.#notification = new this.#notificationType(title, {
+      this.hide();
+      this.#notification = new this.#notificationConstructor(title, {
         body,
         icon: iconUrl,
       });
@@ -60,18 +66,49 @@ export class NotificationClient extends EventTarget {
   }
 
   hide() {
-    this.#notification?.close();
+    if (this.#notification == null) {
+      return;
+    }
+
+    this.#notification.close();
+    this.dispatchEvent(
+      new CustomEvent("NOTIFICATION_HIDDEN", {
+        detail: {
+          title: this.#notification.title,
+          body: this.#notification.body,
+        },
+      }),
+    );
+    this.#notification = undefined;
+  }
+
+  trackNotificationsHidden() {
+    return OutputTracker.create(this, "NOTIFICATION_HIDDEN");
   }
 }
 
-class NotificationStub {
-  static permission: NotificationPermission = "default";
+function createNotificationStub(permission: NotificationPermission) {
+  NotificationStub.permission = "default";
+  NotificationStub.expectedPermission = permission;
 
-  static async requestPermission() {
-    return (NotificationStub.permission = "granted");
+  return NotificationStub as unknown as typeof Notification;
+}
+
+class NotificationStub {
+  static expectedPermission: NotificationPermission;
+  static permission = "default";
+
+  static requestPermission() {
+    return (this.permission = this.expectedPermission);
   }
 
-  constructor(_title: string, _options?: NotificationOptions) {}
+  title: string;
+  body?: string;
+
+  constructor(title: string, options?: NotificationOptions) {
+    this.title = title;
+    this.body = options?.body;
+  }
 
   close() {}
 }
