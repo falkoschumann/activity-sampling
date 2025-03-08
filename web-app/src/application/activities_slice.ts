@@ -15,15 +15,18 @@ import { NotificationClient } from "../infrastructure/notification_client";
 import { Clock } from "../util/clock";
 import { Timer } from "../util/timer";
 
+// TODO Do not log empty activity, disable log button
+// TODO Disable form while countdown is running and not elapsed
+
 export interface ActivitiesState {
-  readonly lastActivity?: Activity;
+  readonly lastActivity?: Activity; // TODO Rename to currentActivity
   readonly countdown: {
     readonly duration: string;
     readonly remaining: string;
     readonly percentage: number;
     readonly isRunning: boolean;
   };
-  readonly workingDays: WorkingDay[];
+  readonly workingDays: WorkingDay[]; // TODO Rename to recentActivities
   readonly timeSummary: TimeSummary;
   readonly timeZone: string;
 }
