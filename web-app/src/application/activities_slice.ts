@@ -1,6 +1,11 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
-import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
+import {
+  createAsyncThunk,
+  createSlice,
+  PayloadAction,
+  SerializedError,
+} from "@reduxjs/toolkit";
 
 import { Activity, TimeSummary, WorkingDay } from "../domain/activities";
 import { Duration } from "../domain/duration";
@@ -29,7 +34,9 @@ export interface ActivitiesState {
   readonly workingDays: WorkingDay[]; // TODO Rename to recentActivities
   readonly timeSummary: TimeSummary;
   readonly timeZone: string;
-  readonly errorMessage?: string;
+  readonly error?: {
+    message: string;
+  };
 }
 
 const initialState: ActivitiesState = {
@@ -181,32 +188,32 @@ export const activitiesSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    // TODO Show logged error message to the user
-
     builder.addCase(getRecentActivities.fulfilled, (state, action) => {
-      return { ...state, ...action.payload, errorMessage: undefined };
+      return { ...state, ...action.payload, error: undefined };
     });
     builder.addCase(getRecentActivities.rejected, (state, action) => {
-      console.error(
-        "Unexpected error while getting recent activities:",
-        action.error,
-      );
-      return { ...state, errorMessage: action.error.message };
+      logError("Could not get recent activities.", action.error);
+      state.error = {
+        message: "Could not get recent activities. Please try again later.",
+      };
     });
     builder.addCase(logActivity.fulfilled, (state, action) => {
       if (!action.payload.success) {
-        console.error(
-          "Unexpected error while logging activity:",
-          action.payload.errorMessage,
-        );
-        return { ...state, errorMessage: action.payload.errorMessage };
+        logError("Could not log activity.", {
+          message: action.payload.errorMessage,
+        });
+        state.error = {
+          message: `Could not log activity. ${action.payload.errorMessage}`,
+        };
+      } else {
+        state.error = undefined;
       }
-
-      return { ...state, errorMessage: undefined };
     });
     builder.addCase(logActivity.rejected, (state, action) => {
-      console.error("Unexpected error while logging activity:", action.error);
-      return { ...state, errorMessage: action.error.message };
+      logError("Could not log activity", action.error);
+      state.error = {
+        message: "Could not log activity. Please try again later.",
+      };
     });
   },
   selectors: {
@@ -215,7 +222,7 @@ export const activitiesSlice = createSlice({
     selectTimeSummary: (state) => state.timeSummary,
     selectWorkingDays: (state) => state.workingDays,
     selectTimeZone: (state) => state.timeZone,
-    selectErrorMessage: (state) => state.errorMessage,
+    selectError: (state) => state.error,
   },
 });
 
@@ -226,7 +233,7 @@ export const { durationSelected, lastActivitySelected } =
   activitiesSlice.actions;
 
 export const {
-  selectErrorMessage,
+  selectError,
   selectLastActivity,
   selectCountdown,
   selectTimeSummary,
@@ -235,3 +242,26 @@ export const {
 } = activitiesSlice.selectors;
 
 export default activitiesSlice.reducer;
+
+function logError(message: string, error: SerializedError) {
+  let cause = "";
+  if (error.name) {
+    cause += error.name;
+  }
+  if (error.message) {
+    if (cause.length === 0) {
+      cause += error.message;
+    } else {
+      cause += `: ${error.message}`;
+    }
+  }
+  if (error.stack) {
+    cause += `\n${error.stack}`;
+  }
+
+  if (cause) {
+    console.error(message, cause);
+  } else {
+    console.error(message);
+  }
+}
