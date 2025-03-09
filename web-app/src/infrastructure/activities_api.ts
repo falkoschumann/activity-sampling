@@ -2,6 +2,7 @@
 
 import {
   CommandStatus,
+  Failure,
   LogActivityCommand,
   RecentActivitiesQuery,
   RecentActivitiesQueryResult,
@@ -48,9 +49,7 @@ export class ActivitiesApi extends EventTarget {
         body: JSON.stringify(command),
       });
       if (!response.ok) {
-        return CommandStatus.failure(
-          `${response.status}: ${response.statusText}`,
-        );
+        return new Failure(`${response.status}: ${response.statusText}`);
       }
 
       this.dispatchEvent(
@@ -58,7 +57,7 @@ export class ActivitiesApi extends EventTarget {
       );
       return response.json();
     } catch (error) {
-      return CommandStatus.failure(String(error));
+      return new Failure(String(error));
     }
   }
 

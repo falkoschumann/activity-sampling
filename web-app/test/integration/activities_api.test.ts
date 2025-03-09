@@ -3,7 +3,7 @@
 import { describe, expect, it } from "vitest";
 
 import { TEST_ACTIVITY } from "../../src/domain/activities";
-import { CommandStatus } from "../../src/domain/messages";
+import { Failure, Success } from "../../src/domain/messages";
 import { ActivitiesApi } from "../../src/infrastructure/activities_api";
 
 describe("Activities API", () => {
@@ -15,7 +15,7 @@ describe("Activities API", () => {
 
       const status = await api.logActivity(TEST_ACTIVITY);
 
-      expect(status).toEqual(CommandStatus.success());
+      expect(status).toEqual(new Success());
     });
 
     it("Handles server error", async () => {
@@ -25,9 +25,7 @@ describe("Activities API", () => {
 
       const status = await api.logActivity(TEST_ACTIVITY);
 
-      expect(status).toEqual(
-        CommandStatus.failure("500: Internal Server Error"),
-      );
+      expect(status).toEqual(new Failure("500: Internal Server Error"));
     });
 
     it("Handles network error", async () => {
@@ -35,7 +33,7 @@ describe("Activities API", () => {
 
       const status = await api.logActivity(TEST_ACTIVITY);
 
-      expect(status).toEqual(CommandStatus.failure("Error: Network Error"));
+      expect(status).toEqual(new Failure("Error: Network Error"));
     });
   });
 

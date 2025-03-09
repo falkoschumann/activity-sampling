@@ -11,19 +11,19 @@ export interface LogActivityCommand {
   readonly notes?: string;
 }
 
-export class CommandStatus {
-  static success(): CommandStatus {
-    return new CommandStatus(true);
-  }
+export type CommandStatus = Success | Failure;
 
-  static failure(errorMessage: string): CommandStatus {
-    return new CommandStatus(false, errorMessage);
-  }
+export class Success {
+  readonly success = true;
+}
 
-  constructor(
-    public readonly success: boolean,
-    public readonly errorMessage?: string,
-  ) {}
+export class Failure {
+  readonly success = false;
+  readonly errorMessage: string;
+
+  constructor(errorMessage: string) {
+    this.errorMessage = errorMessage;
+  }
 }
 
 export interface RecentActivitiesQuery {
