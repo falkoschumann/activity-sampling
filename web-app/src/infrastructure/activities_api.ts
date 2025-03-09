@@ -13,7 +13,10 @@ const ACTIVITY_LOGGED_EVENT = "activityLogged";
 
 export class ActivitiesApi extends EventTarget {
   static create(): ActivitiesApi {
-    return new ActivitiesApi("/api/activities", globalThis.fetch);
+    return new ActivitiesApi(
+      "/api/activities",
+      globalThis.fetch.bind(globalThis),
+    );
   }
 
   static createNull(
