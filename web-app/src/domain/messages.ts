@@ -36,5 +36,4 @@ export interface RecentActivitiesQueryResult {
   readonly workingDays: WorkingDay[];
   readonly timeSummary: TimeSummary;
   readonly timeZone?: string;
-  readonly errorMessage?: string;
 }

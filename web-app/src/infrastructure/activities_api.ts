@@ -2,7 +2,6 @@
 
 import {
   CommandStatus,
-  Failure,
   LogActivityCommand,
   RecentActivitiesQuery,
   RecentActivitiesQueryResult,
@@ -36,29 +35,22 @@ export class ActivitiesApi extends EventTarget {
   }
 
   async logActivity(command: LogActivityCommand): Promise<CommandStatus> {
-    try {
-      const url = new URL(
-        `${this.#baseUrl}/log-activity`,
-        window.location.href,
-      );
-      const response = await this.#fetch(url, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(command),
-      });
-      if (!response.ok) {
-        return new Failure(`${response.status}: ${response.statusText}`);
-      }
-
-      this.dispatchEvent(
-        new CustomEvent(ACTIVITY_LOGGED_EVENT, { detail: command }),
-      );
-      return response.json();
-    } catch (error) {
-      return new Failure(String(error));
+    const url = new URL(`${this.#baseUrl}/log-activity`, window.location.href);
+    const response = await this.#fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(command),
+    });
+    if (!response.ok) {
+      throw new Error(`${response.status}: ${response.statusText}`);
     }
+
+    this.dispatchEvent(
+      new CustomEvent(ACTIVITY_LOGGED_EVENT, { detail: command }),
+    );
+    return response.json();
   }
 
   trackLoggedActivity() {
@@ -70,43 +62,23 @@ export class ActivitiesApi extends EventTarget {
   async getRecentActivities(
     query: RecentActivitiesQuery,
   ): Promise<RecentActivitiesQueryResult> {
-    const nullObject = {
-      workingDays: [],
-      timeSummary: {
-        hoursToday: "PT0S",
-        hoursYesterday: "PT0S",
-        hoursThisWeek: "PT0S",
-        hoursThisMonth: "PT0S",
-      },
-    };
-
-    try {
-      const url = new URL(
-        `${this.#baseUrl}/recent-activities`,
-        window.location.href,
-      );
-      if (query.today) {
-        url.searchParams.append("today", query.today);
-      }
-      if (query.timeZone) {
-        url.searchParams.append("timeZone", query.timeZone);
-      }
-      const response = await this.#fetch(url);
-      if (!response.ok) {
-        return {
-          ...nullObject,
-          errorMessage: `${response.status}: ${response.statusText}`,
-        };
-      }
-
-      const json = await response.text();
-      return JSON.parse(json);
-    } catch (error) {
-      return {
-        ...nullObject,
-        errorMessage: String(error),
-      };
+    const url = new URL(
+      `${this.#baseUrl}/recent-activities`,
+      window.location.href,
+    );
+    if (query.today) {
+      url.searchParams.append("today", query.today);
     }
+    if (query.timeZone) {
+      url.searchParams.append("timeZone", query.timeZone);
+    }
+    const response = await this.#fetch(url);
+    if (!response.ok) {
+      throw new Error(`${response.status}: ${response.statusText}`);
+    }
+
+    const json = await response.text();
+    return JSON.parse(json);
   }
 }
 

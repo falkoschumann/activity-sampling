@@ -3,7 +3,7 @@
 import { describe, expect, it } from "vitest";
 
 import { TEST_ACTIVITY } from "../../src/domain/activities";
-import { Failure, Success } from "../../src/domain/messages";
+import { Success } from "../../src/domain/messages";
 import { ActivitiesApi } from "../../src/infrastructure/activities_api";
 
 describe("Activities API", () => {
@@ -23,17 +23,17 @@ describe("Activities API", () => {
         new Response("", { status: 500, statusText: "Internal Server Error" }),
       );
 
-      const status = await api.logActivity(TEST_ACTIVITY);
+      const result = api.logActivity(TEST_ACTIVITY);
 
-      expect(status).toEqual(new Failure("500: Internal Server Error"));
+      await expect(result).rejects.toThrow("500: Internal Server Error");
     });
 
     it("Handles network error", async () => {
       const api = ActivitiesApi.createNull(new Error("Network Error"));
 
-      const status = await api.logActivity(TEST_ACTIVITY);
+      const result = api.logActivity(TEST_ACTIVITY);
 
-      expect(status).toEqual(new Failure("Error: Network Error"));
+      await expect(result).rejects.toThrow("Network Error");
     });
   });
 
@@ -72,35 +72,17 @@ describe("Activities API", () => {
         new Response("", { status: 500, statusText: "Internal Server Error" }),
       );
 
-      const result = await api.getRecentActivities({});
+      const result = api.getRecentActivities({});
 
-      expect(result).toEqual({
-        workingDays: [],
-        timeSummary: {
-          hoursToday: "PT0S",
-          hoursYesterday: "PT0S",
-          hoursThisWeek: "PT0S",
-          hoursThisMonth: "PT0S",
-        },
-        errorMessage: "500: Internal Server Error",
-      });
+      await expect(result).rejects.toThrow("500: Internal Server Error");
     });
 
     it("Handles network error", async () => {
       const api = ActivitiesApi.createNull(new Error("Network Error"));
 
-      const result = await api.getRecentActivities({});
+      const result = api.getRecentActivities({});
 
-      expect(result).toEqual({
-        workingDays: [],
-        timeSummary: {
-          hoursToday: "PT0S",
-          hoursYesterday: "PT0S",
-          hoursThisWeek: "PT0S",
-          hoursThisMonth: "PT0S",
-        },
-        errorMessage: "Error: Network Error",
-      });
+      await expect(result).rejects.toThrow("Network Error");
     });
   });
 });

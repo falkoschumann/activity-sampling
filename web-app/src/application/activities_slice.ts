@@ -29,6 +29,7 @@ export interface ActivitiesState {
   readonly workingDays: WorkingDay[]; // TODO Rename to recentActivities
   readonly timeSummary: TimeSummary;
   readonly timeZone: string;
+  readonly errorMessage?: string;
 }
 
 const initialState: ActivitiesState = {
@@ -180,8 +181,32 @@ export const activitiesSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
+    // TODO Show logged error message to the user
+
     builder.addCase(getRecentActivities.fulfilled, (state, action) => {
-      return { ...state, ...action.payload };
+      return { ...state, ...action.payload, errorMessage: undefined };
+    });
+    builder.addCase(getRecentActivities.rejected, (state, action) => {
+      console.error(
+        "Unexpected error while getting recent activities:",
+        action.error,
+      );
+      return { ...state, errorMessage: action.error.message };
+    });
+    builder.addCase(logActivity.fulfilled, (state, action) => {
+      if (!action.payload.success) {
+        console.error(
+          "Unexpected error while logging activity:",
+          action.payload.errorMessage,
+        );
+        return { ...state, errorMessage: action.payload.errorMessage };
+      }
+
+      return { ...state, errorMessage: undefined };
+    });
+    builder.addCase(logActivity.rejected, (state, action) => {
+      console.error("Unexpected error while logging activity:", action.error);
+      return { ...state, errorMessage: action.error.message };
     });
   },
   selectors: {
@@ -190,6 +215,7 @@ export const activitiesSlice = createSlice({
     selectTimeSummary: (state) => state.timeSummary,
     selectWorkingDays: (state) => state.workingDays,
     selectTimeZone: (state) => state.timeZone,
+    selectErrorMessage: (state) => state.errorMessage,
   },
 });
 
@@ -200,6 +226,7 @@ export const { durationSelected, lastActivitySelected } =
   activitiesSlice.actions;
 
 export const {
+  selectErrorMessage,
   selectLastActivity,
   selectCountdown,
   selectTimeSummary,
