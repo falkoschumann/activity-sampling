@@ -12,10 +12,12 @@ describe("Activities API", () => {
       const api = ActivitiesApi.createNull(
         new Response(JSON.stringify({ success: true }), { status: 200 }),
       );
+      const loggedActivities = api.trackActivitiesLogged();
 
       const status = await api.logActivity(TEST_ACTIVITY);
 
       expect(status).toEqual(new Success());
+      expect(loggedActivities.data).toEqual([TEST_ACTIVITY]);
     });
 
     it("Handles server error", async () => {

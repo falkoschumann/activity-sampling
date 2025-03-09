@@ -2,6 +2,9 @@
 
 import { OutputTracker } from "../util/output_tracker";
 
+const NOTIFICATION_SHOWN_EVENT = "NOTIFICATION_SHOWN";
+const NOTIFICATION_HIDDEN_EVENT = "NOTIFICATION_HIDDEN";
+
 export class NotificationClient extends EventTarget {
   static create() {
     return new NotificationClient(window.Notification);
@@ -51,7 +54,7 @@ export class NotificationClient extends EventTarget {
         icon: iconUrl,
       });
       this.dispatchEvent(
-        new CustomEvent("NOTIFICATION_SHOWN", {
+        new CustomEvent(NOTIFICATION_SHOWN_EVENT, {
           detail: {
             title,
             body,
@@ -62,7 +65,7 @@ export class NotificationClient extends EventTarget {
   }
 
   trackNotificationsShown() {
-    return OutputTracker.create(this, "NOTIFICATION_SHOWN");
+    return OutputTracker.create(this, NOTIFICATION_SHOWN_EVENT);
   }
 
   hide() {
@@ -72,7 +75,7 @@ export class NotificationClient extends EventTarget {
 
     this.#notification.close();
     this.dispatchEvent(
-      new CustomEvent("NOTIFICATION_HIDDEN", {
+      new CustomEvent(NOTIFICATION_HIDDEN_EVENT, {
         detail: {
           title: this.#notification.title,
           body: this.#notification.body,
@@ -83,7 +86,7 @@ export class NotificationClient extends EventTarget {
   }
 
   trackNotificationsHidden() {
-    return OutputTracker.create(this, "NOTIFICATION_HIDDEN");
+    return OutputTracker.create(this, NOTIFICATION_HIDDEN_EVENT);
   }
 }
 

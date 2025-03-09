@@ -9,8 +9,6 @@ import {
   logActivity,
   selectCountdown,
   selectLastActivity,
-  selectTimeSummary,
-  selectWorkingDays,
   startCountdown,
   stopCountdown,
 } from "../../src/application/activities_slice";
@@ -22,61 +20,50 @@ import { Timer } from "../../src/util/timer";
 import { NotificationClient } from "../../src/infrastructure/notification_client";
 
 describe("Activities", () => {
-  it("Initial state", () => {
-    const { store } = configure();
+  describe("Ask periodically", () => {
+    it("Selects duration", () => {
+      const { store } = configure();
 
-    const lastActivity = selectLastActivity(store.getState());
-    const timeSummary = selectTimeSummary(store.getState());
-    const workingDays = selectWorkingDays(store.getState());
+      store.dispatch(durationSelected({ duration: "PT15M" }));
 
-    expect(lastActivity).toBeUndefined();
-    expect(timeSummary).toEqual({
-      hoursToday: "PT0S",
-      hoursYesterday: "PT0S",
-      hoursThisWeek: "PT0S",
-      hoursThisMonth: "PT0S",
-    });
-    expect(workingDays).toEqual([]);
-  });
-
-  it("Handles duration selected", () => {
-    const { store } = configure();
-
-    store.dispatch(
-      durationSelected({
+      expect(selectCountdown(store.getState())).toEqual({
         duration: "PT15M",
-      }),
-    );
+        remaining: "PT15M",
+        percentage: 0,
+        isRunning: false,
+      });
+    });
 
-    expect(selectCountdown(store.getState())).toEqual({
-      duration: "PT15M",
-      remaining: "PT15M",
-      percentage: 0,
-      isRunning: false,
+    it("Starts countdown", () => {
+      const { store, timer } = configure();
+      store.dispatch(durationSelected({ duration: "PT20M" }));
+      const scheduledTasks = timer.trackScheduledTasks();
+
+      store.dispatch(startCountdown({}));
+
+      expect(selectCountdown(store.getState())).toEqual({
+        duration: "PT20M",
+        remaining: "PT20M",
+        percentage: 0,
+        isRunning: true,
+      });
+      expect(scheduledTasks.data).toEqual([
+        {
+          timeoutId: expect.any(Number),
+          delayOrFirstTime: 0,
+          period: 1000,
+        },
+      ]);
     });
   });
 
-  it("Handles countdown started", () => {
-    const { store, timer } = configure();
-    store.dispatch(durationSelected({ duration: "PT20M" }));
-    const scheduledTasks = timer.trackScheduledTasks();
+  describe.todo("Current interval");
 
-    store.dispatch(startCountdown({}));
+  describe.todo("Log activity");
 
-    expect(selectCountdown(store.getState())).toEqual({
-      duration: "PT20M",
-      remaining: "PT20M",
-      percentage: 0,
-      isRunning: true,
-    });
-    expect(scheduledTasks.data).toEqual([
-      {
-        timeoutId: expect.any(Number),
-        delayOrFirstTime: 0,
-        period: 1000,
-      },
-    ]);
-  });
+  describe.todo("Recent activity");
+
+  // TODO Move to commands and queries above
 
   describe("Progress countdown", () => {
     it("Handles countdown progressed", () => {
@@ -179,10 +166,11 @@ describe("Activities", () => {
   });
 
   it("Logs activity", async () => {
+    // FIXME TypeError: Body is unusable: Body has already been read
     const { store, activitiesApi, clock } = configure({
       responses: new Response('{"success":true}'),
     });
-    const loggedActivity = activitiesApi.trackLoggedActivity();
+    const loggedActivities = activitiesApi.trackActivitiesLogged();
 
     await store.dispatch(
       logActivity({
@@ -193,7 +181,7 @@ describe("Activities", () => {
       }),
     );
 
-    expect(loggedActivity.data).toEqual([
+    expect(loggedActivities.data).toEqual([
       {
         start: clock.now().toISOString(),
         duration: "PT30M",

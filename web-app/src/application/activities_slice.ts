@@ -182,6 +182,7 @@ export const activitiesSlice = createSlice({
     durationSelected: (state, action: PayloadAction<{ duration: string }>) => {
       state.countdown.duration = action.payload.duration;
       state.countdown.remaining = action.payload.duration;
+      state.countdown.percentage = 0;
     },
     lastActivitySelected: (state, action: PayloadAction<Activity>) => {
       state.lastActivity = action.payload;
@@ -233,9 +234,9 @@ export const { durationSelected, lastActivitySelected } =
   activitiesSlice.actions;
 
 export const {
+  selectCountdown,
   selectError,
   selectLastActivity,
-  selectCountdown,
   selectTimeSummary,
   selectTimeZone,
   selectWorkingDays,

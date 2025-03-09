@@ -22,7 +22,7 @@ export class ActivitiesApi extends EventTarget {
   static createNull(
     responses: Response | Error | (Response | Error)[],
   ): ActivitiesApi {
-    return new ActivitiesApi("/stub/activities", createFetchStub(responses));
+    return new ActivitiesApi("/nulled/activities", createFetchStub(responses));
   }
 
   readonly #baseUrl: string;
@@ -53,7 +53,7 @@ export class ActivitiesApi extends EventTarget {
     return response.json();
   }
 
-  trackLoggedActivity() {
+  trackActivitiesLogged() {
     return new OutputTracker<{
       command: LogActivityCommand;
     }>(this, ACTIVITY_LOGGED_EVENT);

@@ -19,79 +19,88 @@ describe("Notification client", () => {
     expect(client.isGranted).toBe(true);
   });
 
-  it("Shows notification", async () => {
-    const client = NotificationClient.createNull();
-    await client.requestPermission();
-    const shownNotifications = client.trackNotificationsShown();
+  describe("Show", () => {
+    it("Shows notification", async () => {
+      const client = NotificationClient.createNull();
+      await client.requestPermission();
+      const shownNotifications = client.trackNotificationsShown();
 
-    client.show("title", "body");
+      client.show("title", "body");
 
-    expect(shownNotifications.data).toEqual([{ title: "title", body: "body" }]);
+      expect(shownNotifications.data).toEqual([
+        {
+          title: "title",
+          body: "body",
+        },
+      ]);
+    });
+
+    it("Closes notification when showing new notification", async () => {
+      const client = NotificationClient.createNull();
+      await client.requestPermission();
+      const shownNotifications = client.trackNotificationsShown();
+      const hiddenNotifications = client.trackNotificationsHidden();
+
+      client.show("title1", "body1");
+      client.show("title2", "body2");
+
+      expect(shownNotifications.data).toEqual([
+        { title: "title1", body: "body1" },
+        { title: "title2", body: "body2" },
+      ]);
+      expect(hiddenNotifications.data).toEqual([
+        { title: "title1", body: "body1" },
+      ]);
+    });
+
+    it("Does not show notification if permission is denied", async () => {
+      const client = NotificationClient.createNull({ permission: "denied" });
+      await client.requestPermission();
+      const shownNotifications = client.trackNotificationsShown();
+
+      client.show("title", "body");
+
+      expect(shownNotifications.data).toEqual([]);
+    });
   });
 
-  it("Closes notification when showing new notification", async () => {
-    const client = NotificationClient.createNull();
-    await client.requestPermission();
-    const shownNotifications = client.trackNotificationsShown();
-    const hiddenNotifications = client.trackNotificationsHidden();
+  describe("Hide", () => {
+    it("Hides notification", async () => {
+      const client = NotificationClient.createNull();
+      await client.requestPermission();
+      client.show("title", "body");
+      const hiddenNotifications = client.trackNotificationsHidden();
 
-    client.show("title1", "body1");
-    client.show("title2", "body2");
+      client.hide();
 
-    expect(shownNotifications.data).toEqual([
-      { title: "title1", body: "body1" },
-      { title: "title2", body: "body2" },
-    ]);
-    expect(hiddenNotifications.data).toEqual([
-      { title: "title1", body: "body1" },
-    ]);
-  });
+      expect(hiddenNotifications.data).toEqual([
+        {
+          title: "title",
+          body: "body",
+        },
+      ]);
+    });
 
-  it("Does not show notification if permission is denied", async () => {
-    const client = NotificationClient.createNull({ permission: "denied" });
-    await client.requestPermission();
-    const shownNotifications = client.trackNotificationsShown();
+    it("Does nothing when notification is not shown", async () => {
+      const client = NotificationClient.createNull();
+      await client.requestPermission();
+      const hiddenNotifications = client.trackNotificationsHidden();
 
-    client.show("title", "body");
+      client.hide();
 
-    expect(shownNotifications.data).toEqual([]);
-  });
+      expect(hiddenNotifications.data).toEqual([]);
+    });
 
-  it("Hides notification", async () => {
-    const client = NotificationClient.createNull();
-    await client.requestPermission();
-    client.show("title", "body");
-    const hiddenNotifications = client.trackNotificationsHidden();
+    it("Does nothing when notification is already hidden", async () => {
+      const client = NotificationClient.createNull();
+      await client.requestPermission();
+      client.show("title", "body");
+      client.hide();
+      const hiddenNotifications = client.trackNotificationsHidden();
 
-    client.hide();
+      client.hide();
 
-    expect(hiddenNotifications.data).toEqual([
-      {
-        title: "title",
-        body: "body",
-      },
-    ]);
-  });
-
-  it("Does nothing when notification is not shown", async () => {
-    const client = NotificationClient.createNull();
-    await client.requestPermission();
-    const hiddenNotifications = client.trackNotificationsHidden();
-
-    client.hide();
-
-    expect(hiddenNotifications.data).toEqual([]);
-  });
-
-  it("Does nothing when notification is already hidden", async () => {
-    const client = NotificationClient.createNull();
-    await client.requestPermission();
-    client.show("title", "body");
-    client.hide();
-    const hiddenNotifications = client.trackNotificationsHidden();
-
-    client.hide();
-
-    expect(hiddenNotifications.data).toEqual([]);
+      expect(hiddenNotifications.data).toEqual([]);
+    });
   });
 });
