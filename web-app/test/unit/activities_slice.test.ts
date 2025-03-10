@@ -3,12 +3,15 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  activitySelected,
   durationSelected,
   getRecentActivities,
-  lastActivitySelected,
   logActivity,
   selectCountdown,
+  selectError,
   selectLastActivity,
+  selectTimeSummary,
+  selectWorkingDays,
   startCountdown,
   stopCountdown,
 } from "../../src/application/activities_slice";
@@ -18,22 +21,13 @@ import { ActivitiesApi } from "../../src/infrastructure/activities_api";
 import { Clock } from "../../src/util/clock";
 import { Timer } from "../../src/util/timer";
 import { NotificationClient } from "../../src/infrastructure/notification_client";
+import {
+  Failure,
+  RecentActivitiesQueryResult,
+} from "../../src/domain/messages";
 
 describe("Activities", () => {
   describe("Ask periodically", () => {
-    it("Selects duration", () => {
-      const { store } = configure();
-
-      store.dispatch(durationSelected({ duration: "PT15M" }));
-
-      expect(selectCountdown(store.getState())).toEqual({
-        duration: "PT15M",
-        remaining: "PT15M",
-        percentage: 0,
-        isRunning: false,
-      });
-    });
-
     it("Starts countdown", () => {
       const { store, timer } = configure();
       store.dispatch(durationSelected({ duration: "PT20M" }));
@@ -55,18 +49,8 @@ describe("Activities", () => {
         },
       ]);
     });
-  });
 
-  describe.todo("Current interval");
-
-  describe.todo("Log activity");
-
-  describe.todo("Recent activity");
-
-  // TODO Move to commands and queries above
-
-  describe("Progress countdown", () => {
-    it("Handles countdown progressed", () => {
+    it("Progresses countdown", () => {
       const { store, notificationsClient, timer } = configure();
       const shownNotifications = notificationsClient.trackNotificationsShown();
       store.dispatch(durationSelected({ duration: "PT20M" }));
@@ -83,27 +67,7 @@ describe("Activities", () => {
       expect(shownNotifications.data).toEqual([]);
     });
 
-    it("Handles countdown elapsed", () => {
-      const { store, notificationsClient, timer } = configure();
-      const shownNotifications = notificationsClient.trackNotificationsShown();
-      store.dispatch(durationSelected({ duration: "PT20M" }));
-      store.dispatch(startCountdown({}));
-      timer.simulateTaskRun(Duration.parse("PT16M").seconds);
-
-      timer.simulateTaskRun(Duration.parse("PT4M").seconds);
-
-      expect(selectCountdown(store.getState())).toEqual({
-        duration: "PT20M",
-        remaining: "PT0S",
-        percentage: 100,
-        isRunning: true,
-      });
-      expect(shownNotifications.data).toEqual([
-        { title: "What are you working on?" },
-      ]);
-    });
-
-    it("Handles countdown restarted", () => {
+    it("Restarts countdown", () => {
       const { store, notificationsClient, timer } = configure();
       const shownNotifications = notificationsClient.trackNotificationsShown();
       store.dispatch(durationSelected({ duration: "PT20M" }));
@@ -122,151 +86,312 @@ describe("Activities", () => {
         { title: "What are you working on?" },
       ]);
     });
-  });
 
-  it("Handles countdown stopped", () => {
-    const { store, timer } = configure();
-    const cancelledTasks = timer.trackCancelledTasks();
-    store.dispatch(startCountdown({}));
-    timer.simulateTaskRun(Duration.parse("PT12M").seconds);
+    it("Stops countdown", () => {
+      const { store, timer } = configure();
+      const cancelledTasks = timer.trackCancelledTasks();
+      store.dispatch(startCountdown({}));
+      timer.simulateTaskRun(Duration.parse("PT12M").seconds);
 
-    store.dispatch(stopCountdown({}));
+      store.dispatch(stopCountdown({}));
 
-    expect(selectCountdown(store.getState())).toEqual({
-      duration: "PT30M",
-      remaining: "PT18M",
-      percentage: 40,
-      isRunning: false,
+      expect(selectCountdown(store.getState())).toEqual({
+        duration: "PT30M",
+        remaining: "PT18M",
+        percentage: 40,
+        isRunning: false,
+      });
+      expect(cancelledTasks.data).toEqual([{ timeoutId: expect.any(Number) }]);
     });
-    expect(cancelledTasks.data).toEqual([{ timeoutId: expect.any(Number) }]);
   });
 
-  it("Handles last activity selected", () => {
-    const { store } = configure();
+  describe("Current interval", () => {
+    it("Selects duration", () => {
+      const { store } = configure();
 
-    store.dispatch(
-      lastActivitySelected({
+      store.dispatch(durationSelected({ duration: "PT15M" }));
+
+      expect(selectCountdown(store.getState())).toEqual({
+        duration: "PT15M",
+        remaining: "PT15M",
+        percentage: 0,
+        isRunning: false,
+      });
+    });
+
+    it("Elapses countdown", () => {
+      const { store, notificationsClient, timer } = configure();
+      const shownNotifications = notificationsClient.trackNotificationsShown();
+      store.dispatch(durationSelected({ duration: "PT20M" }));
+      store.dispatch(startCountdown({}));
+      timer.simulateTaskRun(Duration.parse("PT16M").seconds);
+
+      timer.simulateTaskRun(Duration.parse("PT4M").seconds);
+
+      expect(selectCountdown(store.getState())).toEqual({
+        duration: "PT20M",
+        remaining: "PT0S",
+        percentage: 100,
+        isRunning: true,
+      });
+      expect(shownNotifications.data).toEqual([
+        { title: "What are you working on?" },
+      ]);
+    });
+  });
+
+  describe("Log activity", () => {
+    it("Logs activity", async () => {
+      const commandStatus = JSON.stringify({ success: true });
+      const queryResultJson = JSON.stringify({
+        lastActivity: {
+          start: "2025-03-10T21:00:00Z",
+          duration: "PT30M",
+          client: "client-1",
+          project: "project-1",
+          task: "task-1",
+          notes: "notes-1",
+        },
+        workingDays: [
+          {
+            date: "2025-03-10",
+            activities: [
+              {
+                start: "2025-03-10T21:00:00Z",
+                duration: "PT30M",
+                client: "client-1",
+                project: "project-1",
+                task: "task-1",
+                notes: "notes-1",
+              },
+            ],
+          },
+        ],
+        timeSummary: {
+          hoursToday: "PT30M",
+          hoursYesterday: "PT0S",
+          hoursThisWeek: "PT30M",
+          hoursThisMonth: "PT30M",
+        },
+      } as RecentActivitiesQueryResult);
+      const { store, activitiesApi, clock } = configure({
+        responses: [new Response(commandStatus), new Response(queryResultJson)],
+      });
+      const loggedActivities = activitiesApi.trackActivitiesLogged();
+
+      await store.dispatch(
+        logActivity({
+          client: "client-1",
+          project: "project-1",
+          task: "task-1",
+          notes: "notes-1",
+        }),
+      );
+
+      expect(selectLastActivity(store.getState())).toEqual({
+        start: "2025-03-10T21:00:00Z",
+        duration: "PT30M",
+        client: "client-1",
+        project: "project-1",
+        task: "task-1",
+        notes: "notes-1",
+      });
+      expect(selectWorkingDays(store.getState())).toEqual([
+        {
+          date: "2025-03-10",
+          activities: [
+            {
+              start: "2025-03-10T21:00:00Z",
+              duration: "PT30M",
+              client: "client-1",
+              project: "project-1",
+              task: "task-1",
+              notes: "notes-1",
+            },
+          ],
+        },
+      ]);
+      expect(selectTimeSummary(store.getState())).toEqual({
+        hoursToday: "PT30M",
+        hoursYesterday: "PT0S",
+        hoursThisWeek: "PT30M",
+        hoursThisMonth: "PT30M",
+      });
+      expect(loggedActivities.data).toEqual([
+        {
+          start: clock.now().toISOString(),
+          duration: "PT30M",
+          client: "client-1",
+          project: "project-1",
+          task: "task-1",
+          notes: "notes-1",
+        },
+      ]);
+    });
+
+    it("Handles domain error", async () => {
+      const { store } = configure({
+        responses: [new Response(JSON.stringify(new Failure("Domain error.")))],
+      });
+
+      await store.dispatch(
+        logActivity({
+          client: "client-1",
+          project: "project-1",
+          task: "task-1",
+          notes: "notes-1",
+        }),
+      );
+
+      expect(selectError(store.getState())).toEqual({
+        message: "Could not log activity. Domain error.",
+      });
+    });
+
+    it("Handles server error", async () => {
+      const { store } = configure({
+        responses: [
+          new Response("", {
+            status: 500,
+            statusText: "Internal Server Error",
+          }),
+        ],
+      });
+
+      await store.dispatch(
+        logActivity({
+          client: "client-1",
+          project: "project-1",
+          task: "task-1",
+          notes: "notes-1",
+        }),
+      );
+
+      expect(selectError(store.getState())).toEqual({
+        message: "Could not log activity. Please try again later.",
+      });
+    });
+
+    it("Selects an activity", () => {
+      const { store } = configure();
+
+      store.dispatch(
+        activitySelected({
+          start: "2025-02-12T21:18",
+          duration: "PT30M",
+          client: "client-1",
+          project: "project-1",
+          task: "task-1",
+          notes: "notes-1",
+        }),
+      );
+
+      expect(selectLastActivity(store.getState())).toEqual({
         start: "2025-02-12T21:18",
         duration: "PT30M",
         client: "client-1",
         project: "project-1",
         task: "task-1",
         notes: "notes-1",
-      }),
-    );
-
-    expect(selectLastActivity(store.getState())).toEqual({
-      start: "2025-02-12T21:18",
-      duration: "PT30M",
-      client: "client-1",
-      project: "project-1",
-      task: "task-1",
-      notes: "notes-1",
+      });
     });
   });
 
-  it("Logs activity", async () => {
-    // FIXME TypeError: Body is unusable: Body has already been read
-    const { store, activitiesApi, clock } = configure({
-      responses: new Response('{"success":true}'),
-    });
-    const loggedActivities = activitiesApi.trackActivitiesLogged();
-
-    await store.dispatch(
-      logActivity({
-        client: "client-1",
-        project: "project-1",
-        task: "task-1",
-        notes: "notes-1",
-      }),
-    );
-
-    expect(loggedActivities.data).toEqual([
-      {
-        start: clock.now().toISOString(),
-        duration: "PT30M",
-        client: "client-1",
-        project: "project-1",
-        task: "task-1",
-        notes: "notes-1",
-      },
-    ]);
-  });
-
-  it("Gets recent activities", async () => {
-    const body = JSON.stringify({
-      lastActivity: {
-        start: "2025-02-11T21:30",
-        duration: "PT30M",
-        client: "ACME Inc.",
-        project: "Foobar",
-        task: "Do something",
-        notes: "Lorem ipsum",
-      },
-      workingDays: [
-        {
-          date: "2025-02-11",
-          activities: [
-            {
-              start: "2025-02-11T21:30",
-              duration: "PT30M",
-              client: "ACME Inc.",
-              project: "Foobar",
-              task: "Do something",
-              notes: "Lorem ipsum",
-            },
-          ],
+  describe("Recent activity", () => {
+    it("Gets recent activities", async () => {
+      const queryResultJson = JSON.stringify({
+        lastActivity: {
+          start: "2025-02-11T21:30",
+          duration: "PT30M",
+          client: "ACME Inc.",
+          project: "Foobar",
+          task: "Do something",
+          notes: "Lorem ipsum",
         },
-      ],
-      timeSummary: {
-        hoursToday: "PT30M",
-        hoursYesterday: "PT0S",
-        hoursThisWeek: "PT30M",
-        hoursThisMonth: "PT30M",
-      },
-      timeZone: "Europe/Berlin",
-    });
-    const { store } = configure({ responses: new Response(body) });
-
-    await store.dispatch(getRecentActivities({}));
-
-    expect(store.getState().activities).toEqual({
-      countdown: {
-        duration: "PT30M",
-        remaining: "PT30M",
-        percentage: 0,
-        isRunning: false,
-      },
-      lastActivity: {
-        start: "2025-02-11T21:30",
-        duration: "PT30M",
-        client: "ACME Inc.",
-        project: "Foobar",
-        task: "Do something",
-        notes: "Lorem ipsum",
-      },
-      workingDays: [
-        {
-          date: "2025-02-11",
-          activities: [
-            {
-              start: "2025-02-11T21:30",
-              duration: "PT30M",
-              client: "ACME Inc.",
-              project: "Foobar",
-              task: "Do something",
-              notes: "Lorem ipsum",
-            },
-          ],
+        workingDays: [
+          {
+            date: "2025-02-11",
+            activities: [
+              {
+                start: "2025-02-11T21:30",
+                duration: "PT30M",
+                client: "ACME Inc.",
+                project: "Foobar",
+                task: "Do something",
+                notes: "Lorem ipsum",
+              },
+            ],
+          },
+        ],
+        timeSummary: {
+          hoursToday: "PT30M",
+          hoursYesterday: "PT0S",
+          hoursThisWeek: "PT30M",
+          hoursThisMonth: "PT30M",
         },
-      ],
-      timeSummary: {
-        hoursToday: "PT30M",
-        hoursYesterday: "PT0S",
-        hoursThisWeek: "PT30M",
-        hoursThisMonth: "PT30M",
-      },
-      timeZone: "Europe/Berlin",
+        timeZone: "Europe/Berlin",
+      } as RecentActivitiesQueryResult);
+      const { store } = configure({
+        responses: [new Response(queryResultJson)],
+      });
+
+      await store.dispatch(getRecentActivities({}));
+
+      expect(store.getState().activities).toEqual({
+        countdown: {
+          duration: "PT30M",
+          remaining: "PT30M",
+          percentage: 0,
+          isRunning: false,
+        },
+        lastActivity: {
+          start: "2025-02-11T21:30",
+          duration: "PT30M",
+          client: "ACME Inc.",
+          project: "Foobar",
+          task: "Do something",
+          notes: "Lorem ipsum",
+        },
+        workingDays: [
+          {
+            date: "2025-02-11",
+            activities: [
+              {
+                start: "2025-02-11T21:30",
+                duration: "PT30M",
+                client: "ACME Inc.",
+                project: "Foobar",
+                task: "Do something",
+                notes: "Lorem ipsum",
+              },
+            ],
+          },
+        ],
+        timeSummary: {
+          hoursToday: "PT30M",
+          hoursYesterday: "PT0S",
+          hoursThisWeek: "PT30M",
+          hoursThisMonth: "PT30M",
+        },
+        timeZone: "Europe/Berlin",
+      });
+    });
+
+    it("Handles server error", async () => {
+      const { store } = configure({
+        responses: [
+          new Response("", {
+            status: 500,
+            statusText: "Internal Server Error",
+          }),
+        ],
+      });
+
+      await store.dispatch(getRecentActivities({}));
+
+      expect(selectError(store.getState())).toEqual({
+        message: "Could not get recent activities. Please try again later.",
+      });
     });
   });
 });

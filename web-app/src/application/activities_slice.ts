@@ -86,7 +86,7 @@ export const logActivity = createAsyncThunk<
     notes: action.notes,
   };
   const status = await activitiesApi.logActivity(command);
-  thunkAPI.dispatch(getRecentActivities({}));
+  await thunkAPI.dispatch(getRecentActivities({}));
   return status;
 });
 
@@ -184,7 +184,7 @@ export const activitiesSlice = createSlice({
       state.countdown.remaining = action.payload.duration;
       state.countdown.percentage = 0;
     },
-    lastActivitySelected: (state, action: PayloadAction<Activity>) => {
+    activitySelected: (state, action: PayloadAction<Activity>) => {
       state.lastActivity = action.payload;
     },
   },
@@ -230,8 +230,7 @@ export const activitiesSlice = createSlice({
 const { countdownStarted, countdownProgressed, countdownStopped } =
   activitiesSlice.actions;
 
-export const { durationSelected, lastActivitySelected } =
-  activitiesSlice.actions;
+export const { durationSelected, activitySelected } = activitiesSlice.actions;
 
 export const {
   selectCountdown,

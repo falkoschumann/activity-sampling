@@ -2,7 +2,7 @@
 
 import { useDispatch, useSelector } from "react-redux";
 
-import { lastActivitySelected, selectTimeZone, selectWorkingDays } from "../application/activities_slice";
+import { activitySelected, selectTimeZone, selectWorkingDays } from "../application/activities_slice";
 import { AppDispatch } from "../application/store";
 import { Activity } from "../domain/activities";
 
@@ -12,7 +12,7 @@ export default function RecentActivities() {
   const dispatch = useDispatch<AppDispatch>();
 
   function handleClicked(activity: Activity) {
-    dispatch(lastActivitySelected(activity));
+    dispatch(activitySelected(activity));
   }
 
   return workingDays.map((workingDay) => (
