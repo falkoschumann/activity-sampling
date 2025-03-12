@@ -2,12 +2,12 @@
 
 import { useDispatch, useSelector } from "react-redux";
 
-import { activitySelected, selectTimeZone, selectWorkingDays } from "../application/activities_slice";
+import { activitySelected, selectRecentActivities, selectTimeZone } from "../application/activities_slice";
 import { AppDispatch } from "../application/store";
 import { Activity } from "../domain/activities";
 
 export default function RecentActivities() {
-  const workingDays = useSelector(selectWorkingDays);
+  const recentActivities = useSelector(selectRecentActivities);
   const timeZone = useSelector(selectTimeZone);
   const dispatch = useDispatch<AppDispatch>();
 
@@ -15,7 +15,7 @@ export default function RecentActivities() {
     dispatch(activitySelected(activity));
   }
 
-  return workingDays.map((workingDay) => (
+  return recentActivities.map((workingDay) => (
     <div key={new Date(workingDay.date).toISOString()}>
       <h6 className="bg-body-tertiary p-1 m-0 mt-2 sticky-top small">
         {new Date(workingDay.date).toLocaleDateString(undefined, { dateStyle: "full", timeZone })}

@@ -8,10 +8,10 @@ import {
   logActivity,
   queryRecentActivities,
   selectCountdown,
+  selectCurrentActivity,
   selectError,
-  selectLastActivity,
+  selectRecentActivities,
   selectTimeSummary,
-  selectWorkingDays,
   startCountdown,
   stopCountdown,
 } from "../../src/application/activities_slice";
@@ -188,7 +188,7 @@ describe("Activities", () => {
         }),
       );
 
-      expect(selectLastActivity(store.getState())).toEqual({
+      expect(selectCurrentActivity(store.getState())).toEqual({
         start: "2025-03-10T21:00:00Z",
         duration: "PT30M",
         client: "client-1",
@@ -196,7 +196,7 @@ describe("Activities", () => {
         task: "task-1",
         notes: "notes-1",
       });
-      expect(selectWorkingDays(store.getState())).toEqual([
+      expect(selectRecentActivities(store.getState())).toEqual([
         {
           date: "2025-03-10",
           activities: [
@@ -286,7 +286,7 @@ describe("Activities", () => {
         }),
       );
 
-      expect(selectLastActivity(store.getState())).toEqual({
+      expect(selectCurrentActivity(store.getState())).toEqual({
         start: "2025-02-12T21:18",
         duration: "PT30M",
         client: "client-1",
@@ -298,7 +298,7 @@ describe("Activities", () => {
   });
 
   describe("Recent activity", () => {
-    it("Gets recent activities", async () => {
+    it("Queries recent activities", async () => {
       const queryResultJson = JSON.stringify({
         lastActivity: {
           start: "2025-02-11T21:30",
@@ -344,7 +344,7 @@ describe("Activities", () => {
           percentage: 0,
           isRunning: false,
         },
-        lastActivity: {
+        currentActivity: {
           start: "2025-02-11T21:30",
           duration: "PT30M",
           client: "ACME Inc.",
@@ -352,7 +352,7 @@ describe("Activities", () => {
           task: "Do something",
           notes: "Lorem ipsum",
         },
-        workingDays: [
+        recentActivities: [
           {
             date: "2025-02-11",
             activities: [

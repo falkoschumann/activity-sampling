@@ -3,11 +3,11 @@
 import * as React from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-import { logActivity, selectLastActivity } from "../application/activities_slice";
+import { logActivity, selectCurrentActivity } from "../application/activities_slice";
 import { AppDispatch } from "../application/store";
 
 export default function CurrentActivity() {
-  const lastActivity = useSelector(selectLastActivity);
+  const currentActivity = useSelector(selectCurrentActivity);
   const dispatch = useDispatch<AppDispatch>();
 
   function handleSubmitted(event: React.FormEvent<HTMLFormElement>) {
@@ -32,7 +32,7 @@ export default function CurrentActivity() {
             id="client"
             name="client"
             className="form-control form-control-sm"
-            defaultValue={lastActivity?.client}
+            defaultValue={currentActivity?.client}
           />
         </div>
       </div>
@@ -46,7 +46,7 @@ export default function CurrentActivity() {
             id="project"
             name="project"
             className="form-control form-control-sm"
-            defaultValue={lastActivity?.project}
+            defaultValue={currentActivity?.project}
           />
         </div>
       </div>
@@ -60,7 +60,7 @@ export default function CurrentActivity() {
             id="task"
             name="task"
             className="form-control form-control-sm"
-            defaultValue={lastActivity?.task}
+            defaultValue={currentActivity?.task}
           />
         </div>
       </div>
@@ -74,7 +74,7 @@ export default function CurrentActivity() {
             id="notes"
             name="notes"
             className="form-control form-control-sm"
-            defaultValue={lastActivity?.notes}
+            defaultValue={currentActivity?.notes}
           />
         </div>
       </div>

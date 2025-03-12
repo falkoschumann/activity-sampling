@@ -24,14 +24,14 @@ import { Timer } from "../util/timer";
 // TODO Disable form while countdown is running and not elapsed
 
 export interface ActivitiesState {
-  readonly lastActivity?: Activity; // TODO Rename to currentActivity
+  readonly currentActivity?: Activity;
   readonly countdown: {
     readonly duration: string;
     readonly remaining: string;
     readonly percentage: number;
     readonly isRunning: boolean;
   };
-  readonly workingDays: WorkingDay[]; // TODO Rename to recentActivities
+  readonly recentActivities: WorkingDay[];
   readonly timeSummary: TimeSummary;
   readonly timeZone: string;
   readonly error?: {
@@ -46,7 +46,7 @@ const initialState: ActivitiesState = {
     percentage: 0,
     isRunning: false,
   },
-  workingDays: [],
+  recentActivities: [],
   timeSummary: {
     hoursToday: "PT0S",
     hoursYesterday: "PT0S",
@@ -135,7 +135,7 @@ const progressCountdown = createAsyncThunk<
   if (notificationClient.isGranted && !remaining.isPositive()) {
     notificationClient.show(
       "What are you working on?",
-      thunkAPI.getState().activities.lastActivity?.task,
+      thunkAPI.getState().activities.currentActivity?.task,
       "/apple-touch-icon.png",
     );
   }
@@ -185,7 +185,7 @@ export const activitiesSlice = createSlice({
       state.countdown.percentage = 0;
     },
     activitySelected: (state, action: PayloadAction<Activity>) => {
-      state.lastActivity = action.payload;
+      state.currentActivity = action.payload;
     },
   },
   extraReducers: (builder) => {
@@ -215,7 +215,12 @@ export const activitiesSlice = createSlice({
       state.error = undefined;
     });
     builder.addCase(queryRecentActivities.fulfilled, (state, action) => {
-      return { ...state, ...action.payload };
+      state.currentActivity = action.payload.lastActivity;
+      state.recentActivities = action.payload.workingDays;
+      state.timeSummary = action.payload.timeSummary;
+      if (action.payload.timeZone) {
+        state.timeZone = action.payload.timeZone;
+      }
     });
     builder.addCase(queryRecentActivities.rejected, (state, action) => {
       logError("Could not get recent activities.", action.error);
@@ -225,10 +230,10 @@ export const activitiesSlice = createSlice({
     });
   },
   selectors: {
-    selectLastActivity: (state) => state.lastActivity,
+    selectCurrentActivity: (state) => state.currentActivity,
     selectCountdown: (state) => state.countdown,
     selectTimeSummary: (state) => state.timeSummary,
-    selectWorkingDays: (state) => state.workingDays,
+    selectRecentActivities: (state) => state.recentActivities,
     selectTimeZone: (state) => state.timeZone,
     selectError: (state) => state.error,
   },
@@ -242,10 +247,10 @@ export const { durationSelected, activitySelected } = activitiesSlice.actions;
 export const {
   selectCountdown,
   selectError,
-  selectLastActivity,
+  selectCurrentActivity,
   selectTimeSummary,
   selectTimeZone,
-  selectWorkingDays,
+  selectRecentActivities,
 } = activitiesSlice.selectors;
 
 export default activitiesSlice.reducer;
