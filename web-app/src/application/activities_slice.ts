@@ -189,31 +189,38 @@ export const activitiesSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    builder.addCase(getRecentActivities.fulfilled, (state, action) => {
-      return { ...state, ...action.payload, error: undefined };
-    });
-    builder.addCase(getRecentActivities.rejected, (state, action) => {
-      logError("Could not get recent activities.", action.error);
-      state.error = {
-        message: "Could not get recent activities. Please try again later.",
-      };
+    builder.addCase(logActivity.pending, (state, _action) => {
+      state.error = undefined;
     });
     builder.addCase(logActivity.fulfilled, (state, action) => {
-      if (!action.payload.success) {
-        logError("Could not log activity.", {
-          message: action.payload.errorMessage,
-        });
-        state.error = {
-          message: `Could not log activity. ${action.payload.errorMessage}`,
-        };
-      } else {
-        state.error = undefined;
+      if (action.payload.success) {
+        return;
       }
+
+      logError("Could not log activity.", {
+        message: action.payload.errorMessage,
+      });
+      state.error = {
+        message: `Could not log activity. ${action.payload.errorMessage}`,
+      };
     });
     builder.addCase(logActivity.rejected, (state, action) => {
       logError("Could not log activity", action.error);
       state.error = {
         message: "Could not log activity. Please try again later.",
+      };
+    });
+
+    builder.addCase(getRecentActivities.pending, (state, _action) => {
+      state.error = undefined;
+    });
+    builder.addCase(getRecentActivities.fulfilled, (state, action) => {
+      return { ...state, ...action.payload };
+    });
+    builder.addCase(getRecentActivities.rejected, (state, action) => {
+      logError("Could not get recent activities.", action.error);
+      state.error = {
+        message: "Could not get recent activities. Please try again later.",
       };
     });
   },
