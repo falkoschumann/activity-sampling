@@ -10,6 +10,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import java.io.Serial;
+import java.io.Serializable;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
@@ -30,7 +32,9 @@ import org.hibernate.annotations.JdbcTypeCode;
 @AllArgsConstructor
 @Entity(name = "Activity")
 @Table(name = "activities")
-public class ActivityDto {
+public class ActivityDto implements Serializable {
+
+  @Serial private static final long serialVersionUID = 1L;
 
   public static ActivityDto createTestInstance() {
     return new ActivityDtoBuilder()
