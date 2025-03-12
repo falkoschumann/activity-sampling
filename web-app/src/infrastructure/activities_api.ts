@@ -59,7 +59,7 @@ export class ActivitiesApi extends EventTarget {
     }>(this, ACTIVITY_LOGGED_EVENT);
   }
 
-  async getRecentActivities(
+  async queryRecentActivities(
     query: RecentActivitiesQuery,
   ): Promise<RecentActivitiesQueryResult> {
     const url = new URL(

@@ -76,7 +76,7 @@ class ActivitiesServiceTests {
       var repository = MemoryActivitiesRepository.createTestInstance();
       var service = new ActivitiesService(repository);
 
-      var result = service.getRecentActivities(RecentActivitiesQuery.createTestInstance());
+      var result = service.queryRecentActivities(RecentActivitiesQuery.createTestInstance());
 
       assertEquals(RecentActivitiesQueryResult.createTestInstance(), result);
     }
@@ -86,7 +86,7 @@ class ActivitiesServiceTests {
       var repository = new MemoryActivitiesRepository();
       var service = new ActivitiesService(repository);
 
-      var result = service.getRecentActivities(RecentActivitiesQuery.createTestInstance());
+      var result = service.queryRecentActivities(RecentActivitiesQuery.createTestInstance());
 
       assertEquals(RecentActivitiesQueryResult.NULL, result);
     }
@@ -100,7 +100,7 @@ class ActivitiesServiceTests {
           new ActivityDto(nowTimestamp, Duration.ofMinutes(20), "client-1", "project-1", "task-1"));
       var service = new ActivitiesService(repository);
 
-      var result = service.getRecentActivities(RecentActivitiesQuery.NULL);
+      var result = service.queryRecentActivities(RecentActivitiesQuery.NULL);
 
       assertEquals(
           new RecentActivitiesQueryResult(

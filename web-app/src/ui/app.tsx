@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-import { getRecentActivities, selectError } from "../application/activities_slice";
+import { queryRecentActivities, selectError } from "../application/activities_slice";
 import { AppDispatch } from "../application/store";
 import Alert from "./alert.tsx";
 import Countdown from "./countdown";
@@ -16,7 +16,7 @@ export default function App() {
   const dispatch = useDispatch<AppDispatch>();
 
   useEffect(() => {
-    dispatch(getRecentActivities({}));
+    dispatch(queryRecentActivities({}));
   }, [dispatch]);
 
   return (

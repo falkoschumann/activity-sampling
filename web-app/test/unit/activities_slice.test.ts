@@ -5,8 +5,8 @@ import { describe, expect, it } from "vitest";
 import {
   activitySelected,
   durationSelected,
-  getRecentActivities,
   logActivity,
+  queryRecentActivities,
   selectCountdown,
   selectError,
   selectLastActivity,
@@ -335,7 +335,7 @@ describe("Activities", () => {
         responses: [new Response(queryResultJson)],
       });
 
-      await store.dispatch(getRecentActivities({}));
+      await store.dispatch(queryRecentActivities({}));
 
       expect(store.getState().activities).toEqual({
         countdown: {
@@ -387,7 +387,7 @@ describe("Activities", () => {
         ],
       });
 
-      await store.dispatch(getRecentActivities({}));
+      await store.dispatch(queryRecentActivities({}));
 
       expect(selectError(store.getState())).toEqual({
         message: "Could not get recent activities. Please try again later.",

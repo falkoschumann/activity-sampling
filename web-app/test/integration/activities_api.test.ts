@@ -40,7 +40,7 @@ describe("Activities API", () => {
   });
 
   describe("Recent activities", () => {
-    it("Gets successfully activities", async () => {
+    it("Returns activities", async () => {
       const api = ActivitiesApi.createNull(
         new Response(
           JSON.stringify({
@@ -56,7 +56,7 @@ describe("Activities API", () => {
         ),
       );
 
-      const result = await api.getRecentActivities({});
+      const result = await api.queryRecentActivities({});
 
       expect(result).toEqual({
         workingDays: [],
@@ -74,7 +74,7 @@ describe("Activities API", () => {
         new Response("", { status: 500, statusText: "Internal Server Error" }),
       );
 
-      const result = api.getRecentActivities({});
+      const result = api.queryRecentActivities({});
 
       await expect(result).rejects.toThrow("500: Internal Server Error");
     });
@@ -82,7 +82,7 @@ describe("Activities API", () => {
     it("Handles network error", async () => {
       const api = ActivitiesApi.createNull(new Error("Network Error"));
 
-      const result = api.getRecentActivities({});
+      const result = api.queryRecentActivities({});
 
       await expect(result).rejects.toThrow("Network Error");
     });

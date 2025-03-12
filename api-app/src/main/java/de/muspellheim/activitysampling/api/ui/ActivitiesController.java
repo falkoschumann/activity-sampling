@@ -35,6 +35,6 @@ public class ActivitiesController {
   public RecentActivitiesQueryResult recentActivities(
       @RequestParam(required = false) LocalDate today,
       @RequestParam(required = false) ZoneId timeZone) {
-    return this.service.getRecentActivities(new RecentActivitiesQuery(today, timeZone));
+    return this.service.queryRecentActivities(new RecentActivitiesQuery(today, timeZone));
   }
 }

@@ -86,15 +86,15 @@ export const logActivity = createAsyncThunk<
     notes: action.notes,
   };
   const status = await activitiesApi.logActivity(command);
-  await thunkAPI.dispatch(getRecentActivities({}));
+  await thunkAPI.dispatch(queryRecentActivities({}));
   return status;
 });
 
-export const getRecentActivities = createAsyncThunk<
+export const queryRecentActivities = createAsyncThunk<
   RecentActivitiesQueryResult,
   RecentActivitiesQuery,
   ActivitiesThunkConfig
->("activities/getRecentActivities", async (query, thunkAPI) => {
+>("activities/queryRecentActivities", async (query, thunkAPI) => {
   const { activitiesApi, clock } = thunkAPI.extra;
   const today =
     query.today != null
@@ -104,7 +104,7 @@ export const getRecentActivities = createAsyncThunk<
     query.timeZone != null
       ? query.timeZone
       : Intl.DateTimeFormat().resolvedOptions().timeZone;
-  return activitiesApi.getRecentActivities({ today, timeZone });
+  return activitiesApi.queryRecentActivities({ today, timeZone });
 });
 
 export const startCountdown = createAsyncThunk<
@@ -211,13 +211,13 @@ export const activitiesSlice = createSlice({
       };
     });
 
-    builder.addCase(getRecentActivities.pending, (state, _action) => {
+    builder.addCase(queryRecentActivities.pending, (state, _action) => {
       state.error = undefined;
     });
-    builder.addCase(getRecentActivities.fulfilled, (state, action) => {
+    builder.addCase(queryRecentActivities.fulfilled, (state, action) => {
       return { ...state, ...action.payload };
     });
-    builder.addCase(getRecentActivities.rejected, (state, action) => {
+    builder.addCase(queryRecentActivities.rejected, (state, action) => {
       logError("Could not get recent activities.", action.error);
       state.error = {
         message: "Could not get recent activities. Please try again later.",

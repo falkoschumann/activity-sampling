@@ -51,7 +51,7 @@ public class ActivitiesService {
     }
   }
 
-  public RecentActivitiesQueryResult getRecentActivities(RecentActivitiesQuery query) {
+  public RecentActivitiesQueryResult queryRecentActivities(RecentActivitiesQuery query) {
     try {
       log.info("Get recent activities: {}", query);
       var timeZone = query.timeZone() != null ? query.timeZone() : ZoneId.systemDefault();
