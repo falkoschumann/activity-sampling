@@ -27,6 +27,8 @@ import {
 } from "../../src/domain/messages";
 
 describe("Activities", () => {
+  // TODO Align with user stories
+
   describe("Ask periodically", () => {
     it("Starts countdown", () => {
       const { store, timer } = configure();

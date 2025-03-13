@@ -22,6 +22,8 @@ import org.junit.jupiter.api.Test;
 
 class ActivitiesServiceTests {
 
+  // TODO Align with user stories
+
   private static final ZoneId TIME_ZONE = ZoneId.of("Europe/Berlin");
 
   @Nested
