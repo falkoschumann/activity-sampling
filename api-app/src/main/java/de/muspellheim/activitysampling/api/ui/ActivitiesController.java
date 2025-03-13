@@ -7,6 +7,7 @@ import de.muspellheim.activitysampling.api.application.CommandStatus;
 import de.muspellheim.activitysampling.api.application.LogActivityCommand;
 import de.muspellheim.activitysampling.api.application.RecentActivitiesQuery;
 import de.muspellheim.activitysampling.api.application.RecentActivitiesQueryResult;
+import jakarta.validation.Valid;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,14 +28,14 @@ public class ActivitiesController {
   }
 
   @PostMapping("/log-activity")
-  public CommandStatus logActivity(@RequestBody LogActivityCommand command) {
+  public CommandStatus logActivity(@RequestBody @Valid LogActivityCommand command) {
     return this.service.logActivity(command);
   }
 
   @GetMapping("/recent-activities")
   public RecentActivitiesQueryResult recentActivities(
-      @RequestParam(required = false) LocalDate today,
-      @RequestParam(required = false) ZoneId timeZone) {
+      @RequestParam(required = false) @Valid LocalDate today,
+      @RequestParam(required = false) @Valid ZoneId timeZone) {
     return this.service.queryRecentActivities(new RecentActivitiesQuery(today, timeZone));
   }
 }

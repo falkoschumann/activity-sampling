@@ -8,6 +8,7 @@ import de.muspellheim.activitysampling.api.application.CommandStatus;
 import de.muspellheim.activitysampling.api.application.LogActivityCommand;
 import de.muspellheim.activitysampling.api.application.RecentActivitiesQueryResult;
 import java.time.Instant;
+import java.util.Map;
 import java.util.TimeZone;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeAll;
@@ -48,12 +49,17 @@ class ApiApplicationTests {
 
     @Test
     void failsWhenActivityIsNotValid(@Autowired TestRestTemplate restTemplate) throws Exception {
-      var command = new JSONObject().put("start", "foobar");
+      var command =
+          new JSONObject()
+              .put("start", "2025-03-13T17:46:00Z")
+              .put("duration", "PT30M")
+              // .put("client", "client-1") missing property
+              .put("project", "project-1")
+              .put("task", "task-1");
       var headers = new HttpHeaders();
       headers.setContentType(MediaType.APPLICATION_JSON);
       var request = new HttpEntity<>(command.toString(), headers);
-      var response =
-          restTemplate.postForEntity("/api/activities/log-activity", request, CommandStatus.class);
+      var response = restTemplate.postForEntity("/api/activities/log-activity", request, Map.class);
 
       assertEquals(400, response.getStatusCode().value());
     }
