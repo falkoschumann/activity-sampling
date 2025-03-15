@@ -20,11 +20,16 @@ import { NotificationClient } from "../infrastructure/notification_client";
 import { Clock } from "../util/clock";
 import { Timer } from "../util/timer";
 
-// TODO Do not log empty activity, disable log button
 // TODO Disable form while countdown is running and not elapsed
 
 export interface ActivitiesState {
-  readonly currentActivity?: Activity;
+  readonly currentActivity: {
+    readonly client: string;
+    readonly project: string;
+    readonly task: string;
+    readonly notes: string;
+    readonly isLogDisabled: boolean;
+  };
   readonly countdown: {
     readonly duration: string;
     readonly remaining: string;
@@ -40,6 +45,13 @@ export interface ActivitiesState {
 }
 
 const initialState: ActivitiesState = {
+  currentActivity: {
+    client: "",
+    project: "",
+    task: "",
+    notes: "",
+    isLogDisabled: true,
+  },
   countdown: {
     duration: "PT30M",
     remaining: "PT30M",
@@ -68,22 +80,18 @@ type ActivitiesThunkConfig = {
 
 export const logActivity = createAsyncThunk<
   CommandStatus,
-  {
-    readonly client: string;
-    readonly project: string;
-    readonly task: string;
-    readonly notes: string;
-  },
+  unknown,
   ActivitiesThunkConfig
->("activities/logActivity", async (action, thunkAPI) => {
+>("activities/logActivity", async (_action, thunkAPI) => {
   const { activitiesApi, clock } = thunkAPI.extra;
+  const currentActivity = selectCurrentActivity(thunkAPI.getState());
   const command: LogActivityCommand = {
     start: clock.now().toISOString(),
     duration: thunkAPI.getState().activities.countdown.duration,
-    client: action.client,
-    project: action.project,
-    task: action.task,
-    notes: action.notes,
+    client: currentActivity.client,
+    project: currentActivity.project,
+    task: currentActivity.task,
+    notes: currentActivity.notes,
   };
   const status = await activitiesApi.logActivity(command);
   await thunkAPI.dispatch(queryRecentActivities({}));
@@ -135,7 +143,9 @@ const progressCountdown = createAsyncThunk<
   if (notificationClient.isGranted && !remaining.isPositive()) {
     notificationClient.show(
       "What are you working on?",
-      thunkAPI.getState().activities.currentActivity?.task,
+      thunkAPI.getState().activities.currentActivity.task.length > 0
+        ? thunkAPI.getState().activities.currentActivity.task
+        : undefined,
       "/apple-touch-icon.png",
     );
   }
@@ -155,6 +165,22 @@ export const activitiesSlice = createSlice({
   name: "activities",
   initialState,
   reducers: {
+    changeClient: (state, action: PayloadAction<{ text: string }>) => {
+      state.currentActivity.client = action.payload.text;
+      state.currentActivity.isLogDisabled = isLoggable(state.currentActivity);
+    },
+    changeProject: (state, action: PayloadAction<{ text: string }>) => {
+      state.currentActivity.project = action.payload.text;
+      state.currentActivity.isLogDisabled = isLoggable(state.currentActivity);
+    },
+    changeTask: (state, action: PayloadAction<{ text: string }>) => {
+      state.currentActivity.task = action.payload.text;
+      state.currentActivity.isLogDisabled = isLoggable(state.currentActivity);
+    },
+    changeNotes: (state, action: PayloadAction<{ text: string }>) => {
+      state.currentActivity.notes = action.payload.text;
+      state.currentActivity.isLogDisabled = isLoggable(state.currentActivity);
+    },
     countdownStarted: (state) => {
       state.countdown.remaining = state.countdown.duration;
       state.countdown.percentage = 0;
@@ -185,7 +211,11 @@ export const activitiesSlice = createSlice({
       state.countdown.percentage = 0;
     },
     activitySelected: (state, action: PayloadAction<Activity>) => {
-      state.currentActivity = action.payload;
+      state.currentActivity.client = action.payload.client;
+      state.currentActivity.project = action.payload.project;
+      state.currentActivity.task = action.payload.task;
+      state.currentActivity.notes = action.payload.notes ?? "";
+      state.currentActivity.isLogDisabled = isLoggable(state.currentActivity);
     },
   },
   extraReducers: (builder) => {
@@ -215,7 +245,12 @@ export const activitiesSlice = createSlice({
       state.error = undefined;
     });
     builder.addCase(queryRecentActivities.fulfilled, (state, action) => {
-      state.currentActivity = action.payload.lastActivity;
+      state.currentActivity.client = action.payload.lastActivity?.client ?? "";
+      state.currentActivity.project =
+        action.payload.lastActivity?.project ?? "";
+      state.currentActivity.task = action.payload.lastActivity?.task ?? "";
+      state.currentActivity.notes = action.payload.lastActivity?.notes ?? "";
+      state.currentActivity.isLogDisabled = isLoggable(state.currentActivity);
       state.recentActivities = action.payload.workingDays;
       state.timeSummary = action.payload.timeSummary;
       if (action.payload.timeZone) {
@@ -242,7 +277,14 @@ export const activitiesSlice = createSlice({
 const { countdownStarted, countdownProgressed, countdownStopped } =
   activitiesSlice.actions;
 
-export const { durationSelected, activitySelected } = activitiesSlice.actions;
+export const {
+  changeClient,
+  changeProject,
+  changeTask,
+  changeNotes,
+  durationSelected,
+  activitySelected,
+} = activitiesSlice.actions;
 
 export const {
   selectCountdown,
@@ -276,4 +318,16 @@ function logError(message: string, error: SerializedError) {
   } else {
     console.error(message);
   }
+}
+
+function isLoggable({
+  client,
+  project,
+  task,
+}: {
+  client: string;
+  project: string;
+  task: string;
+}) {
+  return !(Boolean(client) && Boolean(project) && Boolean(task));
 }

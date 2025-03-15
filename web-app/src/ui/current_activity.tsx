@@ -3,7 +3,14 @@
 import * as React from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-import { logActivity, selectCurrentActivity } from "../application/activities_slice";
+import {
+  changeClient,
+  changeNotes,
+  changeProject,
+  changeTask,
+  logActivity,
+  selectCurrentActivity,
+} from "../application/activities_slice";
 import { AppDispatch } from "../application/store";
 
 export default function CurrentActivity() {
@@ -32,7 +39,8 @@ export default function CurrentActivity() {
             id="client"
             name="client"
             className="form-control form-control-sm"
-            defaultValue={currentActivity?.client}
+            value={currentActivity.client}
+            onChange={(e) => dispatch(changeClient({ text: e.target.value }))}
           />
         </div>
       </div>
@@ -46,7 +54,8 @@ export default function CurrentActivity() {
             id="project"
             name="project"
             className="form-control form-control-sm"
-            defaultValue={currentActivity?.project}
+            value={currentActivity.project}
+            onChange={(e) => dispatch(changeProject({ text: e.target.value }))}
           />
         </div>
       </div>
@@ -60,7 +69,8 @@ export default function CurrentActivity() {
             id="task"
             name="task"
             className="form-control form-control-sm"
-            defaultValue={currentActivity?.task}
+            value={currentActivity.task}
+            onChange={(e) => dispatch(changeTask({ text: e.target.value }))}
           />
         </div>
       </div>
@@ -74,11 +84,12 @@ export default function CurrentActivity() {
             id="notes"
             name="notes"
             className="form-control form-control-sm"
-            defaultValue={currentActivity?.notes}
+            value={currentActivity.notes}
+            onChange={(e) => dispatch(changeNotes({ text: e.target.value }))}
           />
         </div>
       </div>
-      <button type="submit" className="btn btn-primary btn-sm w-100">
+      <button type="submit" className="btn btn-primary btn-sm w-100" disabled={currentActivity.isLogDisabled}>
         Log
       </button>
     </form>

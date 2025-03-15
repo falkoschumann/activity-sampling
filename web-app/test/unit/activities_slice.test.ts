@@ -4,6 +4,10 @@ import { describe, expect, it } from "vitest";
 
 import {
   activitySelected,
+  changeClient,
+  changeNotes,
+  changeProject,
+  changeTask,
   durationSelected,
   logActivity,
   queryRecentActivities,
@@ -143,6 +147,46 @@ describe("Activities", () => {
   });
 
   describe("Log activity", () => {
+    it("Logs the activity with client, project, task and optional notes", () => {
+      const { store } = configure();
+
+      store.dispatch(changeClient({ text: "client-1" }));
+      expect(selectCurrentActivity(store.getState())).toEqual({
+        client: "client-1",
+        project: "",
+        task: "",
+        notes: "",
+        isLogDisabled: true,
+      });
+
+      store.dispatch(changeProject({ text: "project-1" }));
+      expect(selectCurrentActivity(store.getState())).toEqual({
+        client: "client-1",
+        project: "project-1",
+        task: "",
+        notes: "",
+        isLogDisabled: true,
+      });
+
+      store.dispatch(changeTask({ text: "task-1" }));
+      expect(selectCurrentActivity(store.getState())).toEqual({
+        client: "client-1",
+        project: "project-1",
+        task: "task-1",
+        notes: "",
+        isLogDisabled: false,
+      });
+
+      store.dispatch(changeNotes({ text: "notes-1" }));
+      expect(selectCurrentActivity(store.getState())).toEqual({
+        client: "client-1",
+        project: "project-1",
+        task: "task-1",
+        notes: "notes-1",
+        isLogDisabled: false,
+      });
+    });
+
     it("Logs activity", async () => {
       const commandStatus = JSON.stringify({ success: true });
       const queryResultJson = JSON.stringify({
@@ -180,23 +224,19 @@ describe("Activities", () => {
         responses: [new Response(commandStatus), new Response(queryResultJson)],
       });
       const loggedActivities = activitiesApi.trackActivitiesLogged();
+      store.dispatch(changeClient({ text: "client-1" }));
+      store.dispatch(changeProject({ text: "project-1" }));
+      store.dispatch(changeTask({ text: "task-1" }));
+      store.dispatch(changeNotes({ text: "notes-1" }));
 
-      await store.dispatch(
-        logActivity({
-          client: "client-1",
-          project: "project-1",
-          task: "task-1",
-          notes: "notes-1",
-        }),
-      );
+      await store.dispatch(logActivity({}));
 
       expect(selectCurrentActivity(store.getState())).toEqual({
-        start: "2025-03-10T21:00:00Z",
-        duration: "PT30M",
         client: "client-1",
         project: "project-1",
         task: "task-1",
         notes: "notes-1",
+        isLogDisabled: false,
       });
       expect(selectRecentActivities(store.getState())).toEqual([
         {
@@ -235,15 +275,11 @@ describe("Activities", () => {
       const { store } = configure({
         responses: [new Response(JSON.stringify(new Failure("Domain error.")))],
       });
+      store.dispatch(changeClient({ text: "client-1" }));
+      store.dispatch(changeProject({ text: "project-1" }));
+      store.dispatch(changeTask({ text: "task-1" }));
 
-      await store.dispatch(
-        logActivity({
-          client: "client-1",
-          project: "project-1",
-          task: "task-1",
-          notes: "notes-1",
-        }),
-      );
+      await store.dispatch(logActivity({}));
 
       expect(selectError(store.getState())).toEqual({
         message: "Could not log activity. Domain error.",
@@ -259,15 +295,11 @@ describe("Activities", () => {
           }),
         ],
       });
+      store.dispatch(changeClient({ text: "client-1" }));
+      store.dispatch(changeProject({ text: "project-1" }));
+      store.dispatch(changeTask({ text: "task-1" }));
 
-      await store.dispatch(
-        logActivity({
-          client: "client-1",
-          project: "project-1",
-          task: "task-1",
-          notes: "notes-1",
-        }),
-      );
+      await store.dispatch(logActivity({}));
 
       expect(selectError(store.getState())).toEqual({
         message: "Could not log activity. Please try again later.",
@@ -289,12 +321,11 @@ describe("Activities", () => {
       );
 
       expect(selectCurrentActivity(store.getState())).toEqual({
-        start: "2025-02-12T21:18",
-        duration: "PT30M",
         client: "client-1",
         project: "project-1",
         task: "task-1",
         notes: "notes-1",
+        isLogDisabled: false,
       });
     });
   });
@@ -347,12 +378,11 @@ describe("Activities", () => {
           isRunning: false,
         },
         currentActivity: {
-          start: "2025-02-11T21:30",
-          duration: "PT30M",
           client: "ACME Inc.",
           project: "Foobar",
           task: "Do something",
           notes: "Lorem ipsum",
+          isLogDisabled: false,
         },
         recentActivities: [
           {
