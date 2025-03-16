@@ -16,6 +16,7 @@ import {
   selectError,
   selectRecentActivities,
   selectTimeSummary,
+  selectTimeZone,
   startCountdown,
   stopCountdown,
 } from "../../src/application/activities_slice";
@@ -32,6 +33,7 @@ import {
 
 describe("Activities", () => {
   // TODO Align with user stories
+  // TODO Use initialState for expected state
 
   describe("Ask periodically", () => {
     it("Starts countdown", () => {
@@ -156,6 +158,7 @@ describe("Activities", () => {
         project: "",
         task: "",
         notes: "",
+        isFormDisabled: false,
         isLogDisabled: true,
       });
 
@@ -165,6 +168,7 @@ describe("Activities", () => {
         project: "project-1",
         task: "",
         notes: "",
+        isFormDisabled: false,
         isLogDisabled: true,
       });
 
@@ -174,6 +178,7 @@ describe("Activities", () => {
         project: "project-1",
         task: "task-1",
         notes: "",
+        isFormDisabled: false,
         isLogDisabled: false,
       });
 
@@ -183,6 +188,7 @@ describe("Activities", () => {
         project: "project-1",
         task: "task-1",
         notes: "notes-1",
+        isFormDisabled: false,
         isLogDisabled: false,
       });
     });
@@ -236,6 +242,7 @@ describe("Activities", () => {
         project: "project-1",
         task: "task-1",
         notes: "notes-1",
+        isFormDisabled: false,
         isLogDisabled: false,
       });
       expect(selectRecentActivities(store.getState())).toEqual([
@@ -269,6 +276,95 @@ describe("Activities", () => {
           notes: "notes-1",
         },
       ]);
+    });
+
+    it("Disables form when countdown is started", async () => {
+      const { store } = configure();
+
+      await store.dispatch(startCountdown({}));
+
+      expect(selectCurrentActivity(store.getState())).toEqual({
+        client: "",
+        project: "",
+        task: "",
+        notes: "",
+        isFormDisabled: true,
+        isLogDisabled: true,
+      });
+    });
+
+    it("Enables form when countdown is stopped", async () => {
+      const { store } = configure();
+      await store.dispatch(startCountdown({}));
+
+      await store.dispatch(stopCountdown({}));
+
+      expect(selectCurrentActivity(store.getState())).toEqual({
+        client: "",
+        project: "",
+        task: "",
+        notes: "",
+        isFormDisabled: false,
+        isLogDisabled: true,
+      });
+    });
+
+    it("Enables form when countdown is elapsed", async () => {
+      const { store, timer } = configure();
+      await store.dispatch(startCountdown({}));
+
+      timer.simulateTaskRun(Duration.parse("PT30M1S").seconds);
+
+      expect(selectCurrentActivity(store.getState())).toEqual({
+        client: "",
+        project: "",
+        task: "",
+        notes: "",
+        isFormDisabled: false,
+        isLogDisabled: true,
+      });
+    });
+
+    it("Disables form when activity is logged and countdown is running", async () => {
+      const { store, timer } = configure({
+        responses: [
+          new Response(JSON.stringify({ success: true })),
+          new Response(
+            JSON.stringify({
+              lastActivity: {
+                start: "2025-02-12T21:18",
+                duration: "PT30M",
+                client: "client-1",
+                project: "project-1",
+                task: "task-1",
+              },
+              workingDays: [],
+              timeSummary: {
+                hoursToday: "PT0S",
+                hoursYesterday: "PT0S",
+                hoursThisWeek: "PT0S",
+                hoursThisMonth: "PT0S",
+              },
+            }),
+          ),
+        ],
+      });
+      await store.dispatch(startCountdown({}));
+
+      timer.simulateTaskRun(Duration.parse("PT30M1S").seconds);
+      store.dispatch(changeClient({ text: "client-1" }));
+      store.dispatch(changeProject({ text: "project-1" }));
+      store.dispatch(changeTask({ text: "task-1" }));
+      await store.dispatch(logActivity({}));
+
+      expect(selectCurrentActivity(store.getState())).toEqual({
+        client: "client-1",
+        project: "project-1",
+        task: "task-1",
+        notes: "",
+        isFormDisabled: true,
+        isLogDisabled: true,
+      });
     });
 
     it("Handles domain error", async () => {
@@ -325,6 +421,7 @@ describe("Activities", () => {
         project: "project-1",
         task: "task-1",
         notes: "notes-1",
+        isFormDisabled: false,
         isLogDisabled: false,
       });
     });
@@ -370,43 +467,36 @@ describe("Activities", () => {
 
       await store.dispatch(queryRecentActivities({}));
 
-      expect(store.getState().activities).toEqual({
-        countdown: {
-          duration: "PT30M",
-          remaining: "PT30M",
-          percentage: 0,
-          isRunning: false,
-        },
-        currentActivity: {
-          client: "ACME Inc.",
-          project: "Foobar",
-          task: "Do something",
-          notes: "Lorem ipsum",
-          isLogDisabled: false,
-        },
-        recentActivities: [
-          {
-            date: "2025-02-11",
-            activities: [
-              {
-                start: "2025-02-11T21:30",
-                duration: "PT30M",
-                client: "ACME Inc.",
-                project: "Foobar",
-                task: "Do something",
-                notes: "Lorem ipsum",
-              },
-            ],
-          },
-        ],
-        timeSummary: {
-          hoursToday: "PT30M",
-          hoursYesterday: "PT0S",
-          hoursThisWeek: "PT30M",
-          hoursThisMonth: "PT30M",
-        },
-        timeZone: "Europe/Berlin",
+      expect(selectCurrentActivity(store.getState())).toEqual({
+        client: "ACME Inc.",
+        project: "Foobar",
+        task: "Do something",
+        notes: "Lorem ipsum",
+        isFormDisabled: false,
+        isLogDisabled: false,
       });
+      expect(selectRecentActivities(store.getState())).toEqual([
+        {
+          date: "2025-02-11",
+          activities: [
+            {
+              start: "2025-02-11T21:30",
+              duration: "PT30M",
+              client: "ACME Inc.",
+              project: "Foobar",
+              task: "Do something",
+              notes: "Lorem ipsum",
+            },
+          ],
+        },
+      ]);
+      expect(selectTimeSummary(store.getState())).toEqual({
+        hoursToday: "PT30M",
+        hoursYesterday: "PT0S",
+        hoursThisWeek: "PT30M",
+        hoursThisMonth: "PT30M",
+      });
+      expect(selectTimeZone(store.getState())).toEqual("Europe/Berlin");
     });
 
     it("Handles server error", async () => {

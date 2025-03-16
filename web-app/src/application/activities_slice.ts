@@ -20,7 +20,7 @@ import { NotificationClient } from "../infrastructure/notification_client";
 import { Clock } from "../util/clock";
 import { Timer } from "../util/timer";
 
-// TODO Disable form while countdown is running and not elapsed
+// TODO Close notification when activity is logged
 
 export interface ActivitiesState {
   readonly currentActivity: {
@@ -28,6 +28,7 @@ export interface ActivitiesState {
     readonly project: string;
     readonly task: string;
     readonly notes: string;
+    readonly isFormDisabled: boolean;
     readonly isLogDisabled: boolean;
   };
   readonly countdown: {
@@ -50,6 +51,7 @@ const initialState: ActivitiesState = {
     project: "",
     task: "",
     notes: "",
+    isFormDisabled: false,
     isLogDisabled: true,
   },
   countdown: {
@@ -95,6 +97,7 @@ export const logActivity = createAsyncThunk<
   };
   const status = await activitiesApi.logActivity(command);
   await thunkAPI.dispatch(queryRecentActivities({}));
+  thunkAPI.dispatch(activityLogged());
   return status;
 });
 
@@ -181,7 +184,15 @@ export const activitiesSlice = createSlice({
       state.currentActivity.notes = action.payload.text;
       state.currentActivity.isLogDisabled = isLoggable(state.currentActivity);
     },
+    activityLogged: (state) => {
+      if (state.countdown.isRunning) {
+        state.currentActivity.isFormDisabled = true;
+        state.currentActivity.isLogDisabled = true;
+      }
+    },
     countdownStarted: (state) => {
+      state.currentActivity.isFormDisabled = true;
+      state.currentActivity.isLogDisabled = true;
       state.countdown.remaining = state.countdown.duration;
       state.countdown.percentage = 0;
       state.countdown.isRunning = true;
@@ -195,6 +206,8 @@ export const activitiesSlice = createSlice({
         action.payload.seconds,
       );
       if (remaining.isNegative()) {
+        state.currentActivity.isFormDisabled = false;
+        state.currentActivity.isLogDisabled = isLoggable(state.currentActivity);
         remaining = duration.minusSeconds(action.payload.seconds);
       }
       state.countdown.remaining = remaining.toString();
@@ -203,6 +216,8 @@ export const activitiesSlice = createSlice({
       );
     },
     countdownStopped: (state) => {
+      state.currentActivity.isFormDisabled = false;
+      state.currentActivity.isLogDisabled = isLoggable(state.currentActivity);
       state.countdown.isRunning = false;
     },
     durationSelected: (state, action: PayloadAction<{ duration: string }>) => {
@@ -274,8 +289,12 @@ export const activitiesSlice = createSlice({
   },
 });
 
-const { countdownStarted, countdownProgressed, countdownStopped } =
-  activitiesSlice.actions;
+const {
+  activityLogged,
+  countdownStarted,
+  countdownProgressed,
+  countdownStopped,
+} = activitiesSlice.actions;
 
 export const {
   changeClient,
