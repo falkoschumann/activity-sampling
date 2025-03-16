@@ -85,7 +85,7 @@ export const logActivity = createAsyncThunk<
   unknown,
   ActivitiesThunkConfig
 >("activities/logActivity", async (_action, thunkAPI) => {
-  const { activitiesApi, clock } = thunkAPI.extra;
+  const { activitiesApi, notificationClient, clock } = thunkAPI.extra;
   const currentActivity = selectCurrentActivity(thunkAPI.getState());
   const command: LogActivityCommand = {
     start: clock.now().toISOString(),
@@ -97,6 +97,7 @@ export const logActivity = createAsyncThunk<
   };
   const status = await activitiesApi.logActivity(command);
   await thunkAPI.dispatch(queryRecentActivities({}));
+  notificationClient.hide();
   thunkAPI.dispatch(activityLogged());
   return status;
 });

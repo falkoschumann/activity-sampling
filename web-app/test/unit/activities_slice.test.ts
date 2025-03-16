@@ -59,8 +59,8 @@ describe("Activities", () => {
     });
 
     it("Progresses countdown", () => {
-      const { store, notificationsClient, timer } = configure();
-      const shownNotifications = notificationsClient.trackNotificationsShown();
+      const { store, notificationClient, timer } = configure();
+      const shownNotifications = notificationClient.trackNotificationsShown();
       store.dispatch(durationSelected({ duration: "PT20M" }));
       store.dispatch(startCountdown({}));
 
@@ -76,8 +76,8 @@ describe("Activities", () => {
     });
 
     it("Restarts countdown", () => {
-      const { store, notificationsClient, timer } = configure();
-      const shownNotifications = notificationsClient.trackNotificationsShown();
+      const { store, notificationClient, timer } = configure();
+      const shownNotifications = notificationClient.trackNotificationsShown();
       store.dispatch(durationSelected({ duration: "PT20M" }));
       store.dispatch(startCountdown({}));
       timer.simulateTaskRun(Duration.parse("PT20M").seconds);
@@ -128,8 +128,8 @@ describe("Activities", () => {
     });
 
     it("Elapses countdown", () => {
-      const { store, notificationsClient, timer } = configure();
-      const shownNotifications = notificationsClient.trackNotificationsShown();
+      const { store, notificationClient, timer } = configure();
+      const shownNotifications = notificationClient.trackNotificationsShown();
       store.dispatch(durationSelected({ duration: "PT20M" }));
       store.dispatch(startCountdown({}));
       timer.simulateTaskRun(Duration.parse("PT16M").seconds);
@@ -326,7 +326,7 @@ describe("Activities", () => {
     });
 
     it("Disables form when activity is logged and countdown is running", async () => {
-      const { store, timer } = configure({
+      const { store, notificationClient, timer } = configure({
         responses: [
           new Response(JSON.stringify({ success: true })),
           new Response(
@@ -349,6 +349,7 @@ describe("Activities", () => {
           ),
         ],
       });
+      const hiddenNotifications = notificationClient.trackNotificationsHidden();
       await store.dispatch(startCountdown({}));
 
       timer.simulateTaskRun(Duration.parse("PT30M1S").seconds);
@@ -365,6 +366,9 @@ describe("Activities", () => {
         isFormDisabled: true,
         isLogDisabled: true,
       });
+      expect(hiddenNotifications.data).toEqual([
+        { title: "What are you working on?" },
+      ]);
     });
 
     it("Handles domain error", async () => {
@@ -524,9 +528,9 @@ function configure({
   responses?: Response | Response[];
 } = {}) {
   const activitiesApi = ActivitiesApi.createNull(responses);
-  const notificationsClient = NotificationClient.createNull();
+  const notificationClient = NotificationClient.createNull();
   const clock = Clock.createNull();
   const timer = Timer.createNull();
-  const store = createStore(activitiesApi, notificationsClient, clock, timer);
-  return { store, activitiesApi, notificationsClient, clock, timer };
+  const store = createStore(activitiesApi, notificationClient, clock, timer);
+  return { store, activitiesApi, notificationClient, clock, timer };
 }
