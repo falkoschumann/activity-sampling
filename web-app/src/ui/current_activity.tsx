@@ -19,12 +19,7 @@ export default function CurrentActivity() {
 
   function handleSubmitted(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const form = event.currentTarget;
-    const client = (form.elements.namedItem("client") as HTMLInputElement).value;
-    const project = (form.elements.namedItem("project") as HTMLInputElement).value;
-    const task = (form.elements.namedItem("task") as HTMLInputElement).value;
-    const notes = (form.elements.namedItem("notes") as HTMLInputElement).value;
-    dispatch(logActivity({ client, project, task, notes }));
+    dispatch(logActivity({}));
   }
 
   return (
