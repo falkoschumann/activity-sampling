@@ -20,8 +20,6 @@ import { NotificationClient } from "../infrastructure/notification_client";
 import { Clock } from "../util/clock";
 import { Timer } from "../util/timer";
 
-// TODO Close notification when activity is logged
-
 export interface ActivitiesState {
   readonly currentActivity: {
     readonly client: string;
