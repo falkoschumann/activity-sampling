@@ -20,7 +20,7 @@ import { NotificationClient } from "../infrastructure/notification_client";
 import { Clock } from "../util/clock";
 import { Timer } from "../util/timer";
 
-export interface ActivitiesState {
+interface ActivitiesState {
   readonly currentActivity: {
     readonly client: string;
     readonly project: string;
@@ -39,7 +39,7 @@ export interface ActivitiesState {
   readonly timeSummary: TimeSummary;
   readonly timeZone: string;
   readonly error?: {
-    message: string;
+    readonly message: string;
   };
 }
 
