@@ -33,7 +33,6 @@ import {
 
 describe("Activities", () => {
   // TODO Align with user stories
-  // TODO Use initialState for expected state
 
   describe("Ask periodically", () => {
     it("Starts countdown", () => {
