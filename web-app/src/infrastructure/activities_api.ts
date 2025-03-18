@@ -20,7 +20,7 @@ export class ActivitiesApi extends EventTarget {
   }
 
   static createNull(
-    responses: Response | Error | (Response | Error)[],
+    responses?: Response | Error | (Response | Error)[],
   ): ActivitiesApi {
     return new ActivitiesApi("/nulled/activities", createFetchStub(responses));
   }
@@ -82,7 +82,7 @@ export class ActivitiesApi extends EventTarget {
   }
 }
 
-function createFetchStub(responses: Response | Error | (Response | Error)[]) {
+function createFetchStub(responses?: Response | Error | (Response | Error)[]) {
   const configurableResponses = ConfigurableResponses.create(responses);
   return async () => {
     const response = configurableResponses.next();
