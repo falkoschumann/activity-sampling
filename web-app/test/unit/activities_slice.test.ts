@@ -372,7 +372,20 @@ describe("Activities", () => {
 
     it("Handles domain error", async () => {
       const { store } = configure({
-        responses: [new Response(JSON.stringify(new Failure("Domain error.")))],
+        responses: [
+          new Response(JSON.stringify(new Failure("Domain error."))),
+          new Response(
+            JSON.stringify({
+              workingDays: [],
+              timeSummary: {
+                hoursToday: "PT0S",
+                hoursYesterday: "PT0S",
+                hoursThisWeek: "PT0S",
+                hoursThisMonth: "PT0S",
+              },
+            }),
+          ),
+        ],
       });
       store.dispatch(changeClient({ text: "client-1" }));
       store.dispatch(changeProject({ text: "project-1" }));
