@@ -2,7 +2,11 @@
 
 import { SerializedError } from "@reduxjs/toolkit";
 
-export default function Alert({ error }: { error: SerializedError }) {
+export default function Error({ error }: { error?: SerializedError }) {
+  if (!error) {
+    return null;
+  }
+
   return (
     <div className="alert alert-danger" role="alert">
       <h4 className="alert-heading">Something went wrong</h4>

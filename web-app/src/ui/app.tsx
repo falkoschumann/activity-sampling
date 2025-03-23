@@ -5,9 +5,9 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { queryRecentActivities, selectError } from "../application/activities_slice";
 import { AppDispatch } from "../application/store";
-import Alert from "./alert.tsx";
 import Countdown from "./countdown";
 import CurrentActivity from "./current_activity";
+import Error from "./error.tsx";
 import RecentActivities from "./recent_activities";
 import TimeSummary from "./time_summary";
 
@@ -22,7 +22,7 @@ export default function App() {
   return (
     <>
       <aside className="container fixed-top py-2 bg-body">
-        {error && <Alert error={error} />}
+        <Error error={error} />
         <CurrentActivity />
         <Countdown />
       </aside>

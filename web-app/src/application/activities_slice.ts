@@ -1,11 +1,6 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
-import {
-  createAsyncThunk,
-  createSlice,
-  PayloadAction,
-  SerializedError,
-} from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 import { Activity, TimeSummary, WorkingDay } from "../domain/activities";
 import { Duration } from "../domain/duration";
@@ -121,7 +116,7 @@ export const startCountdown = createAsyncThunk<
   unknown,
   unknown,
   ActivitiesThunkConfig
->("activities/startCountdown", async (_, thunkAPI) => {
+>("activities/startCountdown", async (_action, thunkAPI) => {
   const { notificationClient, timer } = thunkAPI.extra;
   timer.schedule(
     () => thunkAPI.dispatch(progressCountdown({ seconds: 1 })),
@@ -157,7 +152,7 @@ export const stopCountdown = createAsyncThunk<
   unknown,
   unknown,
   ActivitiesThunkConfig
->("activities/stopCountdown", async (_, thunkAPI) => {
+>("activities/stopCountdown", async (_action, thunkAPI) => {
   const { timer } = thunkAPI.extra;
   timer.cancel();
   thunkAPI.dispatch(countdownStopped());
@@ -233,7 +228,7 @@ export const activitiesSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    builder.addCase(logActivity.pending, (state, _action) => {
+    builder.addCase(logActivity.pending, (state) => {
       state.error = undefined;
     });
     builder.addCase(logActivity.fulfilled, (state, action) => {
@@ -241,21 +236,17 @@ export const activitiesSlice = createSlice({
         return;
       }
 
-      logError("Could not log activity.", {
-        message: action.payload.errorMessage,
-      });
       state.error = {
         message: `Could not log activity. ${action.payload.errorMessage}`,
       };
     });
-    builder.addCase(logActivity.rejected, (state, action) => {
-      logError("Could not log activity", action.error);
+    builder.addCase(logActivity.rejected, (state) => {
       state.error = {
         message: "Could not log activity. Please try again later.",
       };
     });
 
-    builder.addCase(queryRecentActivities.pending, (state, _action) => {
+    builder.addCase(queryRecentActivities.pending, (state) => {
       state.error = undefined;
     });
     builder.addCase(queryRecentActivities.fulfilled, (state, action) => {
@@ -271,8 +262,7 @@ export const activitiesSlice = createSlice({
         state.timeZone = action.payload.timeZone;
       }
     });
-    builder.addCase(queryRecentActivities.rejected, (state, action) => {
-      logError("Could not get recent activities.", action.error);
+    builder.addCase(queryRecentActivities.rejected, (state) => {
       state.error = {
         message: "Could not get recent activities. Please try again later.",
       };
@@ -314,29 +304,6 @@ export const {
 } = activitiesSlice.selectors;
 
 export default activitiesSlice.reducer;
-
-function logError(message: string, error: SerializedError) {
-  let cause = "";
-  if (error.name) {
-    cause += error.name;
-  }
-  if (error.message) {
-    if (cause.length === 0) {
-      cause += error.message;
-    } else {
-      cause += `: ${error.message}`;
-    }
-  }
-  if (error.stack) {
-    cause += `\n${error.stack}`;
-  }
-
-  if (cause) {
-    console.error(message, cause);
-  } else {
-    console.error(message);
-  }
-}
 
 function isLoggable({
   client,
