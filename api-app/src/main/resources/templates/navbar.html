@@ -1,0 +1,44 @@
+<nav
+  class="navbar navbar-expand-lg bg-body-tertiary"
+  xmlns="http://www.w3.org/1999/xhtml"
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+>
+  <div class="container-fluid">
+    <a class="navbar-brand" href="/">Activity Sampling</a>
+    <button
+      class="navbar-toggler"
+      type="button"
+      data-bs-toggle="collapse"
+      data-bs-target="#navbarNav"
+      aria-controls="navbarNav"
+      aria-expanded="false"
+      aria-label="Toggle navigation"
+    >
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav">
+        <th:block sec:authorize="isAuthenticated()">
+          <li class="nav-item">
+            <a class="nav-link" href="/token_details"
+              >Hello
+              <th:block sec:authentication="name"></th:block>
+              !
+            </a>
+          </li>
+          <li>
+            <form action="#" th:action="@{/logout}" method="post">
+              <input class="btn btn-warning" type="submit" value="Sign Out" />
+            </form>
+          </li>
+        </th:block>
+        <th:block sec:authorize="isAnonymous()">
+          <li>
+            <a class="btn btn-success" href="/oauth2/authorization/azure">Sign In</a>
+          </li>
+        </th:block>
+      </ul>
+    </div>
+  </div>
+</nav>

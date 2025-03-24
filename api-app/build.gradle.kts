@@ -10,6 +10,8 @@ plugins {
   id("com.diffplug.spotless") version "7.0.2"
 }
 
+val springCloudAzureVersion by extra("5.20.1")
+
 group = "de.muspellheim.activitysampling"
 version = "0.0.1-SNAPSHOT"
 
@@ -24,23 +26,37 @@ repositories {
 }
 
 dependencies {
-  implementation("org.springframework.boot:spring-boot-starter-web")
+  implementation("com.azure.spring:spring-cloud-azure-starter-active-directory")
+  implementation("com.azure.spring:spring-cloud-azure-starter-actuator")
+  implementation("com.microsoft.graph:microsoft-graph:5.80.0")
   implementation("org.flywaydb:flyway-core")
   implementation("org.flywaydb:flyway-database-postgresql")
-  implementation("org.springframework.boot:spring-boot-starter-data-jpa")
   implementation("org.springframework.boot:spring-boot-starter-actuator")
+  implementation("org.springframework.boot:spring-boot-starter-data-jpa")
   implementation("org.springframework.boot:spring-boot-starter-validation")
+  implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
+  implementation("org.springframework.boot:spring-boot-starter-security")
+  implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
+  implementation("org.springframework.boot:spring-boot-starter-web")
+  implementation("org.thymeleaf.extras:thymeleaf-extras-springsecurity6")
   compileOnly("org.projectlombok:lombok")
   runtimeOnly("org.postgresql:postgresql")
   developmentOnly("org.springframework.boot:spring-boot-devtools")
-  annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
   annotationProcessor("org.projectlombok:lombok")
+  annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
   testImplementation("org.springframework.boot:spring-boot-starter-test")
+  testImplementation("org.springframework.security:spring-security-test")
   testImplementation("com.tngtech.archunit:archunit-junit5:1.4.0")
   testCompileOnly("org.projectlombok:lombok")
-  testRuntimeOnly("org.junit.platform:junit-platform-launcher")
   testRuntimeOnly("com.h2database:h2")
+  testRuntimeOnly("org.junit.platform:junit-platform-launcher")
   testAnnotationProcessor("org.projectlombok:lombok")
+}
+
+dependencyManagement {
+  imports {
+    mavenBom("com.azure.spring:spring-cloud-azure-dependencies:$springCloudAzureVersion")
+  }
 }
 
 tasks.withType<JavaCompile> {

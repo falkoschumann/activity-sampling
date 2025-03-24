@@ -1,0 +1,17 @@
+<footer
+  class="text-center"
+  xmlns="http://www.w3.org/1999/xhtml"
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+>
+  <div sec:authorize="isAnonymous()">
+    Have you updated your app's <em>redirect URI</em> on
+    <a target="_blank" href="https://portal.azure.com/">Azure Portal</a>?
+    <br />
+    <strong>Redirect URI:</strong>
+    <th:block th:text="${@urlBuilder.fromCurrentRequest().replacePath('/login/oauth2/code/').toUriString()}"></th:block>
+  </div>
+  <br />
+  <p>&copy; 2025</p>
+  <p></p>
+</footer>

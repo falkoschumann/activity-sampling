@@ -10,12 +10,12 @@ import java.util.Comparator;
 import java.util.List;
 import org.springframework.dao.DataIntegrityViolationException;
 
-class MemoryActivitiesRepository extends MemoryCrudRepository<ActivityDto, Long>
+public class MemoryActivitiesRepository extends MemoryCrudRepository<ActivityDto, Long>
     implements ActivitiesRepository {
 
   @Serial private static final long serialVersionUID = 1L;
 
-  static ActivitiesRepository createTestInstance() {
+  public static ActivitiesRepository createTestInstance() {
     return new MemoryActivitiesRepository(
         List.of(
             ActivityDto.createTestInstance().withStart(Instant.parse("2024-12-18T08:30:00Z")),
@@ -27,9 +27,9 @@ class MemoryActivitiesRepository extends MemoryCrudRepository<ActivityDto, Long>
                 .withNotes("This is a note")));
   }
 
-  MemoryActivitiesRepository() {}
+  public MemoryActivitiesRepository() {}
 
-  MemoryActivitiesRepository(List<ActivityDto> activities) {
+  public MemoryActivitiesRepository(List<ActivityDto> activities) {
     super(activities);
   }
 

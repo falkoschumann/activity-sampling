@@ -5,9 +5,28 @@ spring:
     url: jdbc:postgresql://localhost:5432/activitysampling
     username: activitysampling
     password:
+  cloud:
+    azure:
+      active-directory:
+        enabled: true
+        profile:
+          tenant-id:
+        credential:
+          client-id:
+          client-secret:
+        post-logout-redirect-uri:
 
 management:
   endpoints:
     web:
       exposure:
         include: "*"
+
+# un-comment the following lines if you are deploying to a reverse proxy (e.g. Azure App Service)
+# server:
+#   forward-headers-strategy: native
+#   tomcat:
+#     remoteip:
+#       protocol-header: "X-Forwarded-Proto"
+#       remote-ip-header: "X-Forwarded-For"
+#       internal-proxies: ".*"
