@@ -158,7 +158,7 @@ export const stopCountdown = createAsyncThunk<
   thunkAPI.dispatch(countdownStopped());
 });
 
-export const activitiesSlice = createSlice({
+const activitiesSlice = createSlice({
   name: "activities",
   initialState,
   reducers: {

@@ -22,7 +22,7 @@ export default function App() {
   return (
     <>
       <aside className="container fixed-top py-2 bg-body">
-        <Error error={error} />
+        <Error {...error} />
         <CurrentActivity />
         <Countdown />
       </aside>
