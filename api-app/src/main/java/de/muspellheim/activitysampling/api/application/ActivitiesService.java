@@ -9,6 +9,7 @@ import de.muspellheim.activitysampling.api.infrastructure.ActivityDto;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
+import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
@@ -36,8 +37,8 @@ public class ActivitiesService {
               .task(command.task())
               .notes(command.notes() != null ? command.notes() : "")
               .build();
-      repository.save(dto);
-      return CommandStatus.createSuccess();
+      dto = repository.save(dto);
+      return CommandStatus.createSuccess(Map.of("id", dto.getId()));
     } catch (DataIntegrityViolationException e) {
       log.error(
           "Log activity failed because of duplicate timestamp (duplicate key): {}", timestamp, e);

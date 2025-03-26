@@ -3,6 +3,7 @@
 package de.muspellheim.activitysampling.api.unit;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import de.muspellheim.activitysampling.api.application.ActivitiesService;
 import de.muspellheim.activitysampling.api.application.CommandStatus;
@@ -12,6 +13,7 @@ import de.muspellheim.activitysampling.api.application.RecentActivitiesQueryResu
 import de.muspellheim.activitysampling.api.domain.Activity;
 import de.muspellheim.activitysampling.api.domain.TimeSummary;
 import de.muspellheim.activitysampling.api.domain.WorkingDay;
+import de.muspellheim.activitysampling.api.infrastructure.ActivitiesRepository;
 import de.muspellheim.activitysampling.api.infrastructure.ActivityDto;
 import java.time.Duration;
 import java.time.Instant;
@@ -19,45 +21,52 @@ import java.time.ZoneId;
 import java.util.List;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
+@DataJpaTest(properties = {"spring.flyway.target=1"})
 class ActivitiesServiceTests {
 
   // TODO Align with user stories
 
   private static final ZoneId TIME_ZONE = ZoneId.of("Europe/Berlin");
 
+  @Autowired private ActivitiesRepository repository;
+
   @Nested
   class LogActivity {
 
     @Test
     void logsActivityWithoutNotes() {
-      var repository = new MemoryActivitiesRepository();
       var service = new ActivitiesService(repository);
 
       var result = service.logActivity(LogActivityCommand.createTestInstance());
 
-      assertEquals(CommandStatus.createSuccess(), result);
-      assertEquals(List.of(ActivityDto.createTestInstance().withId(1L)), repository);
+      assertTrue(result.success());
+      assertEquals(
+          List.of(ActivityDto.createTestInstance().withId(result.detail("id"))),
+          repository.findAll());
     }
 
     @Test
     void logsActivityWithNotes() {
-      var repository = new MemoryActivitiesRepository();
       var service = new ActivitiesService(repository);
 
       var result =
           service.logActivity(LogActivityCommand.createTestInstance().withNotes("This is a note"));
 
-      assertEquals(CommandStatus.createSuccess(), result);
+      assertTrue(result.success());
       assertEquals(
-          List.of(ActivityDto.createTestInstance().withId(1L).withNotes("This is a note")),
-          repository);
+          List.of(
+              ActivityDto.createTestInstance()
+                  .withId(result.detail("id"))
+                  .withNotes("This is a note")),
+          repository.findAll());
     }
 
     @Test
     void failsWhenActivitiesTimestampIsDuplicated() {
-      var repository = new MemoryActivitiesRepository();
-      repository.add(ActivityDto.createTestInstance());
+      repository.save(ActivityDto.createTestInstance());
       var service = new ActivitiesService(repository);
 
       var result = service.logActivity(LogActivityCommand.createTestInstance());
@@ -75,7 +84,15 @@ class ActivitiesServiceTests {
 
     @Test
     void returnsRecentActivities() {
-      var repository = MemoryActivitiesRepository.createTestInstance();
+      repository.saveAll(
+          List.of(
+              ActivityDto.createTestInstance().withStart(Instant.parse("2024-12-18T08:30:00Z")),
+              ActivityDto.createTestInstance().withStart(Instant.parse("2024-12-17T16:00:00Z")),
+              ActivityDto.createTestInstance().withStart(Instant.parse("2024-12-17T15:30:00Z")),
+              ActivityDto.createTestInstance()
+                  .withStart(Instant.parse("2024-12-17T15:00:00Z"))
+                  .withTask("Make things")
+                  .withNotes("This is a note")));
       var service = new ActivitiesService(repository);
 
       var result = service.queryRecentActivities(RecentActivitiesQuery.createTestInstance());
@@ -85,7 +102,6 @@ class ActivitiesServiceTests {
 
     @Test
     void returnsNoRecentActivitiesWithoutActivities() {
-      var repository = new MemoryActivitiesRepository();
       var service = new ActivitiesService(repository);
 
       var result = service.queryRecentActivities(RecentActivitiesQuery.createTestInstance());
@@ -97,8 +113,8 @@ class ActivitiesServiceTests {
     void returnsRecentActivitiesForTodayWhenQueryIsNotGiven() {
       var nowTimestamp = Instant.now();
       var now = nowTimestamp.atZone(TIME_ZONE).toLocalDateTime();
-      var repository = new MemoryActivitiesRepository();
-      repository.add(
+
+      repository.save(
           new ActivityDto(nowTimestamp, Duration.ofMinutes(20), "client-1", "project-1", "task-1"));
       var service = new ActivitiesService(repository);
 

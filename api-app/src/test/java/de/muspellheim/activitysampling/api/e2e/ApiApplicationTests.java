@@ -3,12 +3,14 @@
 package de.muspellheim.activitysampling.api.e2e;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import de.muspellheim.activitysampling.api.application.CommandStatus;
 import de.muspellheim.activitysampling.api.application.LogActivityCommand;
 import de.muspellheim.activitysampling.api.application.RecentActivitiesQueryResult;
 import java.time.Instant;
 import java.util.Map;
+import java.util.Objects;
 import java.util.TimeZone;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeAll;
@@ -75,7 +77,7 @@ class ApiApplicationTests {
               CommandStatus.class);
 
       assertEquals(200, response.getStatusCode().value());
-      assertEquals(CommandStatus.createSuccess(), response.getBody());
+      assertTrue(Objects.requireNonNull(response.getBody()).success());
     }
 
     @Test
