@@ -4,15 +4,12 @@ import { describe, expect, it } from "vitest";
 
 import {
   activitySelected,
-  changeClient,
-  changeNotes,
-  changeProject,
-  changeTask,
+  changeText,
   durationSelected,
   logActivity,
   queryRecentActivities,
   selectCountdown,
-  selectCurrentActivity,
+  selectCurrentActivityForm,
   selectError,
   selectRecentActivities,
   selectTimeSummary,
@@ -151,44 +148,44 @@ describe("Activities", () => {
     it("Logs the activity with client, project, task and optional notes", () => {
       const { store } = configure();
 
-      store.dispatch(changeClient({ text: "client-1" }));
-      expect(selectCurrentActivity(store.getState())).toEqual({
+      store.dispatch(changeText({ name: "client", text: "client-1" }));
+      expect(selectCurrentActivityForm(store.getState())).toEqual({
         client: "client-1",
         project: "",
         task: "",
         notes: "",
-        isFormDisabled: false,
-        isLogDisabled: true,
+        disabled: false,
+        loggable: true,
       });
 
-      store.dispatch(changeProject({ text: "project-1" }));
-      expect(selectCurrentActivity(store.getState())).toEqual({
+      store.dispatch(changeText({ name: "project", text: "project-1" }));
+      expect(selectCurrentActivityForm(store.getState())).toEqual({
         client: "client-1",
         project: "project-1",
         task: "",
         notes: "",
-        isFormDisabled: false,
-        isLogDisabled: true,
+        disabled: false,
+        loggable: true,
       });
 
-      store.dispatch(changeTask({ text: "task-1" }));
-      expect(selectCurrentActivity(store.getState())).toEqual({
+      store.dispatch(changeText({ name: "task", text: "task-1" }));
+      expect(selectCurrentActivityForm(store.getState())).toEqual({
         client: "client-1",
         project: "project-1",
         task: "task-1",
         notes: "",
-        isFormDisabled: false,
-        isLogDisabled: false,
+        disabled: false,
+        loggable: false,
       });
 
-      store.dispatch(changeNotes({ text: "notes-1" }));
-      expect(selectCurrentActivity(store.getState())).toEqual({
+      store.dispatch(changeText({ name: "notes", text: "notes-1" }));
+      expect(selectCurrentActivityForm(store.getState())).toEqual({
         client: "client-1",
         project: "project-1",
         task: "task-1",
         notes: "notes-1",
-        isFormDisabled: false,
-        isLogDisabled: false,
+        disabled: false,
+        loggable: false,
       });
     });
 
@@ -229,20 +226,20 @@ describe("Activities", () => {
         responses: [new Response(commandStatus), new Response(queryResultJson)],
       });
       const loggedActivities = activitiesApi.trackActivitiesLogged();
-      store.dispatch(changeClient({ text: "client-1" }));
-      store.dispatch(changeProject({ text: "project-1" }));
-      store.dispatch(changeTask({ text: "task-1" }));
-      store.dispatch(changeNotes({ text: "notes-1" }));
+      store.dispatch(changeText({ name: "client", text: "client-1" }));
+      store.dispatch(changeText({ name: "project", text: "project-1" }));
+      store.dispatch(changeText({ name: "task", text: "task-1" }));
+      store.dispatch(changeText({ name: "notes", text: "notes-1" }));
 
       await store.dispatch(logActivity({}));
 
-      expect(selectCurrentActivity(store.getState())).toEqual({
+      expect(selectCurrentActivityForm(store.getState())).toEqual({
         client: "client-1",
         project: "project-1",
         task: "task-1",
         notes: "notes-1",
-        isFormDisabled: false,
-        isLogDisabled: false,
+        disabled: false,
+        loggable: false,
       });
       expect(selectRecentActivities(store.getState())).toEqual([
         {
@@ -282,13 +279,13 @@ describe("Activities", () => {
 
       await store.dispatch(startCountdown({}));
 
-      expect(selectCurrentActivity(store.getState())).toEqual({
+      expect(selectCurrentActivityForm(store.getState())).toEqual({
         client: "",
         project: "",
         task: "",
         notes: "",
-        isFormDisabled: true,
-        isLogDisabled: true,
+        disabled: true,
+        loggable: true,
       });
     });
 
@@ -298,13 +295,13 @@ describe("Activities", () => {
 
       await store.dispatch(stopCountdown({}));
 
-      expect(selectCurrentActivity(store.getState())).toEqual({
+      expect(selectCurrentActivityForm(store.getState())).toEqual({
         client: "",
         project: "",
         task: "",
         notes: "",
-        isFormDisabled: false,
-        isLogDisabled: true,
+        disabled: false,
+        loggable: true,
       });
     });
 
@@ -314,13 +311,13 @@ describe("Activities", () => {
 
       timer.simulateTaskRun(Duration.parse("PT30M1S").seconds);
 
-      expect(selectCurrentActivity(store.getState())).toEqual({
+      expect(selectCurrentActivityForm(store.getState())).toEqual({
         client: "",
         project: "",
         task: "",
         notes: "",
-        isFormDisabled: false,
-        isLogDisabled: true,
+        disabled: false,
+        loggable: true,
       });
     });
 
@@ -352,18 +349,18 @@ describe("Activities", () => {
       await store.dispatch(startCountdown({}));
 
       timer.simulateTaskRun(Duration.parse("PT30M1S").seconds);
-      store.dispatch(changeClient({ text: "client-1" }));
-      store.dispatch(changeProject({ text: "project-1" }));
-      store.dispatch(changeTask({ text: "task-1" }));
+      store.dispatch(changeText({ name: "client", text: "client-1" }));
+      store.dispatch(changeText({ name: "project", text: "project-1" }));
+      store.dispatch(changeText({ name: "task", text: "task-1" }));
       await store.dispatch(logActivity({}));
 
-      expect(selectCurrentActivity(store.getState())).toEqual({
+      expect(selectCurrentActivityForm(store.getState())).toEqual({
         client: "client-1",
         project: "project-1",
         task: "task-1",
         notes: "",
-        isFormDisabled: true,
-        isLogDisabled: true,
+        disabled: true,
+        loggable: true,
       });
       expect(hiddenNotifications.data).toEqual([
         { title: "What are you working on?" },
@@ -387,9 +384,9 @@ describe("Activities", () => {
           ),
         ],
       });
-      store.dispatch(changeClient({ text: "client-1" }));
-      store.dispatch(changeProject({ text: "project-1" }));
-      store.dispatch(changeTask({ text: "task-1" }));
+      store.dispatch(changeText({ name: "client", text: "client-1" }));
+      store.dispatch(changeText({ name: "project", text: "project-1" }));
+      store.dispatch(changeText({ name: "task", text: "task-1" }));
 
       await store.dispatch(logActivity({}));
 
@@ -407,9 +404,9 @@ describe("Activities", () => {
           }),
         ],
       });
-      store.dispatch(changeClient({ text: "client-1" }));
-      store.dispatch(changeProject({ text: "project-1" }));
-      store.dispatch(changeTask({ text: "task-1" }));
+      store.dispatch(changeText({ name: "client", text: "client-1" }));
+      store.dispatch(changeText({ name: "project", text: "project-1" }));
+      store.dispatch(changeText({ name: "task", text: "task-1" }));
 
       await store.dispatch(logActivity({}));
 
@@ -432,13 +429,13 @@ describe("Activities", () => {
         }),
       );
 
-      expect(selectCurrentActivity(store.getState())).toEqual({
+      expect(selectCurrentActivityForm(store.getState())).toEqual({
         client: "client-1",
         project: "project-1",
         task: "task-1",
         notes: "notes-1",
-        isFormDisabled: false,
-        isLogDisabled: false,
+        disabled: false,
+        loggable: false,
       });
     });
   });
@@ -483,13 +480,13 @@ describe("Activities", () => {
 
       await store.dispatch(queryRecentActivities({}));
 
-      expect(selectCurrentActivity(store.getState())).toEqual({
+      expect(selectCurrentActivityForm(store.getState())).toEqual({
         client: "ACME Inc.",
         project: "Foobar",
         task: "Do something",
         notes: "Lorem ipsum",
-        isFormDisabled: false,
-        isLogDisabled: false,
+        disabled: false,
+        loggable: false,
       });
       expect(selectRecentActivities(store.getState())).toEqual([
         {
