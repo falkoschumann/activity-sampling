@@ -1,12 +1,9 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
-package de.muspellheim.activitysampling.api.application;
+package de.muspellheim.activitysampling.api.domain;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import de.muspellheim.activitysampling.api.domain.Activity;
-import de.muspellheim.activitysampling.api.domain.TimeSummary;
-import de.muspellheim.activitysampling.api.domain.WorkingDay;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;

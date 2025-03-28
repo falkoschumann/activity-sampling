@@ -6,11 +6,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import de.muspellheim.activitysampling.api.application.ActivitiesService;
-import de.muspellheim.activitysampling.api.application.CommandStatus;
-import de.muspellheim.activitysampling.api.application.LogActivityCommand;
-import de.muspellheim.activitysampling.api.application.RecentActivitiesQuery;
-import de.muspellheim.activitysampling.api.application.RecentActivitiesQueryResult;
 import de.muspellheim.activitysampling.api.domain.Activity;
+import de.muspellheim.activitysampling.api.domain.CommandStatus;
+import de.muspellheim.activitysampling.api.domain.LogActivityCommand;
+import de.muspellheim.activitysampling.api.domain.RecentActivitiesQuery;
+import de.muspellheim.activitysampling.api.domain.RecentActivitiesQueryResult;
 import de.muspellheim.activitysampling.api.domain.TimeSummary;
 import de.muspellheim.activitysampling.api.domain.WorkingDay;
 import de.muspellheim.activitysampling.api.infrastructure.ActivitiesRepository;

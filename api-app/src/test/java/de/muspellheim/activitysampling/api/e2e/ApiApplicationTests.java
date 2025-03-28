@@ -5,9 +5,9 @@ package de.muspellheim.activitysampling.api.e2e;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import de.muspellheim.activitysampling.api.application.CommandStatus;
-import de.muspellheim.activitysampling.api.application.LogActivityCommand;
-import de.muspellheim.activitysampling.api.application.RecentActivitiesQueryResult;
+import de.muspellheim.activitysampling.api.domain.CommandStatus;
+import de.muspellheim.activitysampling.api.domain.LogActivityCommand;
+import de.muspellheim.activitysampling.api.domain.RecentActivitiesQueryResult;
 import java.time.Instant;
 import java.util.Map;
 import java.util.Objects;
