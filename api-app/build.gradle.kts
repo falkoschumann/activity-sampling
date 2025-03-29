@@ -10,8 +10,6 @@ plugins {
   id("com.diffplug.spotless") version "7.0.2"
 }
 
-val springCloudAzureVersion by extra("5.20.1")
-
 group = "de.muspellheim.activitysampling"
 version = "0.0.1-SNAPSHOT"
 
@@ -55,7 +53,7 @@ dependencies {
 
 dependencyManagement {
   imports {
-    mavenBom("com.azure.spring:spring-cloud-azure-dependencies:$springCloudAzureVersion")
+    mavenBom("com.azure.spring:spring-cloud-azure-dependencies:5.21.0")
   }
 }
 
