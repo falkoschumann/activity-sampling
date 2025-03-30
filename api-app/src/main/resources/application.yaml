@@ -14,7 +14,8 @@ spring:
         credential:
           client-id:
           client-secret:
-        post-logout-redirect-uri:
+        post-logout-redirect-uri: http://localhost:8080
+        redirect-uri-template: http://localhost:3000/oauth2/authorization/azure
 
 management:
   endpoints:
