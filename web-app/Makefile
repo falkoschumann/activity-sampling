@@ -1,5 +1,8 @@
 export NPM_CONFIG_YES=true
 
+# Needed for compatibility with Node.js 18
+export NODE_OPTIONS=--experimental-global-webcrypto
+
 all: dist check
 
 clean:
