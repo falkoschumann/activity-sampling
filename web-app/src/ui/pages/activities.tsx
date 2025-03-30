@@ -40,7 +40,7 @@ export default function ActivitiesPage() {
 
   return (
     <>
-      <aside className="container fixed-top py-2 bg-body">
+      <aside className="container py-2 bg-body">
         <Error {...error} />
         <CurrentActivityForm
           {...currentActivityForm}
