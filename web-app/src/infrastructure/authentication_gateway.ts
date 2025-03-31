@@ -11,6 +11,7 @@ const msalConfig: Configuration = {
     clientId: import.meta.env.VITE_CLIENT_ID,
     authority: `https://login.microsoftonline.com/${import.meta.env.VITE_TENANT_ID}`,
     redirectUri: "http://localhost:3000",
+    postLogoutRedirectUri: "http://localhost:3000",
   },
   cache: {
     cacheLocation: "sessionStorage",
