@@ -9,20 +9,15 @@ spring:
     azure:
       active-directory:
         enabled: true
-        profile:
-          tenant-id:
         credential:
-          client-id:
-          client-secret:
-        post-logout-redirect-uri: http://localhost:8080
-        redirect-uri-template: http://localhost:3000/oauth2/authorization/azure
+          client-id: ${AZURE_CLIENT_ID}
+        app-id-uri: ${AZURE_APP_ID_URI}
 
 management:
   endpoints:
     web:
       exposure:
         include: "*"
-
 # un-comment the following lines if you are deploying to a reverse proxy (e.g. Azure App Service)
 # server:
 #   forward-headers-strategy: native

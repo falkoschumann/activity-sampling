@@ -39,9 +39,7 @@ class ApiApplicationTests {
 
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-      http.csrf(AbstractHttpConfigurer::disable)
-          .securityMatcher("/api/**")
-          .authorizeHttpRequests(authorize -> authorize.anyRequest().permitAll());
+      http.authorizeHttpRequests(auth -> auth.anyRequest().permitAll());
       return http.build();
     }
   }
