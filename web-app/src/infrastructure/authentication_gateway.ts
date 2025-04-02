@@ -10,10 +10,6 @@ const msalConfig: Configuration = {
   auth: {
     clientId: import.meta.env.VITE_CLIENT_ID,
     authority: `https://login.microsoftonline.com/${import.meta.env.VITE_TENANT_ID}`,
-    // TODO Can URIs be deleted? Because they are configured in Entra ID.
-    redirectUri: window.location.href,
-    // TODO Use /logout do clear sessionStorage
-    postLogoutRedirectUri: window.location.href,
   },
   cache: {
     cacheLocation: "sessionStorage",
