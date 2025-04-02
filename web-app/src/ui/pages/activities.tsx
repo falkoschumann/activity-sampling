@@ -282,7 +282,12 @@ function RecentActivitiesContainer({
       </h6>
       <div className="list-group list-group-flush">
         {workingDay.activities.map((activity) => (
-          <ActivityComponent activity={activity} timeZone={timeZone} onSelect={() => onSelect(activity)} />
+          <ActivityComponent
+            key={activity.start}
+            activity={activity}
+            timeZone={timeZone}
+            onSelect={() => onSelect(activity)}
+          />
         ))}
       </div>
     </div>
