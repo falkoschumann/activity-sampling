@@ -20,7 +20,7 @@ public class SecurityConfig {
   SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
     http.with(
             AadResourceServerHttpSecurityConfigurer.aadResourceServer(), Customizer.withDefaults())
-        .authorizeHttpRequests(auth -> auth.anyRequest().authenticated());
+        .authorizeHttpRequests(auth -> auth.anyRequest().hasAuthority("APPROLE_user"));
     return http.build();
   }
 }
