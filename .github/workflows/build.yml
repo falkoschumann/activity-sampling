@@ -38,10 +38,10 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        java-version: ["17", "21", "23"]
+        java-version: ["21", "23"]
         # TODO Replace obsolete Java 23 with current Java 24
-        # Current Gradle does not support Java 24
-        # See https://docs.gradle.org/current/userguide/compatibility.html
+        #   Current Gradle does not support Java 24
+        #   See https://docs.gradle.org/current/userguide/compatibility.html
     steps:
       - name: Checkout source code
         uses: actions/checkout@v4
