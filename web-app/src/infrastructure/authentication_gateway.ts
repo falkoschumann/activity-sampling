@@ -48,5 +48,5 @@ console.log("Configuration", msalConfig);
 export const msalInstance = new PublicClientApplication(msalConfig);
 
 export const loginRequest = {
-  scopes: import.meta.env.VITE_SCOPES.split(","),
+  scopes: import.meta.env.VITE_SCOPES?.split(","),
 };
