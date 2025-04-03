@@ -2,6 +2,8 @@
 
 import { useIsAuthenticated } from "@azure/msal-react";
 import * as React from "react";
+
+import Profile from "./profile";
 import { SignInButton } from "./sign_in_button";
 import { SignOutButton } from "./sign_out_button";
 
@@ -16,7 +18,15 @@ export default function PageLayout({ children }: { children?: React.ReactNode })
             <a className="navbar-brand" href="/">
               Activity Sampling
             </a>
-            <div className="justify-content-end">{isAuthenticated ? <SignOutButton /> : <SignInButton />}</div>
+            <div className="justify-content-end d-flex align-items-md-baseline">
+              {isAuthenticated ? (
+                <>
+                  <Profile /> <SignOutButton />
+                </>
+              ) : (
+                <SignInButton />
+              )}
+            </div>
           </div>
         </nav>
       </header>
