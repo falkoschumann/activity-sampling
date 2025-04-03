@@ -12,14 +12,6 @@ updates:
     directory: "/web-app"
     schedule:
       interval: "daily"
-    ignore:
-      # TODO Remove ignoring React 19
-      #   Azure MSAL currently does not support React 19
-      #   See https://github.com/AzureAD/microsoft-authentication-library-for-js/issues/7577
-      - dependency-name: react:*
-        versions: [">=19.0.0"]
-      - dependency-name: react-dom:*
-        versions: [">=19.0.0"]
     groups:
       react:
         patterns:
@@ -31,4 +23,3 @@ updates:
       vitest:
         patterns:
           - "vitest"
-          - "@vitest/*"
