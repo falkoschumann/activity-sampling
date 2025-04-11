@@ -20,7 +20,8 @@ public class SecurityConfig {
 
   @Bean
   SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-    http.with(
+    http.securityMatcher("/api/*")
+        .with(
             AadResourceServerHttpSecurityConfigurer.aadResourceServer(), Customizer.withDefaults())
         .authorizeHttpRequests(auth -> auth.anyRequest().hasAuthority("APPROLE_user"));
     return http.build();

@@ -23,6 +23,12 @@ repositories {
   mavenCentral()
 }
 
+dependencyManagement {
+  imports {
+    mavenBom("com.azure.spring:spring-cloud-azure-dependencies:5.21.0")
+  }
+}
+
 dependencies {
   implementation("com.azure.spring:spring-cloud-azure-starter-active-directory")
   implementation("com.azure.spring:spring-cloud-azure-starter-actuator")
@@ -51,12 +57,6 @@ dependencies {
   testAnnotationProcessor("org.projectlombok:lombok")
 }
 
-dependencyManagement {
-  imports {
-    mavenBom("com.azure.spring:spring-cloud-azure-dependencies:5.22.0")
-  }
-}
-
 tasks.withType<JavaCompile> {
   options.encoding = "UTF-8"
   options.release = 21
@@ -78,19 +78,17 @@ tasks.jacocoTestReport {
   dependsOn(tasks.test)
 }
 
-/*
 tasks.register<Copy>("processFrontendResources") {
   group = "Frontend"
   description = "Process frontend resources"
 
   from(project.layout.projectDirectory.dir("../web-app/dist"))
-  into(project.layout.buildDirectory.dir("resources/main/public"))
+  into(project.layout.buildDirectory.dir("resources/main/static"))
 }
 
 tasks.named("processResources") {
   dependsOn("processFrontendResources")
 }
-*/
 
 checkstyle {
   toolVersion = "10.21.2"
