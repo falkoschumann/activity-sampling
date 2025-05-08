@@ -50,7 +50,7 @@ dependencies {
   annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
   testImplementation("org.springframework.boot:spring-boot-starter-test")
   testImplementation("org.springframework.security:spring-security-test")
-  testImplementation("com.tngtech.archunit:archunit-junit5:1.4.0")
+  testImplementation("com.tngtech.archunit:archunit-junit5:1.4.1")
   testCompileOnly("org.projectlombok:lombok")
   testRuntimeOnly("com.h2database:h2")
   testRuntimeOnly("org.junit.platform:junit-platform-launcher")
