@@ -1,3 +1,5 @@
+# TODO Extract cloud configuration
+
 spring:
   application:
     name: api-app

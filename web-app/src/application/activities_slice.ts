@@ -11,6 +11,7 @@ import {
   RecentActivitiesQueryResult,
 } from "../domain/messages";
 import { ActivitiesApi } from "../infrastructure/activities_api";
+import { AuthenticationGateway } from "../infrastructure/authentication_gateway";
 import { NotificationClient } from "../infrastructure/notification_client";
 import { Clock } from "../util/clock";
 import { Timer } from "../util/timer";
@@ -66,6 +67,7 @@ const initialState: ActivitiesState = {
 type ActivitiesThunkConfig = {
   extra: {
     readonly activitiesApi: ActivitiesApi;
+    readonly authenticationGateway: AuthenticationGateway;
     readonly notificationClient: NotificationClient;
     readonly clock: Clock;
     readonly timer: Timer;
@@ -78,7 +80,8 @@ export const logActivity = createAsyncThunk<
   unknown,
   ActivitiesThunkConfig
 >("activities/logActivity", async (_action, thunkAPI) => {
-  const { activitiesApi, notificationClient, clock } = thunkAPI.extra;
+  const { activitiesApi, authenticationGateway, notificationClient, clock } =
+    thunkAPI.extra;
   const currentActivityForm = selectCurrentActivityForm(thunkAPI.getState());
   const countdown = selectCountdown(thunkAPI.getState());
   const command: LogActivityCommand = {
@@ -89,7 +92,8 @@ export const logActivity = createAsyncThunk<
     task: currentActivityForm.task,
     notes: currentActivityForm.notes,
   };
-  const status = await activitiesApi.logActivity(command);
+  const token = await authenticationGateway.acquireToken();
+  const status = await activitiesApi.logActivity(command, token);
   await thunkAPI.dispatch(queryRecentActivities({}));
   notificationClient.hide();
   thunkAPI.dispatch(activityLogged());
@@ -101,7 +105,7 @@ export const queryRecentActivities = createAsyncThunk<
   RecentActivitiesQuery,
   ActivitiesThunkConfig
 >("activities/queryRecentActivities", async (query, thunkAPI) => {
-  const { activitiesApi, clock } = thunkAPI.extra;
+  const { activitiesApi, authenticationGateway, clock } = thunkAPI.extra;
   const today =
     query.today != null
       ? query.today
@@ -110,7 +114,8 @@ export const queryRecentActivities = createAsyncThunk<
     query.timeZone != null
       ? query.timeZone
       : Intl.DateTimeFormat().resolvedOptions().timeZone;
-  return activitiesApi.queryRecentActivities({ today, timeZone });
+  const token = await authenticationGateway.acquireToken();
+  return activitiesApi.queryRecentActivities({ today, timeZone }, token);
 });
 
 export const startCountdown = createAsyncThunk<

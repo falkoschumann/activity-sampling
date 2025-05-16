@@ -14,7 +14,7 @@ describe("Activities API", () => {
       );
       const loggedActivities = api.trackActivitiesLogged();
 
-      const status = await api.logActivity(TEST_ACTIVITY);
+      const status = await api.logActivity(TEST_ACTIVITY, "nulled-token");
 
       expect(status).toEqual(new Success());
       expect(loggedActivities.data).toEqual([TEST_ACTIVITY]);
@@ -25,7 +25,7 @@ describe("Activities API", () => {
         new Response("", { status: 500, statusText: "Internal Server Error" }),
       );
 
-      const result = api.logActivity(TEST_ACTIVITY);
+      const result = api.logActivity(TEST_ACTIVITY, "nulled-token");
 
       await expect(result).rejects.toThrow("500: Internal Server Error");
     });
@@ -33,7 +33,7 @@ describe("Activities API", () => {
     it("Handles network error", async () => {
       const api = ActivitiesApi.createNull(new Error("Network Error"));
 
-      const result = api.logActivity(TEST_ACTIVITY);
+      const result = api.logActivity(TEST_ACTIVITY, "nulled-token");
 
       await expect(result).rejects.toThrow("Network Error");
     });
@@ -56,7 +56,7 @@ describe("Activities API", () => {
         ),
       );
 
-      const result = await api.queryRecentActivities({});
+      const result = await api.queryRecentActivities({}, "nulled-token");
 
       expect(result).toEqual({
         workingDays: [],
@@ -74,7 +74,7 @@ describe("Activities API", () => {
         new Response("", { status: 500, statusText: "Internal Server Error" }),
       );
 
-      const result = api.queryRecentActivities({});
+      const result = api.queryRecentActivities({}, "nulled-token");
 
       await expect(result).rejects.toThrow("500: Internal Server Error");
     });
@@ -82,7 +82,7 @@ describe("Activities API", () => {
     it("Handles network error", async () => {
       const api = ActivitiesApi.createNull(new Error("Network Error"));
 
-      const result = api.queryRecentActivities({});
+      const result = api.queryRecentActivities({}, "nulled-token");
 
       await expect(result).rejects.toThrow("Network Error");
     });

@@ -5,6 +5,8 @@ import { useMsal } from "@azure/msal-react";
 // FIXME Logout does not clean up session storage
 //  see https://github.com/AzureAD/microsoft-authentication-library-for-js/issues/5807#issuecomment-1478850501
 
+// TODO Create logout page and clear state after logout
+
 export function SignOutButton() {
   const { instance } = useMsal();
 

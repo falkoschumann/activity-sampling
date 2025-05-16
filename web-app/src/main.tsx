@@ -7,13 +7,12 @@ import { Provider } from "react-redux";
 import "bootstrap/dist/css/bootstrap.css";
 import "bootstrap/dist/js/bootstrap.esm.js";
 
-import { store } from "./application/store";
-import { msalInstance } from "./infrastructure/authentication_gateway";
+import { authenticationGateway, store } from "./application/store";
 import App from "./ui/app";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <MsalProvider instance={msalInstance}>
+    <MsalProvider instance={authenticationGateway.unwrap()}>
       <Provider store={store}>
         <App />
       </Provider>

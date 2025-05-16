@@ -2,6 +2,7 @@
 
 import {
   Configuration,
+  InteractionRequiredAuthError,
   LogLevel,
   PublicClientApplication,
 } from "@azure/msal-browser";
@@ -13,7 +14,6 @@ const msalConfig: Configuration = {
   },
   cache: {
     cacheLocation: "sessionStorage",
-    storeAuthStateInCookie: false, // Set this to "true" if you are having issues on IE11 or Edge
   },
   system: {
     loggerOptions: {
@@ -43,10 +43,84 @@ const msalConfig: Configuration = {
   },
 };
 
-console.log("Configuration", msalConfig);
+export class AuthenticationGateway {
+  static create() {
+    return new AuthenticationGateway(new PublicClientApplication(msalConfig));
+  }
 
-export const msalInstance = new PublicClientApplication(msalConfig);
+  static createNull({
+    name = "Alice",
+    username = "alice@example.com",
+    token = "nulled-token",
+  }: {
+    name?: string;
+    username?: string;
+    token?: string;
+  } = {}) {
+    return new AuthenticationGateway(
+      new PublicClientApplicationStub(
+        { name, username },
+        token,
+      ) as unknown as PublicClientApplication,
+    );
+  }
 
-export const loginRequest = {
-  scopes: import.meta.env.VITE_SCOPES?.split(","),
-};
+  readonly #msalInstance;
+
+  constructor(msalInstance: PublicClientApplication) {
+    this.#msalInstance = msalInstance;
+  }
+
+  getUser(): { name: string; username: string } {
+    const accounts = this.#msalInstance.getAllAccounts();
+    return {
+      name: accounts[0].name || accounts[0].username,
+      username: accounts[0].username,
+    };
+  }
+
+  async acquireToken() {
+    const accounts = this.#msalInstance.getAllAccounts();
+    const request = {
+      account: accounts[0],
+      scopes: import.meta.env.VITE_SCOPES?.split(","),
+    };
+    try {
+      const tokenResponse =
+        await this.#msalInstance.acquireTokenSilent(request);
+      return tokenResponse.accessToken;
+    } catch (error) {
+      if (error instanceof InteractionRequiredAuthError) {
+        // TODO Authentication popup may be blocked by the browser
+        const tokenResponse =
+          await this.#msalInstance.acquireTokenPopup(request);
+        return tokenResponse.accessToken;
+      }
+
+      console.error("Error acquiring token silently:", error);
+      throw error;
+    }
+  }
+
+  unwrap() {
+    return this.#msalInstance;
+  }
+}
+
+class PublicClientApplicationStub {
+  #user;
+  #token;
+
+  constructor(user: { name: string; username: string }, token: string) {
+    this.#user = user;
+    this.#token = token;
+  }
+
+  getAllAccounts() {
+    return [this.#user];
+  }
+
+  async acquireTokenSilent() {
+    return { accessToken: this.#token };
+  }
+}
