@@ -13,9 +13,8 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 
-@Profile("local")
+@Profile({"local", "test"})
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
@@ -23,13 +22,10 @@ public class LocalSecurityConfig {
 
   @Bean
   SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-    http.csrf(
-            csrf ->
-                csrf.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-                    .csrfTokenRequestHandler(new SpaCsrfTokenRequestHandler()))
-        .securityMatcher("/api/**")
+    http.securityMatcher("/api/**")
         .authorizeHttpRequests(auth -> auth.anyRequest().hasRole("USER"))
-        .httpBasic(withDefaults());
+        .httpBasic(withDefaults())
+        .csrf(csrf -> csrf.ignoringRequestMatchers("/api/**"));
     return http.build();
   }
 

@@ -59,7 +59,9 @@ dependencies {
 }
 
 tasks.named<BootRun>("bootRun") {
-  systemProperty("spring.profiles.active", "local")
+  if (System.getenv("SPRING_PROFILES_ACTIVE") == null) {
+    systemProperty("spring.profiles.active", "local")
+  }
 }
 
 tasks.withType<JavaCompile> {
