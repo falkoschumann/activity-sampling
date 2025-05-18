@@ -14,39 +14,40 @@ import java.util.Objects;
 import java.util.TimeZone;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.SpringBootTest.UseMainMethod;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.context.annotation.Bean;
+import org.springframework.boot.test.web.client.TestRestTemplate.HttpClientOption;
+import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.web.SecurityFilterChain;
 
-@SpringBootTest(
-    webEnvironment = WebEnvironment.RANDOM_PORT,
-    properties = {"spring.main.allow-bean-definition-overriding=true"})
+@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT, useMainMethod = UseMainMethod.ALWAYS)
 class ApiApplicationTests {
 
-  @TestConfiguration
-  static class Config {
+  @LocalServerPort int port;
 
-    @Bean
-    SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-      http.authorizeHttpRequests(auth -> auth.anyRequest().permitAll());
-      return http.build();
-    }
-  }
+  @Autowired RestTemplateBuilder restTemplateBuilder;
+
+  private TestRestTemplate restTemplate;
 
   @BeforeAll
   static void setup() {
     TimeZone.setDefault(TimeZone.getTimeZone("Europe/Berlin"));
+  }
+
+  @BeforeEach
+  void init() {
+    var restTemplate = restTemplateBuilder.rootUri("http://localhost:" + port);
+    this.restTemplate =
+        new TestRestTemplate(restTemplate, "user", "password", HttpClientOption.ENABLE_COOKIES);
   }
 
   @Test
@@ -55,20 +56,8 @@ class ApiApplicationTests {
   @Nested
   class LogActivity {
 
-    @TestConfiguration
-    static class Config {
-
-      @Bean
-      SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.csrf(AbstractHttpConfigurer::disable)
-            .securityMatcher("/api/**")
-            .authorizeHttpRequests(authorize -> authorize.anyRequest().permitAll());
-        return http.build();
-      }
-    }
-
     @Test
-    void logsActivity(@Autowired TestRestTemplate restTemplate) {
+    void logsActivity() {
       var response =
           restTemplate.postForEntity(
               "/api/activities/log-activity",
@@ -80,7 +69,7 @@ class ApiApplicationTests {
     }
 
     @Test
-    void failsWhenActivityIsNotValid(@Autowired TestRestTemplate restTemplate) throws Exception {
+    void failsWhenActivityIsNotValid() throws Exception {
       var command =
           new JSONObject()
               .put("start", "2025-03-13T17:46:00Z")
@@ -100,20 +89,8 @@ class ApiApplicationTests {
   @Nested
   class RecentActivities {
 
-    @TestConfiguration
-    static class Config {
-
-      @Bean
-      SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.csrf(AbstractHttpConfigurer::disable)
-            .securityMatcher("/api/**")
-            .authorizeHttpRequests(authorize -> authorize.anyRequest().permitAll());
-        return http.build();
-      }
-    }
-
     @Test
-    void queriesRecentActivities(@Autowired TestRestTemplate restTemplate) {
+    void queriesRecentActivities() {
       var response =
           restTemplate.getForEntity(
               "/api/activities/recent-activities?today=2024-12-18&timeZone=Europe/Berlin",
@@ -124,7 +101,7 @@ class ApiApplicationTests {
     }
 
     @Test
-    void doesNotFailWhenQueryIsNotSet(@Autowired TestRestTemplate restTemplate) {
+    void doesNotFailWhenQueryIsNotSet() {
       var response =
           restTemplate.getForEntity(
               "/api/activities/recent-activities", RecentActivitiesQueryResult.class);
@@ -134,7 +111,7 @@ class ApiApplicationTests {
     }
 
     @Test
-    void failsWhenQueryIsNotValid(@Autowired TestRestTemplate restTemplate) {
+    void failsWhenQueryIsNotValid() {
       var response =
           restTemplate.getForEntity("/api/activities/recent-activities?today=foobar", String.class);
 

@@ -1,19 +1,10 @@
-# TODO Extract cloud configuration
-
 spring:
   application:
     name: api-app
   datasource:
     url: jdbc:postgresql://localhost:5432/activitysampling
-    username: activitysampling
+    username:
     password:
-  cloud:
-    azure:
-      active-directory:
-        enabled: true
-        credential:
-          client-id: ${AZURE_CLIENT_ID}
-        app-id-uri: ${AZURE_APP_ID_URI}
 
 management:
   endpoints:

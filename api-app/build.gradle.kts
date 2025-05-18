@@ -1,4 +1,5 @@
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
+import org.springframework.boot.gradle.tasks.run.BootRun
 
 plugins {
   java
@@ -55,6 +56,10 @@ dependencies {
   testRuntimeOnly("com.h2database:h2")
   testRuntimeOnly("org.junit.platform:junit-platform-launcher")
   testAnnotationProcessor("org.projectlombok:lombok")
+}
+
+tasks.named<BootRun>("bootRun") {
+  systemProperty("spring.profiles.active", "local")
 }
 
 tasks.withType<JavaCompile> {
