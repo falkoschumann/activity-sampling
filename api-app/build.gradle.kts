@@ -68,6 +68,7 @@ tasks.withType<JavaCompile> {
   options.encoding = "UTF-8"
   options.release = 21
   options.compilerArgs.add("-Werror")
+  options.compilerArgs.add("-Xlint:all,-processing,-serial")
 }
 
 tasks.withType<Test> {
