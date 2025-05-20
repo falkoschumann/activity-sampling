@@ -1,3 +1,5 @@
+export NPM_CONFIG_YES=true
+
 all: dist check
 
 clean:
@@ -13,9 +15,11 @@ start:
 
 check: test
 	./gradlew check -x test
+	npx prettier --check .
 
 format:
 	./gradlew spotlessApply
+	npx prettier --write .
 
 dev: start
 

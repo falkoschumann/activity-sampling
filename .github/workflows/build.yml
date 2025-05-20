@@ -7,23 +7,29 @@ permissions:
   contents: read
 
 jobs:
-  root:
+  build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source code
         uses: actions/checkout@v4
+      - name: Use Java LTS
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
       - name: Use Node.js LTS
         uses: actions/setup-node@v4
         with:
-          node-version: "lts/*"
+          node-version: "22.x"
       - name: Build
-        run: make root
+        run: make
 
-  web-app:
+  check-web-app-compatibility:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: ["20.x", "22.x", "24.x"]
+        # Verify previous LTS and current
+        node-version: ["20.x", "24.x"]
     steps:
       - name: Checkout source code
         uses: actions/checkout@v4
@@ -34,11 +40,12 @@ jobs:
       - name: Build
         run: make -C web-app
 
-  api-app:
+  check-api-app-compatibility:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        java-version: ["21", "24"]
+        # Verify previous LTS and current
+        java-version: ["17", "24"]
     steps:
       - name: Checkout source code
         uses: actions/checkout@v4
