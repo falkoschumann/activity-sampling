@@ -33,7 +33,7 @@ dependencyManagement {
 dependencies {
   implementation("com.azure.spring:spring-cloud-azure-starter-active-directory")
   implementation("com.azure.spring:spring-cloud-azure-starter-actuator")
-  implementation("com.microsoft.graph:microsoft-graph:6.38.0")
+  implementation("com.microsoft.graph:microsoft-graph:6.39.0")
   implementation("org.flywaydb:flyway-core")
   implementation("org.flywaydb:flyway-database-postgresql")
   implementation("org.springframework.boot:spring-boot-starter-actuator")
