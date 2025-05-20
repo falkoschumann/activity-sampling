@@ -26,8 +26,10 @@ public class AzureSecurityConfig {
             AadWebApplicationHttpSecurityConfigurer.aadWebApplication(), Customizer.withDefaults())
         .authorizeHttpRequests(
             auth ->
-                auth.requestMatchers("/api/**")
-                    .hasAuthority("APPROLE_user")
+                auth.requestMatchers("/api/user")
+                    .authenticated()
+                    .requestMatchers("/api/**")
+                    .hasAuthority("APPROLE_USER")
                     .anyRequest()
                     .permitAll());
     return http.build();
@@ -37,8 +39,8 @@ public class AzureSecurityConfig {
   RoleHierarchy azureRoleHierarchy() {
     return RoleHierarchyImpl.fromHierarchy(
         """
-      APPROLE_admin > APPROLE_staff
-      APPROLE_staff > APPROLE_user
+      APPROLE_ADMIN > APPROLE_STAFF
+      APPROLE_STAFF > APPROLE_USER
       """);
   }
 }

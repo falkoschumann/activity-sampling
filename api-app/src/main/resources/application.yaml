@@ -5,9 +5,3 @@ spring:
     url: jdbc:postgresql://localhost:5432/activitysampling
     username:
     password:
-
-management:
-  endpoints:
-    web:
-      exposure:
-        include: "*"

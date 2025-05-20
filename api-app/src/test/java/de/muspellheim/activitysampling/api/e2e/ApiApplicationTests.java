@@ -8,7 +8,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import de.muspellheim.activitysampling.api.domain.CommandStatus;
 import de.muspellheim.activitysampling.api.domain.LogActivityCommand;
 import de.muspellheim.activitysampling.api.domain.RecentActivitiesQueryResult;
+import de.muspellheim.activitysampling.api.domain.User;
 import java.time.Instant;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.TimeZone;
@@ -52,6 +54,18 @@ class ApiApplicationTests {
 
   @Test
   void contextLoads() {}
+
+  @Nested
+  class WhoAmI {
+
+    @Test
+    void whoAmI() {
+      var response = restTemplate.getForEntity("/api/whoami", User.class);
+
+      assertEquals(200, response.getStatusCode().value());
+      assertEquals(new User("user", List.of("USER")), Objects.requireNonNull(response.getBody()));
+    }
+  }
 
   @Nested
   class LogActivity {

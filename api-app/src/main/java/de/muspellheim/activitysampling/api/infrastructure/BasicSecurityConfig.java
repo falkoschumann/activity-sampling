@@ -18,12 +18,18 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
-public class LocalSecurityConfig {
+public class BasicSecurityConfig {
 
   @Bean
   SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
     http.authorizeHttpRequests(
-            auth -> auth.requestMatchers("/api/**").hasRole("USER").anyRequest().permitAll())
+            auth ->
+                auth.requestMatchers("/api/user")
+                    .authenticated()
+                    .requestMatchers("/api/**")
+                    .hasRole("USER")
+                    .anyRequest()
+                    .permitAll())
         .httpBasic(withDefaults())
         .csrf(csrf -> csrf.ignoringRequestMatchers("/api/**"));
     return http.build();
