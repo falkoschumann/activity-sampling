@@ -22,8 +22,8 @@ public class LocalSecurityConfig {
 
   @Bean
   SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-    http.securityMatcher("/api/**")
-        .authorizeHttpRequests(auth -> auth.anyRequest().hasRole("USER"))
+    http.authorizeHttpRequests(
+            auth -> auth.requestMatchers("/api/**").hasRole("USER").anyRequest().permitAll())
         .httpBasic(withDefaults())
         .csrf(csrf -> csrf.ignoringRequestMatchers("/api/**"));
     return http.build();

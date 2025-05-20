@@ -2,7 +2,7 @@
 
 package de.muspellheim.activitysampling.api.infrastructure;
 
-import com.azure.spring.cloud.autoconfigure.implementation.aad.security.AadResourceServerHttpSecurityConfigurer;
+import com.azure.spring.cloud.autoconfigure.implementation.aad.security.AadWebApplicationHttpSecurityConfigurer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -22,10 +22,14 @@ public class AzureSecurityConfig {
 
   @Bean
   SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-    http.securityMatcher("/api/**")
-        .with(
-            AadResourceServerHttpSecurityConfigurer.aadResourceServer(), Customizer.withDefaults())
-        .authorizeHttpRequests(auth -> auth.anyRequest().hasAuthority("APPROLE_user"));
+    http.with(
+            AadWebApplicationHttpSecurityConfigurer.aadWebApplication(), Customizer.withDefaults())
+        .authorizeHttpRequests(
+            auth ->
+                auth.requestMatchers("/api/**")
+                    .hasAuthority("APPROLE_user")
+                    .anyRequest()
+                    .permitAll());
     return http.build();
   }
 

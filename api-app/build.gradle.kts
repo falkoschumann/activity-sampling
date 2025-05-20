@@ -1,5 +1,4 @@
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
-import org.springframework.boot.gradle.tasks.run.BootRun
 
 plugins {
   java
@@ -33,13 +32,12 @@ dependencyManagement {
 dependencies {
   implementation("com.azure.spring:spring-cloud-azure-starter-active-directory")
   implementation("com.azure.spring:spring-cloud-azure-starter-actuator")
-  implementation("com.microsoft.graph:microsoft-graph:6.38.0")
   implementation("org.flywaydb:flyway-core")
   implementation("org.flywaydb:flyway-database-postgresql")
   implementation("org.springframework.boot:spring-boot-starter-actuator")
   implementation("org.springframework.boot:spring-boot-starter-data-jpa")
   implementation("org.springframework.boot:spring-boot-starter-validation")
-  implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
+  implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
   implementation("org.springframework.boot:spring-boot-starter-security")
   implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
   implementation("org.springframework.boot:spring-boot-starter-web")
@@ -50,18 +48,11 @@ dependencies {
   annotationProcessor("org.projectlombok:lombok")
   annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
   testImplementation("org.springframework.boot:spring-boot-starter-test")
-  testImplementation("org.springframework.security:spring-security-test")
   testImplementation("com.tngtech.archunit:archunit-junit5:1.4.1")
   testCompileOnly("org.projectlombok:lombok")
   testRuntimeOnly("com.h2database:h2")
   testRuntimeOnly("org.junit.platform:junit-platform-launcher")
   testAnnotationProcessor("org.projectlombok:lombok")
-}
-
-tasks.named<BootRun>("bootRun") {
-  if (System.getenv("SPRING_PROFILES_ACTIVE") == null) {
-    systemProperty("spring.profiles.active", "local")
-  }
 }
 
 tasks.withType<JavaCompile> {

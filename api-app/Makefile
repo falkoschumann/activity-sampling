@@ -11,8 +11,8 @@ dist: build
 start:
 	./gradlew bootRun
 
-check:
-	./gradlew check
+check: test
+	./gradlew check -x test
 
 format:
 	./gradlew spotlessApply
