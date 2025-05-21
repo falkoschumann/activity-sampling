@@ -18,7 +18,7 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
-public class BasicSecurityConfig {
+public class SimpleSecurityConfig {
 
   @Bean
   SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -31,6 +31,7 @@ public class BasicSecurityConfig {
                     .anyRequest()
                     .permitAll())
         .httpBasic(withDefaults())
+        .formLogin(withDefaults())
         .csrf(csrf -> csrf.ignoringRequestMatchers("/api/**"));
     return http.build();
   }
