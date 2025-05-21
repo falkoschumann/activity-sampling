@@ -7,6 +7,7 @@ import {
   RecentActivitiesQueryResult,
 } from "../domain/messages";
 import { ConfigurableResponses } from "../util/configurable_responses";
+import { verifyResponse } from "../util/http";
 import { OutputTracker } from "../util/output_tracker";
 
 const ACTIVITY_LOGGED_EVENT = "activityLogged";
@@ -47,10 +48,7 @@ export class ActivitiesApi extends EventTarget {
       },
       body: JSON.stringify(command),
     });
-    if (!response.ok) {
-      throw new Error(`${response.status}: ${response.statusText}`);
-    }
-
+    verifyResponse(response);
     this.dispatchEvent(
       new CustomEvent(ACTIVITY_LOGGED_EVENT, { detail: command }),
     );
@@ -83,10 +81,7 @@ export class ActivitiesApi extends EventTarget {
         Authorization: `Bearer ${bearerToken}`,
       },
     });
-    if (!response.ok) {
-      throw new Error(`${response.status}: ${response.statusText}`);
-    }
-
+    verifyResponse(response);
     const json = await response.text();
     return JSON.parse(json);
   }
