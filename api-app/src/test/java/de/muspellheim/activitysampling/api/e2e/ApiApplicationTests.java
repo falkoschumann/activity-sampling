@@ -56,11 +56,11 @@ class ApiApplicationTests {
   void contextLoads() {}
 
   @Nested
-  class WhoAmI {
+  class UserEndpoint {
 
     @Test
-    void whoAmI() {
-      var response = restTemplate.getForEntity("/api/whoami", User.class);
+    void user() {
+      var response = restTemplate.getForEntity("/api/user", User.class);
 
       assertEquals(200, response.getStatusCode().value());
       assertEquals(new User("user", List.of("USER")), Objects.requireNonNull(response.getBody()));
@@ -68,7 +68,7 @@ class ApiApplicationTests {
   }
 
   @Nested
-  class LogActivity {
+  class LogActivityEndpoint {
 
     @Test
     void logsActivity() {
@@ -101,7 +101,7 @@ class ApiApplicationTests {
   }
 
   @Nested
-  class RecentActivities {
+  class RecentActivitiesEndpoint {
 
     @Test
     void queriesRecentActivities() {
