@@ -13,7 +13,6 @@ export const authenticationGateway = AuthenticationGateway.create();
 
 export const store = createStore(
   ActivitiesApi.create(),
-  authenticationGateway,
   NotificationClient.create(),
   Clock.create(),
   Timer.create(),
@@ -24,7 +23,6 @@ export type AppDispatch = typeof store.dispatch;
 
 export function createStore(
   activitiesApi: ActivitiesApi,
-  authenticationGateway: AuthenticationGateway,
   notificationClient: NotificationClient,
   clock: Clock,
   timer: Timer,
@@ -38,7 +36,6 @@ export function createStore(
         thunk: {
           extraArgument: {
             activitiesApi,
-            authenticationGateway,
             notificationClient,
             clock,
             timer,

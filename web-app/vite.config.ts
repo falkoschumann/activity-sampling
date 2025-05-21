@@ -17,6 +17,16 @@ export default defineConfig({
       "/oauth2": {
         target: `http://localhost:${process.env.PORT ?? 8080}`,
       },
+      "/login": {
+        target: `http://localhost:${process.env.PORT ?? 8080}`,
+      },
+      "/logout": {
+        target: `http://localhost:${process.env.PORT ?? 8080}`,
+      },
+      // Used by /login and /logout
+      "/default-ui.css": {
+        target: `http://localhost:${process.env.PORT ?? 8080}`,
+      },
     },
   },
   test: {

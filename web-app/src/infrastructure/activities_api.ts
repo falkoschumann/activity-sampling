@@ -35,16 +35,12 @@ export class ActivitiesApi extends EventTarget {
     this.#fetch = fetch;
   }
 
-  async logActivity(
-    command: LogActivityCommand,
-    bearerToken: string,
-  ): Promise<CommandStatus> {
+  async logActivity(command: LogActivityCommand): Promise<CommandStatus> {
     const url = new URL(`${this.#baseUrl}/log-activity`, window.location.href);
     const response = await this.#fetch(url, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${bearerToken}`,
       },
       body: JSON.stringify(command),
     });
@@ -63,7 +59,6 @@ export class ActivitiesApi extends EventTarget {
 
   async queryRecentActivities(
     query: RecentActivitiesQuery,
-    bearerToken: string,
   ): Promise<RecentActivitiesQueryResult> {
     const url = new URL(
       `${this.#baseUrl}/recent-activities`,
@@ -75,12 +70,7 @@ export class ActivitiesApi extends EventTarget {
     if (query.timeZone) {
       url.searchParams.append("timeZone", query.timeZone);
     }
-    const response = await this.#fetch(url, {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${bearerToken}`,
-      },
-    });
+    const response = await this.#fetch(url);
     verifyResponse(response);
     const json = await response.text();
     return JSON.parse(json);
