@@ -25,6 +25,7 @@ import {
 } from "../../src/domain/messages";
 import { ActivitiesApi } from "../../src/infrastructure/activities_api";
 import { NotificationClient } from "../../src/infrastructure/notification_client";
+import { UserApi } from "../../src/infrastructure/user_api";
 import { Clock } from "../../src/util/clock";
 import { Timer } from "../../src/util/timer";
 
@@ -440,7 +441,7 @@ describe("Activities", () => {
     });
   });
 
-  describe("Recent activity", () => {
+  describe("Recent activities", () => {
     it("Queries recent activities", async () => {
       const queryResultJson = JSON.stringify({
         lastActivity: {
@@ -531,21 +532,17 @@ describe("Activities", () => {
   });
 });
 
-function configure({
-  responses,
-}: {
-  responses?: Response | Response[];
-} = {}) {
+function configure({ responses }: { responses?: Response | Response[] } = {}) {
   const activitiesApi = ActivitiesApi.createNull(responses);
   const notificationClient = NotificationClient.createNull();
   const clock = Clock.createNull();
   const timer = Timer.createNull();
-  const store = createStore(activitiesApi, notificationClient, clock, timer);
-  return {
-    store,
+  const store = createStore(
     activitiesApi,
+    UserApi.createNull(),
     notificationClient,
     clock,
     timer,
-  };
+  );
+  return { store, activitiesApi, notificationClient, clock, timer };
 }

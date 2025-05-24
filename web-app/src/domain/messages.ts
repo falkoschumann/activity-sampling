@@ -1,6 +1,13 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
 import { Activity, TimeSummary, WorkingDay } from "./activities";
+import { User } from "./user";
+
+export type UserQuery = object;
+
+export interface UserQueryResult {
+  readonly user: User;
+}
 
 export interface LogActivityCommand {
   readonly start: string;
