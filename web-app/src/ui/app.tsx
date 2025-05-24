@@ -2,9 +2,9 @@
 
 import { AuthenticatedTemplate, UnauthenticatedTemplate } from "@azure/msal-react";
 
-import PageLayout from "./components/page_layout";
-import { SignInButton } from "./components/sign_in_button";
+import PageLayout from "./layouts/page_layout";
 import ActivitiesPage from "./pages/activities";
+import UnauthenticatedPage from "./pages/unauthenticated";
 
 export default function App() {
   return (
@@ -14,22 +14,8 @@ export default function App() {
       </AuthenticatedTemplate>
 
       <UnauthenticatedTemplate>
-        <Unauthenticated />
+        <UnauthenticatedPage />
       </UnauthenticatedTemplate>
     </PageLayout>
-  );
-}
-
-function Unauthenticated() {
-  return (
-    <div className="card m-4">
-      <div className="card-body">
-        <h5 className="card-title">Unauthorized</h5>
-        <p>Please sign-in to use this application.</p>
-        <p className="mb-0">
-          <SignInButton />
-        </p>
-      </div>
-    </div>
   );
 }

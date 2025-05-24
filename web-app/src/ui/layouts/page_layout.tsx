@@ -3,9 +3,9 @@
 import { useIsAuthenticated } from "@azure/msal-react";
 import * as React from "react";
 
-import Profile from "./profile";
-import { SignInButton } from "./sign_in_button";
-import { SignOutButton } from "./sign_out_button";
+import Profile from "../components/profile";
+import { SignInButton } from "../components/sign_in_button";
+import { SignOutButton } from "../components/sign_out_button";
 
 export default function PageLayout({ children }: { children?: React.ReactNode }) {
   const isAuthenticated = useIsAuthenticated();
@@ -15,7 +15,7 @@ export default function PageLayout({ children }: { children?: React.ReactNode })
       <header className="sticky-top">
         <nav className="navbar bg-primary navbar-dark">
           <div className="container-fluid">
-            <a className="navbar-brand" href="/">
+            <a className="navbar-brand" href="/public">
               Activity Sampling
             </a>
             <div className="justify-content-end d-flex align-items-md-baseline">
