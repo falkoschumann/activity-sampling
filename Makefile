@@ -39,7 +39,7 @@ format: TARGET=format
 format-root:
 	npx prettier --write $(ROOT_FILES)
 
-dev: dev-root
+dev: build dev-root
 	npx concurrently \
 		--kill-others \
 		--names "WEB,API" \
