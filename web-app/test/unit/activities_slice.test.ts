@@ -24,8 +24,8 @@ import {
   RecentActivitiesQueryResult,
 } from "../../src/domain/messages";
 import { ActivitiesApi } from "../../src/infrastructure/activities_api";
+import { AuthenticationApi } from "../../src/infrastructure/authentication_api";
 import { NotificationClient } from "../../src/infrastructure/notification_client";
-import { UserApi } from "../../src/infrastructure/user_api";
 import { Clock } from "../../src/util/clock";
 import { Timer } from "../../src/util/timer";
 
@@ -539,7 +539,7 @@ function configure({ responses }: { responses?: Response | Response[] } = {}) {
   const timer = Timer.createNull();
   const store = createStore(
     activitiesApi,
-    UserApi.createNull(),
+    AuthenticationApi.createNull(),
     notificationClient,
     clock,
     timer,

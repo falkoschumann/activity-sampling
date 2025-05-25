@@ -1,15 +1,20 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
-import { useMsal } from "@azure/msal-react";
+import { useSelector } from "react-redux";
+
+import { selectAuthentication } from "../../application/authentication_slice";
 
 export default function Profile() {
-  const { instance } = useMsal();
+  const { user } = useSelector(selectAuthentication);
 
-  const account = instance.getAllAccounts()[0];
+  if (!user) {
+    return null;
+  }
 
   return (
     <div className="navbar-text">
-      {account.name} &lt;{account.username}&gt; as {account.idTokenClaims?.roles}
+      {user.name}
+      {user.username ? <> &lt;{user.username}&gt;</> : null} as {user.roles}
     </div>
   );
 }

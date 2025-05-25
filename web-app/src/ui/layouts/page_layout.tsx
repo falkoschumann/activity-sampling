@@ -1,11 +1,11 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
-import { useIsAuthenticated } from "@azure/msal-react";
 import * as React from "react";
 
+import { useIsAuthenticated } from "../components/hooks";
 import Profile from "../components/profile";
-import { SignInButton } from "../components/sign_in_button";
-import { SignOutButton } from "../components/sign_out_button";
+import SignInButton from "../components/sign_in_button";
+import SignOutButton from "../components/sign_out_button";
 
 export default function PageLayout({ children }: { children?: React.ReactNode }) {
   const isAuthenticated = useIsAuthenticated();

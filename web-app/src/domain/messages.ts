@@ -3,9 +3,10 @@
 import { Activity, TimeSummary, WorkingDay } from "./activities";
 import { User } from "./user";
 
-export type UserQuery = object;
+export type AuthenticationQuery = object;
 
-export interface UserQueryResult {
+export interface AuthenticationQueryResult {
+  readonly isAuthenticated: boolean;
   readonly user: User;
 }
 

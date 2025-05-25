@@ -1,21 +1,19 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
 import { configureStore } from "@reduxjs/toolkit";
+
 import { ActivitiesApi } from "../infrastructure/activities_api";
-import { AuthenticationGateway } from "../infrastructure/authentication_gateway";
+import { AuthenticationApi } from "../infrastructure/authentication_api";
 import { NotificationClient } from "../infrastructure/notification_client";
-import { UserApi } from "../infrastructure/user_api";
 import { Clock } from "../util/clock";
 import { Timer } from "../util/timer";
 
 import activitiesReducer from "./activities_slice";
 import authenticationReducer from "./authentication_slice";
 
-export const authenticationGateway = AuthenticationGateway.create();
-
 export const store = createStore(
   ActivitiesApi.create(),
-  UserApi.create(),
+  AuthenticationApi.create(),
   NotificationClient.create(),
   Clock.create(),
   Timer.create(),
@@ -26,7 +24,7 @@ export type AppDispatch = typeof store.dispatch;
 
 export function createStore(
   activitiesApi: ActivitiesApi,
-  userApi: UserApi,
+  authentication: AuthenticationApi,
   notificationClient: NotificationClient,
   clock: Clock,
   timer: Timer,
@@ -41,7 +39,7 @@ export function createStore(
         thunk: {
           extraArgument: {
             activitiesApi,
-            userApi,
+            authentication,
             notificationClient,
             clock,
             timer,

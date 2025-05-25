@@ -1,18 +1,27 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
-import { User } from "../domain/user";
+import {
+  AuthenticationQuery,
+  AuthenticationQueryResult,
+} from "../domain/messages";
 import { ConfigurableResponses } from "../util/configurable_responses";
 import { verifyResponse } from "../util/http";
 
-export class UserApi {
-  static create(): UserApi {
-    return new UserApi("/api/user", globalThis.fetch.bind(globalThis));
+export class AuthenticationApi {
+  static create(): AuthenticationApi {
+    return new AuthenticationApi(
+      "/api/authentication",
+      globalThis.fetch.bind(globalThis),
+    );
   }
 
   static createNull(
     responses?: Response | Error | (Response | Error)[],
-  ): UserApi {
-    return new UserApi("/nulled/user", createFetchStub(responses));
+  ): AuthenticationApi {
+    return new AuthenticationApi(
+      "/nulled/authentication",
+      createFetchStub(responses),
+    );
   }
 
   readonly #url;
@@ -23,9 +32,11 @@ export class UserApi {
     this.#fetch = fetch;
   }
 
-  async getUser(): Promise<User> {
+  async queryAuthentication(
+    _query: AuthenticationQuery,
+  ): Promise<AuthenticationQueryResult> {
     const url = new URL(this.#url, window.location.href);
-    const response = await this.#fetch(url);
+    const response = await this.#fetch(url, { redirect: "error" });
     verifyResponse(response);
     const json = await response.text();
     return JSON.parse(json);

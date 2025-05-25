@@ -9,14 +9,14 @@ export interface Activity {
   readonly notes?: string;
 }
 
-export const TEST_ACTIVITY: Activity = {
+export const TEST_ACTIVITY: Activity = Object.freeze({
   start: "2024-12-18T09:30:00+01:00",
   duration: "PT30M",
   client: "ACME Inc.",
   project: "Foobar",
   task: "Do something",
   notes: "",
-};
+});
 
 export interface WorkingDay {
   readonly date: string;

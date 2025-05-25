@@ -2,10 +2,11 @@
 
 export interface User {
   name: string;
+  username?: string;
   roles: string[];
 }
 
-export const TEST_USER: User = {
+export const TEST_USER: User = Object.freeze({
   name: "John Doe",
   roles: ["admin"],
-};
+});

@@ -5,11 +5,6 @@ export function verifyResponse(response: Response): void {
     return;
   }
 
-  if (response.status === 401) {
-    // Unauthorized, redirect to login page
-    window.location.replace("/oauth2/authorization/azure");
-  }
-
   throw new HttpError(response.status, response.statusText);
 }
 

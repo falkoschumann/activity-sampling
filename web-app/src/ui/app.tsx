@@ -1,12 +1,23 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
-import { AuthenticatedTemplate, UnauthenticatedTemplate } from "@azure/msal-react";
+import { useEffect } from "react";
+import { useDispatch } from "react-redux";
 
+import { queryAuthentication } from "../application/authentication_slice";
+import { AppDispatch } from "../application/store";
+import AuthenticatedTemplate from "./components/authenticated_template";
+import UnauthenticatedTemplate from "./components/unauthenticated_template";
 import PageLayout from "./layouts/page_layout";
 import ActivitiesPage from "./pages/activities";
 import UnauthenticatedPage from "./pages/unauthenticated";
 
 export default function App() {
+  const dispatch = useDispatch<AppDispatch>();
+
+  useEffect(() => {
+    dispatch(queryAuthentication({}));
+  }, [dispatch]);
+
   return (
     <PageLayout>
       <AuthenticatedTemplate>

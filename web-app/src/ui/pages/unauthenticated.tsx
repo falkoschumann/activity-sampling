@@ -1,6 +1,6 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
-import { SignInButton } from "../components/sign_in_button";
+import SignInButton from "../components/sign_in_button";
 
 export default function UnauthenticatedPage() {
   return (
