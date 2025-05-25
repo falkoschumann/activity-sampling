@@ -24,8 +24,8 @@ public class SimpleSecurityConfig {
   SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
     http.authorizeHttpRequests(
             auth ->
-                auth.requestMatchers("/api/user")
-                    .authenticated()
+                auth.requestMatchers("/api/authentication")
+                    .permitAll()
                     .requestMatchers("/api/**")
                     .hasRole("USER")
                     .anyRequest()

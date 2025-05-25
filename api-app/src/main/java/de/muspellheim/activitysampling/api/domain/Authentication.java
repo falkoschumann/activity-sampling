@@ -1,13 +1,17 @@
-// Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
-
 package de.muspellheim.activitysampling.api.domain;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import java.util.List;
 import lombok.Builder;
 import org.springframework.lang.Nullable;
 
 @Builder
 @JsonInclude(Include.NON_NULL)
-public record User(String name, @Nullable String username, List<String> roles) {}
+public record Authentication(boolean isAuthenticated, @Nullable User user) {
+
+  public static final Authentication UNAUTHORIZED = new Authentication(false, null);
+
+  public static Authentication of(User user) {
+    return new Authentication(true, user);
+  }
+}

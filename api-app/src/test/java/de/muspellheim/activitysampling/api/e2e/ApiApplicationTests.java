@@ -5,6 +5,7 @@ package de.muspellheim.activitysampling.api.e2e;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import de.muspellheim.activitysampling.api.domain.Authentication;
 import de.muspellheim.activitysampling.api.domain.CommandStatus;
 import de.muspellheim.activitysampling.api.domain.LogActivityCommand;
 import de.muspellheim.activitysampling.api.domain.RecentActivitiesQueryResult;
@@ -31,7 +32,10 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 
-@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT, useMainMethod = UseMainMethod.ALWAYS)
+@SpringBootTest(
+    webEnvironment = WebEnvironment.RANDOM_PORT,
+    useMainMethod = UseMainMethod.ALWAYS,
+    properties = "spring.profiles.active=test")
 class ApiApplicationTests {
 
   @LocalServerPort int port;
@@ -56,14 +60,16 @@ class ApiApplicationTests {
   void contextLoads() {}
 
   @Nested
-  class UserEndpoint {
+  class AuthenticationEndpoint {
 
     @Test
-    void user() {
-      var response = restTemplate.getForEntity("/api/user", User.class);
+    void authentication() {
+      var response = restTemplate.getForEntity("/api/authentication", Authentication.class);
 
       assertEquals(200, response.getStatusCode().value());
-      assertEquals(new User("user", List.of("USER")), Objects.requireNonNull(response.getBody()));
+      assertEquals(
+          Authentication.of(User.builder().name("user").roles(List.of("USER")).build()),
+          Objects.requireNonNull(response.getBody()));
     }
   }
 
