@@ -32,6 +32,8 @@ public class AzureSecurityConfig {
                     .hasAuthority("APPROLE_USER")
                     .anyRequest()
                     .permitAll());
+        // .exceptionHandling(customizer -> customizer.authenticationEntryPoint(new
+        // HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
     return http.build();
   }
 
