@@ -22,6 +22,9 @@ public class AzureSecurityConfig {
 
   @Bean
   SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    // TODO Handle CSRF
+    // var requestHandler = new CsrfTokenRequestAttributeHandler();
+    // requestHandler.setCsrfRequestAttributeName(null);
     http.with(
             AadWebApplicationHttpSecurityConfigurer.aadWebApplication(), Customizer.withDefaults())
         .authorizeHttpRequests(
@@ -32,8 +35,12 @@ public class AzureSecurityConfig {
                     .hasAuthority("APPROLE_USER")
                     .anyRequest()
                     .permitAll());
-        // .exceptionHandling(customizer -> customizer.authenticationEntryPoint(new
-        // HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
+    // .exceptionHandling(customizer -> customizer.authenticationEntryPoint(new
+    // HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
+    // .csrf(
+    //    csrf ->
+    //        csrf.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+    //            .csrfTokenRequestHandler(requestHandler));
     return http.build();
   }
 
