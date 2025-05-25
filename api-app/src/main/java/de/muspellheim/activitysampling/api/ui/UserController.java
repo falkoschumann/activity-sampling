@@ -2,8 +2,9 @@
 
 package de.muspellheim.activitysampling.api.ui;
 
-import de.muspellheim.activitysampling.api.domain.Authentication;
+import de.muspellheim.activitysampling.api.domain.AuthenticationQueryResult;
 import de.muspellheim.activitysampling.api.domain.User;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,10 +16,9 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserController {
 
   @GetMapping()
-  public Authentication authentication(
-      org.springframework.security.core.Authentication authentication) {
+  public AuthenticationQueryResult authentication(Authentication authentication) {
     if (authentication == null) {
-      return Authentication.UNAUTHORIZED;
+      return AuthenticationQueryResult.UNAUTHORIZED;
     }
 
     var user = User.builder().name(authentication.getName());
@@ -39,6 +39,6 @@ public class UserController {
             .toList();
     user.roles(roles);
 
-    return Authentication.of(user.build());
+    return AuthenticationQueryResult.of(user.build());
   }
 }

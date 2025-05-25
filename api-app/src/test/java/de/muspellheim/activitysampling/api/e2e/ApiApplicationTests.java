@@ -5,7 +5,7 @@ package de.muspellheim.activitysampling.api.e2e;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import de.muspellheim.activitysampling.api.domain.Authentication;
+import de.muspellheim.activitysampling.api.domain.AuthenticationQueryResult;
 import de.muspellheim.activitysampling.api.domain.CommandStatus;
 import de.muspellheim.activitysampling.api.domain.LogActivityCommand;
 import de.muspellheim.activitysampling.api.domain.RecentActivitiesQueryResult;
@@ -60,21 +60,22 @@ class ApiApplicationTests {
   void contextLoads() {}
 
   @Nested
-  class AuthenticationEndpoint {
+  class Authentication {
 
     @Test
     void authentication() {
-      var response = restTemplate.getForEntity("/api/authentication", Authentication.class);
+      var response =
+          restTemplate.getForEntity("/api/authentication", AuthenticationQueryResult.class);
 
       assertEquals(200, response.getStatusCode().value());
       assertEquals(
-          Authentication.of(User.builder().name("user").roles(List.of("USER")).build()),
+          AuthenticationQueryResult.of(User.builder().name("user").roles(List.of("USER")).build()),
           Objects.requireNonNull(response.getBody()));
     }
   }
 
   @Nested
-  class LogActivityEndpoint {
+  class LogActivity {
 
     @Test
     void logsActivity() {
@@ -107,7 +108,7 @@ class ApiApplicationTests {
   }
 
   @Nested
-  class RecentActivitiesEndpoint {
+  class RecentActivities {
 
     @Test
     void queriesRecentActivities() {
