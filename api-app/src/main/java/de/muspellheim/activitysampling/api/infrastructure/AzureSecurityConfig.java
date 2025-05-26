@@ -22,7 +22,6 @@ public class AzureSecurityConfig {
 
   @Bean
   SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-    // TODO Handle CSRF
     // var requestHandler = new CsrfTokenRequestAttributeHandler();
     // requestHandler.setCsrfRequestAttributeName(null);
     http.with(
@@ -34,7 +33,8 @@ public class AzureSecurityConfig {
                     .requestMatchers("/api/**")
                     .hasAuthority("APPROLE_USER")
                     .anyRequest()
-                    .permitAll());
+                    .permitAll())
+        .csrf(csrf -> csrf.ignoringRequestMatchers("/api/**"));
     // .exceptionHandling(customizer -> customizer.authenticationEntryPoint(new
     // HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
     // .csrf(

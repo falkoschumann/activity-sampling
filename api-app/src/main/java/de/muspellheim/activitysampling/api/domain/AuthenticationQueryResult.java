@@ -9,12 +9,12 @@ import org.springframework.lang.Nullable;
 
 @Builder
 @JsonInclude(Include.NON_NULL)
-public record AuthenticationQueryResult(boolean isAuthenticated, @Nullable User user) {
+public record AuthenticationQueryResult(boolean isAuthenticated, @Nullable AccountInfo account) {
 
   public static final AuthenticationQueryResult UNAUTHORIZED =
       new AuthenticationQueryResult(false, null);
 
-  public static AuthenticationQueryResult of(User user) {
-    return new AuthenticationQueryResult(true, user);
+  public static AuthenticationQueryResult of(AccountInfo account) {
+    return new AuthenticationQueryResult(true, account);
   }
 }

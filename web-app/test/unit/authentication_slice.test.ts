@@ -7,8 +7,8 @@ import {
   selectAuthentication,
 } from "../../src/application/authentication_slice";
 import { createStore } from "../../src/application/store";
+import { TEST_ACCOUNT } from "../../src/domain/account";
 import { AuthenticationQueryResult } from "../../src/domain/messages";
-import { TEST_USER } from "../../src/domain/user";
 import { ActivitiesApi } from "../../src/infrastructure/activities_api";
 import { AuthenticationApi } from "../../src/infrastructure/authentication_api";
 import { NotificationClient } from "../../src/infrastructure/notification_client";
@@ -19,7 +19,7 @@ describe("Authentication", () => {
   it("Is authenticated", async () => {
     const json = JSON.stringify({
       isAuthenticated: true,
-      user: TEST_USER,
+      account: TEST_ACCOUNT,
     } as AuthenticationQueryResult);
     const { store } = configure({
       responses: [new Response(json)],
@@ -29,18 +29,16 @@ describe("Authentication", () => {
 
     expect(selectAuthentication(store.getState())).toEqual({
       isAuthenticated: true,
-      user: TEST_USER,
+      account: TEST_ACCOUNT,
     });
   });
 
   it("Is not authenticated", async () => {
+    const json = JSON.stringify({
+      isAuthenticated: false,
+    } as AuthenticationQueryResult);
     const { store } = configure({
-      responses: [
-        new Response("", {
-          status: 401,
-          statusText: "Unauthorized",
-        }),
-      ],
+      responses: [new Response(json)],
     });
 
     await store.dispatch(queryAuthentication({}));
@@ -69,13 +67,17 @@ describe("Authentication", () => {
 });
 
 function configure({ responses }: { responses?: Response | Response[] } = {}) {
-  const userApi = AuthenticationApi.createNull(responses);
-  const store = createStore(
-    ActivitiesApi.createNull(),
-    userApi,
-    NotificationClient.createNull(),
-    Clock.createNull(),
-    Timer.createNull(),
-  );
-  return { store, userApi };
+  const activitiesApi = ActivitiesApi.createNull();
+  const authenticationApi = AuthenticationApi.createNull(responses);
+  const notificationClient = NotificationClient.createNull();
+  const clock = Clock.createNull();
+  const timer = Timer.createNull();
+  const store = createStore({
+    activitiesApi,
+    authenticationApi,
+    notificationClient,
+    clock,
+    timer,
+  });
+  return { store };
 }

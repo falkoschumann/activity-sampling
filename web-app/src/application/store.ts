@@ -7,28 +7,27 @@ import { AuthenticationApi } from "../infrastructure/authentication_api";
 import { NotificationClient } from "../infrastructure/notification_client";
 import { Clock } from "../util/clock";
 import { Timer } from "../util/timer";
-
 import activitiesReducer from "./activities_slice";
 import authenticationReducer from "./authentication_slice";
 
-export const store = createStore(
-  ActivitiesApi.create(),
-  AuthenticationApi.create(),
-  NotificationClient.create(),
-  Clock.create(),
-  Timer.create(),
-);
+export const store = createStore();
 
 export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;
 
-export function createStore(
-  activitiesApi: ActivitiesApi,
-  authentication: AuthenticationApi,
-  notificationClient: NotificationClient,
-  clock: Clock,
-  timer: Timer,
-) {
+export function createStore({
+  activitiesApi = ActivitiesApi.create(),
+  authenticationApi = AuthenticationApi.create(),
+  notificationClient = NotificationClient.create(),
+  clock = Clock.create(),
+  timer = Timer.create(),
+}: {
+  activitiesApi?: ActivitiesApi;
+  authenticationApi?: AuthenticationApi;
+  notificationClient?: NotificationClient;
+  clock?: Clock;
+  timer?: Timer;
+} = {}) {
   return configureStore({
     reducer: {
       activities: activitiesReducer,
@@ -39,7 +38,7 @@ export function createStore(
         thunk: {
           extraArgument: {
             activitiesApi,
-            authentication,
+            authenticationApi,
             notificationClient,
             clock,
             timer,

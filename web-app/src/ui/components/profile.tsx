@@ -4,17 +4,16 @@ import { useSelector } from "react-redux";
 
 import { selectAuthentication } from "../../application/authentication_slice";
 
-export default function Profile() {
-  const { user } = useSelector(selectAuthentication);
+export default function Profile({ className }: { className?: string }) {
+  const { account } = useSelector(selectAuthentication);
 
-  if (!user) {
+  if (!account) {
     return null;
   }
 
   return (
-    <div className="navbar-text">
-      {user.name}
-      {user.username ? <> &lt;{user.username}&gt;</> : null} as {user.roles}
+    <div className={`navbar-text ${className}`}>
+      {account.name ? `${account.name} <${account.username}>` : account.username} as {account.roles}
     </div>
   );
 }

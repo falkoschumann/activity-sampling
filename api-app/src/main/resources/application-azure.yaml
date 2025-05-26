@@ -8,5 +8,4 @@ spring:
         credential:
           client-id: ${AZURE_CLIENT_ID}
           client-secret: ${AZURE_CLIENT_SECRET}
-        app-id-uri: ${AZURE_APP_ID_URI}
         post-logout-redirect-uri: ${AZURE_POST_LOGOUT_REDIRECT_URI}

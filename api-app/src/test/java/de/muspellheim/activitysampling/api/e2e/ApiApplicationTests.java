@@ -5,11 +5,11 @@ package de.muspellheim.activitysampling.api.e2e;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import de.muspellheim.activitysampling.api.domain.AccountInfo;
 import de.muspellheim.activitysampling.api.domain.AuthenticationQueryResult;
 import de.muspellheim.activitysampling.api.domain.CommandStatus;
 import de.muspellheim.activitysampling.api.domain.LogActivityCommand;
 import de.muspellheim.activitysampling.api.domain.RecentActivitiesQueryResult;
-import de.muspellheim.activitysampling.api.domain.User;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
@@ -69,7 +69,8 @@ class ApiApplicationTests {
 
       assertEquals(200, response.getStatusCode().value());
       assertEquals(
-          AuthenticationQueryResult.of(User.builder().name("user").roles(List.of("USER")).build()),
+          AuthenticationQueryResult.of(
+              AccountInfo.builder().username("user").roles(List.of("USER")).build()),
           Objects.requireNonNull(response.getBody()));
     }
   }

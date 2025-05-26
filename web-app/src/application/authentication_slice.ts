@@ -1,17 +1,17 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { AccountInfo } from "../domain/account";
 
 import {
   AuthenticationQuery,
   AuthenticationQueryResult,
 } from "../domain/messages";
-import { User } from "../domain/user";
 import { AuthenticationApi } from "../infrastructure/authentication_api";
 
 interface AuthenticationState {
   readonly isAuthenticated: boolean;
-  readonly user?: User;
+  readonly account?: AccountInfo;
 }
 
 const initialState: AuthenticationState = {
@@ -20,7 +20,7 @@ const initialState: AuthenticationState = {
 
 type AuthenticationThunkConfig = {
   extra: {
-    readonly authentication: AuthenticationApi;
+    readonly authenticationApi: AuthenticationApi;
   };
   state: { readonly authentication: AuthenticationState };
 };
@@ -30,8 +30,8 @@ export const queryAuthentication = createAsyncThunk<
   AuthenticationQuery,
   AuthenticationThunkConfig
 >("activities/queryUser", async (_query, thunkAPI) => {
-  const { authentication } = thunkAPI.extra;
-  return authentication.queryAuthentication({});
+  const { authenticationApi } = thunkAPI.extra;
+  return authenticationApi.queryAuthentication({});
 });
 
 const authenticationSlice = createSlice({
@@ -44,7 +44,7 @@ const authenticationSlice = createSlice({
     });
     builder.addCase(queryAuthentication.rejected, (state) => {
       state.isAuthenticated = false;
-      state.user = undefined;
+      state.account = undefined;
     });
   },
   selectors: {

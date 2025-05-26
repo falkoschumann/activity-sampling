@@ -10,4 +10,4 @@ import org.springframework.lang.Nullable;
 
 @Builder
 @JsonInclude(Include.NON_NULL)
-public record User(String name, @Nullable String username, List<String> roles) {}
+public record AccountInfo(String username, @Nullable String name, List<String> roles) {}

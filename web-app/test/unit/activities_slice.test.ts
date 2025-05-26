@@ -534,15 +534,16 @@ describe("Activities", () => {
 
 function configure({ responses }: { responses?: Response | Response[] } = {}) {
   const activitiesApi = ActivitiesApi.createNull(responses);
+  const authenticationApi = AuthenticationApi.createNull();
   const notificationClient = NotificationClient.createNull();
   const clock = Clock.createNull();
   const timer = Timer.createNull();
-  const store = createStore(
+  const store = createStore({
     activitiesApi,
-    AuthenticationApi.createNull(),
+    authenticationApi,
     notificationClient,
     clock,
     timer,
-  );
+  });
   return { store, activitiesApi, notificationClient, clock, timer };
 }

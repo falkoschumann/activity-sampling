@@ -2,8 +2,8 @@
 
 package de.muspellheim.activitysampling.api.ui;
 
+import de.muspellheim.activitysampling.api.domain.AccountInfo;
 import de.muspellheim.activitysampling.api.domain.AuthenticationQueryResult;
-import de.muspellheim.activitysampling.api.domain.User;
 import org.springframework.context.annotation.Profile;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -22,13 +22,13 @@ public class SimpleAuthenticationController {
       return AuthenticationQueryResult.UNAUTHORIZED;
     }
 
-    var user = User.builder().name(authentication.getName());
+    var account = AccountInfo.builder().username(authentication.getName());
     var roles =
         authentication.getAuthorities().stream()
             .map(GrantedAuthority::getAuthority)
             .map(role -> role.replaceAll("^ROLE_", ""))
             .toList();
-    user.roles(roles);
-    return AuthenticationQueryResult.of(user.build());
+    account.roles(roles);
+    return AuthenticationQueryResult.of(account.build());
   }
 }

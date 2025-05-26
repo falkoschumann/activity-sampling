@@ -2,14 +2,13 @@
 
 import * as React from "react";
 
-import { useIsAuthenticated } from "../components/hooks";
+import AuthenticatedTemplate from "../components/authenticated_template";
 import Profile from "../components/profile";
 import SignInButton from "../components/sign_in_button";
 import SignOutButton from "../components/sign_out_button";
+import UnauthenticatedTemplate from "../components/unauthenticated_template";
 
 export default function PageLayout({ children }: { children?: React.ReactNode }) {
-  const isAuthenticated = useIsAuthenticated();
-
   return (
     <>
       <header className="sticky-top">
@@ -19,13 +18,12 @@ export default function PageLayout({ children }: { children?: React.ReactNode })
               Activity Sampling
             </a>
             <div className="justify-content-end d-flex align-items-md-baseline">
-              {isAuthenticated ? (
-                <>
-                  <Profile /> <SignOutButton />
-                </>
-              ) : (
+              <AuthenticatedTemplate>
+                <Profile className="me-2" /> <SignOutButton />
+              </AuthenticatedTemplate>
+              <UnauthenticatedTemplate>
                 <SignInButton />
-              )}
+              </UnauthenticatedTemplate>
             </div>
           </div>
         </nav>

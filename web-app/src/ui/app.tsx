@@ -7,7 +7,7 @@ import { queryAuthentication } from "../application/authentication_slice";
 import { AppDispatch } from "../application/store";
 import AuthenticatedTemplate from "./components/authenticated_template";
 import UnauthenticatedTemplate from "./components/unauthenticated_template";
-import PageLayout from "./layouts/page_layout";
+import PageLayout from "./layouts/page";
 import ActivitiesPage from "./pages/activities";
 import UnauthenticatedPage from "./pages/unauthenticated";
 

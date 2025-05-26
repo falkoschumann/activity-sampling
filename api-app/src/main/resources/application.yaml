@@ -5,3 +5,10 @@ spring:
     url: jdbc:postgresql://localhost:5432/activitysampling
     username:
     password:
+
+# TODO use same site or CSRF?
+server:
+  servlet:
+    session:
+      cookie:
+        same-site: lax
