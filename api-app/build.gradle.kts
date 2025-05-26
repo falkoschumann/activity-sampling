@@ -1,3 +1,5 @@
+// Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
+
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 
 plugins {
@@ -46,7 +48,9 @@ dependencies {
   runtimeOnly("org.postgresql:postgresql")
   developmentOnly("org.springframework.boot:spring-boot-devtools")
   annotationProcessor("org.projectlombok:lombok")
-  annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
+  annotationProcessor(
+    "org.springframework.boot:spring-boot-configuration-processor",
+  )
   testImplementation("org.springframework.boot:spring-boot-starter-test")
   testImplementation("com.tngtech.archunit:archunit-junit5:1.4.1")
   testCompileOnly("org.projectlombok:lombok")
@@ -93,12 +97,13 @@ checkstyle {
   toolVersion = "10.21.2"
   maxWarnings = 0
   maxErrors = 0
-  val archive = configurations.checkstyle.get().resolve().filter {
-    it.name.startsWith("checkstyle")
-  }
+  val archive =
+    configurations.checkstyle.get().resolve().filter {
+      it.name.startsWith("checkstyle")
+    }
   config = resources.text.fromArchiveEntry(archive, "google_checks.xml")
   configProperties["org.checkstyle.google.suppressionfilter.config"] =
-    "${projectDir}/config/checkstyle/suppressions.xml"
+    "$projectDir/config/checkstyle/suppressions.xml"
 }
 
 pmd {
@@ -110,6 +115,16 @@ pmd {
 spotless {
   java {
     googleJavaFormat()
-    licenseHeader("// Copyright (c) \$YEAR Falko Schumann. All rights reserved. MIT license.\n\n")
+    licenseHeader(
+      "// Copyright (c) \$YEAR Falko Schumann. All rights reserved. MIT license.\n\n",
+    )
+  }
+  kotlinGradle {
+    target("*.gradle.kts")
+    ktlint()
+    licenseHeader(
+      "// Copyright (c) \$YEAR Falko Schumann. All rights reserved. MIT license.\n\n",
+      "^(import|plugins|rootProject).*",
+    )
   }
 }
