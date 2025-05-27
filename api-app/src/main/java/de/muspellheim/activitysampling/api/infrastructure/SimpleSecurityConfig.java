@@ -32,6 +32,8 @@ public class SimpleSecurityConfig {
                     .permitAll())
         .httpBasic(withDefaults())
         .formLogin(withDefaults())
+        // Session cookies are configured with SameSite=Lax, so CSRF protection is not needed for
+        // API endpoints.
         .csrf(csrf -> csrf.ignoringRequestMatchers("/api/**"));
     return http.build();
   }

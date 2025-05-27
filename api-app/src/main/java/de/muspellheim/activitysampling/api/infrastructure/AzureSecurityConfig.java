@@ -22,8 +22,6 @@ public class AzureSecurityConfig {
 
   @Bean
   SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-    // var requestHandler = new CsrfTokenRequestAttributeHandler();
-    // requestHandler.setCsrfRequestAttributeName(null);
     http.with(
             AadWebApplicationHttpSecurityConfigurer.aadWebApplication(), Customizer.withDefaults())
         .authorizeHttpRequests(
@@ -34,13 +32,9 @@ public class AzureSecurityConfig {
                     .hasAuthority("APPROLE_USER")
                     .anyRequest()
                     .permitAll())
+        // Session cookies are configured with SameSite=Lax, so CSRF protection is not needed for
+        // API endpoints.
         .csrf(csrf -> csrf.ignoringRequestMatchers("/api/**"));
-    // .exceptionHandling(customizer -> customizer.authenticationEntryPoint(new
-    // HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
-    // .csrf(
-    //    csrf ->
-    //        csrf.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-    //            .csrfTokenRequestHandler(requestHandler));
     return http.build();
   }
 
