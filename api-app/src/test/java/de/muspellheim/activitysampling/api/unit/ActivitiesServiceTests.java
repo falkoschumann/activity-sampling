@@ -24,7 +24,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
-@DataJpaTest(properties = {"spring.flyway.target=1"})
+@DataJpaTest(properties = {"spring.profiles.active=test", "spring.flyway.target=1"})
 class ActivitiesServiceTests {
 
   // TODO Align with user stories
