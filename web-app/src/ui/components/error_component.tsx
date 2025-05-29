@@ -1,6 +1,8 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
-export default function Error({ message }: { message?: string }) {
+import { SerializedError } from "@reduxjs/toolkit";
+
+export default function ErrorComponent({ message }: SerializedError) {
   if (!message) {
     return null;
   }

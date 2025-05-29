@@ -7,11 +7,11 @@ import { queryAuthentication } from "../application/authentication_slice";
 import { AppDispatch } from "../application/store";
 import AuthenticatedTemplate from "./components/authenticated_template";
 import UnauthenticatedTemplate from "./components/unauthenticated_template";
-import PageLayout from "./layouts/page";
-import ActivitiesPage from "./pages/activities";
-import UnauthenticatedPage from "./pages/unauthenticated";
+import PageLayout from "./layouts/page_layout";
+import ActivitiesPage from "./pages/activities_page";
+import UnauthenticatedPage from "./pages/unauthenticated_page";
 
-export default function App() {
+export default function WebApplication() {
   const dispatch = useDispatch<AppDispatch>();
 
   useEffect(() => {
@@ -23,7 +23,6 @@ export default function App() {
       <AuthenticatedTemplate>
         <ActivitiesPage />
       </AuthenticatedTemplate>
-
       <UnauthenticatedTemplate>
         <UnauthenticatedPage />
       </UnauthenticatedTemplate>

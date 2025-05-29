@@ -7,12 +7,12 @@ import "bootstrap/dist/css/bootstrap.css";
 import "bootstrap/dist/js/bootstrap.esm.js";
 
 import { store } from "./application/store";
-import App from "./ui/app";
+import WebApplication from "./ui/web_application";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <Provider store={store}>
-      <App />
+      <WebApplication />
     </Provider>
   </StrictMode>,
 );

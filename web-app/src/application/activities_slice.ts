@@ -1,6 +1,11 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
-import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
+import {
+  createAsyncThunk,
+  createSlice,
+  PayloadAction,
+  SerializedError,
+} from "@reduxjs/toolkit";
 
 import { Activity, TimeSummary, WorkingDay } from "../domain/activities";
 import { Duration } from "../domain/duration";
@@ -33,9 +38,7 @@ interface ActivitiesState {
   readonly recentActivities: WorkingDay[];
   readonly timeSummary: TimeSummary;
   readonly timeZone: string;
-  readonly error?: {
-    readonly message: string;
-  };
+  readonly error?: SerializedError;
 }
 
 const initialState: ActivitiesState = {

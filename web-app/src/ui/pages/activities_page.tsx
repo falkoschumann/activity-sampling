@@ -22,7 +22,8 @@ import {
 import { AppDispatch } from "../../application/store";
 import { Activity, TimeSummary, WorkingDay } from "../../domain/activities";
 import { Duration } from "../../domain/duration";
-import Error from "../components/error";
+import { EventHandler } from "../../util/types";
+import ErrorComponent from "../components/error_component";
 
 export default function ActivitiesPage() {
   const error = useSelector(selectError);
@@ -40,28 +41,28 @@ export default function ActivitiesPage() {
 
   return (
     <>
-      <aside className="container py-2 bg-body">
-        <Error {...error} />
+      <aside className="container my-4">
+        <ErrorComponent {...error} />
         <CurrentActivityForm
           {...currentActivityForm}
-          onChange={(name, text) => dispatch(changeText({ name, text }))}
+          onChange={(event) => dispatch(changeText(event))}
           onSubmit={() => dispatch(logActivity({}))}
         />
         <CountdownComponent
           {...countdown}
           onStart={() => dispatch(startCountdown({}))}
           onStop={() => dispatch(stopCountdown({}))}
-          onChange={(duration) => dispatch(durationSelected({ duration }))}
+          onChange={(event) => dispatch(durationSelected(event))}
         />
       </aside>
-      <main className="container flex-shrink-0" style={{ paddingTop: "290px", paddingBottom: "90px" }}>
+      <main className="container my-4">
         <RecentActivitiesContainer
           recentActivities={recentActivities}
           timeZone={timeZone}
-          onSelect={(activity) => dispatch(activitySelected(activity))}
+          onSelect={({ activity }) => dispatch(activitySelected(activity))}
         />
       </main>
-      <footer className="container fixed-bottom py-3 bg-body">
+      <footer className="container-fluid sticky-bottom py-2 bg-body-secondary">
         <TimeSummaryComponent {...timeSummary} />
       </footer>
     </>
@@ -84,8 +85,8 @@ function CurrentActivityForm({
   notes: string;
   disabled: boolean;
   loggable: boolean;
-  onChange: (name: "client" | "project" | "task" | "notes", text: string) => void;
-  onSubmit: () => void;
+  onChange: EventHandler<{ name: "client" | "project" | "task" | "notes"; text: string }>;
+  onSubmit: EventHandler;
 }) {
   function handleSubmitted(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -94,34 +95,10 @@ function CurrentActivityForm({
 
   return (
     <form onSubmit={handleSubmitted}>
-      <FormInput
-        name={"client"}
-        title={"Client"}
-        disabled={disabled}
-        value={client}
-        onChange={(text) => onChange("client", text)}
-      />
-      <FormInput
-        name={"project"}
-        title={"Project"}
-        disabled={disabled}
-        value={project}
-        onChange={(text) => onChange("project", text)}
-      />
-      <FormInput
-        name={"task"}
-        title={"Task"}
-        disabled={disabled}
-        value={task}
-        onChange={(text) => onChange("task", text)}
-      />
-      <FormInput
-        name={"notes"}
-        title={"Notes"}
-        disabled={disabled}
-        value={notes}
-        onChange={(text) => onChange("notes", text)}
-      />
+      <FormInput name="client" title="Client" disabled={disabled} value={client} onChange={onChange} />
+      <FormInput name="project" title="Project" disabled={disabled} value={project} onChange={onChange} />
+      <FormInput name="task" title="Task" disabled={disabled} value={task} onChange={onChange} />
+      <FormInput name="notes" title="Notes" disabled={disabled} value={notes} onChange={onChange} />
       <button type="submit" className="btn btn-primary btn-sm w-100" disabled={disabled || loggable}>
         Log
       </button>
@@ -136,16 +113,16 @@ function FormInput({
   value,
   onChange,
 }: {
-  name: string;
+  name: "client" | "project" | "task" | "notes";
   title: string;
   disabled: boolean;
   value: string;
-  onChange: (text: string) => void;
+  onChange: EventHandler<{ name: "client" | "project" | "task" | "notes"; text: string }>;
 }) {
   return (
-    <div className="row mb-2">
+    <div className="row mb-3">
       <label htmlFor={name} className="col-sm-2 col-form-label">
-        {title}:
+        {title}
       </label>
       <div className="col-sm-10">
         <input
@@ -155,7 +132,7 @@ function FormInput({
           className="form-control form-control-sm"
           disabled={disabled}
           value={value}
-          onChange={(e) => onChange(e.target.value)}
+          onChange={(e) => onChange({ name, text: e.target.value })}
         />
       </div>
     </div>
@@ -175,9 +152,9 @@ function CountdownComponent({
   remaining: string;
   percentage: number;
   isRunning: boolean;
-  onStart: () => void;
-  onStop: () => void;
-  onChange: (duration: string) => void;
+  onStart: EventHandler;
+  onStop: EventHandler;
+  onChange: EventHandler<{ duration: string }>;
 }) {
   function handleToggled(event: React.ChangeEvent<HTMLInputElement>) {
     if (event.target.checked) {
@@ -188,7 +165,7 @@ function CountdownComponent({
   }
 
   return (
-    <div className="my-3 d-flex gap-3">
+    <div className="d-flex my-4 gap-3">
       <div className="flex-fill">
         <div
           className="progress"
@@ -203,7 +180,7 @@ function CountdownComponent({
         <div className="text-center">{Duration.parse(remaining).toLocaleString({ style: "medium" })}</div>
       </div>
       <div>
-        <div className="btn-group btn-group-sm">
+        <div className="btn-group">
           <input
             id="start-stop-countdown"
             type="checkbox"
@@ -224,13 +201,13 @@ function CountdownComponent({
             <span className="visually-hidden">Toggle Dropdown</span>
           </button>
           <ul className="dropdown-menu">
-            <DurationItem value="PT5M" active={duration === "PT5M"} onChange={onChange} />
-            <DurationItem value="PT10M" active={duration === "PT10M"} onChange={onChange} />
-            <DurationItem value="PT15M" active={duration === "PT15M"} onChange={onChange} />
-            <DurationItem value="PT20M" active={duration === "PT20M"} onChange={onChange} />
-            <DurationItem value="PT30M" active={duration === "PT30M"} onChange={onChange} />
-            <DurationItem value="PT60M" active={duration === "PT60M"} onChange={onChange} />
-            <DurationItem value="PT1M" active={duration === "PT1M"} onChange={onChange} />
+            <DurationItem duration="PT5M" active={duration === "PT5M"} onChange={onChange} />
+            <DurationItem duration="PT10M" active={duration === "PT10M"} onChange={onChange} />
+            <DurationItem duration="PT15M" active={duration === "PT15M"} onChange={onChange} />
+            <DurationItem duration="PT20M" active={duration === "PT20M"} onChange={onChange} />
+            <DurationItem duration="PT30M" active={duration === "PT30M"} onChange={onChange} />
+            <DurationItem duration="PT60M" active={duration === "PT60M"} onChange={onChange} />
+            <DurationItem duration="PT1M" active={duration === "PT1M"} onChange={onChange} />
           </ul>
         </div>
       </div>
@@ -239,17 +216,17 @@ function CountdownComponent({
 }
 
 function DurationItem({
-  value,
+  duration,
   active,
   onChange,
 }: {
-  value: string;
+  duration: string;
   active: boolean;
-  onChange: (duration: string) => void;
+  onChange: EventHandler<{ duration: string }>;
 }) {
   function handleClick(event: React.MouseEvent<HTMLAnchorElement>) {
     event.preventDefault();
-    onChange(value);
+    onChange({ duration });
   }
 
   return (
@@ -260,7 +237,7 @@ function DurationItem({
         href="#"
         onClick={handleClick}
       >
-        {Duration.parse(value).minutes} min
+        {Duration.parse(duration).minutes} min
       </a>
     </li>
   );
@@ -273,11 +250,30 @@ function RecentActivitiesContainer({
 }: {
   recentActivities: WorkingDay[];
   timeZone: string;
-  onSelect: (activity: Activity) => void;
+  onSelect: EventHandler<{ activity: Activity }>;
 }) {
   return recentActivities.map((workingDay) => (
-    <div key={new Date(workingDay.date).toISOString()}>
-      <h6 className="bg-body-tertiary p-1 m-0 mt-2 sticky-top small">
+    <WorkingDayComponent
+      key={new Date(workingDay.date).toISOString()}
+      workingDay={workingDay}
+      timeZone={timeZone}
+      onSelect={onSelect}
+    />
+  ));
+}
+
+function WorkingDayComponent({
+  workingDay,
+  timeZone,
+  onSelect,
+}: {
+  workingDay: WorkingDay;
+  timeZone: string;
+  onSelect: EventHandler<{ activity: Activity }>;
+}) {
+  return (
+    <div className="mt-4">
+      <h6 className="m-0 p-2 sticky-top bg-body-tertiary" style={{ top: "3.5rem" }}>
         {new Date(workingDay.date).toLocaleDateString(undefined, { dateStyle: "full", timeZone })}
       </h6>
       <div className="list-group list-group-flush">
@@ -286,12 +282,12 @@ function RecentActivitiesContainer({
             key={activity.start}
             activity={activity}
             timeZone={timeZone}
-            onSelect={() => onSelect(activity)}
+            onSelect={() => onSelect({ activity })}
           />
         ))}
       </div>
     </div>
-  ));
+  );
 }
 
 function ActivityComponent({
@@ -301,7 +297,7 @@ function ActivityComponent({
 }: {
   activity: Activity;
   timeZone: string;
-  onSelect: () => void;
+  onSelect: EventHandler;
 }) {
   return (
     <button
@@ -333,20 +329,20 @@ function TimeSummaryComponent({ hoursToday, hoursYesterday, hoursThisWeek, hours
     <div>
       <div className="d-flex justify-content-center flex-wrap text-center">
         <div className="flex-fill">
-          <div>Hours Today</div>
-          <div className="fs-5">{Duration.parse(hoursToday).toLocaleString()}</div>
+          <div className="small">Hours Today</div>
+          <div>{Duration.parse(hoursToday).toLocaleString()}</div>
         </div>
         <div className="flex-fill">
-          <div>Hours Yesterday</div>
-          <div className="fs-5">{Duration.parse(hoursYesterday).toLocaleString()}</div>
+          <div className="small">Hours Yesterday</div>
+          <div>{Duration.parse(hoursYesterday).toLocaleString()}</div>
         </div>
         <div className="flex-fill">
-          <div>Hours this Week</div>
-          <div className="fs-5">{Duration.parse(hoursThisWeek).toLocaleString()}</div>
+          <div className="small">Hours this Week</div>
+          <div>{Duration.parse(hoursThisWeek).toLocaleString()}</div>
         </div>
         <div className="flex-fill">
-          <div>Hours this Month</div>
-          <div className="fs-5">{Duration.parse(hoursThisMonth).toLocaleString()}</div>
+          <div className="small">Hours this Month</div>
+          <div>{Duration.parse(hoursThisMonth).toLocaleString()}</div>
         </div>
       </div>
     </div>
