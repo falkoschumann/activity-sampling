@@ -31,11 +31,10 @@ import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 
-@SpringBootTest(
-    webEnvironment = WebEnvironment.RANDOM_PORT,
-    useMainMethod = UseMainMethod.ALWAYS,
-    properties = "spring.profiles.active=test")
+@ActiveProfiles("test")
+@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT, useMainMethod = UseMainMethod.ALWAYS)
 class ApiApplicationTests {
 
   @LocalServerPort int port;
