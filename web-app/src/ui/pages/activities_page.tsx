@@ -62,8 +62,10 @@ export default function ActivitiesPage() {
           onSelect={({ activity }) => dispatch(activitySelected(activity))}
         />
       </main>
-      <footer className="container-fluid sticky-bottom py-2 bg-body-secondary">
-        <TimeSummaryComponent {...timeSummary} />
+      <footer className="sticky-bottom bg-body-secondary">
+        <div className="container py-2">
+          <TimeSummaryComponent {...timeSummary} />
+        </div>
       </footer>
     </>
   );
@@ -326,24 +328,22 @@ function ActivityComponent({
 
 function TimeSummaryComponent({ hoursToday, hoursYesterday, hoursThisWeek, hoursThisMonth }: TimeSummary) {
   return (
-    <div>
-      <div className="d-flex justify-content-center flex-wrap text-center">
-        <div className="flex-fill">
-          <div className="small">Hours Today</div>
-          <div>{Duration.parse(hoursToday).toLocaleString()}</div>
-        </div>
-        <div className="flex-fill">
-          <div className="small">Hours Yesterday</div>
-          <div>{Duration.parse(hoursYesterday).toLocaleString()}</div>
-        </div>
-        <div className="flex-fill">
-          <div className="small">Hours this Week</div>
-          <div>{Duration.parse(hoursThisWeek).toLocaleString()}</div>
-        </div>
-        <div className="flex-fill">
-          <div className="small">Hours this Month</div>
-          <div>{Duration.parse(hoursThisMonth).toLocaleString()}</div>
-        </div>
+    <div className="d-flex justify-content-center flex-wrap text-center">
+      <div className="flex-fill">
+        <div className="small">Hours Today</div>
+        <div>{Duration.parse(hoursToday).toLocaleString()}</div>
+      </div>
+      <div className="flex-fill">
+        <div className="small">Hours Yesterday</div>
+        <div>{Duration.parse(hoursYesterday).toLocaleString()}</div>
+      </div>
+      <div className="flex-fill">
+        <div className="small">Hours this Week</div>
+        <div>{Duration.parse(hoursThisWeek).toLocaleString()}</div>
+      </div>
+      <div className="flex-fill">
+        <div className="small">Hours this Month</div>
+        <div>{Duration.parse(hoursThisMonth).toLocaleString()}</div>
       </div>
     </div>
   );
