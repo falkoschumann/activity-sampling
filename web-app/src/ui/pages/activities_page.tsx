@@ -273,7 +273,7 @@ function WorkingDayComponent({
 }) {
   return (
     <div className="mt-4">
-      <h6 className="m-0 p-2 sticky-top bg-body-tertiary" style={{ top: "3.5rem" }}>
+      <h6 className="m-0 p-2 sticky-top" style={{ top: "3.5rem" }}>
         {new Date(workingDay.date).toLocaleDateString(undefined, { dateStyle: "full", timeZone })}
       </h6>
       <div className="list-group list-group-flush">
