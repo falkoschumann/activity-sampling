@@ -4,8 +4,8 @@ package de.muspellheim.activitysampling.api.unit;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import de.muspellheim.activitysampling.api.domain.Activity;
-import de.muspellheim.activitysampling.api.domain.WorkingDay;
+import de.muspellheim.activitysampling.api.domain.activities.Activity;
+import de.muspellheim.activitysampling.api.domain.activities.WorkingDay;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;

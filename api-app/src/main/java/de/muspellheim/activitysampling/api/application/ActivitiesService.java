@@ -2,12 +2,12 @@
 
 package de.muspellheim.activitysampling.api.application;
 
-import de.muspellheim.activitysampling.api.domain.CommandStatus;
-import de.muspellheim.activitysampling.api.domain.LogActivityCommand;
-import de.muspellheim.activitysampling.api.domain.RecentActivitiesQuery;
-import de.muspellheim.activitysampling.api.domain.RecentActivitiesQueryResult;
-import de.muspellheim.activitysampling.api.domain.TimeSummary;
-import de.muspellheim.activitysampling.api.domain.WorkingDay;
+import de.muspellheim.activitysampling.api.domain.activities.LogActivityCommand;
+import de.muspellheim.activitysampling.api.domain.activities.RecentActivitiesQuery;
+import de.muspellheim.activitysampling.api.domain.activities.RecentActivitiesQueryResult;
+import de.muspellheim.activitysampling.api.domain.activities.TimeSummary;
+import de.muspellheim.activitysampling.api.domain.activities.WorkingDay;
+import de.muspellheim.activitysampling.api.domain.common.CommandStatus;
 import de.muspellheim.activitysampling.api.infrastructure.ActivitiesRepository;
 import de.muspellheim.activitysampling.api.infrastructure.ActivityDto;
 import java.time.Instant;

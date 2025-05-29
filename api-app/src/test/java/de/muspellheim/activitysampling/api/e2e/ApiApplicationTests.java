@@ -5,11 +5,11 @@ package de.muspellheim.activitysampling.api.e2e;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import de.muspellheim.activitysampling.api.domain.AccountInfo;
-import de.muspellheim.activitysampling.api.domain.AuthenticationQueryResult;
-import de.muspellheim.activitysampling.api.domain.CommandStatus;
-import de.muspellheim.activitysampling.api.domain.LogActivityCommand;
-import de.muspellheim.activitysampling.api.domain.RecentActivitiesQueryResult;
+import de.muspellheim.activitysampling.api.domain.activities.LogActivityCommand;
+import de.muspellheim.activitysampling.api.domain.activities.RecentActivitiesQueryResult;
+import de.muspellheim.activitysampling.api.domain.authentication.AccountInfo;
+import de.muspellheim.activitysampling.api.domain.authentication.AuthenticationQueryResult;
+import de.muspellheim.activitysampling.api.domain.common.CommandStatus;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;

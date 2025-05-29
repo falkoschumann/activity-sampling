@@ -4,7 +4,7 @@ package de.muspellheim.activitysampling.api.infrastructure;
 
 import static org.hibernate.type.SqlTypes.INTERVAL_SECOND;
 
-import de.muspellheim.activitysampling.api.domain.Activity;
+import de.muspellheim.activitysampling.api.domain.activities.Activity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;

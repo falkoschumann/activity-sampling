@@ -2,8 +2,8 @@
 
 package de.muspellheim.activitysampling.api.ui;
 
-import de.muspellheim.activitysampling.api.domain.AccountInfo;
-import de.muspellheim.activitysampling.api.domain.AuthenticationQueryResult;
+import de.muspellheim.activitysampling.api.domain.authentication.AccountInfo;
+import de.muspellheim.activitysampling.api.domain.authentication.AuthenticationQueryResult;
 import org.springframework.context.annotation.Profile;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
