@@ -2,6 +2,7 @@
 
 package de.muspellheim.activitysampling.api.domain.activities;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import lombok.Builder;
@@ -9,8 +10,9 @@ import lombok.With;
 
 @Builder
 @With
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public record Activity(
-    LocalDateTime start,
+    LocalDateTime timestamp,
     Duration duration,
     String client,
     String project,
@@ -19,12 +21,11 @@ public record Activity(
 
   public static Activity createTestInstance() {
     return new ActivityBuilder()
-        .start(LocalDateTime.parse("2024-12-18T09:30"))
+        .timestamp(LocalDateTime.parse("2024-12-18T09:30"))
         .duration(Duration.ofMinutes(30))
         .client("ACME Inc.")
         .project("Foobar")
         .task("Do something")
-        .notes("")
         .build();
   }
 }

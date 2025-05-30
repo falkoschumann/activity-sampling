@@ -85,7 +85,7 @@ export const logActivity = createAsyncThunk<
   const currentActivityForm = selectCurrentActivityForm(thunkAPI.getState());
   const countdown = selectCountdown(thunkAPI.getState());
   const command: LogActivityCommand = {
-    start: clock.now().toISOString(),
+    timestamp: clock.now().toISOString(),
     duration: countdown.duration,
     client: currentActivityForm.client,
     project: currentActivityForm.project,

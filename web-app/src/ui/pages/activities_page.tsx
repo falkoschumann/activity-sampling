@@ -62,7 +62,7 @@ export default function ActivitiesPage() {
           onSelect={({ activity }) => dispatch(activitySelected(activity))}
         />
       </main>
-      <footer className="sticky-bottom bg-body-secondary">
+      <footer className="fixed-bottom bg-body-secondary">
         <div className="container py-2">
           <TimeSummaryComponent {...timeSummary} />
         </div>
@@ -202,7 +202,7 @@ function CountdownComponent({
           >
             <span className="visually-hidden">Toggle Dropdown</span>
           </button>
-          <ul className="dropdown-menu">
+          <ul className="dropdown-menu" style={{ zIndex: 1035 }}>
             <DurationItem duration="PT5M" active={duration === "PT5M"} onChange={onChange} />
             <DurationItem duration="PT10M" active={duration === "PT10M"} onChange={onChange} />
             <DurationItem duration="PT15M" active={duration === "PT15M"} onChange={onChange} />
@@ -275,13 +275,13 @@ function WorkingDayComponent({
 }) {
   return (
     <div className="mt-4">
-      <h6 className="m-0 p-2 sticky-top" style={{ top: "3.5rem" }}>
+      <h6 className="m-0 p-2 sticky-top bg-body-tertiary" style={{ top: "3.5rem" }}>
         {new Date(workingDay.date).toLocaleDateString(undefined, { dateStyle: "full", timeZone })}
       </h6>
       <div className="list-group list-group-flush">
         {workingDay.activities.map((activity) => (
           <ActivityComponent
-            key={activity.start}
+            key={activity.timestamp}
             activity={activity}
             timeZone={timeZone}
             onSelect={() => onSelect({ activity })}
@@ -303,12 +303,12 @@ function ActivityComponent({
 }) {
   return (
     <button
-      key={new Date(activity.start).toISOString()}
+      key={new Date(activity.timestamp).toISOString()}
       onClick={() => onSelect()}
       className="list-group-item list-group-item-action py-1 d-flex justify-content-start align-items-start"
     >
       <div style={{ width: "3em" }}>
-        {new Date(activity.start).toLocaleTimeString(undefined, {
+        {new Date(activity.timestamp).toLocaleTimeString(undefined, {
           timeStyle: "short",
           hour12: false,
           timeZone,

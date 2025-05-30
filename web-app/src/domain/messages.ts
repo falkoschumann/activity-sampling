@@ -15,7 +15,7 @@ export type AuthenticationQueryResult =
     };
 
 export interface LogActivityCommand {
-  readonly start: string;
+  readonly timestamp: string;
   readonly duration: string;
   readonly client: string;
   readonly project: string;

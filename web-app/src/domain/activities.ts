@@ -1,7 +1,7 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
 export interface Activity {
-  readonly start: string;
+  readonly timestamp: string;
   readonly duration: string;
   readonly client: string;
   readonly project: string;
@@ -10,7 +10,7 @@ export interface Activity {
 }
 
 export const TEST_ACTIVITY: Activity = Object.freeze({
-  start: "2024-12-18T09:30:00+01:00",
+  timestamp: "2024-12-18T09:30:00+01:00",
   duration: "PT30M",
   client: "ACME Inc.",
   project: "Foobar",

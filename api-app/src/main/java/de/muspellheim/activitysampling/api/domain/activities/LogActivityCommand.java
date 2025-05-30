@@ -15,7 +15,7 @@ import lombok.With;
 @With
 @JsonInclude(Include.NON_NULL)
 public record LogActivityCommand(
-    @NotNull Instant start,
+    @NotNull Instant timestamp,
     @NotNull Duration duration,
     @NotBlank String client,
     @NotBlank String project,
@@ -24,7 +24,7 @@ public record LogActivityCommand(
 
   public static LogActivityCommand createTestInstance() {
     return new LogActivityCommandBuilder()
-        .start(Instant.parse("2024-12-18T09:30:00+01:00"))
+        .timestamp(Instant.parse("2024-12-18T09:30:00+01:00"))
         .duration(Duration.ofMinutes(30))
         .client("ACME Inc.")
         .project("Foobar")

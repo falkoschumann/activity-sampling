@@ -10,7 +10,7 @@ import UnauthenticatedTemplate from "../components/unauthenticated_template";
 export default function PageLayout({ children }: { children?: React.ReactNode }) {
   return (
     <>
-      <header className="sticky-top">
+      <header className="fixed-top">
         <nav className="navbar navbar-dark bg-primary">
           <div className="container">
             <a className="navbar-brand" href="/">

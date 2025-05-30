@@ -194,7 +194,7 @@ describe("Activities", () => {
       const commandStatus = JSON.stringify({ success: true });
       const queryResultJson = JSON.stringify({
         lastActivity: {
-          start: "2025-03-10T21:00:00Z",
+          timestamp: "2025-03-10T21:00:00Z",
           duration: "PT30M",
           client: "client-1",
           project: "project-1",
@@ -206,7 +206,7 @@ describe("Activities", () => {
             date: "2025-03-10",
             activities: [
               {
-                start: "2025-03-10T21:00:00Z",
+                timestamp: "2025-03-10T21:00:00Z",
                 duration: "PT30M",
                 client: "client-1",
                 project: "project-1",
@@ -247,7 +247,7 @@ describe("Activities", () => {
           date: "2025-03-10",
           activities: [
             {
-              start: "2025-03-10T21:00:00Z",
+              timestamp: "2025-03-10T21:00:00Z",
               duration: "PT30M",
               client: "client-1",
               project: "project-1",
@@ -265,7 +265,7 @@ describe("Activities", () => {
       });
       expect(loggedActivities.data).toEqual([
         {
-          start: clock.now().toISOString(),
+          timestamp: clock.now().toISOString(),
           duration: "PT30M",
           client: "client-1",
           project: "project-1",
@@ -329,7 +329,7 @@ describe("Activities", () => {
           new Response(
             JSON.stringify({
               lastActivity: {
-                start: "2025-02-12T21:18",
+                timestamp: "2025-02-12T21:18",
                 duration: "PT30M",
                 client: "client-1",
                 project: "project-1",
@@ -421,7 +421,7 @@ describe("Activities", () => {
 
       store.dispatch(
         activitySelected({
-          start: "2025-02-12T21:18",
+          timestamp: "2025-02-12T21:18",
           duration: "PT30M",
           client: "client-1",
           project: "project-1",
@@ -445,7 +445,7 @@ describe("Activities", () => {
     it("Queries recent activities", async () => {
       const queryResultJson = JSON.stringify({
         lastActivity: {
-          start: "2025-02-11T21:30",
+          timestamp: "2025-02-11T21:30",
           duration: "PT30M",
           client: "ACME Inc.",
           project: "Foobar",
@@ -457,7 +457,7 @@ describe("Activities", () => {
             date: "2025-02-11",
             activities: [
               {
-                start: "2025-02-11T21:30",
+                timestamp: "2025-02-11T21:30",
                 duration: "PT30M",
                 client: "ACME Inc.",
                 project: "Foobar",
@@ -494,7 +494,7 @@ describe("Activities", () => {
           date: "2025-02-11",
           activities: [
             {
-              start: "2025-02-11T21:30",
+              timestamp: "2025-02-11T21:30",
               duration: "PT30M",
               client: "ACME Inc.",
               project: "Foobar",

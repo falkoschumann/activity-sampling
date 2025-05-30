@@ -82,7 +82,7 @@ class ApiApplicationTests {
       var response =
           restTemplate.postForEntity(
               "/api/activities/log-activity",
-              LogActivityCommand.createTestInstance().withStart(Instant.now()),
+              LogActivityCommand.createTestInstance().withTimestamp(Instant.now()),
               CommandStatus.class);
 
       assertEquals(200, response.getStatusCode().value());

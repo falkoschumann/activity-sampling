@@ -89,11 +89,11 @@ class ActivitiesServiceTests {
     void returnsRecentActivities() {
       repository.saveAll(
           List.of(
-              ActivityDto.createTestInstance().withStart(Instant.parse("2024-12-18T08:30:00Z")),
-              ActivityDto.createTestInstance().withStart(Instant.parse("2024-12-17T16:00:00Z")),
-              ActivityDto.createTestInstance().withStart(Instant.parse("2024-12-17T15:30:00Z")),
+              ActivityDto.createTestInstance().withTimestamp(Instant.parse("2024-12-18T08:30:00Z")),
+              ActivityDto.createTestInstance().withTimestamp(Instant.parse("2024-12-17T16:00:00Z")),
+              ActivityDto.createTestInstance().withTimestamp(Instant.parse("2024-12-17T15:30:00Z")),
               ActivityDto.createTestInstance()
-                  .withStart(Instant.parse("2024-12-17T15:00:00Z"))
+                  .withTimestamp(Instant.parse("2024-12-17T15:00:00Z"))
                   .withTask("Make things")
                   .withNotes("This is a note")));
       var service = new ActivitiesService(repository);
@@ -126,7 +126,7 @@ class ActivitiesServiceTests {
       assertEquals(
           new RecentActivitiesQueryResult(
               Activity.createTestInstance()
-                  .withStart(now)
+                  .withTimestamp(now)
                   .withDuration(Duration.ofMinutes(20))
                   .withClient("client-1")
                   .withProject("project-1")
@@ -136,7 +136,7 @@ class ActivitiesServiceTests {
                       now.toLocalDate(),
                       List.of(
                           Activity.createTestInstance()
-                              .withStart(now)
+                              .withTimestamp(now)
                               .withDuration(Duration.ofMinutes(20))
                               .withClient("client-1")
                               .withProject("project-1")

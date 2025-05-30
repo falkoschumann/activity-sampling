@@ -38,12 +38,11 @@ public class ActivityDto implements Serializable {
 
   public static ActivityDto createTestInstance() {
     return new ActivityDtoBuilder()
-        .start(Instant.parse("2024-12-18T08:30:00Z"))
+        .timestamp(Instant.parse("2024-12-18T08:30:00Z"))
         .duration(Duration.ofMinutes(30))
         .client("ACME Inc.")
         .project("Foobar")
         .task("Do something")
-        .notes("")
         .build();
   }
 
@@ -51,7 +50,7 @@ public class ActivityDto implements Serializable {
   @Id
   private Long id;
 
-  @NonNull private Instant start;
+  @NonNull private Instant timestamp;
 
   @NonNull
   @JdbcTypeCode(INTERVAL_SECOND)
@@ -67,11 +66,6 @@ public class ActivityDto implements Serializable {
 
   public Activity validate(ZoneId timeZone) {
     return new Activity(
-        start.atZone(timeZone).toLocalDateTime(),
-        duration,
-        client,
-        project,
-        task,
-        notes != null ? notes : "");
+        timestamp.atZone(timeZone).toLocalDateTime(), duration, client, project, task, notes);
   }
 }
