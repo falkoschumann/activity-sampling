@@ -202,7 +202,7 @@ function CountdownComponent({
           >
             <span className="visually-hidden">Toggle Dropdown</span>
           </button>
-          <ul className="dropdown-menu" style={{ zIndex: 1035 }}>
+          <ul className="dropdown-menu">
             <DurationItem duration="PT5M" active={duration === "PT5M"} onChange={onChange} />
             <DurationItem duration="PT10M" active={duration === "PT10M"} onChange={onChange} />
             <DurationItem duration="PT15M" active={duration === "PT15M"} onChange={onChange} />
