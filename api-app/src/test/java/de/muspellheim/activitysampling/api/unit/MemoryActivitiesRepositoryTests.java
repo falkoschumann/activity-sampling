@@ -26,17 +26,17 @@ class MemoryActivitiesRepositoryTests {
   void findsByTimestampGreaterThanEqualOrderByTimestampDesc() {
     var repository = new MemoryActivitiesRepository();
     repository.save(
-        ActivityDto.createTestInstance().withTimestamp(Instant.parse("2023-01-01T10:00:00Z")));
+        ActivityDto.createTestInstance().withTimestamp(Instant.parse("2023-01-01T11:00:00Z")));
     var activity2 =
         repository.save(
-            ActivityDto.createTestInstance().withTimestamp(Instant.parse("2023-01-01T11:00:00Z")));
+            ActivityDto.createTestInstance().withTimestamp(Instant.parse("2023-01-01T12:00:00Z")));
     var activity3 =
         repository.save(
-            ActivityDto.createTestInstance().withTimestamp(Instant.parse("2023-01-01T12:00:00Z")));
+            ActivityDto.createTestInstance().withTimestamp(Instant.parse("2023-01-01T13:00:00Z")));
 
     var activities =
         repository.findByTimestampGreaterThanEqualOrderByTimestampDesc(
-            Instant.parse("2023-01-01T11:00:00Z"));
+            Instant.parse("2023-01-01T12:00:00Z"));
 
     assertEquals(List.of(activity3, activity2), activities);
   }
@@ -54,10 +54,14 @@ class MemoryActivitiesRepositoryTests {
   @Test
   void addsActivityWithGivenId() {
     var repository = new MemoryActivitiesRepository();
-    var activity1 = ActivityDto.createTestInstance();
+    var activity1 =
+        ActivityDto.createTestInstance().withTimestamp(Instant.parse("2025-06-01T11:00:00Z"));
     repository.save(activity1);
 
-    var activity3 = ActivityDto.createTestInstance().withId(3L);
+    var activity3 =
+        ActivityDto.createTestInstance()
+            .withId(3L)
+            .withTimestamp(Instant.parse("2025-06-01T13:00:00Z"));
     repository.save(activity3);
 
     assertEquals(List.of(activity1.withId(1L), activity3), repository.findAll());
@@ -78,8 +82,10 @@ class MemoryActivitiesRepositoryTests {
   void savesAllActivities() {
     var repository = new MemoryActivitiesRepository();
 
-    var activity1 = ActivityDto.createTestInstance();
-    var activity2 = ActivityDto.createTestInstance();
+    var activity1 =
+        ActivityDto.createTestInstance().withTimestamp(Instant.parse("2025-06-01T11:00:00Z"));
+    var activity2 =
+        ActivityDto.createTestInstance().withTimestamp(Instant.parse("2025-06-01T12:00:00Z"));
     repository.saveAll(List.of(activity1, activity2));
 
     assertEquals(List.of(activity1.withId(1L), activity2.withId(2L)), repository.findAll());
@@ -119,8 +125,12 @@ class MemoryActivitiesRepositoryTests {
   @Test
   void findsAllActivities() {
     var repository = new MemoryActivitiesRepository();
-    var activity1 = repository.save(ActivityDto.createTestInstance());
-    var activity2 = repository.save(ActivityDto.createTestInstance());
+    var activity1 =
+        repository.save(
+            ActivityDto.createTestInstance().withTimestamp(Instant.parse("2025-06-01T11:00:00Z")));
+    var activity2 =
+        repository.save(
+            ActivityDto.createTestInstance().withTimestamp(Instant.parse("2025-06-01T12:00:00Z")));
 
     var activities = repository.findAll();
 
@@ -130,9 +140,14 @@ class MemoryActivitiesRepositoryTests {
   @Test
   void findsAllActivitiesById() {
     var repository = new MemoryActivitiesRepository();
-    repository.save(ActivityDto.createTestInstance());
-    var activity2 = repository.save(ActivityDto.createTestInstance());
-    var activity3 = repository.save(ActivityDto.createTestInstance());
+    repository.save(
+        ActivityDto.createTestInstance().withTimestamp(Instant.parse("2025-06-01T11:00:00Z")));
+    var activity2 =
+        repository.save(
+            ActivityDto.createTestInstance().withTimestamp(Instant.parse("2025-06-01T12:00:00Z")));
+    var activity3 =
+        repository.save(
+            ActivityDto.createTestInstance().withTimestamp(Instant.parse("2025-06-01T13:00:00Z")));
 
     var activities = repository.findAllById(List.of(activity2.getId(), activity3.getId()));
 
@@ -142,8 +157,10 @@ class MemoryActivitiesRepositoryTests {
   @Test
   void countsActivities() {
     var repository = new MemoryActivitiesRepository();
-    repository.save(ActivityDto.createTestInstance());
-    repository.save(ActivityDto.createTestInstance());
+    repository.save(
+        ActivityDto.createTestInstance().withTimestamp(Instant.parse("2025-06-01T11:00:00Z")));
+    repository.save(
+        ActivityDto.createTestInstance().withTimestamp(Instant.parse("2025-06-01T12:00:00Z")));
 
     var count = repository.count();
 
@@ -173,9 +190,15 @@ class MemoryActivitiesRepositoryTests {
   @Test
   void deletesAllActivitiesById() {
     var repository = new MemoryActivitiesRepository();
-    var activity1 = repository.save(ActivityDto.createTestInstance());
-    var activity2 = repository.save(ActivityDto.createTestInstance());
-    var activity3 = repository.save(ActivityDto.createTestInstance());
+    var activity1 =
+        repository.save(
+            ActivityDto.createTestInstance().withTimestamp(Instant.parse("2025-06-01T11:00:00Z")));
+    var activity2 =
+        repository.save(
+            ActivityDto.createTestInstance().withTimestamp(Instant.parse("2025-06-01T12:00:00Z")));
+    var activity3 =
+        repository.save(
+            ActivityDto.createTestInstance().withTimestamp(Instant.parse("2025-06-01T13:00:00Z")));
 
     repository.deleteAllById(List.of(activity1.getId(), activity2.getId()));
 
@@ -187,9 +210,15 @@ class MemoryActivitiesRepositoryTests {
   @Test
   void deletesAllActivitiesByInstance() {
     var repository = new MemoryActivitiesRepository();
-    var activity1 = repository.save(ActivityDto.createTestInstance());
-    var activity2 = repository.save(ActivityDto.createTestInstance());
-    var activity3 = repository.save(ActivityDto.createTestInstance());
+    var activity1 =
+        repository.save(
+            ActivityDto.createTestInstance().withTimestamp(Instant.parse("2025-06-01T11:00:00Z")));
+    var activity2 =
+        repository.save(
+            ActivityDto.createTestInstance().withTimestamp(Instant.parse("2025-06-01T12:00:00Z")));
+    var activity3 =
+        repository.save(
+            ActivityDto.createTestInstance().withTimestamp(Instant.parse("2025-06-01T13:00:00Z")));
 
     repository.deleteAll(List.of(activity2, activity3));
 
@@ -201,9 +230,12 @@ class MemoryActivitiesRepositoryTests {
   @Test
   void deletesAllActivities() {
     var repository = new MemoryActivitiesRepository();
-    repository.save(ActivityDto.createTestInstance());
-    repository.save(ActivityDto.createTestInstance());
-    repository.save(ActivityDto.createTestInstance());
+    repository.save(
+        ActivityDto.createTestInstance().withTimestamp(Instant.parse("2025-06-01T11:00:00Z")));
+    repository.save(
+        ActivityDto.createTestInstance().withTimestamp(Instant.parse("2025-06-01T12:00:00Z")));
+    repository.save(
+        ActivityDto.createTestInstance().withTimestamp(Instant.parse("2025-06-01T13:00:00Z")));
 
     repository.deleteAll();
 

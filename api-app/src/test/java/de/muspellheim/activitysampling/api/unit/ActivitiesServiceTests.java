@@ -1,6 +1,6 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
-package de.muspellheim.activitysampling.api.integration;
+package de.muspellheim.activitysampling.api.unit;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -15,25 +15,27 @@ import de.muspellheim.activitysampling.api.domain.activities.WorkingDay;
 import de.muspellheim.activitysampling.api.domain.common.CommandStatus;
 import de.muspellheim.activitysampling.api.infrastructure.ActivitiesRepository;
 import de.muspellheim.activitysampling.api.infrastructure.ActivityDto;
+import de.muspellheim.activitysampling.api.infrastructure.MemoryActivitiesRepository;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.util.List;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.test.context.ActiveProfiles;
 
-@ActiveProfiles("test")
-@DataJpaTest(properties = {"spring.flyway.target=1"})
 class ActivitiesServiceTests {
 
   // TODO Align with user stories
 
   private static final ZoneId TIME_ZONE = ZoneId.of("Europe/Berlin");
 
-  @Autowired private ActivitiesRepository repository;
+  private ActivitiesRepository repository;
+
+  @BeforeEach
+  void setUp() {
+    repository = new MemoryActivitiesRepository();
+  }
 
   @Nested
   class LogActivity {

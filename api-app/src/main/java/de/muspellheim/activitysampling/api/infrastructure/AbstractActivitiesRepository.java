@@ -3,16 +3,14 @@
 package de.muspellheim.activitysampling.api.infrastructure;
 
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.StreamSupport;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.lang.NonNull;
 
 public abstract class AbstractActivitiesRepository implements ActivitiesRepository {
-
-  private final List<ActivityDto> activities = new ArrayList<>();
 
   @Override
   public List<ActivityDto> findByTimestampGreaterThanEqualOrderByTimestampDesc(Instant start) {
@@ -71,5 +69,15 @@ public abstract class AbstractActivitiesRepository implements ActivitiesReposito
   @Override
   public void deleteAll() {
     findAll().forEach(this::delete);
+  }
+
+  protected void validateConstraint(ActivityDto activity) {
+    var activityWithSameTimestamp =
+        findAll().stream()
+            .filter(e -> e.getTimestamp().equals(activity.getTimestamp()))
+            .findFirst();
+    if (activityWithSameTimestamp.isPresent()) {
+      throw new DataIntegrityViolationException("Duplicate timestamp: " + activity.getTimestamp());
+    }
   }
 }

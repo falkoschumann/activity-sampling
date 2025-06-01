@@ -24,6 +24,7 @@ public class MemoryActivitiesRepository extends AbstractActivitiesRepository {
       }
     }
 
+    validateConstraint(entity);
     if (entity.getId() == null) {
       var newId =
           activities.stream()
