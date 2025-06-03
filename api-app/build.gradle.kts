@@ -29,6 +29,7 @@ dependencyManagement {
 }
 
 dependencies {
+  implementation("org.apache.commons:commons-csv:1.14.0")
   implementation("com.azure.spring:spring-cloud-azure-starter-active-directory")
   implementation("com.azure.spring:spring-cloud-azure-starter-actuator")
   implementation("org.springframework.boot:spring-boot-starter-actuator")

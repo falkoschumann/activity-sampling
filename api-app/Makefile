@@ -4,6 +4,7 @@ all: dist check
 
 clean:
 	./gradlew clean
+	rm -rf testdata
 
 distclean: clean
 	rm -rf .gradle
