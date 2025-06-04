@@ -26,8 +26,6 @@ public class CsvActivitiesRepository extends AbstractActivitiesRepository {
   public static final String TASK_COLUMN = "Task";
   public static final String NOTES_COLUMN = "Notes";
 
-  // TODO Handle row number as ID
-
   private final Path file;
 
   public CsvActivitiesRepository(Path file) {
@@ -36,8 +34,10 @@ public class CsvActivitiesRepository extends AbstractActivitiesRepository {
 
   @NonNull
   @Override
+  @SuppressWarnings("unchecked")
   public <S extends ActivityDto> S save(@NonNull S entity) {
     try (var printer = createPrinter()) {
+      var count = count();
       printer.printRecord(
           entity.getTimestamp().truncatedTo(ChronoUnit.SECONDS),
           entity.getDuration(),
@@ -45,7 +45,7 @@ public class CsvActivitiesRepository extends AbstractActivitiesRepository {
           entity.getProject(),
           entity.getTask(),
           entity.getNotes());
-      return entity;
+      return (S) entity.withId(count + 1);
     } catch (IOException e) {
       throw new UncheckedIOException("Failed to append activity to file " + file, e);
     }
@@ -81,19 +81,22 @@ public class CsvActivitiesRepository extends AbstractActivitiesRepository {
   }
 
   private ActivityDto parseRecord(CSVRecord record) {
+    var id = record.getRecordNumber();
     var timestamp = record.get(TIMESTAMP_COLUMN);
     var duration = record.get(DURATION_COLUMN);
     var client = record.get(CLIENT_COLUMN);
     var project = record.get(PROJECT_COLUMN);
     var task = record.get(TASK_COLUMN);
     var notes = record.get(NOTES_COLUMN);
-    return ActivityDto.createTestInstance()
-        .withTimestamp(Instant.parse(timestamp))
-        .withDuration(Duration.parse(duration))
-        .withClient(client)
-        .withProject(project)
-        .withTask(task)
-        .withNotes(notes);
+    return ActivityDto.builder()
+        .id(id)
+        .timestamp(Instant.parse(timestamp))
+        .duration(Duration.parse(duration))
+        .client(client)
+        .project(project)
+        .task(task)
+        .notes(notes)
+        .build();
   }
 
   private CSVFormat createCsvFormat() {
