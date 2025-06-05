@@ -2,6 +2,7 @@
 
 package de.muspellheim.activitysampling.api.infrastructure;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
@@ -11,14 +12,14 @@ import java.nio.file.StandardOpenOption;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.List;
+import java.util.stream.Stream;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.csv.CSVRecord;
-import org.springframework.lang.NonNull;
 
-public class CsvActivitiesRepository extends AbstractActivitiesRepository {
+public class CsvActivitiesStore implements ActivitiesStore {
+
   public static final String TIMESTAMP_COLUMN = "Timestamp";
   public static final String DURATION_COLUMN = "Duration";
   public static final String CLIENT_COLUMN = "Client";
@@ -28,43 +29,36 @@ public class CsvActivitiesRepository extends AbstractActivitiesRepository {
 
   private final Path file;
 
-  public CsvActivitiesRepository(Path file) {
+  public CsvActivitiesStore(Path file) {
     this.file = file;
   }
 
-  @NonNull
   @Override
-  @SuppressWarnings("unchecked")
-  public <S extends ActivityDto> S save(@NonNull S entity) {
+  public void record(ActivityLoggedEvent event) {
     try (var printer = createPrinter()) {
-      var count = count();
       printer.printRecord(
-          entity.getTimestamp().truncatedTo(ChronoUnit.SECONDS),
-          entity.getDuration(),
-          entity.getClient(),
-          entity.getProject(),
-          entity.getTask(),
-          entity.getNotes());
-      return (S) entity.withId(count + 1);
+          event.timestamp().truncatedTo(ChronoUnit.SECONDS),
+          event.duration(),
+          event.client(),
+          event.project(),
+          event.task(),
+          event.notes());
     } catch (IOException e) {
       throw new UncheckedIOException("Failed to append activity to file " + file, e);
     }
   }
 
-  @NonNull
   @Override
-  public List<ActivityDto> findAll() {
-    try (var parser = createParser()) {
-      return parser.stream().map(this::parseRecord).toList();
+  public Stream<ActivityLoggedEvent> replay() {
+    try {
+      var parser = createParser();
+      return parser.stream().map(this::parseRecord).onClose(() -> tryClose(parser));
     } catch (NoSuchFileException e) {
-      return List.of();
+      return Stream.empty();
     } catch (IOException e) {
       throw new UncheckedIOException("Error reading CSV file", e);
     }
   }
-
-  @Override
-  public void deleteById(Long ids) {}
 
   private CSVPrinter createPrinter() throws IOException {
     var format = createCsvFormat();
@@ -80,16 +74,14 @@ public class CsvActivitiesRepository extends AbstractActivitiesRepository {
     return format.parse(reader);
   }
 
-  private ActivityDto parseRecord(CSVRecord record) {
-    var id = record.getRecordNumber();
+  private ActivityLoggedEvent parseRecord(CSVRecord record) {
     var timestamp = record.get(TIMESTAMP_COLUMN);
     var duration = record.get(DURATION_COLUMN);
     var client = record.get(CLIENT_COLUMN);
     var project = record.get(PROJECT_COLUMN);
     var task = record.get(TASK_COLUMN);
     var notes = record.get(NOTES_COLUMN);
-    return ActivityDto.builder()
-        .id(id)
+    return ActivityLoggedEvent.builder()
         .timestamp(Instant.parse(timestamp))
         .duration(Duration.parse(duration))
         .client(client)
@@ -112,5 +104,13 @@ public class CsvActivitiesRepository extends AbstractActivitiesRepository {
         .setSkipHeaderRecord(Files.exists(file))
         .setNullString("")
         .get();
+  }
+
+  private void tryClose(Closeable closeable) {
+    try {
+      closeable.close();
+    } catch (IOException e) {
+      throw new UncheckedIOException(e);
+    }
   }
 }

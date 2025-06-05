@@ -29,7 +29,6 @@ public record LogActivityCommand(
         .client("ACME Inc.")
         .project("Foobar")
         .task("Do something")
-        .notes(null)
         .build();
   }
 }

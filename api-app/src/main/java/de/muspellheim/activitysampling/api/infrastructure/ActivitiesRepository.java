@@ -10,5 +10,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ActivitiesRepository extends ListCrudRepository<ActivityDto, Long> {
 
-  List<ActivityDto> findByTimestampGreaterThanEqualOrderByTimestampDesc(Instant start);
+  List<ActivityDto> findByTimestampGreaterThanEqualAndTimestampBefore(Instant from, Instant to);
 }
