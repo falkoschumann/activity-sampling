@@ -1,8 +1,8 @@
+app:
+  file-store:
+    file: testdata/activities-store-e2e.csv
+
 spring:
-  datasource:
-    url: jdbc:h2:mem:test
-    username: sa
-    password:
   security:
     user:
       name: user

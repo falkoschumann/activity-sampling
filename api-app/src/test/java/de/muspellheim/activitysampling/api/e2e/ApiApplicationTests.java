@@ -10,6 +10,10 @@ import de.muspellheim.activitysampling.api.domain.activities.RecentActivitiesQue
 import de.muspellheim.activitysampling.api.domain.authentication.AccountInfo;
 import de.muspellheim.activitysampling.api.domain.authentication.AuthenticationQueryResult;
 import de.muspellheim.activitysampling.api.domain.common.CommandStatus;
+import de.muspellheim.activitysampling.api.infrastructure.ActivityLoggedEvent;
+import de.muspellheim.activitysampling.api.infrastructure.CsvActivitiesStore;
+import de.muspellheim.activitysampling.api.infrastructure.FileStoreConfiguration;
+import java.nio.file.Files;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
@@ -39,6 +43,10 @@ class ApiApplicationTests {
 
   @LocalServerPort int port;
 
+  @Autowired private FileStoreConfiguration configuration;
+
+  @Autowired private CsvActivitiesStore store;
+
   @Autowired RestTemplateBuilder restTemplateBuilder;
 
   private TestRestTemplate restTemplate;
@@ -49,7 +57,8 @@ class ApiApplicationTests {
   }
 
   @BeforeEach
-  void init() {
+  void init() throws Exception {
+    Files.deleteIfExists(configuration.file());
     var restTemplate = restTemplateBuilder.rootUri("http://localhost:" + port);
     this.restTemplate =
         new TestRestTemplate(restTemplate, "user", "password", HttpClientOption.ENABLE_COOKIES);
@@ -112,6 +121,16 @@ class ApiApplicationTests {
 
     @Test
     void queriesRecentActivities() {
+      var event = ActivityLoggedEvent.createTestInstance();
+      store.record(
+          event
+              .withTimestamp(Instant.parse("2024-12-17T15:00:00Z"))
+              .withTask("Make things")
+              .withNotes("This is a note"));
+      store.record(event.withTimestamp(Instant.parse("2024-12-17T15:30:00Z")));
+      store.record(event.withTimestamp(Instant.parse("2024-12-17T16:00:00Z")));
+      store.record(event.withTimestamp(Instant.parse("2024-12-18T08:30:00Z")));
+
       var response =
           restTemplate.getForEntity(
               "/api/activities/recent-activities?today=2024-12-18&timeZone=Europe/Berlin",

@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
-import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.time.Duration;
 import java.time.Instant;
@@ -17,7 +16,9 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.csv.CSVRecord;
+import org.springframework.stereotype.Component;
 
+@Component
 public class CsvActivitiesStore implements ActivitiesStore {
 
   public static final String TIMESTAMP_COLUMN = "Timestamp";
@@ -27,10 +28,10 @@ public class CsvActivitiesStore implements ActivitiesStore {
   public static final String TASK_COLUMN = "Task";
   public static final String NOTES_COLUMN = "Notes";
 
-  private final Path file;
+  private final FileStoreConfiguration configuration;
 
-  public CsvActivitiesStore(Path file) {
-    this.file = file;
+  public CsvActivitiesStore(FileStoreConfiguration configuration) {
+    this.configuration = configuration;
   }
 
   @Override
@@ -44,7 +45,8 @@ public class CsvActivitiesStore implements ActivitiesStore {
           event.task(),
           event.notes());
     } catch (IOException e) {
-      throw new UncheckedIOException("Failed to append activity to file " + file, e);
+      throw new UncheckedIOException(
+          "Failed to append activity to file " + configuration.file(), e);
     }
   }
 
@@ -61,16 +63,20 @@ public class CsvActivitiesStore implements ActivitiesStore {
   }
 
   private CSVPrinter createPrinter() throws IOException {
+    Files.createDirectories(configuration.file().getParent());
     var format = createCsvFormat();
     var writer =
         Files.newBufferedWriter(
-            file, StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.APPEND);
+            configuration.file(),
+            StandardOpenOption.CREATE,
+            StandardOpenOption.WRITE,
+            StandardOpenOption.APPEND);
     return new CSVPrinter(writer, format);
   }
 
   private CSVParser createParser() throws IOException {
     var format = createCsvFormat();
-    var reader = Files.newBufferedReader(file);
+    var reader = Files.newBufferedReader(configuration.file());
     return format.parse(reader);
   }
 
@@ -101,7 +107,7 @@ public class CsvActivitiesStore implements ActivitiesStore {
             PROJECT_COLUMN,
             TASK_COLUMN,
             NOTES_COLUMN)
-        .setSkipHeaderRecord(Files.exists(file))
+        .setSkipHeaderRecord(Files.exists(configuration.file()))
         .setNullString("")
         .get();
   }

@@ -1,10 +1,10 @@
 spring:
   application:
     name: api-app
-  datasource:
-    url: jdbc:postgresql://localhost:5432/activitysampling
-    username:
-    password:
+
+app:
+  file-store:
+    file: data/activity-log.csv
 
 server:
   servlet:

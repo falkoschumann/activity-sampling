@@ -1,7 +1,4 @@
 spring:
-  datasource:
-    username: activitysampling
-    password: activitysampling
   security:
     user:
       name: user

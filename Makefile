@@ -16,10 +16,10 @@ distclean-root:
 dist: $(SUBDIRS)
 dist: TARGET=dist
 
-start:
+up:
 	docker compose up --build --detach
 
-stop:
+down:
 	docker compose down
 
 root: check-root
@@ -39,15 +39,12 @@ format: TARGET=format
 format-root:
 	npx prettier --write $(ROOT_FILES)
 
-dev: build dev-root
+dev: build
 	npx concurrently \
 		--kill-others \
 		--names "WEB,API" \
 		--prefix-colors "bgMagenta.bold,bgGreen.bold" \
 		$(foreach dir,$(SUBDIRS),"$(MAKE) -C $(dir) dev")
-
-dev-root:
-	docker compose up --detach database
 
 test: $(SUBDIRS)
 test: TARGET=test
