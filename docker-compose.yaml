@@ -5,7 +5,7 @@ services:
       - web-app
       - api-app
     ports:
-      - "3000:8080"
+      - "8080:8080"
 
   web-app:
     build: web-app
@@ -14,23 +14,12 @@ services:
 
   api-app:
     build: api-app
-    depends_on:
-      - database
     env_file:
-      - .env
-      - path: .env.local
-        required: false
+      - .env.local
     ports:
       - "8082:8080"
-
-  database:
-    image: postgres
-    env_file:
-      - .env
-    ports:
-      - "5432:5432"
     volumes:
-      - database-data:/var/lib/postgresql/data
+      - store-data:/app/data
 
 volumes:
-  database-data:
+  store-data:

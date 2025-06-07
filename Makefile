@@ -22,6 +22,11 @@ up:
 down:
 	docker compose down
 
+prune:
+	docker container prune
+	docker image prune --all
+	docker volume prune --all
+
 root: check-root
 
 doc:
@@ -61,7 +66,8 @@ $(SUBDIRS): force
 force: ;
 
 .PHONY: \
-	all clean distclean distclean-root dist start stop \
+	all clean distclean distclean-root dist \
+	up down prune \
 	root doc \
 	check check-root format format-root \
 	dev test \

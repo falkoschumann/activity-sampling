@@ -37,8 +37,13 @@ public class SpaConfiguration implements WebMvcConfigurer {
                   return resource;
                 }
 
-                // Fallback to index.html for SPA routing
-                return new ClassPathResource("/static/index.html");
+                // Fallback to index.html for SPA routing if file exists
+                resource = new ClassPathResource("/static/index.html");
+                if (resource.exists() && resource.isReadable()) {
+                  return resource;
+                }
+
+                return null;
               }
             });
   }
