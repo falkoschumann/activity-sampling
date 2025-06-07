@@ -53,12 +53,13 @@ analysis.
 ```mermaid
 classDiagram
     class IntervalElapsed {
-        start: Date
+        timestamp: Timestamp
         duration: Duration
+        activity?: Activity
     }
 
     class ActivityLogged {
-        start: Date
+        timestamp: Timestamp
         duration: Duration
         client: String
         project: String
