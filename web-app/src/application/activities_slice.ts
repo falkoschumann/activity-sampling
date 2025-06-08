@@ -145,7 +145,7 @@ const progressCountdown = createAsyncThunk<
     notificationClient.show(
       "What are you working on?",
       currentActivityForm.task.length > 0
-        ? currentActivityForm.task
+        ? `${currentActivityForm.project} (${currentActivityForm.client}) ${currentActivityForm.task}`
         : undefined,
       "/apple-touch-icon.png",
     );
