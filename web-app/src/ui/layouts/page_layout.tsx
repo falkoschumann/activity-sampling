@@ -11,24 +11,64 @@ export default function PageLayout({ children }: { children?: React.ReactNode })
   return (
     <>
       <header className="sticky-top">
-        <nav className="navbar navbar-dark bg-primary">
+        <nav className="navbar navbar-expand-lg navbar-dark bg-primary">
           <div className="container">
             <a className="navbar-brand" href="/">
               Activity Sampling
             </a>
-            <div className="d-flex gap-2">
-              <AuthenticatedTemplate>
-                <Profile />
-                <a className="btn btn-outline-light" href="/logout">
-                  Sign out
-                </a>
-              </AuthenticatedTemplate>
-              <UnauthenticatedTemplate>
+            <AuthenticatedTemplate>
+              <button
+                className="navbar-toggler"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#navbarSupportedContent"
+                aria-controls="navbarSupportedContent"
+                aria-expanded="false"
+                aria-label="Toggle navigation"
+              >
+                <span className="navbar-toggler-icon"></span>
+              </button>
+              <div className="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul className="navbar-nav me-auto mb-2 mb-lg-0">
+                  <li className="nav-item">
+                    <a className="nav-link active" aria-current="page" href="/">
+                      Log
+                    </a>
+                  </li>
+                  <li className="nav-item dropdown">
+                    <a
+                      className="nav-link dropdown-toggle"
+                      href="#"
+                      role="button"
+                      data-bs-toggle="dropdown"
+                      aria-expanded="false"
+                    >
+                      Report
+                    </a>
+                    <ul className="dropdown-menu">
+                      <li>
+                        <a className="dropdown-item" href="/report/timesheet">
+                          Timesheet
+                        </a>
+                      </li>
+                    </ul>
+                  </li>
+                </ul>
+                <div className="d-flex gap-2">
+                  <Profile />
+                  <a className="btn btn-outline-light" href="/logout">
+                    Sign out
+                  </a>
+                </div>
+              </div>
+            </AuthenticatedTemplate>
+            <UnauthenticatedTemplate>
+              <div className="d-flex gap-2">
                 <a className="btn btn-outline-light" href="/login">
                   Sign in
                 </a>
-              </UnauthenticatedTemplate>
-            </div>
+              </div>
+            </UnauthenticatedTemplate>
           </div>
         </nav>
       </header>

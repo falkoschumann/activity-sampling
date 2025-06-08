@@ -24,6 +24,7 @@ import { Activity, WorkingDay } from "../../domain/activities";
 import { Duration } from "../../domain/duration";
 import { EventHandler } from "../../util/types";
 import ErrorComponent from "../components/error_component";
+import PageLayout from "../layouts/page_layout";
 
 export default function ActivitiesPage() {
   const error = useSelector(selectError);
@@ -34,7 +35,7 @@ export default function ActivitiesPage() {
   }, [dispatch]);
 
   return (
-    <>
+    <PageLayout>
       <aside className="container my-4">
         <ErrorComponent {...error} />
         <CurrentActivityForm />
@@ -48,7 +49,7 @@ export default function ActivitiesPage() {
           <TimeSummaryComponent />
         </div>
       </footer>
-    </>
+    </PageLayout>
   );
 }
 
