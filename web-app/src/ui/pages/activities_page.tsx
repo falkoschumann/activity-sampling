@@ -317,7 +317,7 @@ function ActivityComponent({
       <div>
         <div className="ms-2 me-auto">
           <div>
-            {activity.project} ({activity.client}) {activity.task}
+            <strong>{activity.project}</strong> ({activity.client}) {activity.task}
           </div>
           {activity.notes && <small className="text-body-tertiary">{activity.notes}</small>}
         </div>
