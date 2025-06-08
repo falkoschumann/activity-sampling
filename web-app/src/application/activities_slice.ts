@@ -186,7 +186,9 @@ const activitiesSlice = createSlice({
     },
     countdownStarted: (state) => {
       state.currentActivityForm.disabled = true;
-      state.currentActivityForm.loggable = true;
+      state.currentActivityForm.loggable = isLoggable(
+        state.currentActivityForm,
+      );
       state.countdown.remaining = state.countdown.duration;
       state.countdown.percentage = 0;
       state.countdown.isRunning = true;
@@ -318,5 +320,5 @@ function isLoggable({
   project: string;
   task: string;
 }) {
-  return !(Boolean(client) && Boolean(project) && Boolean(task));
+  return client.length > 0 && project.length > 0 && task.length > 0;
 }

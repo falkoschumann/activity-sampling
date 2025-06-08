@@ -156,7 +156,7 @@ describe("Activities", () => {
         task: "",
         notes: "",
         disabled: false,
-        loggable: true,
+        loggable: false,
       });
 
       store.dispatch(changeText({ name: "project", text: "project-1" }));
@@ -166,7 +166,7 @@ describe("Activities", () => {
         task: "",
         notes: "",
         disabled: false,
-        loggable: true,
+        loggable: false,
       });
 
       store.dispatch(changeText({ name: "task", text: "task-1" }));
@@ -176,7 +176,7 @@ describe("Activities", () => {
         task: "task-1",
         notes: "",
         disabled: false,
-        loggable: false,
+        loggable: true,
       });
 
       store.dispatch(changeText({ name: "notes", text: "notes-1" }));
@@ -186,7 +186,7 @@ describe("Activities", () => {
         task: "task-1",
         notes: "notes-1",
         disabled: false,
-        loggable: false,
+        loggable: true,
       });
     });
 
@@ -240,7 +240,7 @@ describe("Activities", () => {
         task: "task-1",
         notes: "notes-1",
         disabled: false,
-        loggable: false,
+        loggable: true,
       });
       expect(selectRecentActivities(store.getState())).toEqual([
         {
@@ -286,7 +286,7 @@ describe("Activities", () => {
         task: "",
         notes: "",
         disabled: true,
-        loggable: true,
+        loggable: false,
       });
     });
 
@@ -302,7 +302,7 @@ describe("Activities", () => {
         task: "",
         notes: "",
         disabled: false,
-        loggable: true,
+        loggable: false,
       });
     });
 
@@ -318,7 +318,7 @@ describe("Activities", () => {
         task: "",
         notes: "",
         disabled: false,
-        loggable: true,
+        loggable: false,
       });
     });
 
@@ -436,7 +436,7 @@ describe("Activities", () => {
         task: "task-1",
         notes: "notes-1",
         disabled: false,
-        loggable: false,
+        loggable: true,
       });
     });
   });
@@ -487,7 +487,7 @@ describe("Activities", () => {
         task: "Do something",
         notes: "Lorem ipsum",
         disabled: false,
-        loggable: false,
+        loggable: true,
       });
       expect(selectRecentActivities(store.getState())).toEqual([
         {

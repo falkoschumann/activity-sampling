@@ -20,19 +20,13 @@ import {
   stopCountdown,
 } from "../../application/activities_slice";
 import { AppDispatch } from "../../application/store";
-import { Activity, TimeSummary, WorkingDay } from "../../domain/activities";
+import { Activity, WorkingDay } from "../../domain/activities";
 import { Duration } from "../../domain/duration";
 import { EventHandler } from "../../util/types";
 import ErrorComponent from "../components/error_component";
 
 export default function ActivitiesPage() {
   const error = useSelector(selectError);
-  const currentActivityForm = useSelector(selectCurrentActivityForm);
-  const countdown = useSelector(selectCountdown);
-  const recentActivities = useSelector(selectRecentActivities);
-  const timeZone = useSelector(selectTimeZone);
-  const timeSummary = useSelector(selectTimeSummary);
-
   const dispatch = useDispatch<AppDispatch>();
 
   useEffect(() => {
@@ -43,65 +37,41 @@ export default function ActivitiesPage() {
     <>
       <aside className="container my-4">
         <ErrorComponent {...error} />
-        <CurrentActivityForm
-          {...currentActivityForm}
-          onChange={(event) => dispatch(changeText(event))}
-          onSubmit={() => dispatch(logActivity({}))}
-        />
-        <CountdownComponent
-          {...countdown}
-          onStart={() => dispatch(startCountdown({}))}
-          onStop={() => dispatch(stopCountdown({}))}
-          onChange={(event) => dispatch(durationSelected(event))}
-        />
+        <CurrentActivityForm />
+        <CountdownComponent />
       </aside>
       <main className="container my-4">
-        <RecentActivitiesContainer
-          recentActivities={recentActivities}
-          timeZone={timeZone}
-          onSelect={({ activity }) => dispatch(activitySelected(activity))}
-        />
+        <RecentActivitiesContainer />
       </main>
       <footer className="fixed-bottom bg-body-secondary">
         <div className="container py-2">
-          <TimeSummaryComponent {...timeSummary} />
+          <TimeSummaryComponent />
         </div>
       </footer>
     </>
   );
 }
 
-function CurrentActivityForm({
-  client,
-  project,
-  task,
-  notes,
-  disabled,
-  loggable,
-  onChange,
-  onSubmit,
-}: {
-  client: string;
-  project: string;
-  task: string;
-  notes: string;
-  disabled: boolean;
-  loggable: boolean;
-  onChange: EventHandler<{ name: "client" | "project" | "task" | "notes"; text: string }>;
-  onSubmit: EventHandler;
-}) {
+function CurrentActivityForm() {
+  const { client, project, task, notes, disabled, loggable } = useSelector(selectCurrentActivityForm);
+  const dispatch = useDispatch<AppDispatch>();
+
+  function handleChange(event: { name: "client" | "project" | "task" | "notes"; text: string }) {
+    dispatch(changeText(event));
+  }
+
   function handleSubmitted(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    onSubmit();
+    dispatch(logActivity({}));
   }
 
   return (
     <form onSubmit={handleSubmitted}>
-      <FormInput name="client" title="Client" disabled={disabled} value={client} onChange={onChange} />
-      <FormInput name="project" title="Project" disabled={disabled} value={project} onChange={onChange} />
-      <FormInput name="task" title="Task" disabled={disabled} value={task} onChange={onChange} />
-      <FormInput name="notes" title="Notes" disabled={disabled} value={notes} onChange={onChange} />
-      <button type="submit" className="btn btn-primary btn-sm w-100" disabled={disabled || loggable}>
+      <FormInput name="client" title="Client" disabled={disabled} value={client} onChange={handleChange} />
+      <FormInput name="project" title="Project" disabled={disabled} value={project} onChange={handleChange} />
+      <FormInput name="task" title="Task" disabled={disabled} value={task} onChange={handleChange} />
+      <FormInput name="notes" title="Notes" disabled={disabled} value={notes} onChange={handleChange} />
+      <button type="submit" className="btn btn-primary btn-sm w-100" disabled={disabled || !loggable}>
         Log
       </button>
     </form>
@@ -141,28 +111,19 @@ function FormInput({
   );
 }
 
-function CountdownComponent({
-  duration,
-  remaining,
-  percentage,
-  isRunning,
-  onStart,
-  onStop,
-  onChange,
-}: {
-  duration: string;
-  remaining: string;
-  percentage: number;
-  isRunning: boolean;
-  onStart: EventHandler;
-  onStop: EventHandler;
-  onChange: EventHandler<{ duration: string }>;
-}) {
+function CountdownComponent() {
+  const { duration, remaining, percentage, isRunning } = useSelector(selectCountdown);
+  const dispatch = useDispatch<AppDispatch>();
+
+  function handleChange(event: { duration: string }) {
+    dispatch(durationSelected(event));
+  }
+
   function handleToggled(event: React.ChangeEvent<HTMLInputElement>) {
     if (event.target.checked) {
-      onStart();
+      dispatch(startCountdown({}));
     } else {
-      onStop();
+      dispatch(stopCountdown({}));
     }
   }
 
@@ -203,13 +164,13 @@ function CountdownComponent({
             <span className="visually-hidden">Toggle Dropdown</span>
           </button>
           <ul className="dropdown-menu">
-            <DurationItem duration="PT5M" active={duration === "PT5M"} onChange={onChange} />
-            <DurationItem duration="PT10M" active={duration === "PT10M"} onChange={onChange} />
-            <DurationItem duration="PT15M" active={duration === "PT15M"} onChange={onChange} />
-            <DurationItem duration="PT20M" active={duration === "PT20M"} onChange={onChange} />
-            <DurationItem duration="PT30M" active={duration === "PT30M"} onChange={onChange} />
-            <DurationItem duration="PT60M" active={duration === "PT60M"} onChange={onChange} />
-            <DurationItem duration="PT1M" active={duration === "PT1M"} onChange={onChange} />
+            <DurationItem duration="PT5M" active={duration === "PT5M"} onChange={handleChange} />
+            <DurationItem duration="PT10M" active={duration === "PT10M"} onChange={handleChange} />
+            <DurationItem duration="PT15M" active={duration === "PT15M"} onChange={handleChange} />
+            <DurationItem duration="PT20M" active={duration === "PT20M"} onChange={handleChange} />
+            <DurationItem duration="PT30M" active={duration === "PT30M"} onChange={handleChange} />
+            <DurationItem duration="PT60M" active={duration === "PT60M"} onChange={handleChange} />
+            <DurationItem duration="PT1M" active={duration === "PT1M"} onChange={handleChange} />
           </ul>
         </div>
       </div>
@@ -245,21 +206,21 @@ function DurationItem({
   );
 }
 
-function RecentActivitiesContainer({
-  recentActivities,
-  timeZone,
-  onSelect,
-}: {
-  recentActivities: WorkingDay[];
-  timeZone: string;
-  onSelect: EventHandler<{ activity: Activity }>;
-}) {
+function RecentActivitiesContainer() {
+  const recentActivities = useSelector(selectRecentActivities);
+  const timeZone = useSelector(selectTimeZone);
+  const dispatch = useDispatch<AppDispatch>();
+
+  function handleSelect(event: { activity: Activity }) {
+    dispatch(activitySelected(event.activity));
+  }
+
   return recentActivities.map((workingDay) => (
     <WorkingDayComponent
       key={new Date(workingDay.date).toISOString()}
       workingDay={workingDay}
       timeZone={timeZone}
-      onSelect={onSelect}
+      onSelect={handleSelect}
     />
   ));
 }
@@ -326,7 +287,9 @@ function ActivityComponent({
   );
 }
 
-function TimeSummaryComponent({ hoursToday, hoursYesterday, hoursThisWeek, hoursThisMonth }: TimeSummary) {
+function TimeSummaryComponent() {
+  const { hoursToday, hoursYesterday, hoursThisWeek, hoursThisMonth } = useSelector(selectTimeSummary);
+
   return (
     <div className="d-flex justify-content-center flex-wrap text-center">
       <div className="flex-fill">
