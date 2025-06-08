@@ -50,19 +50,14 @@ export class NotificationClient extends EventTarget {
     }
   }
 
-  show(title: string, body?: string, iconUrl?: string) {
+  show(title: string, options: NotificationOptions = {}) {
     if (this.isGranted) {
       this.hide();
-      this.#notification = new this.#notificationConstructor(title, {
-        body,
-        icon: iconUrl,
-      });
+      this.#notification = new this.#notificationConstructor(title, options);
+      this.#notification.onclick = () => this.hide();
       this.dispatchEvent(
         new CustomEvent(NOTIFICATION_SHOWN_EVENT, {
-          detail: {
-            title,
-            body,
-          },
+          detail: { title, ...options },
         }),
       );
     }

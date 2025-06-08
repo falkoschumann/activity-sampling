@@ -25,7 +25,7 @@ describe("Notification client", () => {
       await client.requestPermission();
       const shownNotifications = client.trackNotificationsShown();
 
-      client.show("title", "body");
+      client.show("title", { body: "body" });
 
       expect(shownNotifications.data).toEqual([
         {
@@ -41,8 +41,8 @@ describe("Notification client", () => {
       const shownNotifications = client.trackNotificationsShown();
       const hiddenNotifications = client.trackNotificationsHidden();
 
-      client.show("title1", "body1");
-      client.show("title2", "body2");
+      client.show("title1", { body: "body1" });
+      client.show("title2", { body: "body2" });
 
       expect(shownNotifications.data).toEqual([
         { title: "title1", body: "body1" },
@@ -58,7 +58,7 @@ describe("Notification client", () => {
       await client.requestPermission();
       const shownNotifications = client.trackNotificationsShown();
 
-      client.show("title", "body");
+      client.show("title", { body: "body" });
 
       expect(shownNotifications.data).toEqual([]);
     });
@@ -68,7 +68,7 @@ describe("Notification client", () => {
     it("Hides notification", async () => {
       const client = NotificationClient.createNull();
       await client.requestPermission();
-      client.show("title", "body");
+      client.show("title", { body: "body" });
       const hiddenNotifications = client.trackNotificationsHidden();
 
       client.hide();
@@ -94,7 +94,7 @@ describe("Notification client", () => {
     it("Does nothing when notification is already hidden", async () => {
       const client = NotificationClient.createNull();
       await client.requestPermission();
-      client.show("title", "body");
+      client.show("title", { body: "body" });
       client.hide();
       const hiddenNotifications = client.trackNotificationsHidden();
 

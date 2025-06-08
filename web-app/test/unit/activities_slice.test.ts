@@ -88,7 +88,11 @@ describe("Activities", () => {
         isRunning: true,
       });
       expect(shownNotifications.data).toEqual([
-        { title: "What are you working on?" },
+        {
+          title: "What are you working on?",
+          icon: expect.any(String),
+          requireInteraction: true,
+        },
       ]);
     });
 
@@ -140,7 +144,11 @@ describe("Activities", () => {
         isRunning: true,
       });
       expect(shownNotifications.data).toEqual([
-        { title: "What are you working on?" },
+        {
+          title: "What are you working on?",
+          icon: expect.any(String),
+          requireInteraction: true,
+        },
       ]);
     });
   });

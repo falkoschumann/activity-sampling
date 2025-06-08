@@ -142,13 +142,14 @@ const progressCountdown = createAsyncThunk<
   const remaining = Duration.parse(countdown.remaining);
   if (notificationClient.isGranted && !remaining.isPositive()) {
     const currentActivityForm = selectCurrentActivityForm(thunkAPI.getState());
-    notificationClient.show(
-      "What are you working on?",
-      currentActivityForm.task.length > 0
-        ? `${currentActivityForm.project} (${currentActivityForm.client}) ${currentActivityForm.task}`
-        : undefined,
-      "/apple-touch-icon.png",
-    );
+    notificationClient.show("What are you working on?", {
+      body:
+        currentActivityForm.task.length > 0
+          ? `${currentActivityForm.project} (${currentActivityForm.client}) ${currentActivityForm.task}`
+          : undefined,
+      icon: "/apple-touch-icon.png",
+      requireInteraction: true,
+    });
   }
 });
 
