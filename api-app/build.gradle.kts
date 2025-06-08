@@ -32,6 +32,7 @@ dependencies {
   implementation("org.apache.commons:commons-csv:1.14.0")
   implementation("com.azure.spring:spring-cloud-azure-starter-active-directory")
   implementation("com.azure.spring:spring-cloud-azure-starter-actuator")
+  implementation("org.mnode.ical4j:ical4j:4.1.1")
   implementation("org.springframework.boot:spring-boot-starter-actuator")
   implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
   implementation("org.springframework.boot:spring-boot-starter-security")
