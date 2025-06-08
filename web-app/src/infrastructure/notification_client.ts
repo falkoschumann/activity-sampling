@@ -17,10 +17,14 @@ export class NotificationClient extends EventTarget {
       permission: NotificationPermission;
     } = { permission: "granted" },
   ) {
-    return new NotificationClient(createNotificationStub(permission));
+    NotificationStub.permission = "default";
+    NotificationStub.expectedPermission = permission;
+    return new NotificationClient(
+      NotificationStub as unknown as typeof Notification,
+    );
   }
 
-  readonly #notificationConstructor;
+  readonly #notificationConstructor: typeof Notification;
   #notification?: Notification;
 
   constructor(notificationConstructor: typeof Notification) {
@@ -88,13 +92,6 @@ export class NotificationClient extends EventTarget {
   trackNotificationsHidden() {
     return OutputTracker.create(this, NOTIFICATION_HIDDEN_EVENT);
   }
-}
-
-function createNotificationStub(permission: NotificationPermission) {
-  NotificationStub.permission = "default";
-  NotificationStub.expectedPermission = permission;
-
-  return NotificationStub as unknown as typeof Notification;
 }
 
 class NotificationStub {

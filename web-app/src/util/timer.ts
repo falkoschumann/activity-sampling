@@ -7,25 +7,30 @@ export type Task = () => void;
 
 export type Cancel = () => void;
 
+type TimeoutId = NodeJS.Timeout | number;
+
 export class Timer extends EventTarget {
   static create() {
     return new Timer(Clock.create(), globalThis);
   }
 
   static createNull(fixedDate?: Date) {
-    return new Timer(Clock.createNull(fixedDate), new GlobalStub());
+    return new Timer(
+      Clock.createNull(fixedDate),
+      new GlobalStub() as unknown as typeof globalThis,
+    );
   }
 
-  #global: GlobalStub;
-  #clock: Clock;
+  readonly #global: typeof globalThis;
+  readonly #clock: Clock;
 
-  private constructor(clock: Clock, global: GlobalStub) {
+  private constructor(clock: Clock, global: typeof globalThis) {
     super();
     this.#clock = clock;
     this.#global = global;
   }
 
-  #tasks = new Map<unknown, Task>();
+  #tasks = new Map<TimeoutId, Task>();
 
   schedule(task: Task, delay: number, period?: number): Cancel;
   schedule(task: Task, firstTime: Date, period?: number): Cancel;
@@ -93,7 +98,7 @@ export class Timer extends EventTarget {
     }
   }
 
-  #cancel(timeoutId: unknown) {
+  #cancel(timeoutId: TimeoutId) {
     this.#global.clearTimeout(timeoutId);
     this.#tasks.delete(timeoutId);
     this.dispatchEvent(
@@ -102,16 +107,16 @@ export class Timer extends EventTarget {
   }
 }
 
-let timeoutIdStub = 0;
-
 class GlobalStub {
-  setTimeout(_callback: () => void, _ms?: number): unknown {
-    return timeoutIdStub++;
+  static timeoutIdStub = 0;
+
+  setTimeout(_callback: () => void, _ms?: number): TimeoutId {
+    return GlobalStub.timeoutIdStub++;
   }
 
-  clearTimeout(_timeoutId: unknown) {}
+  clearTimeout(_timeoutId?: TimeoutId) {}
 
-  setInterval(_callback: () => void, _ms?: number): unknown {
-    return timeoutIdStub++;
+  setInterval(_callback: () => void, _ms?: number): TimeoutId {
+    return GlobalStub.timeoutIdStub++;
   }
 }
