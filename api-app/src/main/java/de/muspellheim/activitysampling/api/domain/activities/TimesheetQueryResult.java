@@ -5,6 +5,7 @@ package de.muspellheim.activitysampling.api.domain.activities;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import java.time.Duration;
+import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.List;
 import lombok.Builder;
@@ -21,7 +22,11 @@ public record TimesheetQueryResult(
 
   public static TimesheetQueryResult createTestInstance() {
     return TimesheetQueryResult.builder()
-        .entries(List.of()) // TODO add example entries
+        .entries(
+            List.of(
+                TimesheetEntry.createTestInstance().withDate(LocalDate.parse("2025-06-02")),
+                TimesheetEntry.createTestInstance().withDate(LocalDate.parse("2025-06-03"))))
+        .totalHours(Duration.ofHours(4))
         .timeZone(ZoneId.of("Europe/Berlin"))
         .build();
   }

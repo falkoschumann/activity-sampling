@@ -6,6 +6,8 @@ import de.muspellheim.activitysampling.api.application.ActivitiesService;
 import de.muspellheim.activitysampling.api.domain.activities.LogActivityCommand;
 import de.muspellheim.activitysampling.api.domain.activities.RecentActivitiesQuery;
 import de.muspellheim.activitysampling.api.domain.activities.RecentActivitiesQueryResult;
+import de.muspellheim.activitysampling.api.domain.activities.TimesheetQuery;
+import de.muspellheim.activitysampling.api.domain.activities.TimesheetQueryResult;
 import de.muspellheim.activitysampling.api.domain.common.CommandStatus;
 import jakarta.validation.Valid;
 import java.time.LocalDate;
@@ -33,9 +35,17 @@ public class ActivitiesController {
   }
 
   @GetMapping("/recent-activities")
-  public RecentActivitiesQueryResult recentActivities(
+  public RecentActivitiesQueryResult queryRecentActivities(
       @RequestParam(required = false) @Valid LocalDate today,
       @RequestParam(required = false) @Valid ZoneId timeZone) {
     return this.service.queryRecentActivities(new RecentActivitiesQuery(today, timeZone));
+  }
+
+  @GetMapping("/timesheet")
+  public TimesheetQueryResult queryTimesheet(
+      @RequestParam @Valid LocalDate from,
+      @RequestParam @Valid LocalDate to,
+      @RequestParam(required = false) @Valid ZoneId timeZone) {
+    return this.service.queryTimesheet(new TimesheetQuery(from, to, timeZone));
   }
 }

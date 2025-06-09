@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import de.muspellheim.activitysampling.api.domain.activities.LogActivityCommand;
 import de.muspellheim.activitysampling.api.domain.activities.RecentActivitiesQueryResult;
+import de.muspellheim.activitysampling.api.domain.activities.TimesheetQueryResult;
 import de.muspellheim.activitysampling.api.domain.authentication.AccountInfo;
 import de.muspellheim.activitysampling.api.domain.authentication.AuthenticationQueryResult;
 import de.muspellheim.activitysampling.api.domain.common.CommandStatus;
@@ -154,6 +155,49 @@ class ApiApplicationTests {
     void failsWhenQueryIsNotValid() {
       var response =
           restTemplate.getForEntity("/api/activities/recent-activities?today=foobar", String.class);
+
+      assertEquals(400, response.getStatusCode().value());
+    }
+  }
+
+  @Nested
+  class QueryTimesheet {
+
+    @Test
+    void queriesTimesheet() {
+      var event = ActivityLoggedEvent.createTestInstance();
+      store.record(event.withTimestamp(Instant.parse("2025-06-02T13:30:00Z")));
+      store.record(event.withTimestamp(Instant.parse("2025-06-02T14:00:00Z")));
+      store.record(event.withTimestamp(Instant.parse("2025-06-02T14:30:00Z")));
+      store.record(event.withTimestamp(Instant.parse("2025-06-02T15:00:00Z")));
+      store.record(event.withTimestamp(Instant.parse("2025-06-03T08:30:00Z")));
+      store.record(event.withTimestamp(Instant.parse("2025-06-03T09:00:00Z")));
+      store.record(event.withTimestamp(Instant.parse("2025-06-03T09:30:00Z")));
+      store.record(event.withTimestamp(Instant.parse("2025-06-03T10:00:00Z")));
+
+      var response =
+          restTemplate.getForEntity(
+              "/api/activities/timesheet?from=2025-06-02&to=2025-06-09&timeZone=Europe/Berlin",
+              TimesheetQueryResult.class);
+
+      assertEquals(200, response.getStatusCode().value());
+      assertEquals(TimesheetQueryResult.createTestInstance(), response.getBody());
+    }
+
+    @Test
+    void failsWhenQueryIsNotSet() {
+      var response =
+          restTemplate.getForEntity("/api/activities/timesheet", TimesheetQueryResult.class);
+
+      assertEquals(400, response.getStatusCode().value());
+    }
+
+    @Test
+    void failsWhenQueryIsNotValid() {
+      var response =
+          restTemplate.getForEntity(
+              "/api/activities/timesheet?from=foobar&to=2025-06-09&timeZone=Europe/Berlin",
+              TimesheetQueryResult.class);
 
       assertEquals(400, response.getStatusCode().value());
     }
