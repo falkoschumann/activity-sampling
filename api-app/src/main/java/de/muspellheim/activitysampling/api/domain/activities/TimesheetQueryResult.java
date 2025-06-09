@@ -13,7 +13,8 @@ import lombok.With;
 @Builder
 @With
 @JsonInclude(Include.NON_NULL)
-public record TimesheetQueryResult(List<TimesheetEntry> entries, Duration totalHours, ZoneId timeZone) {
+public record TimesheetQueryResult(
+    List<TimesheetEntry> entries, Duration totalHours, ZoneId timeZone) {
 
   public static final TimesheetQueryResult EMPTY =
       new TimesheetQueryResult(List.of(), Duration.ZERO, ZoneId.systemDefault());

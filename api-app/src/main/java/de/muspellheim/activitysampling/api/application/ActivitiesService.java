@@ -6,18 +6,14 @@ import de.muspellheim.activitysampling.api.domain.activities.Activity;
 import de.muspellheim.activitysampling.api.domain.activities.LogActivityCommand;
 import de.muspellheim.activitysampling.api.domain.activities.RecentActivitiesQuery;
 import de.muspellheim.activitysampling.api.domain.activities.RecentActivitiesQueryResult;
-import de.muspellheim.activitysampling.api.domain.activities.TimeSummary;
 import de.muspellheim.activitysampling.api.domain.activities.TimesheetEntry;
 import de.muspellheim.activitysampling.api.domain.activities.TimesheetQuery;
 import de.muspellheim.activitysampling.api.domain.activities.TimesheetQueryResult;
-import de.muspellheim.activitysampling.api.domain.activities.WorkingDay;
 import de.muspellheim.activitysampling.api.domain.common.CommandStatus;
 import de.muspellheim.activitysampling.api.infrastructure.ActivitiesStore;
 import de.muspellheim.activitysampling.api.infrastructure.ActivityLoggedEvent;
 import java.time.Duration;
-import java.time.Instant;
 import java.time.ZoneId;
-import java.util.Comparator;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -54,20 +50,9 @@ public class ActivitiesService {
   public RecentActivitiesQueryResult queryRecentActivities(RecentActivitiesQuery query) {
     try {
       log.info("Query recent activities: {}", query);
-      var timeZone = getTimeZone(query.timeZone());
-      var today =
-          query.today() != null ? query.today() : Instant.now().atZone(timeZone).toLocalDate();
-      var from = today.minusDays(30).atStartOfDay().atZone(timeZone).toInstant();
-      var activities =
-          store
-              .replay(from)
-              .sorted(Comparator.comparing(ActivityLoggedEvent::timestamp).reversed())
-              .map(it -> map(it, timeZone))
-              .toList();
-      var recentActivities = WorkingDay.from(activities);
-      var timeSummary = TimeSummary.from(today, activities);
-      var lastActivity = activities.isEmpty() ? null : activities.get(0);
-      return new RecentActivitiesQueryResult(lastActivity, recentActivities, timeSummary, timeZone);
+      var projection = new RecentActivitiesProjection(query);
+      var replay = store.replay(projection.getFrom());
+      return projection.project(replay);
     } catch (Exception e) {
       log.error("Query recent activities failed: {}", e.getMessage(), e);
       throw e;

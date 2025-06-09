@@ -117,7 +117,7 @@ class ApiApplicationTests {
   }
 
   @Nested
-  class RecentActivities {
+  class QueryRecentActivities {
 
     @Test
     void queriesRecentActivities() {

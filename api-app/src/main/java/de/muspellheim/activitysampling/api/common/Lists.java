@@ -1,3 +1,5 @@
+// Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
+
 package de.muspellheim.activitysampling.api.common;
 
 import java.util.List;
