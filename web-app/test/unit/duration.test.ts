@@ -38,6 +38,22 @@ describe("Duration", () => {
     expect(duration.milliseconds).toBe(20 * 1000);
   });
 
+  it("Create absolute duration", () => {
+    const duration = Duration.ofMilliseconds(-5);
+
+    const result = duration.abs();
+
+    expect(result.milliseconds).toBe(5);
+  });
+
+  it("Create negated duration", () => {
+    const duration = Duration.ofMilliseconds(5);
+
+    const result = duration.negated();
+
+    expect(result.milliseconds).toBe(-5);
+  });
+
   it("Checks negative duration", () => {
     const duration = Duration.ofMilliseconds(-5);
 
@@ -147,6 +163,16 @@ describe("Duration", () => {
       expect(duration.minutesPart).toBe(3);
       expect(duration.secondsPart).toBe(2);
       expect(duration.millisecondsPart).toBe(1);
+    });
+
+    it("Parses negative value", () => {
+      const duration = Duration.parse("-PT4H3M2.001S");
+
+      expect(duration.isNegative()).toBe(true);
+      expect(duration.hoursPart).toBe(-4);
+      expect(duration.minutesPart).toBe(-3);
+      expect(duration.secondsPart).toBe(-2);
+      expect(duration.millisecondsPart).toBe(-1);
     });
 
     it("Fails to parse invalid duration", () => {

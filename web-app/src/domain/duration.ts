@@ -8,21 +8,23 @@ export class Duration {
   static ZERO = new Duration();
 
   static parse(duration: string): Duration {
-    const regex = /^PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)(\.(\d+))?S)?$/;
+    const regex = /^(-)?PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)(\.(\d+))?S)?$/;
     const matches = duration.match(regex);
     if (!matches) {
       throw new RangeError(`Invalid duration format: ${duration}.`);
     }
 
-    const hours = parseInt(matches[1] || "0", 10);
-    const minutes = parseInt(matches[2] || "0", 10);
-    const seconds = parseInt(matches[3] || "0", 10);
-    const milliseconds = parseInt((matches[5] || "0").padEnd(3, "0"), 10);
+    const sign = matches[1] === "-" ? -1 : 1;
+    const hours = parseInt(matches[2] || "0", 10);
+    const minutes = parseInt(matches[3] || "0", 10);
+    const seconds = parseInt(matches[4] || "0", 10);
+    const milliseconds = parseInt((matches[6] || "0").padEnd(3, "0"), 10);
     return new Duration(
-      hours * MILLIS_PER_HOUR +
-        minutes * MILLIS_PER_MINUTE +
-        seconds * MILLIS_PER_SECOND +
-        milliseconds,
+      sign *
+        (hours * MILLIS_PER_HOUR +
+          minutes * MILLIS_PER_MINUTE +
+          seconds * MILLIS_PER_SECOND +
+          milliseconds),
     );
   }
 
@@ -53,8 +55,9 @@ export class Duration {
   }
 
   get hoursPart(): number {
-    const part = this.milliseconds / MILLIS_PER_HOUR;
-    return Math.floor(part);
+    const sign = Math.sign(this.milliseconds);
+    const part = Math.abs(this.milliseconds) / MILLIS_PER_HOUR;
+    return sign * Math.floor(part);
   }
 
   get minutes(): number {
@@ -62,8 +65,10 @@ export class Duration {
   }
 
   get minutesPart(): number {
-    const part = this.milliseconds - this.hoursPart * MILLIS_PER_HOUR;
-    return Math.floor(part / MILLIS_PER_MINUTE);
+    const sign = Math.sign(this.milliseconds);
+    const part =
+      Math.abs(this.milliseconds) - Math.abs(this.hoursPart) * MILLIS_PER_HOUR;
+    return sign * Math.floor(part / MILLIS_PER_MINUTE);
   }
 
   get seconds(): number {
@@ -71,11 +76,12 @@ export class Duration {
   }
 
   get secondsPart(): number {
+    const sign = Math.sign(this.milliseconds);
     const part =
-      this.milliseconds -
-      this.hoursPart * MILLIS_PER_HOUR -
-      this.minutesPart * MILLIS_PER_MINUTE;
-    return Math.floor(part / MILLIS_PER_SECOND);
+      Math.abs(this.milliseconds) -
+      Math.abs(this.hoursPart) * MILLIS_PER_HOUR -
+      Math.abs(this.minutesPart) * MILLIS_PER_MINUTE;
+    return sign * Math.floor(part / MILLIS_PER_SECOND);
   }
 
   get milliseconds(): number {
@@ -83,12 +89,22 @@ export class Duration {
   }
 
   get millisecondsPart(): number {
+    const sign = Math.sign(this.milliseconds);
     return (
-      this.#millis -
-      this.hoursPart * MILLIS_PER_HOUR -
-      this.minutesPart * MILLIS_PER_MINUTE -
-      this.secondsPart * MILLIS_PER_SECOND
+      sign *
+      (Math.abs(this.#millis) -
+        Math.abs(this.hoursPart) * MILLIS_PER_HOUR -
+        Math.abs(this.minutesPart) * MILLIS_PER_MINUTE -
+        Math.abs(this.secondsPart) * MILLIS_PER_SECOND)
     );
+  }
+
+  abs() {
+    return new Duration(Math.abs(this.#millis));
+  }
+
+  negated() {
+    return new Duration(-this.#millis);
   }
 
   isPositive(): boolean {
