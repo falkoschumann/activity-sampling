@@ -53,11 +53,11 @@ class RecentActivitiesProjection {
   RecentActivitiesQueryResult project(Stream<ActivityLoggedEvent> events) {
     events
         .sorted(Comparator.comparing(ActivityLoggedEvent::timestamp).reversed())
+        .map(it -> ActivityMapping.map(it, timeZone))
         .forEach(
             it -> {
-              var activity = map(it);
-              updateWorkingDays(activity);
-              updateTimeSummary(activity);
+              updateWorkingDays(it);
+              updateTimeSummary(it);
             });
     createWorkingDay();
 
@@ -66,17 +66,6 @@ class RecentActivitiesProjection {
         .workingDays(workingDays)
         .timeSummary(getTimeSummary())
         .timeZone(timeZone)
-        .build();
-  }
-
-  private Activity map(ActivityLoggedEvent event) {
-    return Activity.builder()
-        .timestamp(event.timestamp().atZone(timeZone).toLocalDateTime())
-        .duration(event.duration())
-        .client(event.client())
-        .project(event.project())
-        .task(event.task())
-        .notes(event.notes())
         .build();
   }
 

@@ -19,11 +19,11 @@ import java.util.stream.Stream;
 
 class TimesheetProjection {
 
-  private LocalDate from;
-  private LocalDate to;
+  private final LocalDate from;
+  private final LocalDate to;
   private final ZoneId timeZone;
 
-  private List<TimesheetEntry> entries = new ArrayList<TimesheetEntry>();
+  private final List<TimesheetEntry> entries = new ArrayList<>();
 
   TimesheetProjection(TimesheetQuery query) {
     from = query.from();
@@ -40,11 +40,13 @@ class TimesheetProjection {
   }
 
   TimesheetQueryResult project(Stream<ActivityLoggedEvent> events) {
-    events.forEach(
-        it -> {
-          var activity = map(it);
-          updateEntries(activity);
-        });
+    events
+        .sorted(Comparator.comparing(ActivityLoggedEvent::timestamp))
+        .map(it -> ActivityMapping.map(it, timeZone))
+        .forEach(
+            it -> {
+              updateEntries(it);
+            });
 
     var sortedEntries =
         entries.stream()
@@ -61,24 +63,13 @@ class TimesheetProjection {
         .build();
   }
 
-  private Activity map(ActivityLoggedEvent event) {
-    return Activity.builder()
-        .timestamp(event.timestamp().atZone(timeZone).toLocalDateTime())
-        .duration(event.duration())
-        .client(event.client())
-        .project(event.project())
-        .task(event.task())
-        .notes(event.notes())
-        .build();
-  }
-
   private void updateEntries(Activity activity) {
-    var date = activity.timestamp().toLocalDate();
+    var activityDate = activity.timestamp().toLocalDate();
     var index =
         Lists.indexOf(
             entries,
             e ->
-                e.date().equals(date)
+                e.date().equals(activityDate)
                     && e.client().equals(activity.client())
                     && e.project().equals(activity.project())
                     && e.task().equals(activity.task()));
