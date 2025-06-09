@@ -35,23 +35,10 @@ export default function PageLayout({ children }: { children?: React.ReactNode })
                       Log
                     </a>
                   </li>
-                  <li className="nav-item dropdown">
-                    <a
-                      className="nav-link dropdown-toggle"
-                      href="#"
-                      role="button"
-                      data-bs-toggle="dropdown"
-                      aria-expanded="false"
-                    >
-                      Report
+                  <li>
+                    <a className="nav-link" href="/timesheet">
+                      Timesheet
                     </a>
-                    <ul className="dropdown-menu">
-                      <li>
-                        <a className="dropdown-item" href="/report/timesheet">
-                          Timesheet
-                        </a>
-                      </li>
-                    </ul>
                   </li>
                 </ul>
                 <div className="d-flex gap-2">

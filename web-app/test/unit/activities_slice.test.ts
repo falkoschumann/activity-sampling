@@ -30,8 +30,6 @@ import { Clock } from "../../src/util/clock";
 import { Timer } from "../../src/util/timer";
 
 describe("Activities", () => {
-  // TODO Align with user stories
-
   describe("Ask periodically", () => {
     it("Starts countdown", () => {
       const { store, timer } = configure();

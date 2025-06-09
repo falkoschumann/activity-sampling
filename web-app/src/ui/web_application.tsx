@@ -25,7 +25,7 @@ export default function WebApplication() {
       <AuthenticatedTemplate>
         <Routes>
           <Route index element={<ActivitiesPage />} />
-          <Route path="/report/timesheet" element={<TimesheetPage />} />
+          <Route path="/timesheet" element={<TimesheetPage />} />
           <Route path="/*" element={<NotFoundPage />} />
         </Routes>
       </AuthenticatedTemplate>
