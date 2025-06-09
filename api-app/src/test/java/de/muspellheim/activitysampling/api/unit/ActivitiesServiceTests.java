@@ -2,6 +2,7 @@
 
 package de.muspellheim.activitysampling.api.unit;
 
+import static org.assertj.core.api.Fail.fail;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -11,6 +12,9 @@ import de.muspellheim.activitysampling.api.domain.activities.LogActivityCommand;
 import de.muspellheim.activitysampling.api.domain.activities.RecentActivitiesQuery;
 import de.muspellheim.activitysampling.api.domain.activities.RecentActivitiesQueryResult;
 import de.muspellheim.activitysampling.api.domain.activities.TimeSummary;
+import de.muspellheim.activitysampling.api.domain.activities.TimesheetEntry;
+import de.muspellheim.activitysampling.api.domain.activities.TimesheetQuery;
+import de.muspellheim.activitysampling.api.domain.activities.TimesheetQueryResult;
 import de.muspellheim.activitysampling.api.domain.activities.WorkingDay;
 import de.muspellheim.activitysampling.api.infrastructure.ActivitiesStore;
 import de.muspellheim.activitysampling.api.infrastructure.ActivityLoggedEvent;
@@ -21,6 +25,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
@@ -69,15 +74,15 @@ class ActivitiesServiceTests {
     void queriesEmptyResult() {
       var service = new ActivitiesService(store);
 
-      var result = service.queryRecentActivities(RecentActivitiesQuery.createTestInstance());
+      var result = service.queryRecentActivities(RecentActivitiesQuery.DEFAULT);
 
       assertEquals(RecentActivitiesQueryResult.EMPTY, result);
     }
 
     @Test
     void returnsLastActivity() {
-      logEvent("2025-06-09T08:30:00Z");
-      logEvent("2025-06-09T09:00:00Z");
+      recordEvent("2025-06-09T08:30:00Z");
+      recordEvent("2025-06-09T09:00:00Z");
       var service = new ActivitiesService(store);
 
       var result = service.queryRecentActivities(RecentActivitiesQuery.DEFAULT);
@@ -87,11 +92,11 @@ class ActivitiesServiceTests {
 
     @Test
     void groupsActivitiesByWorkingDaysForTheLast30Days() {
-      logEvent("2025-05-05T14:00:00Z"); // is not included
-      logEvent("2025-05-06T14:00:00Z");
-      logEvent("2025-06-04T14:00:00Z");
-      logEvent("2025-06-05T08:30:00Z");
-      logEvent("2025-06-05T09:00:00Z");
+      recordEvent("2025-05-05T14:00:00Z"); // is not included
+      recordEvent("2025-05-06T14:00:00Z");
+      recordEvent("2025-06-04T14:00:00Z");
+      recordEvent("2025-06-05T08:30:00Z");
+      recordEvent("2025-06-05T09:00:00Z");
       var service = new ActivitiesService(store);
 
       var result =
@@ -122,26 +127,26 @@ class ActivitiesServiceTests {
     @Test
     void summarizesHoursWorkedTodayYesterdayThisWeekAndThisMonth() {
       // end of last month
-      logEvent("2025-05-31T14:00:00Z"); // is not included
+      recordEvent("2025-05-31T14:00:00Z"); // is not included
       // start of this month
-      logEvent("2025-06-01T14:00:00Z");
+      recordEvent("2025-06-01T14:00:00Z");
       // end of last week
-      logEvent("2025-06-01T10:00:00Z");
+      recordEvent("2025-06-01T10:00:00Z");
       // start of this week
-      logEvent("2025-06-02T10:00:00Z");
+      recordEvent("2025-06-02T10:00:00Z");
       // the day before yesterday
-      logEvent("2025-06-03T10:00:00Z");
+      recordEvent("2025-06-03T10:00:00Z");
       // yesterday
-      logEvent("2025-06-04T10:00:00Z");
-      logEvent("2025-06-04T10:30:00Z");
-      logEvent("2025-06-04T11:00:00Z");
+      recordEvent("2025-06-04T10:00:00Z");
+      recordEvent("2025-06-04T10:30:00Z");
+      recordEvent("2025-06-04T11:00:00Z");
       // today
-      logEvent("2025-06-05T09:00:00Z");
-      logEvent("2025-06-05T09:30:00Z");
+      recordEvent("2025-06-05T09:00:00Z");
+      recordEvent("2025-06-05T09:30:00Z");
       // tomorrow
-      logEvent("2025-06-06T08:30:00Z"); // is included in week and month
+      recordEvent("2025-06-06T08:30:00Z"); // is included in week and month
       // first day of next month
-      logEvent("2025-07-01T10:30:00Z"); // is not included
+      recordEvent("2025-07-01T10:30:00Z"); // is not included
       var service = new ActivitiesService(store);
 
       var result =
@@ -159,11 +164,60 @@ class ActivitiesServiceTests {
     }
   }
 
-  private void logEvent(String timestamp) {
-    store.record(ActivityLoggedEvent.createTestInstance().withTimestamp(Instant.parse(timestamp)));
+  @Nested
+  class QueryTimesheet {
+
+    @Test
+    void queriesEmptyResult() {
+      var service = new ActivitiesService(store);
+
+      var result = service.queryTimesheet(TimesheetQuery.createTestInstance());
+
+      assertEquals(TimesheetQueryResult.EMPTY, result);
+    }
+
+    @Test
+    void summarizesHoursWorkedOnTasks() {
+      // monday, only same tasks
+      recordEvent("2025-06-02T10:00:00Z");
+      recordEvent("2025-06-02T10:30:00Z");
+      // tuesday, different tasks
+      recordEvent("2025-06-03T10:00:00Z");
+      store.record(createEvent("2025-06-03T10:30:00Z").withTask("Other task"));
+      var service = new ActivitiesService(store);
+
+      var result = service.queryTimesheet(TimesheetQuery.createTestInstance());
+
+      assertEquals(
+          List.of(
+              createTimesheetEntry("2025-06-02").withHours(Duration.parse("PT1H")),
+              createTimesheetEntry("2025-06-03")
+                  .withTask("Other task")
+                  .withHours(Duration.parse("PT30M")),
+              createTimesheetEntry("2025-06-03").withHours(Duration.parse("PT30M"))),
+          result.entries());
+    }
+
+    @Test
+    @Disabled
+    void summarizesTheTotalHoursWorked() {
+      fail("Not implemented yet");
+    }
+  }
+
+  private void recordEvent(String timestamp) {
+    store.record(createEvent(timestamp));
+  }
+
+  private ActivityLoggedEvent createEvent(String timestamp) {
+    return ActivityLoggedEvent.createTestInstance().withTimestamp(Instant.parse(timestamp));
   }
 
   private Activity createActivity(String timestamp) {
     return Activity.createTestInstance().withTimestamp(LocalDateTime.parse(timestamp));
+  }
+
+  private TimesheetEntry createTimesheetEntry(String date) {
+    return TimesheetEntry.createTestInstance().withDate(LocalDate.parse(date));
   }
 }
