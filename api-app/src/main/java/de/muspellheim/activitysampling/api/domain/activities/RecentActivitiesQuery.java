@@ -17,7 +17,7 @@ public record RecentActivitiesQuery(LocalDate today, ZoneId timeZone) {
   public static final RecentActivitiesQuery DEFAULT = new RecentActivitiesQuery(null, null);
 
   public static RecentActivitiesQuery createTestInstance() {
-    return new RecentActivitiesQueryBuilder()
+    return RecentActivitiesQuery.builder()
         .today(LocalDate.of(2024, 12, 18))
         .timeZone(ZoneId.of("Europe/Berlin"))
         .build();

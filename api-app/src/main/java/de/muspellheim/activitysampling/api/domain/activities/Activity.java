@@ -20,7 +20,7 @@ public record Activity(
     String notes) {
 
   public static Activity createTestInstance() {
-    return new ActivityBuilder()
+    return Activity.builder()
         .timestamp(LocalDateTime.parse("2024-12-18T09:30"))
         .duration(Duration.ofMinutes(30))
         .client("Test client")

@@ -22,7 +22,7 @@ public record RecentActivitiesQueryResult(
       new RecentActivitiesQueryResult(null, List.of(), TimeSummary.NULL, ZoneId.systemDefault());
 
   public static RecentActivitiesQueryResult createTestInstance() {
-    return new RecentActivitiesQueryResultBuilder()
+    return RecentActivitiesQueryResult.builder()
         .lastActivity(
             Activity.createTestInstance().withTimestamp(LocalDateTime.parse("2024-12-18T09:30")))
         .workingDays(

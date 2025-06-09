@@ -23,7 +23,7 @@ public record LogActivityCommand(
     String notes) {
 
   public static LogActivityCommand createTestInstance() {
-    return new LogActivityCommandBuilder()
+    return LogActivityCommand.builder()
         .timestamp(Instant.parse("2024-12-18T08:30:00Z"))
         .duration(Duration.ofMinutes(30))
         .client("Test client")
