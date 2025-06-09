@@ -2,7 +2,6 @@
 
 package de.muspellheim.activitysampling.api.unit;
 
-import static org.assertj.core.api.Fail.fail;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -25,7 +24,6 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
@@ -184,6 +182,12 @@ class ActivitiesServiceTests {
       // tuesday, different tasks
       recordEvent("2025-06-03T10:00:00Z");
       store.record(createEvent("2025-06-03T10:30:00Z").withTask("Other task"));
+      // wednesday, different projects
+      recordEvent("2025-06-04T10:00:00Z");
+      store.record(createEvent("2025-06-04T10:30:00Z").withProject("Other project"));
+      // thursday, different clients
+      recordEvent("2025-06-05T10:00:00Z");
+      store.record(createEvent("2025-06-05T10:30:00Z").withClient("Other client"));
       var service = new ActivitiesService(store);
 
       var result = service.queryTimesheet(TimesheetQuery.createTestInstance());
@@ -194,14 +198,28 @@ class ActivitiesServiceTests {
               createTimesheetEntry("2025-06-03")
                   .withTask("Other task")
                   .withHours(Duration.parse("PT30M")),
-              createTimesheetEntry("2025-06-03").withHours(Duration.parse("PT30M"))),
+              createTimesheetEntry("2025-06-03").withHours(Duration.parse("PT30M")),
+              createTimesheetEntry("2025-06-04")
+                  .withProject("Other project")
+                  .withHours(Duration.parse("PT30M")),
+              createTimesheetEntry("2025-06-04").withHours(Duration.parse("PT30M")),
+              createTimesheetEntry("2025-06-05")
+                  .withClient("Other client")
+                  .withHours(Duration.parse("PT30M")),
+              createTimesheetEntry("2025-06-05").withHours(Duration.parse("PT30M"))),
           result.entries());
     }
 
     @Test
-    @Disabled
     void summarizesTheTotalHoursWorked() {
-      fail("Not implemented yet");
+      recordEvent("2025-06-02T10:00:00Z");
+      recordEvent("2025-06-02T10:30:00Z");
+      recordEvent("2025-06-02T11:00:00Z");
+      var service = new ActivitiesService(store);
+
+      var result = service.queryTimesheet(TimesheetQuery.createTestInstance());
+
+      assertEquals(Duration.parse("PT1H30M"), result.totalHours());
     }
   }
 

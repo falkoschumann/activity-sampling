@@ -24,6 +24,7 @@ class TimesheetProjection {
   private final ZoneId timeZone;
 
   private final List<TimesheetEntry> entries = new ArrayList<>();
+  private Duration totalHours = Duration.ZERO;
 
   TimesheetProjection(TimesheetQuery query) {
     from = query.from();
@@ -46,6 +47,7 @@ class TimesheetProjection {
         .forEach(
             it -> {
               updateEntries(it);
+              updateTotalHours(it);
             });
 
     var sortedEntries =
@@ -58,7 +60,7 @@ class TimesheetProjection {
             .toList();
     return TimesheetQueryResult.builder()
         .entries(sortedEntries)
-        .totalHours(Duration.ZERO)
+        .totalHours(totalHours)
         .timeZone(timeZone)
         .build();
   }
@@ -89,5 +91,9 @@ class TimesheetProjection {
       var updatedEntry = existingEntry.withHours(accumulatedHours);
       entries.set(index, updatedEntry);
     }
+  }
+
+  private void updateTotalHours(Activity activity) {
+    totalHours = totalHours.plus(activity.duration());
   }
 }
