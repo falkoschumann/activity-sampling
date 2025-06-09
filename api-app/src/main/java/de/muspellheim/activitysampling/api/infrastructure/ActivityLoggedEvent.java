@@ -23,9 +23,9 @@ public record ActivityLoggedEvent(
     return ActivityLoggedEvent.builder()
         .timestamp(Instant.parse("2024-12-18T08:30:00Z"))
         .duration(Duration.ofMinutes(30))
-        .client("ACME Inc.")
-        .project("Foobar")
-        .task("Do something")
+        .client("Test client")
+        .project("Test project")
+        .task("Test task")
         .build();
   }
 }

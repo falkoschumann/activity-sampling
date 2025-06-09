@@ -28,8 +28,8 @@ public class ActivitiesService {
   }
 
   public CommandStatus logActivity(LogActivityCommand command) {
-    log.info("Log activity: {}", command);
     try {
+      log.info("Log activity: {}", command);
       var event =
           ActivityLoggedEvent.builder()
               .timestamp(command.timestamp())
@@ -53,7 +53,7 @@ public class ActivitiesService {
       var timeZone = query.timeZone() != null ? query.timeZone() : ZoneId.systemDefault();
       var today =
           query.today() != null ? query.today() : Instant.now().atZone(timeZone).toLocalDate();
-      var from = today.minusDays(31).atStartOfDay().atZone(timeZone).toInstant();
+      var from = today.minusDays(30).atStartOfDay().atZone(timeZone).toInstant();
       var activities =
           store
               .replay(from)
@@ -73,7 +73,7 @@ public class ActivitiesService {
       var timeSummary = TimeSummary.from(today, activities);
       var lastActivity = activities.isEmpty() ? null : activities.get(0);
       return new RecentActivitiesQueryResult(lastActivity, recentActivities, timeSummary, timeZone);
-    } catch (RuntimeException e) {
+    } catch (Exception e) {
       log.error("Get recent activities failed: {}", e.getMessage(), e);
       throw e;
     }

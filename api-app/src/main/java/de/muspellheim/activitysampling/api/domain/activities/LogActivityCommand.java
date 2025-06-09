@@ -24,11 +24,11 @@ public record LogActivityCommand(
 
   public static LogActivityCommand createTestInstance() {
     return new LogActivityCommandBuilder()
-        .timestamp(Instant.parse("2024-12-18T09:30:00+01:00"))
+        .timestamp(Instant.parse("2024-12-18T08:30:00Z"))
         .duration(Duration.ofMinutes(30))
-        .client("ACME Inc.")
-        .project("Foobar")
-        .task("Do something")
+        .client("Test client")
+        .project("Test project")
+        .task("Test task")
         .build();
   }
 }

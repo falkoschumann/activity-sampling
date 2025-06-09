@@ -5,7 +5,11 @@ package de.muspellheim.activitysampling.api.domain.activities;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import lombok.Builder;
+import lombok.With;
 
+@Builder
+@With
 public record WorkingDay(LocalDate date, List<Activity> activities) {
 
   public static List<WorkingDay> from(List<Activity> recentActivities) {

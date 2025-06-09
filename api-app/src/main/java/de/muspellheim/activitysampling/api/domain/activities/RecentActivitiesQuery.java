@@ -14,7 +14,7 @@ import lombok.With;
 @JsonInclude(Include.NON_NULL)
 public record RecentActivitiesQuery(LocalDate today, ZoneId timeZone) {
 
-  public static final RecentActivitiesQuery NULL = new RecentActivitiesQuery(null, null);
+  public static final RecentActivitiesQuery DEFAULT = new RecentActivitiesQuery(null, null);
 
   public static RecentActivitiesQuery createTestInstance() {
     return new RecentActivitiesQueryBuilder()

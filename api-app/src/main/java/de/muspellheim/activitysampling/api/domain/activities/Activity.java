@@ -23,9 +23,9 @@ public record Activity(
     return new ActivityBuilder()
         .timestamp(LocalDateTime.parse("2024-12-18T09:30"))
         .duration(Duration.ofMinutes(30))
-        .client("ACME Inc.")
-        .project("Foobar")
-        .task("Do something")
+        .client("Test client")
+        .project("Test project")
+        .task("Test task")
         .build();
   }
 }

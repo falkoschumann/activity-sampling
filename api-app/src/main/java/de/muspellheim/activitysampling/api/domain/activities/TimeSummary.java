@@ -19,7 +19,9 @@ public record TimeSummary(
   public static TimeSummary from(LocalDate today, List<Activity> activities) {
     var yesterday = today.minusDays(1);
     var thisWeekStart = today.minusDays(today.getDayOfWeek().getValue() - 1);
+    var thisWeekEnd = thisWeekStart.plusDays(6);
     var thisMonthStart = today.withDayOfMonth(1);
+    var nextMonthStart = thisMonthStart.plusMonths(1).withDayOfMonth(1);
 
     var hoursToday = Duration.ZERO;
     var hoursYesterday = Duration.ZERO;
@@ -34,10 +36,10 @@ public record TimeSummary(
       if (date.equals(yesterday)) {
         hoursYesterday = hoursYesterday.plus(duration);
       }
-      if (!date.isBefore(thisWeekStart)) {
+      if (!date.isBefore(thisWeekStart) && !date.isAfter(thisWeekEnd)) {
         hoursThisWeek = hoursThisWeek.plus(duration);
       }
-      if (!date.isBefore(thisMonthStart)) {
+      if (!date.isBefore(thisMonthStart) && date.isBefore(nextMonthStart)) {
         hoursThisMonth = hoursThisMonth.plus(duration);
       }
     }

@@ -18,7 +18,7 @@ import lombok.With;
 public record RecentActivitiesQueryResult(
     Activity lastActivity, List<WorkingDay> workingDays, TimeSummary timeSummary, ZoneId timeZone) {
 
-  public static final RecentActivitiesQueryResult NULL =
+  public static final RecentActivitiesQueryResult EMPTY =
       new RecentActivitiesQueryResult(null, List.of(), TimeSummary.NULL, ZoneId.systemDefault());
 
   public static RecentActivitiesQueryResult createTestInstance() {
@@ -41,8 +41,8 @@ public record RecentActivitiesQueryResult(
                             .withTimestamp(LocalDateTime.parse("2024-12-17T16:30")),
                         Activity.createTestInstance()
                             .withTimestamp(LocalDateTime.parse("2024-12-17T16:00"))
-                            .withTask("Make things")
-                            .withNotes("This is a note")))))
+                            .withTask("Other task")
+                            .withNotes("Other notes")))))
         .timeSummary(
             new TimeSummary(
                 Duration.ofMinutes(30),

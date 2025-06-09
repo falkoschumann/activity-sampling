@@ -125,8 +125,8 @@ class ApiApplicationTests {
       store.record(
           event
               .withTimestamp(Instant.parse("2024-12-17T15:00:00Z"))
-              .withTask("Make things")
-              .withNotes("This is a note"));
+              .withTask("Other task")
+              .withNotes("Other notes"));
       store.record(event.withTimestamp(Instant.parse("2024-12-17T15:30:00Z")));
       store.record(event.withTimestamp(Instant.parse("2024-12-17T16:00:00Z")));
       store.record(event.withTimestamp(Instant.parse("2024-12-18T08:30:00Z")));
@@ -147,7 +147,7 @@ class ApiApplicationTests {
               "/api/activities/recent-activities", RecentActivitiesQueryResult.class);
 
       assertEquals(200, response.getStatusCode().value());
-      assertEquals(RecentActivitiesQueryResult.NULL, response.getBody());
+      assertEquals(RecentActivitiesQueryResult.EMPTY, response.getBody());
     }
 
     @Test
