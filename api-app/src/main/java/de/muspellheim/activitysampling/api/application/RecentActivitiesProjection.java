@@ -20,12 +20,12 @@ import java.util.stream.Stream;
 class RecentActivitiesProjection {
 
   private final LocalDate today;
-  private final ZoneId timeZone;
   private final LocalDate yesterday;
   private final LocalDate thisWeekStart;
   private final LocalDate thisWeekEnd;
   private final LocalDate thisMonthStart;
   private final LocalDate nextMonthStart;
+  private final ZoneId timeZone;
 
   private LocalDate date;
   private final List<Activity> activities = new ArrayList<>();
@@ -37,14 +37,13 @@ class RecentActivitiesProjection {
   private Duration hoursThisMonth = Duration.ZERO;
 
   RecentActivitiesProjection(RecentActivitiesQuery query) {
-    this.today = query.today() != null ? query.today() : LocalDate.now();
-    this.timeZone = query.timeZone() != null ? query.timeZone() : ZoneId.systemDefault();
-
+    today = query.today() != null ? query.today() : LocalDate.now();
     yesterday = today.minusDays(1);
     thisWeekStart = today.minusDays(today.getDayOfWeek().getValue() - 1);
     thisWeekEnd = thisWeekStart.plusDays(6);
     thisMonthStart = today.withDayOfMonth(1);
     nextMonthStart = thisMonthStart.plusMonths(1).withDayOfMonth(1);
+    timeZone = query.timeZone() != null ? query.timeZone() : ZoneId.systemDefault();
   }
 
   Instant getFrom() {
@@ -55,8 +54,8 @@ class RecentActivitiesProjection {
     events
         .sorted(Comparator.comparing(ActivityLoggedEvent::timestamp).reversed())
         .forEach(
-            event -> {
-              var activity = map(event);
+            it -> {
+              var activity = map(it);
               updateWorkingDays(activity);
               updateTimeSummary(activity);
             });

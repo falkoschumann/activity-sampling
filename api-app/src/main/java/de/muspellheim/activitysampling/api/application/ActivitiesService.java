@@ -6,13 +6,11 @@ import de.muspellheim.activitysampling.api.domain.activities.Activity;
 import de.muspellheim.activitysampling.api.domain.activities.LogActivityCommand;
 import de.muspellheim.activitysampling.api.domain.activities.RecentActivitiesQuery;
 import de.muspellheim.activitysampling.api.domain.activities.RecentActivitiesQueryResult;
-import de.muspellheim.activitysampling.api.domain.activities.TimesheetEntry;
 import de.muspellheim.activitysampling.api.domain.activities.TimesheetQuery;
 import de.muspellheim.activitysampling.api.domain.activities.TimesheetQueryResult;
 import de.muspellheim.activitysampling.api.domain.common.CommandStatus;
 import de.muspellheim.activitysampling.api.infrastructure.ActivitiesStore;
 import de.muspellheim.activitysampling.api.infrastructure.ActivityLoggedEvent;
-import java.time.Duration;
 import java.time.ZoneId;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -62,15 +60,9 @@ public class ActivitiesService {
   public TimesheetQueryResult queryTimesheet(TimesheetQuery query) {
     try {
       log.info("Query timesheet: {}", query);
-      var timeZone = getTimeZone(query.timeZone());
-      var from = query.from().atStartOfDay(timeZone).toInstant();
-      var to = query.to().atStartOfDay(timeZone).toInstant();
-      var activities = store.replay(from, to).map(it -> map(it, timeZone)).toList();
-      return TimesheetQueryResult.builder()
-          .entries(TimesheetEntry.from(activities))
-          .totalHours(Duration.ZERO)
-          .timeZone(timeZone)
-          .build();
+      var projection = new TimesheetProjection(query);
+      var replay = store.replay(projection.getFrom(), projection.getTo());
+      return projection.project(replay);
     } catch (Exception e) {
       log.error("Query timesheet failed: {}", e.getMessage(), e);
       throw e;
