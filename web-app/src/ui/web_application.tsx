@@ -10,6 +10,7 @@ import AuthenticatedTemplate from "./components/authenticated_template";
 import UnauthenticatedTemplate from "./components/unauthenticated_template";
 import ActivitiesPage from "./pages/activities_page";
 import NotFoundPage from "./pages/not_found_page";
+import TimesheetPage from "./pages/timesheet_page";
 import UnauthenticatedPage from "./pages/unauthenticated_page";
 
 export default function WebApplication() {
@@ -24,6 +25,7 @@ export default function WebApplication() {
       <AuthenticatedTemplate>
         <Routes>
           <Route index element={<ActivitiesPage />} />
+          <Route path="/report/timesheet" element={<TimesheetPage />} />
           <Route path="/*" element={<NotFoundPage />} />
         </Routes>
       </AuthenticatedTemplate>
