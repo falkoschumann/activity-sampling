@@ -9,12 +9,12 @@ analysis.
 
 ### Ask periodically
 
-- [x] Start countdown with given interval
+- [x] Start countdown with a given interval
 - [ ] Start countdown with the default interval when the application starts
 
 ### Current Interval
 
-- [x] Notify user when interval is elapsed
+- [x] Notify user when an interval is elapsed
 
 ### Log Activity
 
@@ -37,14 +37,16 @@ analysis.
 - [ ] Summarize hours worked per week
 - [ ] Summarize hours worked per month
 - [ ] Summarize hours worked per year
+- [ ] Summarize hours worked overall
 - [ ] Summarize the total hours worked
 
 ### Timesheet
 
 - [ ] Summarize hours worked on tasks
-- [ ] Summarize hours worked on projects per day
-- [ ] Summarize hours worked on projects per week
-- [ ] Summarize hours worked on projects per month
+- [ ] Summarize hours worked per day
+- [ ] Summarize hours worked per week
+- [ ] Summarize hours worked per month
+- [ ] Summarize the total hours worked
 - [ ] Compare with capacity
 - [ ] Take holidays into account
 - [ ] Take vacation into account
