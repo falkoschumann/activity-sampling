@@ -16,7 +16,7 @@ import {
   LogActivityCommand,
   RecentActivitiesQuery,
   RecentActivitiesQueryResult,
-} from "../domain/messages";
+} from "../domain/activities_messages";
 import { ActivitiesApi } from "../infrastructure/activities_api";
 import { NotificationClient } from "../infrastructure/notification_client";
 

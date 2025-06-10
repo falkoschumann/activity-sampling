@@ -8,7 +8,7 @@ import {
   LogActivityCommand,
   RecentActivitiesQuery,
   RecentActivitiesQueryResult,
-} from "../domain/messages";
+} from "../domain/activities_messages";
 
 const ACTIVITY_LOGGED_EVENT = "activityLogged";
 

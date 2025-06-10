@@ -1,12 +1,12 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { AccountInfo } from "../domain/account";
 
+import { AccountInfo } from "../domain/authentication";
 import {
   AuthenticationQuery,
   AuthenticationQueryResult,
-} from "../domain/messages";
+} from "../domain/authentication_messages";
 import { AuthenticationApi } from "../infrastructure/authentication_api";
 
 interface AuthenticationState {

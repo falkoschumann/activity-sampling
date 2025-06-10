@@ -24,7 +24,7 @@ import { Timer } from "../../src/common/timer";
 import {
   Failure,
   RecentActivitiesQueryResult,
-} from "../../src/domain/messages";
+} from "../../src/domain/activities_messages";
 import { ActivitiesApi } from "../../src/infrastructure/activities_api";
 import { AuthenticationApi } from "../../src/infrastructure/authentication_api";
 import { NotificationClient } from "../../src/infrastructure/notification_client";

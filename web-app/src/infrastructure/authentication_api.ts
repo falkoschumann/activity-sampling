@@ -5,7 +5,7 @@ import { verifyResponse } from "../common/http";
 import {
   AuthenticationQuery,
   AuthenticationQueryResult,
-} from "../domain/messages";
+} from "../domain/authentication_messages";
 
 export class AuthenticationApi {
   static create(): AuthenticationApi {

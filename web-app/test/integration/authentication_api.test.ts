@@ -1,9 +1,9 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
 import { describe, expect, it } from "vitest";
+import { AuthenticationQueryResult } from "../../src/domain/activities_messages";
 
-import { TEST_ACCOUNT } from "../../src/domain/account";
-import { AuthenticationQueryResult } from "../../src/domain/messages";
+import { TEST_ACCOUNT } from "../../src/domain/authentication";
 import { AuthenticationApi } from "../../src/infrastructure/authentication_api";
 
 describe("Authentication API", () => {

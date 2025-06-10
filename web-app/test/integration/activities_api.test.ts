@@ -3,7 +3,7 @@
 import { describe, expect, it } from "vitest";
 
 import { TEST_ACTIVITY } from "../../src/domain/activities";
-import { Success } from "../../src/domain/messages";
+import { Success } from "../../src/domain/activities_messages";
 import { ActivitiesApi } from "../../src/infrastructure/activities_api";
 
 describe("Activities API", () => {
