@@ -7,13 +7,13 @@ import {
   selectAuthentication,
 } from "../../src/application/authentication_slice";
 import { createStore } from "../../src/application/store";
+import { Clock } from "../../src/common/clock";
+import { Timer } from "../../src/common/timer";
 import { TEST_ACCOUNT } from "../../src/domain/account";
 import { AuthenticationQueryResult } from "../../src/domain/messages";
 import { ActivitiesApi } from "../../src/infrastructure/activities_api";
 import { AuthenticationApi } from "../../src/infrastructure/authentication_api";
 import { NotificationClient } from "../../src/infrastructure/notification_client";
-import { Clock } from "../../src/util/clock";
-import { Timer } from "../../src/util/timer";
 
 describe("Authentication", () => {
   it("Is authenticated", async () => {

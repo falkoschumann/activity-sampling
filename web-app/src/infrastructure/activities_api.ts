@@ -1,14 +1,14 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
+import { ConfigurableResponses } from "../common/configurable_responses";
+import { verifyResponse } from "../common/http";
+import { OutputTracker } from "../common/output_tracker";
 import {
   CommandStatus,
   LogActivityCommand,
   RecentActivitiesQuery,
   RecentActivitiesQueryResult,
 } from "../domain/messages";
-import { ConfigurableResponses } from "../util/configurable_responses";
-import { verifyResponse } from "../util/http";
-import { OutputTracker } from "../util/output_tracker";
 
 const ACTIVITY_LOGGED_EVENT = "activityLogged";
 

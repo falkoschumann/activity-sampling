@@ -1,6 +1,6 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
-import { OutputTracker } from "../util/output_tracker";
+import { OutputTracker } from "../common/output_tracker";
 
 const NOTIFICATION_SHOWN_EVENT = "NOTIFICATION_SHOWN";
 const NOTIFICATION_HIDDEN_EVENT = "NOTIFICATION_HIDDEN";

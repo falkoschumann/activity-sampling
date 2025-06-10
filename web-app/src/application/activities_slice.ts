@@ -6,9 +6,11 @@ import {
   PayloadAction,
   SerializedError,
 } from "@reduxjs/toolkit";
+import { Clock } from "../common/clock";
+import { Duration } from "../common/duration";
+import { Timer } from "../common/timer";
 
 import { Activity, TimeSummary, WorkingDay } from "../domain/activities";
-import { Duration } from "../domain/duration";
 import {
   CommandStatus,
   LogActivityCommand,
@@ -17,8 +19,6 @@ import {
 } from "../domain/messages";
 import { ActivitiesApi } from "../infrastructure/activities_api";
 import { NotificationClient } from "../infrastructure/notification_client";
-import { Clock } from "../util/clock";
-import { Timer } from "../util/timer";
 
 interface ActivitiesState {
   readonly currentActivityForm: {

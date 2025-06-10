@@ -1,12 +1,12 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
 import { configureStore } from "@reduxjs/toolkit";
+import { Clock } from "../common/clock";
+import { Timer } from "../common/timer";
 
 import { ActivitiesApi } from "../infrastructure/activities_api";
 import { AuthenticationApi } from "../infrastructure/authentication_api";
 import { NotificationClient } from "../infrastructure/notification_client";
-import { Clock } from "../util/clock";
-import { Timer } from "../util/timer";
 import activitiesReducer from "./activities_slice";
 import authenticationReducer from "./authentication_slice";
 

@@ -2,7 +2,7 @@
 
 import { describe, expect, it } from "vitest";
 
-import { Duration } from "../../src/domain/duration";
+import { Duration } from "../../src/common/duration";
 
 describe("Duration", () => {
   it("Creates zero duration", () => {

@@ -1,11 +1,11 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
+import { ConfigurableResponses } from "../common/configurable_responses";
+import { verifyResponse } from "../common/http";
 import {
   AuthenticationQuery,
   AuthenticationQueryResult,
 } from "../domain/messages";
-import { ConfigurableResponses } from "../util/configurable_responses";
-import { verifyResponse } from "../util/http";
 
 export class AuthenticationApi {
   static create(): AuthenticationApi {

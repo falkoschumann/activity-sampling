@@ -2,7 +2,7 @@
 
 import { describe, expect, it } from "vitest";
 
-import { HttpError, verifyResponse } from "../../src/util/http";
+import { HttpError, verifyResponse } from "../../src/common/http";
 
 describe("HTTP", () => {
   describe("Verify response", () => {

@@ -1,6 +1,6 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
-import { Duration } from "../../domain/duration";
+import { Duration } from "../../common/duration";
 import PageLayout from "../layouts/page_layout";
 
 export default function TimesheetPage() {

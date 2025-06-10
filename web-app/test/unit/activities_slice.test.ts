@@ -18,7 +18,9 @@ import {
   stopCountdown,
 } from "../../src/application/activities_slice";
 import { createStore } from "../../src/application/store";
-import { Duration } from "../../src/domain/duration";
+import { Clock } from "../../src/common/clock";
+import { Duration } from "../../src/common/duration";
+import { Timer } from "../../src/common/timer";
 import {
   Failure,
   RecentActivitiesQueryResult,
@@ -26,8 +28,6 @@ import {
 import { ActivitiesApi } from "../../src/infrastructure/activities_api";
 import { AuthenticationApi } from "../../src/infrastructure/authentication_api";
 import { NotificationClient } from "../../src/infrastructure/notification_client";
-import { Clock } from "../../src/util/clock";
-import { Timer } from "../../src/util/timer";
 
 describe("Activities", () => {
   describe("Ask periodically", () => {

@@ -20,9 +20,9 @@ import {
   stopCountdown,
 } from "../../application/activities_slice";
 import { AppDispatch } from "../../application/store";
+import { Duration } from "../../common/duration";
+import { EventHandler } from "../../common/types";
 import { Activity, WorkingDay } from "../../domain/activities";
-import { Duration } from "../../domain/duration";
-import { EventHandler } from "../../util/types";
 import ErrorComponent from "../components/error_component";
 import PageLayout from "../layouts/page_layout";
 
