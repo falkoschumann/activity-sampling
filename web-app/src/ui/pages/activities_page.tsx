@@ -38,22 +38,22 @@ export default function ActivitiesPage() {
     <PageLayout>
       <aside className="container my-4">
         <ErrorComponent {...error} />
-        <CurrentActivityForm />
-        <CountdownComponent />
+        <CurrentActivityFormContainer />
+        <CountdownContainer />
       </aside>
       <main className="container my-4">
         <RecentActivitiesContainer />
       </main>
       <footer className="fixed-bottom bg-body-secondary">
         <div className="container py-2">
-          <TimeSummaryComponent />
+          <TimeSummaryContainer />
         </div>
       </footer>
     </PageLayout>
   );
 }
 
-function CurrentActivityForm() {
+function CurrentActivityFormContainer() {
   const { client, project, task, notes, disabled, loggable } = useSelector(selectCurrentActivityForm);
   const dispatch = useDispatch<AppDispatch>();
 
@@ -68,10 +68,10 @@ function CurrentActivityForm() {
 
   return (
     <form onSubmit={handleSubmitted}>
-      <FormInput name="client" title="Client" disabled={disabled} value={client} onChange={handleChange} />
-      <FormInput name="project" title="Project" disabled={disabled} value={project} onChange={handleChange} />
-      <FormInput name="task" title="Task" disabled={disabled} value={task} onChange={handleChange} />
-      <FormInput name="notes" title="Notes" disabled={disabled} value={notes} onChange={handleChange} />
+      <FormInputComponent name="client" title="Client" disabled={disabled} value={client} onChange={handleChange} />
+      <FormInputComponent name="project" title="Project" disabled={disabled} value={project} onChange={handleChange} />
+      <FormInputComponent name="task" title="Task" disabled={disabled} value={task} onChange={handleChange} />
+      <FormInputComponent name="notes" title="Notes" disabled={disabled} value={notes} onChange={handleChange} />
       <button type="submit" className="btn btn-primary btn-sm w-100" disabled={disabled || !loggable}>
         Log
       </button>
@@ -79,7 +79,7 @@ function CurrentActivityForm() {
   );
 }
 
-function FormInput({
+function FormInputComponent({
   name,
   title,
   disabled,
@@ -112,7 +112,7 @@ function FormInput({
   );
 }
 
-function CountdownComponent() {
+function CountdownContainer() {
   const { duration, remaining, percentage, isRunning } = useSelector(selectCountdown);
   const dispatch = useDispatch<AppDispatch>();
 
@@ -165,13 +165,13 @@ function CountdownComponent() {
             <span className="visually-hidden">Toggle Dropdown</span>
           </button>
           <ul className="dropdown-menu">
-            <DurationItem duration="PT5M" active={duration === "PT5M"} onChange={handleChange} />
-            <DurationItem duration="PT10M" active={duration === "PT10M"} onChange={handleChange} />
-            <DurationItem duration="PT15M" active={duration === "PT15M"} onChange={handleChange} />
-            <DurationItem duration="PT20M" active={duration === "PT20M"} onChange={handleChange} />
-            <DurationItem duration="PT30M" active={duration === "PT30M"} onChange={handleChange} />
-            <DurationItem duration="PT60M" active={duration === "PT60M"} onChange={handleChange} />
-            <DurationItem duration="PT1M" active={duration === "PT1M"} onChange={handleChange} />
+            <DurationItemComponent duration="PT5M" active={duration === "PT5M"} onChange={handleChange} />
+            <DurationItemComponent duration="PT10M" active={duration === "PT10M"} onChange={handleChange} />
+            <DurationItemComponent duration="PT15M" active={duration === "PT15M"} onChange={handleChange} />
+            <DurationItemComponent duration="PT20M" active={duration === "PT20M"} onChange={handleChange} />
+            <DurationItemComponent duration="PT30M" active={duration === "PT30M"} onChange={handleChange} />
+            <DurationItemComponent duration="PT60M" active={duration === "PT60M"} onChange={handleChange} />
+            <DurationItemComponent duration="PT1M" active={duration === "PT1M"} onChange={handleChange} />
           </ul>
         </div>
       </div>
@@ -179,7 +179,7 @@ function CountdownComponent() {
   );
 }
 
-function DurationItem({
+function DurationItemComponent({
   duration,
   active,
   onChange,
@@ -288,7 +288,7 @@ function ActivityComponent({
   );
 }
 
-function TimeSummaryComponent() {
+function TimeSummaryContainer() {
   const { hoursToday, hoursYesterday, hoursThisWeek, hoursThisMonth } = useSelector(selectTimeSummary);
 
   return (
