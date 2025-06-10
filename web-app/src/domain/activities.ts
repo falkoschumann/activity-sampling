@@ -84,10 +84,35 @@ export interface TimesheetQuery {
   readonly timeZone?: string;
 }
 
+export function createTestTimesheetQuery(
+  query: Partial<TimesheetQuery> = {},
+): TimesheetQuery {
+  return {
+    from: "2025-06-02",
+    to: "2025-06-09",
+    timeZone: "Europe/Berlin",
+    ...query,
+  };
+}
+
 export interface TimesheetQueryResult {
   readonly entries: TimesheetEntry[];
   readonly totalHours: string;
   readonly timeZone?: string;
+}
+
+export function createTestTimesheetQueryResult(
+  result: Partial<TimesheetQueryResult> = {},
+): TimesheetQueryResult {
+  return {
+    entries: [
+      createTestTimesheetEntry({ date: "2025-06-02" }),
+      createTestTimesheetEntry({ date: "2025-06-03" }),
+    ],
+    totalHours: "PT4H",
+    timeZone: "Europe/Berlin",
+    ...result,
+  };
 }
 
 export interface Activity {
@@ -137,4 +162,17 @@ export interface TimesheetEntry {
   readonly project: string;
   readonly task: string;
   readonly hours: string;
+}
+
+export function createTestTimesheetEntry(
+  entry: Partial<TimesheetEntry>,
+): TimesheetEntry {
+  return {
+    date: "2025-06-04",
+    client: "Test client",
+    project: "Test project",
+    task: "Test task",
+    hours: "PT2H",
+    ...entry,
+  };
 }

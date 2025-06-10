@@ -8,6 +8,8 @@ import {
   LogActivityCommand,
   RecentActivitiesQuery,
   RecentActivitiesQueryResult,
+  TimesheetQuery,
+  TimesheetQueryResult,
 } from "../domain/activities";
 
 const ACTIVITY_LOGGED_EVENT = "activityLogged";
@@ -67,6 +69,19 @@ export class ActivitiesApi extends EventTarget {
     if (query.today) {
       url.searchParams.append("today", query.today);
     }
+    if (query.timeZone) {
+      url.searchParams.append("timeZone", query.timeZone);
+    }
+    const response = await this.#fetch(url);
+    verifyResponse(response);
+    const json = await response.text();
+    return JSON.parse(json);
+  }
+
+  async queryTimesheet(query: TimesheetQuery): Promise<TimesheetQueryResult> {
+    const url = new URL(`${this.#baseUrl}/timesheet`, window.location.href);
+    url.searchParams.append("from", query.from);
+    url.searchParams.append("to", query.to);
     if (query.timeZone) {
       url.searchParams.append("timeZone", query.timeZone);
     }
