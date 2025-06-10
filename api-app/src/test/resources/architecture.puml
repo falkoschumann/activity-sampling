@@ -3,10 +3,16 @@
 [Domain] <<..domain..>>
 [Infrastructure] <<..infrastructure..>>
 [UI] <<..ui..>>
+[Common] <<..common..>>
 
 [Application] --> [Domain]
 [Application] --> [Infrastructure]
 [Infrastructure] --> [Domain]
 [UI] --> [Application]
 [UI] --> [Domain]
+
+[Application] --> [Common]
+[Infrastructure] --> [Common]
+[UI] --> [Common]
+[Domain] --> [Common]
 @enduml
