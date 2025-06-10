@@ -2,7 +2,7 @@
 
 import { SerializedError } from "@reduxjs/toolkit";
 
-export default function ErrorComponent({ message }: SerializedError) {
+export default function ErrorComponent({ message }: SerializedError | undefined = {}) {
   if (!message) {
     return null;
   }

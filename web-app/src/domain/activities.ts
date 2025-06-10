@@ -165,7 +165,7 @@ export interface TimesheetEntry {
 }
 
 export function createTestTimesheetEntry(
-  entry: Partial<TimesheetEntry>,
+  entry: Partial<TimesheetEntry> = {},
 ): TimesheetEntry {
   return {
     date: "2025-06-04",

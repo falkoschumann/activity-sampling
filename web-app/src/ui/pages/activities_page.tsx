@@ -37,11 +37,11 @@ export default function ActivitiesPage() {
   return (
     <PageLayout>
       <aside className="container my-4">
-        <ErrorComponent {...error} />
         <CurrentActivityFormContainer />
         <CountdownContainer />
       </aside>
       <main className="container my-4">
+        <ErrorComponent {...error} />
         <RecentActivitiesContainer />
       </main>
       <footer className="fixed-bottom bg-body-secondary">

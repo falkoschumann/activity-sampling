@@ -1,83 +1,115 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
+import { SerializedError } from "@reduxjs/toolkit";
+
 import { Duration } from "../../common/duration";
+import { createTestTimesheetEntry, TimesheetEntry } from "../../domain/activities";
+import ErrorComponent from "../components/error_component";
 import PageLayout from "../layouts/page_layout";
 
 export default function TimesheetPage() {
+  const error: SerializedError = {};
+  const timesheet: { entries: TimesheetEntry[]; totalHours: string; timeZone: string } = {
+    entries: [
+      createTestTimesheetEntry(),
+      createTestTimesheetEntry(),
+      createTestTimesheetEntry(),
+      createTestTimesheetEntry(),
+      createTestTimesheetEntry(),
+    ],
+    totalHours: "PT10H",
+    timeZone: "Europe/Berlin",
+  };
+
   return (
     <PageLayout>
-      <aside className="bg-body-secondary">
-        <div className="container">
-          <div className="btn-toolbar py-2 gap-2" role="toolbar" aria-label="Toolbar with navigation buttons">
-            <div className="btn-group btn-group-sm" role="group" aria-label="Navigation buttons">
-              <button type="button" className="btn btn-toolbar">
-                <i className="bi bi-chevron-left"></i>
-              </button>
-              <button type="button" className="btn btn-toolbar">
-                <i className="bi bi-chevron-right"></i>
-              </button>
-            </div>
-            <div className="align-content-center">
-              <strong>This Week:</strong> 02.06.2025 - 08.06.2025
-            </div>
-            <div className="dropdown ms-auto">
-              <button
-                className="btn btn-sm btn-outline-secondary dropdown-toggle"
-                type="button"
-                data-bs-toggle="dropdown"
-                aria-expanded="false"
-              >
-                Week
-              </button>
-              <ul className="dropdown-menu">
-                <li>
-                  <a className="dropdown-item" href="#">
-                    Day
-                  </a>
-                </li>
-                <li>
-                  <a className="dropdown-item" href="#">
-                    Week
-                  </a>
-                </li>
-                <li>
-                  <a className="dropdown-item" href="#">
-                    Month
-                  </a>
-                </li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      </aside>
+      <PeriodContainer />
       <main className="container my-4">
-        <table className="table">
-          <thead>
-            <tr>
-              <th scope="col">Date</th>
-              <th scope="col">Client</th>
-              <th scope="col">Project</th>
-              <th scope="col">Task</th>
-              <th scope="col">Hours</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>08.06.2025</td>
-              <td>ACME Ltd.</td>
-              <td>Foobar</td>
-              <td>Lorem ipsum</td>
-              <td>04:40</td>
-            </tr>
-          </tbody>
-        </table>
+        <ErrorComponent {...error} />
+        <TimesheetContainer entries={timesheet.entries} timeZone={timesheet.timeZone} />
       </main>
       <footer className="fixed-bottom bg-body">
         <div className="container py-2">
-          <CapacityComponent totalHours="PT12H" offset="-PT1H" capacity="PT40H" />
+          <CapacityComponent totalHours={timesheet.totalHours} offset="-PT1H" capacity="PT40H" />
         </div>
       </footer>
     </PageLayout>
+  );
+}
+
+function PeriodContainer() {
+  return (
+    <aside className="bg-body-secondary">
+      <div className="container">
+        <div className="btn-toolbar py-2 gap-2" role="toolbar" aria-label="Toolbar with navigation buttons">
+          <div className="btn-group btn-group-sm" role="group" aria-label="Navigation buttons">
+            <button type="button" className="btn btn-toolbar">
+              <i className="bi bi-chevron-left"></i>
+            </button>
+            <button type="button" className="btn btn-toolbar">
+              <i className="bi bi-chevron-right"></i>
+            </button>
+          </div>
+          <div className="align-content-center">
+            <strong>This Week:</strong> 02.06.2025 - 08.06.2025
+          </div>
+          <div className="dropdown ms-auto">
+            <button
+              className="btn btn-sm btn-outline-secondary dropdown-toggle"
+              type="button"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+            >
+              Week
+            </button>
+            <ul className="dropdown-menu">
+              <li>
+                <a className="dropdown-item" href="#">
+                  Day
+                </a>
+              </li>
+              <li>
+                <a className="dropdown-item" href="#">
+                  Week
+                </a>
+              </li>
+              <li>
+                <a className="dropdown-item" href="#">
+                  Month
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </aside>
+  );
+}
+
+function TimesheetContainer({ entries, timeZone }: { entries: TimesheetEntry[]; timeZone: string }) {
+  return (
+    <table className="table">
+      <thead>
+        <tr>
+          <th scope="col">Date</th>
+          <th scope="col">Client</th>
+          <th scope="col">Project</th>
+          <th scope="col">Task</th>
+          <th scope="col">Hours</th>
+        </tr>
+      </thead>
+      <tbody>
+        {entries.map((entry, index) => (
+          <tr key={index}>
+            <td>{new Date(entry.date).toLocaleDateString(undefined, { dateStyle: "medium", timeZone })}</td>
+            <td>{entry.client}</td>
+            <td>{entry.project}</td>
+            <td>{entry.task}</td>
+            <td>{Duration.parse(entry.hours).toLocaleString()}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
   );
 }
 
