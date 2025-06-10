@@ -9,8 +9,10 @@ import {
 import { createStore } from "../../src/application/store";
 import { Clock } from "../../src/common/clock";
 import { Timer } from "../../src/common/timer";
-import { AuthenticationQueryResult } from "../../src/domain/activities_messages";
-import { TEST_ACCOUNT } from "../../src/domain/authentication";
+import {
+  AuthenticationQueryResult,
+  createTestAccountInfo,
+} from "../../src/domain/authentication";
 import { ActivitiesApi } from "../../src/infrastructure/activities_api";
 import { AuthenticationApi } from "../../src/infrastructure/authentication_api";
 import { NotificationClient } from "../../src/infrastructure/notification_client";
@@ -19,7 +21,7 @@ describe("Authentication", () => {
   it("Is authenticated", async () => {
     const json = JSON.stringify({
       isAuthenticated: true,
-      account: TEST_ACCOUNT,
+      account: createTestAccountInfo(),
     } as AuthenticationQueryResult);
     const { store } = configure({
       responses: [new Response(json)],
@@ -29,7 +31,7 @@ describe("Authentication", () => {
 
     expect(selectAuthentication(store.getState())).toEqual({
       isAuthenticated: true,
-      account: TEST_ACCOUNT,
+      account: createTestAccountInfo(),
     });
   });
 

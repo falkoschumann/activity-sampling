@@ -17,7 +17,12 @@ export interface AccountInfo {
   roles: string[];
 }
 
-export const TEST_ACCOUNT: AccountInfo = Object.freeze({
-  username: "user",
-  roles: ["USER"],
-});
+export function createTestAccountInfo(
+  info: Partial<AccountInfo> = {},
+): AccountInfo {
+  return {
+    username: "user",
+    roles: ["USER"],
+    ...info,
+  };
+}

@@ -1,9 +1,11 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
 import { describe, expect, it } from "vitest";
-import { AuthenticationQueryResult } from "../../src/domain/activities_messages";
 
-import { TEST_ACCOUNT } from "../../src/domain/authentication";
+import {
+  AuthenticationQueryResult,
+  createTestAccountInfo,
+} from "../../src/domain/authentication";
 import { AuthenticationApi } from "../../src/infrastructure/authentication_api";
 
 describe("Authentication API", () => {
@@ -12,7 +14,7 @@ describe("Authentication API", () => {
       new Response(
         JSON.stringify({
           isAuthenticated: true,
-          account: TEST_ACCOUNT,
+          account: createTestAccountInfo(),
         } as AuthenticationQueryResult),
         { status: 200 },
       ),
@@ -20,7 +22,10 @@ describe("Authentication API", () => {
 
     const user = await api.queryAuthentication({});
 
-    expect(user).toEqual({ isAuthenticated: true, account: TEST_ACCOUNT });
+    expect(user).toEqual({
+      isAuthenticated: true,
+      account: createTestAccountInfo(),
+    });
   });
 
   it("Returns unauthenticated", async () => {
