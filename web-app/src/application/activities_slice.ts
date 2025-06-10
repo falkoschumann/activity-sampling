@@ -89,10 +89,10 @@ export const logActivity = createAsyncThunk<
   const command: LogActivityCommand = {
     timestamp: clock.now().toISOString(),
     duration: countdown.duration,
-    client: currentActivityForm.client,
-    project: currentActivityForm.project,
-    task: currentActivityForm.task,
-    notes: currentActivityForm.notes,
+    client: currentActivityForm.client.trim(),
+    project: currentActivityForm.project.trim(),
+    task: currentActivityForm.task.trim(),
+    notes: currentActivityForm.notes.trim() || undefined,
   };
   const status = await activitiesApi.logActivity(command);
   await thunkAPI.dispatch(queryRecentActivities({}));

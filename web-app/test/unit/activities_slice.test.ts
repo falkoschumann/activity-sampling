@@ -25,6 +25,7 @@ import { Timer } from "../../src/common/timer";
 import {
   createEmptyTimeSummary,
   createTestActivity,
+  createTestLogActivityCommand,
   createTestRecentActivitiesQuery,
   createTestRecentActivitiesQueryResult,
   RecentActivitiesQueryResult,
@@ -35,13 +36,21 @@ import { NotificationClient } from "../../src/infrastructure/notification_client
 
 describe("Activities", () => {
   describe("Ask periodically", () => {
-    it("Starts countdown", () => {
+    it("Starts countdown and disables form", () => {
       const { store, timer } = configure();
       store.dispatch(durationSelected({ duration: "PT20M" }));
       const scheduledTasks = timer.trackScheduledTasks();
 
       store.dispatch(startCountdown({}));
 
+      expect(selectCurrentActivityForm(store.getState())).toEqual({
+        client: "",
+        project: "",
+        task: "",
+        notes: "",
+        disabled: true,
+        loggable: false,
+      });
       expect(selectCountdown(store.getState())).toEqual({
         duration: "PT20M",
         remaining: "PT20M",
@@ -65,6 +74,14 @@ describe("Activities", () => {
 
       timer.simulateTaskRun(Duration.parse("PT16M").seconds);
 
+      expect(selectCurrentActivityForm(store.getState())).toEqual({
+        client: "",
+        project: "",
+        task: "",
+        notes: "",
+        disabled: true,
+        loggable: false,
+      });
       expect(selectCountdown(store.getState())).toEqual({
         duration: "PT20M",
         remaining: "PT4M",
@@ -74,7 +91,7 @@ describe("Activities", () => {
       expect(shownNotifications.data).toEqual([]);
     });
 
-    it("Restarts countdown", () => {
+    it("Restarts countdown and enable form when countdown is elapsed", () => {
       const { store, notificationClient, timer } = configure();
       const shownNotifications = notificationClient.trackNotificationsShown();
       store.dispatch(durationSelected({ duration: "PT20M" }));
@@ -83,6 +100,14 @@ describe("Activities", () => {
 
       timer.simulateTaskRun(Duration.parse("PT1M").seconds);
 
+      expect(selectCurrentActivityForm(store.getState())).toEqual({
+        client: "",
+        project: "",
+        task: "",
+        notes: "",
+        disabled: false,
+        loggable: false,
+      });
       expect(selectCountdown(store.getState())).toEqual({
         duration: "PT20M",
         remaining: "PT19M",
@@ -98,7 +123,7 @@ describe("Activities", () => {
       ]);
     });
 
-    it("Stops countdown", () => {
+    it("Stops countdown and enables form", () => {
       const { store, timer } = configure();
       const cancelledTasks = timer.trackCancelledTasks();
       store.dispatch(startCountdown({}));
@@ -106,6 +131,14 @@ describe("Activities", () => {
 
       store.dispatch(stopCountdown({}));
 
+      expect(selectCurrentActivityForm(store.getState())).toEqual({
+        client: "",
+        project: "",
+        task: "",
+        notes: "",
+        disabled: false,
+        loggable: false,
+      });
       expect(selectCountdown(store.getState())).toEqual({
         duration: "PT30M",
         remaining: "PT18M",
@@ -156,179 +189,144 @@ describe("Activities", () => {
   });
 
   describe("Log activity", () => {
-    it("Logs the activity with client, project, task and optional notes", () => {
-      const { store } = configure();
-
-      store.dispatch(changeText({ name: "client", text: "client-1" }));
-      expect(selectCurrentActivityForm(store.getState())).toEqual({
-        client: "client-1",
-        project: "",
-        task: "",
-        notes: "",
-        disabled: false,
-        loggable: false,
-      });
-
-      store.dispatch(changeText({ name: "project", text: "project-1" }));
-      expect(selectCurrentActivityForm(store.getState())).toEqual({
-        client: "client-1",
-        project: "project-1",
-        task: "",
-        notes: "",
-        disabled: false,
-        loggable: false,
-      });
-
-      store.dispatch(changeText({ name: "task", text: "task-1" }));
-      expect(selectCurrentActivityForm(store.getState())).toEqual({
-        client: "client-1",
-        project: "project-1",
-        task: "task-1",
-        notes: "",
-        disabled: false,
-        loggable: true,
-      });
-
-      store.dispatch(changeText({ name: "notes", text: "notes-1" }));
-      expect(selectCurrentActivityForm(store.getState())).toEqual({
-        client: "client-1",
-        project: "project-1",
-        task: "task-1",
-        notes: "notes-1",
-        disabled: false,
-        loggable: true,
-      });
-    });
-
     it("Logs activity", async () => {
       const commandStatus = JSON.stringify({ success: true });
-      const queryResultJson = JSON.stringify({
-        lastActivity: {
-          timestamp: "2025-03-10T21:00:00Z",
-          duration: "PT30M",
-          client: "client-1",
-          project: "project-1",
-          task: "task-1",
-          notes: "notes-1",
-        },
-        workingDays: [
-          {
-            date: "2025-03-10",
-            activities: [
-              {
-                timestamp: "2025-03-10T21:00:00Z",
-                duration: "PT30M",
-                client: "client-1",
-                project: "project-1",
-                task: "task-1",
-                notes: "notes-1",
-              },
-            ],
-          },
-        ],
-        timeSummary: {
-          hoursToday: "PT30M",
-          hoursYesterday: "PT0S",
-          hoursThisWeek: "PT30M",
-          hoursThisMonth: "PT30M",
-        },
-      } as RecentActivitiesQueryResult);
+      const queryResultJson = JSON.stringify(
+        createTestRecentActivitiesQueryResult(),
+      );
       const { store, activitiesApi, clock } = configure({
         responses: [new Response(commandStatus), new Response(queryResultJson)],
       });
       const loggedActivities = activitiesApi.trackActivitiesLogged();
-      store.dispatch(changeText({ name: "client", text: "client-1" }));
-      store.dispatch(changeText({ name: "project", text: "project-1" }));
-      store.dispatch(changeText({ name: "task", text: "task-1" }));
-      store.dispatch(changeText({ name: "notes", text: "notes-1" }));
 
-      await store.dispatch(logActivity({}));
-
+      store.dispatch(changeText({ name: "client", text: "Test client" }));
       expect(selectCurrentActivityForm(store.getState())).toEqual({
-        client: "client-1",
-        project: "project-1",
-        task: "task-1",
-        notes: "notes-1",
+        client: "Test client",
+        project: "",
+        task: "",
+        notes: "",
+        disabled: false,
+        loggable: false,
+      });
+      store.dispatch(changeText({ name: "project", text: "Test project" }));
+      expect(selectCurrentActivityForm(store.getState())).toEqual({
+        client: "Test client",
+        project: "Test project",
+        task: "",
+        notes: "",
+        disabled: false,
+        loggable: false,
+      });
+      store.dispatch(changeText({ name: "task", text: "Test task" }));
+      expect(selectCurrentActivityForm(store.getState())).toEqual({
+        client: "Test client",
+        project: "Test project",
+        task: "Test task",
+        notes: "",
         disabled: false,
         loggable: true,
       });
-      expect(selectRecentActivities(store.getState())).toEqual([
-        {
-          date: "2025-03-10",
-          activities: [
-            {
-              timestamp: "2025-03-10T21:00:00Z",
-              duration: "PT30M",
-              client: "client-1",
-              project: "project-1",
-              task: "task-1",
-              notes: "notes-1",
-            },
-          ],
-        },
-      ]);
-      expect(selectTimeSummary(store.getState())).toEqual({
-        hoursToday: "PT30M",
-        hoursYesterday: "PT0S",
-        hoursThisWeek: "PT30M",
-        hoursThisMonth: "PT30M",
-      });
+
+      await store.dispatch(logActivity({}));
+
       expect(loggedActivities.data).toEqual([
-        {
-          timestamp: clock.now().toISOString(),
-          duration: "PT30M",
-          client: "client-1",
-          project: "project-1",
-          task: "task-1",
-          notes: "notes-1",
-        },
+        createTestLogActivityCommand({ timestamp: clock.now().toISOString() }),
       ]);
     });
 
-    it("Disables form when countdown is started", async () => {
-      const { store } = configure();
-
-      await store.dispatch(startCountdown({}));
-
-      expect(selectCurrentActivityForm(store.getState())).toEqual({
-        client: "",
-        project: "",
-        task: "",
-        notes: "",
-        disabled: true,
-        loggable: false,
+    it("Logs activity with optional notes", async () => {
+      const commandStatus = JSON.stringify({ success: true });
+      const queryResultJson = JSON.stringify(
+        createTestRecentActivitiesQueryResult(),
+      );
+      const { store, activitiesApi, clock } = configure({
+        responses: [new Response(commandStatus), new Response(queryResultJson)],
       });
-    });
+      const loggedActivities = activitiesApi.trackActivitiesLogged();
 
-    it("Enables form when countdown is stopped", async () => {
-      const { store } = configure();
-      await store.dispatch(startCountdown({}));
-
-      await store.dispatch(stopCountdown({}));
-
+      store.dispatch(changeText({ name: "client", text: "Test client" }));
       expect(selectCurrentActivityForm(store.getState())).toEqual({
-        client: "",
+        client: "Test client",
         project: "",
         task: "",
         notes: "",
         disabled: false,
         loggable: false,
       });
-    });
-
-    it("Enables form when countdown is elapsed", async () => {
-      const { store, timer } = configure();
-      await store.dispatch(startCountdown({}));
-
-      timer.simulateTaskRun(Duration.parse("PT30M1S").seconds);
-
+      store.dispatch(changeText({ name: "project", text: "Test project" }));
       expect(selectCurrentActivityForm(store.getState())).toEqual({
-        client: "",
-        project: "",
+        client: "Test client",
+        project: "Test project",
         task: "",
         notes: "",
         disabled: false,
         loggable: false,
+      });
+      store.dispatch(changeText({ name: "task", text: "Test task" }));
+      expect(selectCurrentActivityForm(store.getState())).toEqual({
+        client: "Test client",
+        project: "Test project",
+        task: "Test task",
+        notes: "",
+        disabled: false,
+        loggable: true,
+      });
+      store.dispatch(changeText({ name: "notes", text: "Test notes" }));
+      expect(selectCurrentActivityForm(store.getState())).toEqual({
+        client: "Test client",
+        project: "Test project",
+        task: "Test task",
+        notes: "Test notes",
+        disabled: false,
+        loggable: true,
+      });
+
+      await store.dispatch(logActivity({}));
+
+      expect(loggedActivities.data).toEqual([
+        createTestLogActivityCommand({
+          timestamp: clock.now().toISOString(),
+          notes: "Test notes",
+        }),
+      ]);
+    });
+
+    it("Selects an activity from recent activities", () => {
+      const { store } = configure();
+
+      store.dispatch(
+        activitySelected(createTestActivity({ notes: "Test notes" })),
+      );
+
+      expect(selectCurrentActivityForm(store.getState())).toEqual({
+        client: "Test client",
+        project: "Test project",
+        task: "Test task",
+        notes: "Test notes",
+        disabled: false,
+        loggable: true,
+      });
+    });
+
+    it("Selects last activity when the application starts", async () => {
+      const queryResultJson = JSON.stringify(
+        createTestRecentActivitiesQueryResult(),
+      );
+      const { store } = configure({
+        responses: [new Response(queryResultJson)],
+      });
+
+      await store.dispatch(
+        queryRecentActivities(createTestRecentActivitiesQuery()),
+      );
+
+      expect(selectCurrentActivityForm(store.getState())).toEqual({
+        client: "Test client",
+        project: "Test project",
+        task: "Test task",
+        notes: "",
+        disabled: false,
+        loggable: true,
       });
     });
 
@@ -336,39 +334,22 @@ describe("Activities", () => {
       const { store, notificationClient, timer } = configure({
         responses: [
           new Response(JSON.stringify({ success: true })),
-          new Response(
-            JSON.stringify({
-              lastActivity: {
-                timestamp: "2025-02-12T21:18",
-                duration: "PT30M",
-                client: "client-1",
-                project: "project-1",
-                task: "task-1",
-              },
-              workingDays: [],
-              timeSummary: {
-                hoursToday: "PT0S",
-                hoursYesterday: "PT0S",
-                hoursThisWeek: "PT0S",
-                hoursThisMonth: "PT0S",
-              },
-            }),
-          ),
+          new Response(JSON.stringify(createTestRecentActivitiesQueryResult())),
         ],
       });
       const hiddenNotifications = notificationClient.trackNotificationsHidden();
       await store.dispatch(startCountdown({}));
 
       timer.simulateTaskRun(Duration.parse("PT30M1S").seconds);
-      store.dispatch(changeText({ name: "client", text: "client-1" }));
-      store.dispatch(changeText({ name: "project", text: "project-1" }));
-      store.dispatch(changeText({ name: "task", text: "task-1" }));
+      store.dispatch(changeText({ name: "client", text: "Test client" }));
+      store.dispatch(changeText({ name: "project", text: "Test project" }));
+      store.dispatch(changeText({ name: "task", text: "Test task" }));
       await store.dispatch(logActivity({}));
 
       expect(selectCurrentActivityForm(store.getState())).toEqual({
-        client: "client-1",
-        project: "project-1",
-        task: "task-1",
+        client: "Test client",
+        project: "Test project",
+        task: "Test task",
         notes: "",
         disabled: true,
         loggable: true,
@@ -382,17 +363,7 @@ describe("Activities", () => {
       const { store } = configure({
         responses: [
           new Response(JSON.stringify(new Failure("Domain error."))),
-          new Response(
-            JSON.stringify({
-              workingDays: [],
-              timeSummary: {
-                hoursToday: "PT0S",
-                hoursYesterday: "PT0S",
-                hoursThisWeek: "PT0S",
-                hoursThisMonth: "PT0S",
-              },
-            }),
-          ),
+          new Response(JSON.stringify(createTestRecentActivitiesQueryResult())),
         ],
       });
       store.dispatch(changeText({ name: "client", text: "client-1" }));
@@ -425,34 +396,10 @@ describe("Activities", () => {
         message: "Could not log activity. Please try again later.",
       });
     });
-
-    it("Selects an activity", () => {
-      const { store } = configure();
-
-      store.dispatch(
-        activitySelected({
-          timestamp: "2025-02-12T21:18",
-          duration: "PT30M",
-          client: "client-1",
-          project: "project-1",
-          task: "task-1",
-          notes: "notes-1",
-        }),
-      );
-
-      expect(selectCurrentActivityForm(store.getState())).toEqual({
-        client: "client-1",
-        project: "project-1",
-        task: "task-1",
-        notes: "notes-1",
-        disabled: false,
-        loggable: true,
-      });
-    });
   });
 
   describe("Recent activities", () => {
-    it("Returns empty result", async () => {
+    it("Queries empty result", async () => {
       const queryResultJson = JSON.stringify({
         workingDays: [],
         timeSummary: createEmptyTimeSummary(),
