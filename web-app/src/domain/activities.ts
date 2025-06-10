@@ -9,9 +9,32 @@ export interface LogActivityCommand {
   readonly notes?: string;
 }
 
+export function createTestLogActivityCommand(
+  command: Partial<LogActivityCommand> = {},
+): LogActivityCommand {
+  return {
+    timestamp: "2024-12-18T08:30:00Z",
+    duration: "PT30M",
+    client: "Test client",
+    project: "Test project",
+    task: "Test task",
+    ...command,
+  };
+}
+
 export interface RecentActivitiesQuery {
   readonly today?: string;
   readonly timeZone?: string;
+}
+
+export function createTestRecentActivitiesQuery(
+  query: Partial<RecentActivitiesQuery> = {},
+): RecentActivitiesQuery {
+  return {
+    today: "2024-12-18",
+    timeZone: "Europe/Berlin",
+    ...query,
+  };
 }
 
 export interface RecentActivitiesQueryResult {
@@ -19,6 +42,40 @@ export interface RecentActivitiesQueryResult {
   readonly workingDays: WorkingDay[];
   readonly timeSummary: TimeSummary;
   readonly timeZone: string;
+}
+
+export function createTestRecentActivitiesQueryResult(
+  result: Partial<RecentActivitiesQueryResult> = {},
+): RecentActivitiesQueryResult {
+  return {
+    lastActivity: createTestActivity({ timestamp: "2024-12-18T09:30" }),
+    workingDays: [
+      {
+        date: "2024-12-18",
+        activities: [createTestActivity({ timestamp: "2024-12-18T09:30" })],
+      },
+      {
+        date: "2024-12-17",
+        activities: [
+          createTestActivity({ timestamp: "2024-12-17T17:00" }),
+          createTestActivity({ timestamp: "2024-12-17T16:30" }),
+          createTestActivity({
+            timestamp: "2024-12-17T16:00",
+            task: "Other task",
+            notes: "Other notes",
+          }),
+        ],
+      },
+    ],
+    timeSummary: {
+      hoursToday: "PT30M",
+      hoursYesterday: "PT1H30M",
+      hoursThisWeek: "PT2H",
+      hoursThisMonth: "PT2H",
+    },
+    timeZone: "Europe/Berlin",
+    ...result,
+  };
 }
 
 export interface TimesheetQuery {
@@ -42,14 +99,16 @@ export interface Activity {
   readonly notes?: string;
 }
 
-export const TEST_ACTIVITY: Activity = Object.freeze({
-  timestamp: "2024-12-18T09:30:00+01:00",
-  duration: "PT30M",
-  client: "ACME Inc.",
-  project: "Foobar",
-  task: "Do something",
-  notes: "",
-});
+export function createTestActivity(activity: Partial<Activity> = {}): Activity {
+  return {
+    timestamp: "2024-12-18T09:30",
+    duration: "PT30M",
+    client: "Test client",
+    project: "Test project",
+    task: "Test task",
+    ...activity,
+  };
+}
 
 export interface WorkingDay {
   readonly date: string;
@@ -61,6 +120,15 @@ export interface TimeSummary {
   readonly hoursYesterday: string;
   readonly hoursThisWeek: string;
   readonly hoursThisMonth: string;
+}
+
+export function createEmptyTimeSummary(): TimeSummary {
+  return {
+    hoursToday: "PT0S",
+    hoursYesterday: "PT0S",
+    hoursThisWeek: "PT0S",
+    hoursThisMonth: "PT0S",
+  };
 }
 
 export interface TimesheetEntry {

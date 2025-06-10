@@ -239,6 +239,7 @@ const activitiesSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
+    // Log activity
     builder.addCase(logActivity.pending, (state) => {
       state.error = undefined;
     });
@@ -257,6 +258,7 @@ const activitiesSlice = createSlice({
       };
     });
 
+    // Query recent activities
     builder.addCase(queryRecentActivities.pending, (state) => {
       state.error = undefined;
     });

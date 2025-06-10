@@ -3,21 +3,25 @@
 import { describe, expect, it } from "vitest";
 import { Success } from "../../src/common/messages";
 
-import { TEST_ACTIVITY } from "../../src/domain/activities";
+import {
+  createTestLogActivityCommand,
+  createTestRecentActivitiesQuery,
+  createTestRecentActivitiesQueryResult,
+} from "../../src/domain/activities";
 import { ActivitiesApi } from "../../src/infrastructure/activities_api";
 
 describe("Activities API", () => {
   describe("Log activity", () => {
     it("Logs successfully activity", async () => {
       const api = ActivitiesApi.createNull(
-        new Response(JSON.stringify({ success: true }), { status: 200 }),
+        new Response(JSON.stringify(new Success()), { status: 200 }),
       );
       const loggedActivities = api.trackActivitiesLogged();
 
-      const status = await api.logActivity(TEST_ACTIVITY);
+      const status = await api.logActivity(createTestLogActivityCommand());
 
       expect(status).toEqual(new Success());
-      expect(loggedActivities.data).toEqual([TEST_ACTIVITY]);
+      expect(loggedActivities.data).toEqual([createTestLogActivityCommand()]);
     });
 
     it("Handles server error", async () => {
@@ -25,7 +29,7 @@ describe("Activities API", () => {
         new Response("", { status: 500, statusText: "Internal Server Error" }),
       );
 
-      const result = api.logActivity(TEST_ACTIVITY);
+      const result = api.logActivity(createTestLogActivityCommand());
 
       await expect(result).rejects.toThrow("500: Internal Server Error");
     });
@@ -33,7 +37,7 @@ describe("Activities API", () => {
     it("Handles network error", async () => {
       const api = ActivitiesApi.createNull(new Error("Network Error"));
 
-      const result = api.logActivity(TEST_ACTIVITY);
+      const result = api.logActivity(createTestLogActivityCommand());
 
       await expect(result).rejects.toThrow("Network Error");
     });
@@ -42,31 +46,16 @@ describe("Activities API", () => {
   describe("Recent activities", () => {
     it("Returns activities", async () => {
       const api = ActivitiesApi.createNull(
-        new Response(
-          JSON.stringify({
-            workingDays: [],
-            timeSummary: {
-              hoursToday: "PT0S",
-              hoursYesterday: "PT0S",
-              hoursThisWeek: "PT0S",
-              hoursThisMonth: "PT0S",
-            },
-          }),
-          { status: 200 },
-        ),
+        new Response(JSON.stringify(createTestRecentActivitiesQueryResult()), {
+          status: 200,
+        }),
       );
 
-      const result = await api.queryRecentActivities({});
+      const result = await api.queryRecentActivities(
+        createTestRecentActivitiesQuery(),
+      );
 
-      expect(result).toEqual({
-        workingDays: [],
-        timeSummary: {
-          hoursToday: "PT0S",
-          hoursYesterday: "PT0S",
-          hoursThisWeek: "PT0S",
-          hoursThisMonth: "PT0S",
-        },
-      });
+      expect(result).toEqual(createTestRecentActivitiesQueryResult());
     });
 
     it("Handles server error", async () => {
@@ -74,7 +63,9 @@ describe("Activities API", () => {
         new Response("", { status: 500, statusText: "Internal Server Error" }),
       );
 
-      const result = api.queryRecentActivities({});
+      const result = api.queryRecentActivities(
+        createTestRecentActivitiesQuery(),
+      );
 
       await expect(result).rejects.toThrow("500: Internal Server Error");
     });
@@ -82,7 +73,9 @@ describe("Activities API", () => {
     it("Handles network error", async () => {
       const api = ActivitiesApi.createNull(new Error("Network Error"));
 
-      const result = api.queryRecentActivities({});
+      const result = api.queryRecentActivities(
+        createTestRecentActivitiesQuery(),
+      );
 
       await expect(result).rejects.toThrow("Network Error");
     });

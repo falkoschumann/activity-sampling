@@ -22,7 +22,13 @@ import { Clock } from "../../src/common/clock";
 import { Duration } from "../../src/common/duration";
 import { Failure } from "../../src/common/messages";
 import { Timer } from "../../src/common/timer";
-import { RecentActivitiesQueryResult } from "../../src/domain/activities";
+import {
+  createEmptyTimeSummary,
+  createTestActivity,
+  createTestRecentActivitiesQuery,
+  createTestRecentActivitiesQueryResult,
+  RecentActivitiesQueryResult,
+} from "../../src/domain/activities";
 import { ActivitiesApi } from "../../src/infrastructure/activities_api";
 import { AuthenticationApi } from "../../src/infrastructure/authentication_api";
 import { NotificationClient } from "../../src/infrastructure/notification_client";
@@ -446,75 +452,108 @@ describe("Activities", () => {
   });
 
   describe("Recent activities", () => {
-    it("Queries recent activities", async () => {
+    it("Returns empty result", async () => {
       const queryResultJson = JSON.stringify({
-        lastActivity: {
-          timestamp: "2025-02-11T21:30",
-          duration: "PT30M",
-          client: "ACME Inc.",
-          project: "Foobar",
-          task: "Do something",
-          notes: "Lorem ipsum",
-        },
-        workingDays: [
-          {
-            date: "2025-02-11",
-            activities: [
-              {
-                timestamp: "2025-02-11T21:30",
-                duration: "PT30M",
-                client: "ACME Inc.",
-                project: "Foobar",
-                task: "Do something",
-                notes: "Lorem ipsum",
-              },
-            ],
-          },
-        ],
-        timeSummary: {
-          hoursToday: "PT30M",
-          hoursYesterday: "PT0S",
-          hoursThisWeek: "PT30M",
-          hoursThisMonth: "PT30M",
-        },
+        workingDays: [],
+        timeSummary: createEmptyTimeSummary(),
         timeZone: "Europe/Berlin",
       } as RecentActivitiesQueryResult);
       const { store } = configure({
         responses: [new Response(queryResultJson)],
       });
 
-      await store.dispatch(queryRecentActivities({}));
+      await store.dispatch(
+        queryRecentActivities(createTestRecentActivitiesQuery()),
+      );
 
       expect(selectCurrentActivityForm(store.getState())).toEqual({
-        client: "ACME Inc.",
-        project: "Foobar",
-        task: "Do something",
-        notes: "Lorem ipsum",
+        client: "",
+        project: "",
+        task: "",
+        notes: "",
+        disabled: false,
+        loggable: false,
+      });
+      expect(selectRecentActivities(store.getState())).toEqual([]);
+      expect(selectTimeZone(store.getState())).toEqual("Europe/Berlin");
+      expect(selectTimeSummary(store.getState())).toEqual(
+        createEmptyTimeSummary(),
+      );
+    });
+
+    it("Returns last activity", async () => {
+      const queryResultJson = JSON.stringify(
+        createTestRecentActivitiesQueryResult(),
+      );
+      const { store } = configure({
+        responses: [new Response(queryResultJson)],
+      });
+
+      await store.dispatch(
+        queryRecentActivities(createTestRecentActivitiesQuery()),
+      );
+
+      expect(selectCurrentActivityForm(store.getState())).toEqual({
+        client: "Test client",
+        project: "Test project",
+        task: "Test task",
+        notes: "",
         disabled: false,
         loggable: true,
       });
+    });
+
+    it("Groups activities by working days for the last 30 days", async () => {
+      const queryResultJson = JSON.stringify(
+        createTestRecentActivitiesQueryResult(),
+      );
+      const { store } = configure({
+        responses: [new Response(queryResultJson)],
+      });
+
+      await store.dispatch(
+        queryRecentActivities(createTestRecentActivitiesQuery()),
+      );
+
       expect(selectRecentActivities(store.getState())).toEqual([
         {
-          date: "2025-02-11",
+          date: "2024-12-18",
+          activities: [createTestActivity({ timestamp: "2024-12-18T09:30" })],
+        },
+        {
+          date: "2024-12-17",
           activities: [
-            {
-              timestamp: "2025-02-11T21:30",
-              duration: "PT30M",
-              client: "ACME Inc.",
-              project: "Foobar",
-              task: "Do something",
-              notes: "Lorem ipsum",
-            },
+            createTestActivity({ timestamp: "2024-12-17T17:00" }),
+            createTestActivity({ timestamp: "2024-12-17T16:30" }),
+            createTestActivity({
+              timestamp: "2024-12-17T16:00",
+              task: "Other task",
+              notes: "Other notes",
+            }),
           ],
         },
       ]);
+      expect(selectTimeZone(store.getState())).toEqual("Europe/Berlin");
+    });
+
+    it("Summarizes hours worked today, yesterday, this week and this month", async () => {
+      const queryResultJson = JSON.stringify(
+        createTestRecentActivitiesQueryResult(),
+      );
+      const { store } = configure({
+        responses: [new Response(queryResultJson)],
+      });
+
+      await store.dispatch(
+        queryRecentActivities(createTestRecentActivitiesQuery()),
+      );
+
       expect(selectTimeSummary(store.getState())).toEqual({
         hoursToday: "PT30M",
-        hoursYesterday: "PT0S",
-        hoursThisWeek: "PT30M",
-        hoursThisMonth: "PT30M",
+        hoursYesterday: "PT1H30M",
+        hoursThisWeek: "PT2H",
+        hoursThisMonth: "PT2H",
       });
-      expect(selectTimeZone(store.getState())).toEqual("Europe/Berlin");
     });
 
     it("Handles server error", async () => {
