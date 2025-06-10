@@ -142,7 +142,8 @@ const progressCountdown = createAsyncThunk<
   thunkAPI.dispatch(countdownProgressed({ seconds }));
   const countdown = selectCountdown(thunkAPI.getState());
   const remaining = Duration.parse(countdown.remaining);
-  if (notificationClient.isGranted && !remaining.isPositive()) {
+  const intervalElapsed = !remaining.isPositive();
+  if (intervalElapsed && notificationClient.isGranted) {
     const currentActivityForm = selectCurrentActivityForm(thunkAPI.getState());
     notificationClient.show("What are you working on?", {
       body:

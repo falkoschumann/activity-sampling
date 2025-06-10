@@ -69,15 +69,6 @@ class ActivitiesServiceTests {
   class QueryRecentActivities {
 
     @Test
-    void queriesEmptyResult() {
-      var service = new ActivitiesService(store);
-
-      var result = service.queryRecentActivities(RecentActivitiesQuery.DEFAULT);
-
-      assertEquals(RecentActivitiesQueryResult.EMPTY, result);
-    }
-
-    @Test
     void returnsLastActivity() {
       recordEvent("2025-06-09T08:30:00Z");
       recordEvent("2025-06-09T09:00:00Z");
@@ -159,6 +150,15 @@ class ActivitiesServiceTests {
               .hoursThisMonth((Duration.parse("PT5H")))
               .build(),
           result.timeSummary());
+    }
+
+    @Test
+    void queriesEmptyResult() {
+      var service = new ActivitiesService(store);
+
+      var result = service.queryRecentActivities(RecentActivitiesQuery.DEFAULT);
+
+      assertEquals(RecentActivitiesQueryResult.EMPTY, result);
     }
   }
 

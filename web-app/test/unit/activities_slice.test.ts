@@ -36,11 +36,11 @@ import { NotificationClient } from "../../src/infrastructure/notification_client
 
 describe("Activities", () => {
   describe("Ask periodically", () => {
-    it("Starts countdown and disables form", () => {
+    it("Starts countdown with a given interval", () => {
       const { store, timer } = configure();
-      store.dispatch(durationSelected({ duration: "PT20M" }));
       const scheduledTasks = timer.trackScheduledTasks();
 
+      store.dispatch(durationSelected({ duration: "PT20M" }));
       store.dispatch(startCountdown({}));
 
       expect(selectCurrentActivityForm(store.getState())).toEqual({
@@ -150,20 +150,7 @@ describe("Activities", () => {
   });
 
   describe("Current interval", () => {
-    it("Selects duration", () => {
-      const { store } = configure();
-
-      store.dispatch(durationSelected({ duration: "PT15M" }));
-
-      expect(selectCountdown(store.getState())).toEqual({
-        duration: "PT15M",
-        remaining: "PT15M",
-        percentage: 0,
-        isRunning: false,
-      });
-    });
-
-    it("Elapses countdown", () => {
+    it("Notify user when an interval is elapsed", () => {
       const { store, notificationClient, timer } = configure();
       const shownNotifications = notificationClient.trackNotificationsShown();
       store.dispatch(durationSelected({ duration: "PT20M" }));
@@ -399,35 +386,6 @@ describe("Activities", () => {
   });
 
   describe("Recent activities", () => {
-    it("Queries empty result", async () => {
-      const queryResultJson = JSON.stringify({
-        workingDays: [],
-        timeSummary: createEmptyTimeSummary(),
-        timeZone: "Europe/Berlin",
-      } as RecentActivitiesQueryResult);
-      const { store } = configure({
-        responses: [new Response(queryResultJson)],
-      });
-
-      await store.dispatch(
-        queryRecentActivities(createTestRecentActivitiesQuery()),
-      );
-
-      expect(selectCurrentActivityForm(store.getState())).toEqual({
-        client: "",
-        project: "",
-        task: "",
-        notes: "",
-        disabled: false,
-        loggable: false,
-      });
-      expect(selectRecentActivities(store.getState())).toEqual([]);
-      expect(selectTimeZone(store.getState())).toEqual("Europe/Berlin");
-      expect(selectTimeSummary(store.getState())).toEqual(
-        createEmptyTimeSummary(),
-      );
-    });
-
     it("Returns last activity", async () => {
       const queryResultJson = JSON.stringify(
         createTestRecentActivitiesQueryResult(),
@@ -501,6 +459,35 @@ describe("Activities", () => {
         hoursThisWeek: "PT2H",
         hoursThisMonth: "PT2H",
       });
+    });
+
+    it("Queries empty result", async () => {
+      const queryResultJson = JSON.stringify({
+        workingDays: [],
+        timeSummary: createEmptyTimeSummary(),
+        timeZone: "Europe/Berlin",
+      } as RecentActivitiesQueryResult);
+      const { store } = configure({
+        responses: [new Response(queryResultJson)],
+      });
+
+      await store.dispatch(
+        queryRecentActivities(createTestRecentActivitiesQuery()),
+      );
+
+      expect(selectCurrentActivityForm(store.getState())).toEqual({
+        client: "",
+        project: "",
+        task: "",
+        notes: "",
+        disabled: false,
+        loggable: false,
+      });
+      expect(selectRecentActivities(store.getState())).toEqual([]);
+      expect(selectTimeZone(store.getState())).toEqual("Europe/Berlin");
+      expect(selectTimeSummary(store.getState())).toEqual(
+        createEmptyTimeSummary(),
+      );
     });
 
     it("Handles server error", async () => {
