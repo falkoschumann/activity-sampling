@@ -8,15 +8,17 @@ import {
 } from "@reduxjs/toolkit";
 import { Clock } from "../common/clock";
 import { Duration } from "../common/duration";
+import { CommandStatus } from "../common/messages";
 import { Timer } from "../common/timer";
 
-import { Activity, TimeSummary, WorkingDay } from "../domain/activities";
 import {
-  CommandStatus,
+  Activity,
   LogActivityCommand,
   RecentActivitiesQuery,
   RecentActivitiesQueryResult,
-} from "../domain/activities_messages";
+  TimeSummary,
+  WorkingDay,
+} from "../domain/activities";
 import { ActivitiesApi } from "../infrastructure/activities_api";
 import { NotificationClient } from "../infrastructure/notification_client";
 

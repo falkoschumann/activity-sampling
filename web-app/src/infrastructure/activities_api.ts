@@ -2,13 +2,13 @@
 
 import { ConfigurableResponses } from "../common/configurable_responses";
 import { verifyResponse } from "../common/http";
+import { CommandStatus } from "../common/messages";
 import { OutputTracker } from "../common/output_tracker";
 import {
-  CommandStatus,
   LogActivityCommand,
   RecentActivitiesQuery,
   RecentActivitiesQueryResult,
-} from "../domain/activities_messages";
+} from "../domain/activities";
 
 const ACTIVITY_LOGGED_EVENT = "activityLogged";
 

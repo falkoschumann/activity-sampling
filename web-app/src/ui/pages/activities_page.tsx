@@ -21,7 +21,7 @@ import {
 } from "../../application/activities_slice";
 import { AppDispatch } from "../../application/store";
 import { Duration } from "../../common/duration";
-import { EventHandler } from "../../common/types";
+import { EventHandler } from "../../common/events";
 import { Activity, WorkingDay } from "../../domain/activities";
 import ErrorComponent from "../components/error_component";
 import PageLayout from "../layouts/page_layout";

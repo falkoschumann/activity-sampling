@@ -1,9 +1,9 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
 import { describe, expect, it } from "vitest";
+import { Success } from "../../src/common/messages";
 
 import { TEST_ACTIVITY } from "../../src/domain/activities";
-import { Success } from "../../src/domain/activities_messages";
 import { ActivitiesApi } from "../../src/infrastructure/activities_api";
 
 describe("Activities API", () => {

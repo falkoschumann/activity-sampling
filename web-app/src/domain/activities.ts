@@ -1,5 +1,38 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
+export interface LogActivityCommand {
+  readonly timestamp: string;
+  readonly duration: string;
+  readonly client: string;
+  readonly project: string;
+  readonly task: string;
+  readonly notes?: string;
+}
+
+export interface RecentActivitiesQuery {
+  readonly today?: string;
+  readonly timeZone?: string;
+}
+
+export interface RecentActivitiesQueryResult {
+  readonly lastActivity?: Activity;
+  readonly workingDays: WorkingDay[];
+  readonly timeSummary: TimeSummary;
+  readonly timeZone: string;
+}
+
+export interface TimesheetQuery {
+  readonly from: string;
+  readonly to: string;
+  readonly timeZone?: string;
+}
+
+export interface TimesheetQueryResult {
+  readonly entries: TimesheetEntry[];
+  readonly totalHours: string;
+  readonly timeZone?: string;
+}
+
 export interface Activity {
   readonly timestamp: string;
   readonly duration: string;
@@ -28,4 +61,12 @@ export interface TimeSummary {
   readonly hoursYesterday: string;
   readonly hoursThisWeek: string;
   readonly hoursThisMonth: string;
+}
+
+export interface TimesheetEntry {
+  readonly date: string;
+  readonly client: string;
+  readonly project: string;
+  readonly task: string;
+  readonly hours: string;
 }

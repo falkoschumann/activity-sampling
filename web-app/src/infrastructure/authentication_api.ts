@@ -2,10 +2,11 @@
 
 import { ConfigurableResponses } from "../common/configurable_responses";
 import { verifyResponse } from "../common/http";
+
 import {
   AuthenticationQuery,
   AuthenticationQueryResult,
-} from "../domain/authentication_messages";
+} from "../domain/authentication";
 
 export class AuthenticationApi {
   static create(): AuthenticationApi {

@@ -20,11 +20,9 @@ import {
 import { createStore } from "../../src/application/store";
 import { Clock } from "../../src/common/clock";
 import { Duration } from "../../src/common/duration";
+import { Failure } from "../../src/common/messages";
 import { Timer } from "../../src/common/timer";
-import {
-  Failure,
-  RecentActivitiesQueryResult,
-} from "../../src/domain/activities_messages";
+import { RecentActivitiesQueryResult } from "../../src/domain/activities";
 import { ActivitiesApi } from "../../src/infrastructure/activities_api";
 import { AuthenticationApi } from "../../src/infrastructure/authentication_api";
 import { NotificationClient } from "../../src/infrastructure/notification_client";

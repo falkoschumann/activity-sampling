@@ -2,11 +2,11 @@
 
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
-import { AccountInfo } from "../domain/authentication";
 import {
+  AccountInfo,
   AuthenticationQuery,
   AuthenticationQueryResult,
-} from "../domain/authentication_messages";
+} from "../domain/authentication";
 import { AuthenticationApi } from "../infrastructure/authentication_api";
 
 interface AuthenticationState {
