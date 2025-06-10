@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { useSelector } from "react-redux";
+import { NavLink } from "react-router";
 
 import { selectAuthentication } from "../../application/authentication_slice";
 import AuthenticatedTemplate from "../components/authenticated_template";
@@ -31,14 +32,14 @@ export default function PageLayout({ children }: { children?: React.ReactNode })
               <div className="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul className="navbar-nav me-auto mb-2 mb-lg-0">
                   <li className="nav-item">
-                    <a className="nav-link active" aria-current="page" href="/">
+                    <NavLink className="nav-link" to="/">
                       Log
-                    </a>
+                    </NavLink>
                   </li>
                   <li>
-                    <a className="nav-link" href="/timesheet">
+                    <NavLink className="nav-link" to="/timesheet">
                       Timesheet
-                    </a>
+                    </NavLink>
                   </li>
                 </ul>
                 <div className="d-flex gap-2">
