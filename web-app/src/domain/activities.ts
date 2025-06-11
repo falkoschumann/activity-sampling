@@ -23,7 +23,6 @@ export function createTestLogActivityCommand(
 }
 
 export interface RecentActivitiesQuery {
-  readonly today?: string;
   readonly timeZone?: string;
 }
 
@@ -31,7 +30,6 @@ export function createTestRecentActivitiesQuery(
   query: Partial<RecentActivitiesQuery> = {},
 ): RecentActivitiesQuery {
   return {
-    today: "2024-12-18",
     timeZone: "Europe/Berlin",
     ...query,
   };

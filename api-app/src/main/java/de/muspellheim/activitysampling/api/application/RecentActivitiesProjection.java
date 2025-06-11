@@ -8,6 +8,7 @@ import de.muspellheim.activitysampling.api.domain.activities.RecentActivitiesQue
 import de.muspellheim.activitysampling.api.domain.activities.TimeSummary;
 import de.muspellheim.activitysampling.api.domain.activities.WorkingDay;
 import de.muspellheim.activitysampling.api.infrastructure.ActivityLoggedEvent;
+import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -36,14 +37,14 @@ class RecentActivitiesProjection {
   private Duration hoursThisWeek = Duration.ZERO;
   private Duration hoursThisMonth = Duration.ZERO;
 
-  RecentActivitiesProjection(RecentActivitiesQuery query) {
-    today = query.today() != null ? query.today() : LocalDate.now();
+  RecentActivitiesProjection(RecentActivitiesQuery query, Clock clock) {
+    timeZone = query.timeZone() != null ? query.timeZone() : ZoneId.systemDefault();
+    today = clock.instant().atZone(timeZone).toLocalDate();
     yesterday = today.minusDays(1);
     thisWeekStart = today.minusDays(today.getDayOfWeek().getValue() - 1);
     thisWeekEnd = thisWeekStart.plusDays(6);
     thisMonthStart = today.withDayOfMonth(1);
     nextMonthStart = thisMonthStart.plusMonths(1).withDayOfMonth(1);
-    timeZone = query.timeZone() != null ? query.timeZone() : ZoneId.systemDefault();
   }
 
   Instant getFrom() {

@@ -106,16 +106,12 @@ export const queryRecentActivities = createAsyncThunk<
   RecentActivitiesQuery,
   ActivitiesThunkConfig
 >("activities/queryRecentActivities", async (query, thunkAPI) => {
-  const { activitiesApi, clock } = thunkAPI.extra;
-  const today =
-    query.today != null
-      ? query.today
-      : clock.now().toISOString().substring(0, 10);
+  const { activitiesApi } = thunkAPI.extra;
   const timeZone =
     query.timeZone != null
       ? query.timeZone
       : Intl.DateTimeFormat().resolvedOptions().timeZone;
-  return activitiesApi.queryRecentActivities({ today, timeZone });
+  return activitiesApi.queryRecentActivities({ timeZone });
 });
 
 export const startCountdown = createAsyncThunk<

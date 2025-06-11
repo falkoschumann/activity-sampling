@@ -36,9 +36,8 @@ public class ActivitiesController {
 
   @GetMapping("/recent-activities")
   public RecentActivitiesQueryResult queryRecentActivities(
-      @RequestParam(required = false) @Valid LocalDate today,
       @RequestParam(required = false) @Valid ZoneId timeZone) {
-    return this.service.queryRecentActivities(new RecentActivitiesQuery(today, timeZone));
+    return this.service.queryRecentActivities(new RecentActivitiesQuery(timeZone));
   }
 
   @GetMapping("/timesheet")

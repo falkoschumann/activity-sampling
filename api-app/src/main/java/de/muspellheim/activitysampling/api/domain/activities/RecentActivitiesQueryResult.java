@@ -24,23 +24,23 @@ public record RecentActivitiesQueryResult(
   public static RecentActivitiesQueryResult createTestInstance() {
     return RecentActivitiesQueryResult.builder()
         .lastActivity(
-            Activity.createTestInstance().withTimestamp(LocalDateTime.parse("2024-12-18T09:30")))
+            Activity.createTestInstance().withTimestamp(LocalDateTime.parse("2025-06-04T09:30")))
         .workingDays(
             List.of(
                 new WorkingDay(
-                    LocalDate.of(2024, 12, 18),
+                    LocalDate.parse("2025-06-04"),
                     List.of(
                         Activity.createTestInstance()
-                            .withTimestamp(LocalDateTime.parse("2024-12-18T09:30")))),
+                            .withTimestamp(LocalDateTime.parse("2025-06-04T09:30")))),
                 new WorkingDay(
-                    LocalDate.of(2024, 12, 17),
+                    LocalDate.parse("2025-06-03"),
                     List.of(
                         Activity.createTestInstance()
-                            .withTimestamp(LocalDateTime.parse("2024-12-17T17:00")),
+                            .withTimestamp(LocalDateTime.parse("2025-06-03T17:00")),
                         Activity.createTestInstance()
-                            .withTimestamp(LocalDateTime.parse("2024-12-17T16:30")),
+                            .withTimestamp(LocalDateTime.parse("2025-06-03T16:30")),
                         Activity.createTestInstance()
-                            .withTimestamp(LocalDateTime.parse("2024-12-17T16:00"))
+                            .withTimestamp(LocalDateTime.parse("2025-06-03T16:00"))
                             .withTask("Other task")
                             .withNotes("Other notes")))))
         .timeSummary(

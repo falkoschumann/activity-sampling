@@ -140,16 +140,16 @@ class ApiApplicationTests {
       var event = ActivityLoggedEvent.createTestInstance();
       store.record(
           event
-              .withTimestamp(Instant.parse("2024-12-17T15:00:00Z"))
+              .withTimestamp(Instant.parse("2025-06-03T14:00:00Z"))
               .withTask("Other task")
               .withNotes("Other notes"));
-      store.record(event.withTimestamp(Instant.parse("2024-12-17T15:30:00Z")));
-      store.record(event.withTimestamp(Instant.parse("2024-12-17T16:00:00Z")));
-      store.record(event.withTimestamp(Instant.parse("2024-12-18T08:30:00Z")));
+      store.record(event.withTimestamp(Instant.parse("2025-06-03T14:30:00Z")));
+      store.record(event.withTimestamp(Instant.parse("2025-06-03T15:00:00Z")));
+      store.record(event.withTimestamp(Instant.parse("2025-06-04T07:30:00Z")));
 
       var response =
           restTemplate.getForEntity(
-              "/api/activities/recent-activities?today=2024-12-18&timeZone=Europe/Berlin",
+              "/api/activities/recent-activities?timeZone=Europe/Berlin",
               RecentActivitiesQueryResult.class);
 
       assertEquals(200, response.getStatusCode().value());
@@ -169,7 +169,8 @@ class ApiApplicationTests {
     @Test
     void failsWhenQueryIsNotValid() {
       var response =
-          restTemplate.getForEntity("/api/activities/recent-activities?today=foobar", String.class);
+          restTemplate.getForEntity(
+              "/api/activities/recent-activities?timeZone=foobar", String.class);
 
       assertEquals(400, response.getStatusCode().value());
     }

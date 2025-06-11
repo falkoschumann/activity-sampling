@@ -89,11 +89,13 @@ class ActivitiesServiceTests {
       recordEvent("2025-06-04T14:00:00Z");
       recordEvent("2025-06-05T08:30:00Z");
       recordEvent("2025-06-05T09:00:00Z");
-      var service = new ActivitiesService(ActivitiesConfiguration.DEFAULT, store, CLOCK);
+      var service =
+          new ActivitiesService(
+              ActivitiesConfiguration.DEFAULT,
+              store,
+              Clock.fixed(Instant.parse("2025-06-05T10:00:00Z"), TIME_ZONE));
 
-      var result =
-          service.queryRecentActivities(
-              RecentActivitiesQuery.DEFAULT.withToday(LocalDate.parse("2025-06-05")));
+      var result = service.queryRecentActivities(RecentActivitiesQuery.DEFAULT);
 
       assertEquals(
           List.of(
@@ -139,11 +141,13 @@ class ActivitiesServiceTests {
       recordEvent("2025-06-06T08:30:00Z"); // is included in week and month
       // first day of next month
       recordEvent("2025-07-01T10:30:00Z"); // is not included
-      var service = new ActivitiesService(ActivitiesConfiguration.DEFAULT, store, CLOCK);
+      var service =
+          new ActivitiesService(
+              ActivitiesConfiguration.DEFAULT,
+              store,
+              Clock.fixed(Instant.parse("2025-06-05T10:00:00Z"), TIME_ZONE));
 
-      var result =
-          service.queryRecentActivities(
-              RecentActivitiesQuery.DEFAULT.withToday(LocalDate.parse("2025-06-05")));
+      var result = service.queryRecentActivities(RecentActivitiesQuery.DEFAULT);
 
       assertEquals(
           TimeSummary.builder()

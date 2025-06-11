@@ -66,9 +66,6 @@ export class ActivitiesApi extends EventTarget {
       `${this.#baseUrl}/recent-activities`,
       window.location.href,
     );
-    if (query.today) {
-      url.searchParams.append("today", query.today);
-    }
     if (query.timeZone) {
       url.searchParams.append("timeZone", query.timeZone);
     }

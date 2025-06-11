@@ -52,7 +52,7 @@ public class ActivitiesService {
   public RecentActivitiesQueryResult queryRecentActivities(RecentActivitiesQuery query) {
     try {
       log.info("Query recent activities: {}", query);
-      var projection = new RecentActivitiesProjection(query);
+      var projection = new RecentActivitiesProjection(query, clock);
       var replay = store.replay(projection.getFrom());
       return projection.project(replay);
     } catch (Exception e) {
