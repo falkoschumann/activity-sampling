@@ -25,7 +25,7 @@ export default function TimesheetPage() {
   return (
     <PageLayout>
       <PeriodContainer />
-      <main className="container my-4">
+      <main className="container my-4" style={{ paddingTop: "3.5rem", paddingBottom: "3rem" }}>
         <ErrorComponent {...error} />
         <TimesheetContainer entries={timesheet} timeZone={timeZone} />
       </main>
@@ -40,7 +40,7 @@ export default function TimesheetPage() {
 
 function PeriodContainer() {
   return (
-    <aside className="bg-body-secondary">
+    <aside className="fixed-top bg-body-secondary" style={{ marginTop: "3.5rem" }}>
       <div className="container">
         <div className="btn-toolbar py-2 gap-2" role="toolbar" aria-label="Toolbar with navigation buttons">
           <div className="btn-group btn-group-sm" role="group" aria-label="Navigation buttons">
@@ -90,7 +90,7 @@ function PeriodContainer() {
 function TimesheetContainer({ entries, timeZone }: { entries: TimesheetEntry[]; timeZone: string }) {
   return (
     <table className="table">
-      <thead>
+      <thead className="sticky-top" style={{ top: "6.4375rem" }}>
         <tr>
           <th scope="col">Date</th>
           <th scope="col">Client</th>

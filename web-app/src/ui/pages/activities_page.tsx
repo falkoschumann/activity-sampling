@@ -40,7 +40,7 @@ export default function ActivitiesPage() {
         <CurrentActivityFormContainer />
         <CountdownContainer />
       </aside>
-      <main className="container my-4">
+      <main className="container my-4" style={{ paddingBottom: "3rem" }}>
         <ErrorComponent {...error} />
         <RecentActivitiesContainer />
       </main>
