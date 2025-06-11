@@ -98,7 +98,7 @@ export function createTestTimesheetQuery(
 export interface TimesheetQueryResult {
   readonly entries: TimesheetEntry[];
   readonly totalHours: string;
-  readonly timeZone?: string;
+  readonly timeZone: string;
 }
 
 export function createTestTimesheetQueryResult(

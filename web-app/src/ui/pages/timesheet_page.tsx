@@ -1,36 +1,37 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
-import { SerializedError } from "@reduxjs/toolkit";
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 
+import { selectError } from "../../application/activities_slice";
+import { AppDispatch } from "../../application/store";
+import { queryTimesheet, selectTimesheet, selectTimeZone, selectTotalHours } from "../../application/timesheet_slice";
 import { Duration } from "../../common/duration";
-import { createTestTimesheetEntry, TimesheetEntry } from "../../domain/activities";
+import { TimesheetEntry } from "../../domain/activities";
 import ErrorComponent from "../components/error_component";
 import PageLayout from "../layouts/page_layout";
 
 export default function TimesheetPage() {
-  const error: SerializedError = {};
-  const timesheet: { entries: TimesheetEntry[]; totalHours: string; timeZone: string } = {
-    entries: [
-      createTestTimesheetEntry(),
-      createTestTimesheetEntry(),
-      createTestTimesheetEntry(),
-      createTestTimesheetEntry(),
-      createTestTimesheetEntry(),
-    ],
-    totalHours: "PT10H",
-    timeZone: "Europe/Berlin",
-  };
+  const timesheet = useSelector(selectTimesheet);
+  const totalHours = useSelector(selectTotalHours);
+  const timeZone = useSelector(selectTimeZone);
+  const error = useSelector(selectError);
+  const dispatch = useDispatch<AppDispatch>();
+
+  useEffect(() => {
+    dispatch(queryTimesheet({ from: "2025-06-02", to: "2025-06-09" }));
+  }, [dispatch]);
 
   return (
     <PageLayout>
       <PeriodContainer />
       <main className="container my-4">
         <ErrorComponent {...error} />
-        <TimesheetContainer entries={timesheet.entries} timeZone={timesheet.timeZone} />
+        <TimesheetContainer entries={timesheet} timeZone={timeZone} />
       </main>
       <footer className="fixed-bottom bg-body">
         <div className="container py-2">
-          <CapacityComponent totalHours={timesheet.totalHours} offset="-PT1H" capacity="PT40H" />
+          <CapacityComponent totalHours={totalHours} offset="PT0S" capacity="PT60H" />
         </div>
       </footer>
     </PageLayout>
