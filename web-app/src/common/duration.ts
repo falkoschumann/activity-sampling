@@ -8,7 +8,8 @@ export class Duration {
   static ZERO = new Duration();
 
   static parse(duration: string): Duration {
-    const regex = /^(-)?PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)(\.(\d+))?S)?$/;
+    const regex =
+      /^([-+])?PT(?:([-+]?\d+)H)?(?:([-+]?\d+)M)?(?:([-+]?\d+)(\.(\d+))?S)?$/;
     const matches = duration.match(regex);
     if (!matches) {
       throw new RangeError(`Invalid duration format: ${duration}.`);
@@ -18,13 +19,14 @@ export class Duration {
     const hours = parseInt(matches[2] || "0", 10);
     const minutes = parseInt(matches[3] || "0", 10);
     const seconds = parseInt(matches[4] || "0", 10);
+    const secondsSign = Math.sign(seconds) < 0 ? -1 : 1;
     const milliseconds = parseInt((matches[6] || "0").padEnd(3, "0"), 10);
     return new Duration(
       sign *
         (hours * MILLIS_PER_HOUR +
           minutes * MILLIS_PER_MINUTE +
           seconds * MILLIS_PER_SECOND +
-          milliseconds),
+          secondsSign * milliseconds),
     );
   }
 

@@ -10,6 +10,7 @@ import de.muspellheim.activitysampling.api.domain.activities.TimesheetQueryResul
 import de.muspellheim.activitysampling.api.domain.common.CommandStatus;
 import de.muspellheim.activitysampling.api.infrastructure.ActivitiesStore;
 import de.muspellheim.activitysampling.api.infrastructure.ActivityLoggedEvent;
+import java.time.Clock;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -19,10 +20,13 @@ public class ActivitiesService {
 
   private final ActivitiesConfiguration configuration;
   private final ActivitiesStore store;
+  private final Clock clock;
 
-  public ActivitiesService(ActivitiesConfiguration configuration, ActivitiesStore store) {
+  public ActivitiesService(
+      ActivitiesConfiguration configuration, ActivitiesStore store, Clock clock) {
     this.configuration = configuration;
     this.store = store;
+    this.clock = clock;
   }
 
   public CommandStatus logActivity(LogActivityCommand command) {
@@ -60,7 +64,7 @@ public class ActivitiesService {
   public TimesheetQueryResult queryTimesheet(TimesheetQuery query) {
     try {
       log.info("Query timesheet: {}", query);
-      var projection = new TimesheetProjection(query, configuration);
+      var projection = new TimesheetProjection(query, configuration, clock);
       var replay = store.replay(projection.getFrom(), projection.getTo());
       return projection.project(replay);
     } catch (Exception e) {

@@ -18,6 +18,7 @@ import de.muspellheim.activitysampling.api.domain.activities.TimesheetQueryResul
 import de.muspellheim.activitysampling.api.domain.activities.WorkingDay;
 import de.muspellheim.activitysampling.api.infrastructure.ActivitiesStore;
 import de.muspellheim.activitysampling.api.infrastructure.ActivityLoggedEvent;
+import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -31,6 +32,7 @@ import org.junit.jupiter.api.Test;
 class ActivitiesServiceTests {
 
   private static final ZoneId TIME_ZONE = ZoneId.of("Europe/Berlin");
+  private static final Clock CLOCK = Clock.fixed(Instant.parse("2025-06-04T10:00:00Z"), TIME_ZONE);
 
   private ActivitiesStore store;
 
@@ -44,7 +46,7 @@ class ActivitiesServiceTests {
 
     @Test
     void logsActivity() {
-      var service = new ActivitiesService(ActivitiesConfiguration.DEFAULT, store);
+      var service = new ActivitiesService(ActivitiesConfiguration.DEFAULT, store, CLOCK);
 
       var result = service.logActivity(LogActivityCommand.createTestInstance());
 
@@ -54,7 +56,7 @@ class ActivitiesServiceTests {
 
     @Test
     void logsActivityWithOptionalNotes() {
-      var service = new ActivitiesService(ActivitiesConfiguration.DEFAULT, store);
+      var service = new ActivitiesService(ActivitiesConfiguration.DEFAULT, store, CLOCK);
 
       var result =
           service.logActivity(LogActivityCommand.createTestInstance().withNotes("This is a note"));
@@ -73,7 +75,7 @@ class ActivitiesServiceTests {
     void returnsLastActivity() {
       recordEvent("2025-06-09T08:30:00Z");
       recordEvent("2025-06-09T09:00:00Z");
-      var service = new ActivitiesService(ActivitiesConfiguration.DEFAULT, store);
+      var service = new ActivitiesService(ActivitiesConfiguration.DEFAULT, store, CLOCK);
 
       var result = service.queryRecentActivities(RecentActivitiesQuery.DEFAULT);
 
@@ -87,7 +89,7 @@ class ActivitiesServiceTests {
       recordEvent("2025-06-04T14:00:00Z");
       recordEvent("2025-06-05T08:30:00Z");
       recordEvent("2025-06-05T09:00:00Z");
-      var service = new ActivitiesService(ActivitiesConfiguration.DEFAULT, store);
+      var service = new ActivitiesService(ActivitiesConfiguration.DEFAULT, store, CLOCK);
 
       var result =
           service.queryRecentActivities(
@@ -137,7 +139,7 @@ class ActivitiesServiceTests {
       recordEvent("2025-06-06T08:30:00Z"); // is included in week and month
       // first day of next month
       recordEvent("2025-07-01T10:30:00Z"); // is not included
-      var service = new ActivitiesService(ActivitiesConfiguration.DEFAULT, store);
+      var service = new ActivitiesService(ActivitiesConfiguration.DEFAULT, store, CLOCK);
 
       var result =
           service.queryRecentActivities(
@@ -155,7 +157,7 @@ class ActivitiesServiceTests {
 
     @Test
     void queriesEmptyResult() {
-      var service = new ActivitiesService(ActivitiesConfiguration.DEFAULT, store);
+      var service = new ActivitiesService(ActivitiesConfiguration.DEFAULT, store, CLOCK);
 
       var result = service.queryRecentActivities(RecentActivitiesQuery.DEFAULT);
 
@@ -165,15 +167,6 @@ class ActivitiesServiceTests {
 
   @Nested
   class QueryTimesheet {
-
-    @Test
-    void queriesEmptyResult() {
-      var service = new ActivitiesService(ActivitiesConfiguration.DEFAULT, store);
-
-      var result = service.queryTimesheet(TimesheetQuery.createTestInstance());
-
-      assertEquals(TimesheetQueryResult.EMPTY, result);
-    }
 
     @Test
     void summarizesHoursWorkedOnTasks() {
@@ -189,7 +182,7 @@ class ActivitiesServiceTests {
       // thursday, different clients
       recordEvent("2025-06-05T10:00:00Z");
       store.record(createEvent("2025-06-05T10:30:00Z").withClient("Other client"));
-      var service = new ActivitiesService(ActivitiesConfiguration.DEFAULT, store);
+      var service = new ActivitiesService(ActivitiesConfiguration.DEFAULT, store, CLOCK);
 
       var result = service.queryTimesheet(TimesheetQuery.createTestInstance());
 
@@ -216,11 +209,80 @@ class ActivitiesServiceTests {
       recordEvent("2025-06-02T10:00:00Z");
       recordEvent("2025-06-02T10:30:00Z");
       recordEvent("2025-06-02T11:00:00Z");
-      var service = new ActivitiesService(ActivitiesConfiguration.DEFAULT, store);
+      var service = new ActivitiesService(ActivitiesConfiguration.DEFAULT, store, CLOCK);
 
       var result = service.queryTimesheet(TimesheetQuery.createTestInstance());
 
       assertEquals(Duration.parse("PT1H30M"), result.totalHours());
+    }
+
+    @Test
+    void comparesWithCapacity() {
+      store.record(createEvent("2025-06-02T14:00:00Z").withDuration(Duration.ofHours(8)));
+      store.record(createEvent("2025-06-03T14:00:00Z").withDuration(Duration.ofHours(8)));
+      store.record(createEvent("2025-06-04T14:00:00Z").withDuration(Duration.ofHours(8)));
+      var service = new ActivitiesService(ActivitiesConfiguration.DEFAULT, store, CLOCK);
+
+      var result = service.queryTimesheet(TimesheetQuery.createTestInstance());
+
+      assertEquals(Duration.parse("PT24H"), result.totalHours());
+      assertEquals(Duration.parse("PT0S"), result.offset());
+      assertEquals(Duration.parse("PT40H"), result.capacity());
+    }
+
+    @Test
+    void comparesWithCapacityAndTotalHoursBehindCapacity() {
+      store.record(createEvent("2025-06-02T14:00:00Z").withDuration(Duration.ofHours(8)));
+      store.record(createEvent("2025-06-03T14:00:00Z").withDuration(Duration.ofHours(8)));
+      store.record(createEvent("2025-06-04T10:00:00Z").withDuration(Duration.ofHours(4)));
+      var service = new ActivitiesService(ActivitiesConfiguration.DEFAULT, store, CLOCK);
+
+      var result = service.queryTimesheet(TimesheetQuery.createTestInstance());
+
+      assertEquals(Duration.parse("PT20H"), result.totalHours());
+      assertEquals(Duration.parse("-PT4H"), result.offset());
+      assertEquals(Duration.parse("PT40H"), result.capacity());
+    }
+
+    @Test
+    void comparesWithCapacityAndTotalHoursAheadCapacity() {
+      store.record(createEvent("2025-06-02T14:00:00Z").withDuration(Duration.ofHours(8)));
+      store.record(createEvent("2025-06-03T14:00:00Z").withDuration(Duration.ofHours(8)));
+      store.record(createEvent("2025-06-04T16:00:00Z").withDuration(Duration.ofHours(10)));
+      var service = new ActivitiesService(ActivitiesConfiguration.DEFAULT, store, CLOCK);
+
+      var result = service.queryTimesheet(TimesheetQuery.createTestInstance());
+
+      assertEquals(Duration.parse("PT26H"), result.totalHours());
+      assertEquals(Duration.parse("PT2H"), result.offset());
+      assertEquals(Duration.parse("PT40H"), result.capacity());
+    }
+
+    @Test
+    void comparesWithCapacityAndTodayIsInFuture() {
+      store.record(createEvent("2025-06-02T14:00:00Z").withDuration(Duration.ofHours(8)));
+      store.record(createEvent("2025-06-03T14:00:00Z").withDuration(Duration.ofHours(8)));
+      store.record(createEvent("2025-06-04T14:00:00Z").withDuration(Duration.ofHours(8)));
+      var service =
+          new ActivitiesService(
+              ActivitiesConfiguration.DEFAULT,
+              store,
+              Clock.fixed(Instant.parse("2025-06-11T10:00:00Z"), TIME_ZONE));
+
+      var result = service.queryTimesheet(TimesheetQuery.createTestInstance());
+
+      assertEquals(Duration.parse("PT24H"), result.totalHours());
+      assertEquals(Duration.parse("-PT16H"), result.offset());
+      assertEquals(Duration.parse("PT40H"), result.capacity());
+    }
+
+    @Test
+    void queriesEmptyResult() {
+      var service = new ActivitiesService(ActivitiesConfiguration.DEFAULT, store, CLOCK);
+
+      var result = service.queryTimesheet(TimesheetQuery.createTestInstance());
+
+      assertEquals(TimesheetQueryResult.EMPTY.withOffset(Duration.ofHours(-24)), result);
     }
   }
 

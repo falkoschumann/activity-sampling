@@ -99,6 +99,7 @@ export interface TimesheetQueryResult {
   readonly entries: TimesheetEntry[];
   readonly totalHours: string;
   readonly capacity: string;
+  readonly offset: string;
   readonly timeZone: string;
 }
 
@@ -112,6 +113,7 @@ export function createTestTimesheetQueryResult(
     ],
     totalHours: "PT4H",
     capacity: "PT40H",
+    offset: "PT12H",
     timeZone: "Europe/Berlin",
     ...result,
   };

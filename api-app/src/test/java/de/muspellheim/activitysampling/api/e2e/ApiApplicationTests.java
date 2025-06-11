@@ -15,7 +15,9 @@ import de.muspellheim.activitysampling.api.infrastructure.ActivityLoggedEvent;
 import de.muspellheim.activitysampling.api.infrastructure.CsvActivitiesStore;
 import de.muspellheim.activitysampling.api.infrastructure.FileStoreConfiguration;
 import java.nio.file.Files;
+import java.time.Clock;
 import java.time.Instant;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -29,10 +31,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.UseMainMethod;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.client.TestRestTemplate.HttpClientOption;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Primary;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -41,6 +46,16 @@ import org.springframework.test.context.ActiveProfiles;
 @ActiveProfiles("test")
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT, useMainMethod = UseMainMethod.ALWAYS)
 class ApiApplicationTests {
+
+  @TestConfiguration
+  static class Configuration {
+
+    @Bean
+    @Primary
+    Clock testingClock() {
+      return Clock.fixed(Instant.parse("2025-06-04T10:00:00Z"), ZoneId.of("Europe/Berlin"));
+    }
+  }
 
   @LocalServerPort int port;
 

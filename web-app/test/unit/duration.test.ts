@@ -175,6 +175,16 @@ describe("Duration", () => {
       expect(duration.millisecondsPart).toBe(-1);
     });
 
+    it("Parses negative part", () => {
+      const duration = Duration.parse("PT-4H-3M-2.001S");
+
+      expect(duration.isNegative()).toBe(true);
+      expect(duration.hoursPart).toBe(-4);
+      expect(duration.minutesPart).toBe(-3);
+      expect(duration.secondsPart).toBe(-2);
+      expect(duration.millisecondsPart).toBe(-1);
+    });
+
     it("Fails to parse invalid duration", () => {
       expect(() => Duration.parse("PT5X")).toThrowError(
         "Invalid duration format: PT5X.",

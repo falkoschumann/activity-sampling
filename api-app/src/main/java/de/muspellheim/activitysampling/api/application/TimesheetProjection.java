@@ -8,6 +8,7 @@ import de.muspellheim.activitysampling.api.domain.activities.TimesheetEntry;
 import de.muspellheim.activitysampling.api.domain.activities.TimesheetQuery;
 import de.muspellheim.activitysampling.api.domain.activities.TimesheetQueryResult;
 import de.muspellheim.activitysampling.api.infrastructure.ActivityLoggedEvent;
+import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -22,16 +23,18 @@ class TimesheetProjection {
   private final LocalDate from;
   private final LocalDate to;
   private final ZoneId timeZone;
-  private Duration capacity;
+  private final Duration capacity;
+  private final LocalDate today;
 
   private final List<TimesheetEntry> entries = new ArrayList<>();
   private Duration totalHours = Duration.ZERO;
 
-  TimesheetProjection(TimesheetQuery query, ActivitiesConfiguration configuration) {
+  TimesheetProjection(TimesheetQuery query, ActivitiesConfiguration configuration, Clock clock) {
     from = query.from();
     to = query.to();
     timeZone = query.timeZone() != null ? query.timeZone() : ZoneId.systemDefault();
     capacity = configuration.capacity();
+    today = clock.instant().atZone(timeZone).toLocalDate();
   }
 
   Instant getFrom() {
@@ -60,10 +63,14 @@ class TimesheetProjection {
                     .thenComparing(TimesheetEntry::project)
                     .thenComparing(TimesheetEntry::task))
             .toList();
+    var offsetDays = from.until(today.plusDays(1)).getDays();
+    offsetDays = Math.min(Math.max(0, offsetDays), 5);
+    var offset = totalHours.minus(Duration.ofHours(offsetDays * 8L));
     return TimesheetQueryResult.builder()
         .entries(sortedEntries)
         .totalHours(totalHours)
         .capacity(capacity)
+        .offset(offset)
         .timeZone(timeZone)
         .build();
   }

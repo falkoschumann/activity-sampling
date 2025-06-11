@@ -18,6 +18,7 @@ interface TimesheetState {
   readonly entries: TimesheetEntry[];
   readonly totalHours: string;
   readonly capacity: string;
+  readonly offset: string;
   readonly timeZone: string;
   readonly error?: SerializedError;
 }
@@ -26,6 +27,7 @@ const initialState: TimesheetState = {
   entries: [],
   totalHours: "PT0S",
   capacity: "PT40H",
+  offset: "PT0S",
   timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
 };
 
@@ -63,6 +65,8 @@ const timesheetSlice = createSlice({
     builder.addCase(queryTimesheet.fulfilled, (state, action) => {
       state.entries = action.payload.entries;
       state.totalHours = action.payload.totalHours;
+      state.capacity = action.payload.capacity;
+      state.offset = action.payload.offset;
       state.timeZone = action.payload.timeZone;
     });
     builder.addCase(queryTimesheet.rejected, (state) => {
@@ -75,6 +79,7 @@ const timesheetSlice = createSlice({
     selectTimesheet: (state) => state.entries,
     selectTotalHours: (state) => state.totalHours,
     selectCapacity: (state) => state.capacity,
+    selectOffset: (state) => state.offset,
     selectTimeZone: (state) => state.timeZone,
     selectError: (state) => state.error,
   },
@@ -83,6 +88,7 @@ const timesheetSlice = createSlice({
 export const {
   selectCapacity,
   selectError,
+  selectOffset,
   selectTimesheet,
   selectTimeZone,
   selectTotalHours,
