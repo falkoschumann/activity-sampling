@@ -12,12 +12,12 @@ import lombok.With;
 @Builder
 @With
 @JsonInclude(Include.NON_NULL)
-public record TimesheetQuery(LocalDate from, LocalDate to, ZoneId timeZone) {
+public record TimesheetQuery(LocalDate startInclusive, LocalDate endExclusive, ZoneId timeZone) {
 
   public static TimesheetQuery createTestInstance() {
     return TimesheetQuery.builder()
-        .from(LocalDate.of(2025, 6, 2))
-        .to(LocalDate.of(2025, 6, 9))
+        .startInclusive(LocalDate.of(2025, 6, 2))
+        .endExclusive(LocalDate.of(2025, 6, 9))
         .timeZone(ZoneId.of("Europe/Berlin"))
         .build();
   }

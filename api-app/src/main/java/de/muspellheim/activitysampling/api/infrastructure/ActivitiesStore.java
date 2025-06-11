@@ -11,13 +11,14 @@ public interface ActivitiesStore {
 
   Stream<ActivityLoggedEvent> replay();
 
-  default Stream<ActivityLoggedEvent> replay(Instant from) {
-    return replay(from, Instant.MAX);
+  default Stream<ActivityLoggedEvent> replay(Instant startInclusive) {
+    return replay(startInclusive, Instant.MAX);
   }
 
-  default Stream<ActivityLoggedEvent> replay(Instant from, Instant to) {
+  default Stream<ActivityLoggedEvent> replay(Instant startInclusive, Instant endExclusive) {
     return replay()
-        .filter(it -> it.timestamp().equals(from) || it.timestamp().isAfter(from))
-        .filter(it -> it.timestamp().isBefore(to));
+        .filter(
+            it -> it.timestamp().equals(startInclusive) || it.timestamp().isAfter(startInclusive))
+        .filter(it -> it.timestamp().isBefore(endExclusive));
   }
 }

@@ -65,7 +65,7 @@ public class ActivitiesService {
     try {
       log.info("Query timesheet: {}", query);
       var projection = new TimesheetProjection(query, configuration, clock);
-      var replay = store.replay(projection.getFrom(), projection.getTo());
+      var replay = store.replay(projection.getStartInclusive(), projection.getEndExclusive());
       return projection.project(replay);
     } catch (Exception e) {
       log.error("Query timesheet failed: {}", e.getMessage(), e);

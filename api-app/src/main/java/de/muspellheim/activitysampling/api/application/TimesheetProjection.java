@@ -20,8 +20,8 @@ import java.util.stream.Stream;
 
 class TimesheetProjection {
 
-  private final LocalDate from;
-  private final LocalDate to;
+  private final LocalDate startInclusive;
+  private final LocalDate endExclusive;
   private final ZoneId timeZone;
   private final Duration capacity;
   private final LocalDate today;
@@ -30,19 +30,19 @@ class TimesheetProjection {
   private Duration totalHours = Duration.ZERO;
 
   TimesheetProjection(TimesheetQuery query, ActivitiesConfiguration configuration, Clock clock) {
-    from = query.from();
-    to = query.to();
+    startInclusive = query.startInclusive();
+    endExclusive = query.endExclusive();
     timeZone = query.timeZone() != null ? query.timeZone() : ZoneId.systemDefault();
     capacity = configuration.capacity();
     today = clock.instant().atZone(timeZone).toLocalDate();
   }
 
-  Instant getFrom() {
-    return from.atStartOfDay(timeZone).toInstant();
+  Instant getStartInclusive() {
+    return startInclusive.atStartOfDay(timeZone).toInstant();
   }
 
-  public Instant getTo() {
-    return to.atStartOfDay(timeZone).toInstant();
+  public Instant getEndExclusive() {
+    return endExclusive.atStartOfDay(timeZone).toInstant();
   }
 
   TimesheetQueryResult project(Stream<ActivityLoggedEvent> events) {
@@ -63,7 +63,7 @@ class TimesheetProjection {
                     .thenComparing(TimesheetEntry::project)
                     .thenComparing(TimesheetEntry::task))
             .toList();
-    var offsetDays = from.until(today.plusDays(1)).getDays();
+    var offsetDays = startInclusive.until(today.plusDays(1)).getDays();
     offsetDays = Math.min(Math.max(0, offsetDays), 5);
     var offset = totalHours.minus(Duration.ofHours(offsetDays * 8L));
     return TimesheetQueryResult.builder()

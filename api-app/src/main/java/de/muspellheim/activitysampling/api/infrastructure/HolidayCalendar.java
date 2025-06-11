@@ -22,15 +22,15 @@ public class HolidayCalendar {
     this.file = file;
   }
 
-  public List<Holiday> getHolidays(LocalDate from, LocalDate to) {
+  public List<Holiday> getHolidays(LocalDate startInclusive, LocalDate endExclusive) {
     try {
       var fin = Files.newInputStream(file);
       var builder = new CalendarBuilder();
       var calendar = builder.build(fin);
       return calendar.getComponents().stream()
           .map(this::map)
-          .filter(it -> !it.date().isBefore(from))
-          .filter(it -> !it.date().isAfter(to))
+          .filter(it -> !it.date().isBefore(startInclusive))
+          .filter(it -> !it.date().isAfter(endExclusive))
           .sorted(Comparator.comparing(Holiday::date))
           .toList();
     } catch (IOException e) {

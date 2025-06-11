@@ -45,12 +45,16 @@ export const queryTimesheet = createAsyncThunk<
   TimesheetThunkConfig
 >("timesheet/queryTimesheet", async (query, thunkAPI) => {
   const { activitiesApi } = thunkAPI.extra;
-  const { from, to } = query;
+  const { startInclusive, endExclusive } = query;
   const timeZone =
     query.timeZone != null
       ? query.timeZone
       : Intl.DateTimeFormat().resolvedOptions().timeZone;
-  return activitiesApi.queryTimesheet({ from, to, timeZone });
+  return activitiesApi.queryTimesheet({
+    startInclusive,
+    endExclusive,
+    timeZone,
+  });
 });
 
 const timesheetSlice = createSlice({

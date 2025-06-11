@@ -42,9 +42,9 @@ class CsvActivitiesStoreTests {
         ActivityLoggedEvent.createTestInstance()
             .withTimestamp(Instant.parse("2023-01-01T14:00:00Z")));
 
-    Instant from = Instant.parse("2023-01-01T12:00:00Z");
-    Instant to = Instant.parse("2023-01-01T14:00:00Z");
-    var events = store.replay(from, to).toList();
+    Instant start = Instant.parse("2023-01-01T12:00:00Z");
+    Instant end = Instant.parse("2023-01-01T14:00:00Z");
+    var events = store.replay(start, end).toList();
 
     assertEquals(
         List.of(

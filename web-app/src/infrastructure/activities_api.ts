@@ -80,8 +80,8 @@ export class ActivitiesApi extends EventTarget {
 
   async queryTimesheet(query: TimesheetQuery): Promise<TimesheetQueryResult> {
     const url = new URL(`${this.#baseUrl}/timesheet`, window.location.href);
-    url.searchParams.append("from", query.from);
-    url.searchParams.append("to", query.to);
+    url.searchParams.append("startInclusive", query.startInclusive);
+    url.searchParams.append("endExclusive", query.endExclusive);
     if (query.timeZone) {
       url.searchParams.append("timeZone", query.timeZone);
     }

@@ -28,7 +28,7 @@ export default function TimesheetPage() {
   const dispatch = useDispatch<AppDispatch>();
 
   useEffect(() => {
-    dispatch(queryTimesheet({ from: "2025-06-02", to: "2025-06-09" }));
+    dispatch(queryTimesheet({ startInclusive: "2025-06-02", endExclusive: "2025-06-09" }));
   }, [dispatch]);
 
   return (
