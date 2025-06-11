@@ -72,5 +72,4 @@ public class ActivitiesService {
       throw e;
     }
   }
-
 }
