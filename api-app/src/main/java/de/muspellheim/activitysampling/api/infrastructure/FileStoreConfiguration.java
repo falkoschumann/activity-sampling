@@ -2,10 +2,11 @@
 
 package de.muspellheim.activitysampling.api.infrastructure;
 
+import jakarta.validation.constraints.NotNull;
 import java.nio.file.Path;
 import lombok.Builder;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @Builder
 @ConfigurationProperties(prefix = "app.file-store")
-public record FileStoreConfiguration(Path file) {}
+public record FileStoreConfiguration(@NotNull Path file) {}

@@ -22,14 +22,16 @@ class TimesheetProjection {
   private final LocalDate from;
   private final LocalDate to;
   private final ZoneId timeZone;
+  private Duration capacity;
 
   private final List<TimesheetEntry> entries = new ArrayList<>();
   private Duration totalHours = Duration.ZERO;
 
-  TimesheetProjection(TimesheetQuery query) {
+  TimesheetProjection(TimesheetQuery query, ActivitiesConfiguration configuration) {
     from = query.from();
     to = query.to();
     timeZone = query.timeZone() != null ? query.timeZone() : ZoneId.systemDefault();
+    capacity = configuration.capacity();
   }
 
   Instant getFrom() {
@@ -61,6 +63,7 @@ class TimesheetProjection {
     return TimesheetQueryResult.builder()
         .entries(sortedEntries)
         .totalHours(totalHours)
+        .capacity(capacity)
         .timeZone(timeZone)
         .build();
   }

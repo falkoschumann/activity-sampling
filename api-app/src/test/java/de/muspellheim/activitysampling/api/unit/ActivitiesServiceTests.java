@@ -5,6 +5,7 @@ package de.muspellheim.activitysampling.api.unit;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import de.muspellheim.activitysampling.api.application.ActivitiesConfiguration;
 import de.muspellheim.activitysampling.api.application.ActivitiesService;
 import de.muspellheim.activitysampling.api.domain.activities.Activity;
 import de.muspellheim.activitysampling.api.domain.activities.LogActivityCommand;
@@ -43,7 +44,7 @@ class ActivitiesServiceTests {
 
     @Test
     void logsActivity() {
-      var service = new ActivitiesService(store);
+      var service = new ActivitiesService(ActivitiesConfiguration.DEFAULT, store);
 
       var result = service.logActivity(LogActivityCommand.createTestInstance());
 
@@ -53,7 +54,7 @@ class ActivitiesServiceTests {
 
     @Test
     void logsActivityWithOptionalNotes() {
-      var service = new ActivitiesService(store);
+      var service = new ActivitiesService(ActivitiesConfiguration.DEFAULT, store);
 
       var result =
           service.logActivity(LogActivityCommand.createTestInstance().withNotes("This is a note"));
@@ -72,7 +73,7 @@ class ActivitiesServiceTests {
     void returnsLastActivity() {
       recordEvent("2025-06-09T08:30:00Z");
       recordEvent("2025-06-09T09:00:00Z");
-      var service = new ActivitiesService(store);
+      var service = new ActivitiesService(ActivitiesConfiguration.DEFAULT, store);
 
       var result = service.queryRecentActivities(RecentActivitiesQuery.DEFAULT);
 
@@ -86,7 +87,7 @@ class ActivitiesServiceTests {
       recordEvent("2025-06-04T14:00:00Z");
       recordEvent("2025-06-05T08:30:00Z");
       recordEvent("2025-06-05T09:00:00Z");
-      var service = new ActivitiesService(store);
+      var service = new ActivitiesService(ActivitiesConfiguration.DEFAULT, store);
 
       var result =
           service.queryRecentActivities(
@@ -136,7 +137,7 @@ class ActivitiesServiceTests {
       recordEvent("2025-06-06T08:30:00Z"); // is included in week and month
       // first day of next month
       recordEvent("2025-07-01T10:30:00Z"); // is not included
-      var service = new ActivitiesService(store);
+      var service = new ActivitiesService(ActivitiesConfiguration.DEFAULT, store);
 
       var result =
           service.queryRecentActivities(
@@ -154,7 +155,7 @@ class ActivitiesServiceTests {
 
     @Test
     void queriesEmptyResult() {
-      var service = new ActivitiesService(store);
+      var service = new ActivitiesService(ActivitiesConfiguration.DEFAULT, store);
 
       var result = service.queryRecentActivities(RecentActivitiesQuery.DEFAULT);
 
@@ -167,7 +168,7 @@ class ActivitiesServiceTests {
 
     @Test
     void queriesEmptyResult() {
-      var service = new ActivitiesService(store);
+      var service = new ActivitiesService(ActivitiesConfiguration.DEFAULT, store);
 
       var result = service.queryTimesheet(TimesheetQuery.createTestInstance());
 
@@ -188,7 +189,7 @@ class ActivitiesServiceTests {
       // thursday, different clients
       recordEvent("2025-06-05T10:00:00Z");
       store.record(createEvent("2025-06-05T10:30:00Z").withClient("Other client"));
-      var service = new ActivitiesService(store);
+      var service = new ActivitiesService(ActivitiesConfiguration.DEFAULT, store);
 
       var result = service.queryTimesheet(TimesheetQuery.createTestInstance());
 
@@ -215,7 +216,7 @@ class ActivitiesServiceTests {
       recordEvent("2025-06-02T10:00:00Z");
       recordEvent("2025-06-02T10:30:00Z");
       recordEvent("2025-06-02T11:00:00Z");
-      var service = new ActivitiesService(store);
+      var service = new ActivitiesService(ActivitiesConfiguration.DEFAULT, store);
 
       var result = service.queryTimesheet(TimesheetQuery.createTestInstance());
 

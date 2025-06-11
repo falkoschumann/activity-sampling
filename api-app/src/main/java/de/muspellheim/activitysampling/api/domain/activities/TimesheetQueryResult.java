@@ -15,10 +15,11 @@ import lombok.With;
 @With
 @JsonInclude(Include.NON_NULL)
 public record TimesheetQueryResult(
-    List<TimesheetEntry> entries, Duration totalHours, ZoneId timeZone) {
+    List<TimesheetEntry> entries, Duration totalHours, Duration capacity, ZoneId timeZone) {
 
   public static final TimesheetQueryResult EMPTY =
-      new TimesheetQueryResult(List.of(), Duration.ZERO, ZoneId.systemDefault());
+      new TimesheetQueryResult(
+          List.of(), Duration.ZERO, Duration.ofHours(40), ZoneId.systemDefault());
 
   public static TimesheetQueryResult createTestInstance() {
     return TimesheetQueryResult.builder()
@@ -27,6 +28,7 @@ public record TimesheetQueryResult(
                 TimesheetEntry.createTestInstance().withDate(LocalDate.parse("2025-06-02")),
                 TimesheetEntry.createTestInstance().withDate(LocalDate.parse("2025-06-03"))))
         .totalHours(Duration.ofHours(4))
+        .capacity(Duration.ofHours(40))
         .timeZone(ZoneId.of("Europe/Berlin"))
         .build();
   }

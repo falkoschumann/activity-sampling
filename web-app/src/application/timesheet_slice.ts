@@ -17,6 +17,7 @@ import { ActivitiesApi } from "../infrastructure/activities_api";
 interface TimesheetState {
   readonly entries: TimesheetEntry[];
   readonly totalHours: string;
+  readonly capacity: string;
   readonly timeZone: string;
   readonly error?: SerializedError;
 }
@@ -24,6 +25,7 @@ interface TimesheetState {
 const initialState: TimesheetState = {
   entries: [],
   totalHours: "PT0S",
+  capacity: "PT40H",
   timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
 };
 
@@ -72,12 +74,14 @@ const timesheetSlice = createSlice({
   selectors: {
     selectTimesheet: (state) => state.entries,
     selectTotalHours: (state) => state.totalHours,
+    selectCapacity: (state) => state.capacity,
     selectTimeZone: (state) => state.timeZone,
     selectError: (state) => state.error,
   },
 });
 
 export const {
+  selectCapacity,
   selectError,
   selectTimesheet,
   selectTimeZone,

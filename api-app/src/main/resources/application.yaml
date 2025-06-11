@@ -3,6 +3,8 @@ spring:
     name: api-app
 
 app:
+  activities:
+    capacity: PT40H
   file-store:
     file: data/activity-log.csv
 

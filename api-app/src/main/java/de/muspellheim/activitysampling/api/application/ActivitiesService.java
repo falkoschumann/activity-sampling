@@ -2,7 +2,6 @@
 
 package de.muspellheim.activitysampling.api.application;
 
-import de.muspellheim.activitysampling.api.domain.activities.Activity;
 import de.muspellheim.activitysampling.api.domain.activities.LogActivityCommand;
 import de.muspellheim.activitysampling.api.domain.activities.RecentActivitiesQuery;
 import de.muspellheim.activitysampling.api.domain.activities.RecentActivitiesQueryResult;
@@ -11,7 +10,6 @@ import de.muspellheim.activitysampling.api.domain.activities.TimesheetQueryResul
 import de.muspellheim.activitysampling.api.domain.common.CommandStatus;
 import de.muspellheim.activitysampling.api.infrastructure.ActivitiesStore;
 import de.muspellheim.activitysampling.api.infrastructure.ActivityLoggedEvent;
-import java.time.ZoneId;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -19,9 +17,11 @@ import org.springframework.stereotype.Service;
 @Service
 public class ActivitiesService {
 
+  private final ActivitiesConfiguration configuration;
   private final ActivitiesStore store;
 
-  public ActivitiesService(ActivitiesStore store) {
+  public ActivitiesService(ActivitiesConfiguration configuration, ActivitiesStore store) {
+    this.configuration = configuration;
     this.store = store;
   }
 
@@ -60,7 +60,7 @@ public class ActivitiesService {
   public TimesheetQueryResult queryTimesheet(TimesheetQuery query) {
     try {
       log.info("Query timesheet: {}", query);
-      var projection = new TimesheetProjection(query);
+      var projection = new TimesheetProjection(query, configuration);
       var replay = store.replay(projection.getFrom(), projection.getTo());
       return projection.project(replay);
     } catch (Exception e) {
@@ -69,18 +69,4 @@ public class ActivitiesService {
     }
   }
 
-  private ZoneId getTimeZone(ZoneId timeZone) {
-    return timeZone != null ? timeZone : ZoneId.systemDefault();
-  }
-
-  private Activity map(ActivityLoggedEvent event, ZoneId timeZone) {
-    return Activity.builder()
-        .timestamp(event.timestamp().atZone(timeZone).toLocalDateTime())
-        .duration(event.duration())
-        .client(event.client())
-        .project(event.project())
-        .task(event.task())
-        .notes(event.notes())
-        .build();
-  }
 }

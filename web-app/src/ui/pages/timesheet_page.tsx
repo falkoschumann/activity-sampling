@@ -5,7 +5,13 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { selectError } from "../../application/activities_slice";
 import { AppDispatch } from "../../application/store";
-import { queryTimesheet, selectTimesheet, selectTimeZone, selectTotalHours } from "../../application/timesheet_slice";
+import {
+  queryTimesheet,
+  selectCapacity,
+  selectTimesheet,
+  selectTimeZone,
+  selectTotalHours,
+} from "../../application/timesheet_slice";
 import { Duration } from "../../common/duration";
 import { TimesheetEntry } from "../../domain/activities";
 import ErrorComponent from "../components/error_component";
@@ -14,6 +20,7 @@ import PageLayout from "../layouts/page_layout";
 export default function TimesheetPage() {
   const timesheet = useSelector(selectTimesheet);
   const totalHours = useSelector(selectTotalHours);
+  const capacity = useSelector(selectCapacity);
   const timeZone = useSelector(selectTimeZone);
   const error = useSelector(selectError);
   const dispatch = useDispatch<AppDispatch>();
@@ -31,7 +38,7 @@ export default function TimesheetPage() {
       </main>
       <footer className="fixed-bottom bg-body">
         <div className="container py-2">
-          <CapacityComponent totalHours={totalHours} offset="PT0S" capacity="PT60H" />
+          <CapacityComponent totalHours={totalHours} offset="PT0S" capacity={capacity} />
         </div>
       </footer>
     </PageLayout>

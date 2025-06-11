@@ -5,6 +5,7 @@ import { describe, expect, it } from "vitest";
 import { createStore } from "../../src/application/store";
 import {
   queryTimesheet,
+  selectCapacity,
   selectError,
   selectTimesheet,
   selectTimeZone,
@@ -49,6 +50,19 @@ describe("Timesheet", () => {
 
       expect(selectTotalHours(store.getState())).toEqual(
         createTestTimesheetQueryResult().totalHours,
+      );
+    });
+
+    it("Compares with capacity", async () => {
+      const queryResultJson = JSON.stringify(createTestTimesheetQueryResult());
+      const { store } = configure({
+        responses: [new Response(queryResultJson)],
+      });
+
+      await store.dispatch(queryTimesheet(createTestTimesheetQuery()));
+
+      expect(selectCapacity(store.getState())).toEqual(
+        createTestTimesheetQueryResult().capacity,
       );
     });
 
