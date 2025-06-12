@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-import { selectError } from "../../application/activities_slice";
+import { selectError } from "../../application/log_slice";
 import { AppDispatch } from "../../application/store";
 import {
   queryTimesheet,

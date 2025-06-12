@@ -32,7 +32,7 @@ export default function PageLayout({ children }: { children?: React.ReactNode })
               <div className="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul className="navbar-nav me-auto mb-2 mb-lg-0">
                   <li className="nav-item">
-                    <NavLink className="nav-link" to="/">
+                    <NavLink className="nav-link" to="/log">
                       Log
                     </NavLink>
                   </li>

@@ -22,7 +22,7 @@ import {
 import { ActivitiesApi } from "../infrastructure/activities_api";
 import { NotificationClient } from "../infrastructure/notification_client";
 
-interface ActivitiesState {
+interface LogState {
   readonly currentActivityForm: {
     readonly client: string;
     readonly project: string;
@@ -43,7 +43,7 @@ interface ActivitiesState {
   readonly error?: SerializedError;
 }
 
-const initialState: ActivitiesState = {
+const initialState: LogState = {
   currentActivityForm: {
     client: "",
     project: "",
@@ -68,21 +68,21 @@ const initialState: ActivitiesState = {
   timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
 };
 
-type ActivitiesThunkConfig = {
+type LogThunkConfig = {
   extra: {
     readonly activitiesApi: ActivitiesApi;
     readonly notificationClient: NotificationClient;
     readonly clock: Clock;
     readonly timer: Timer;
   };
-  state: { readonly activities: ActivitiesState };
+  state: { readonly log: LogState };
 };
 
 export const logActivity = createAsyncThunk<
   CommandStatus,
   unknown,
-  ActivitiesThunkConfig
->("activities/logActivity", async (_action, thunkAPI) => {
+  LogThunkConfig
+>("log/logActivity", async (_action, thunkAPI) => {
   const { activitiesApi, notificationClient, clock } = thunkAPI.extra;
   const currentActivityForm = selectCurrentActivityForm(thunkAPI.getState());
   const countdown = selectCountdown(thunkAPI.getState());
@@ -104,8 +104,8 @@ export const logActivity = createAsyncThunk<
 export const queryRecentActivities = createAsyncThunk<
   RecentActivitiesQueryResult,
   RecentActivitiesQuery,
-  ActivitiesThunkConfig
->("activities/queryRecentActivities", async (query, thunkAPI) => {
+  LogThunkConfig
+>("log/queryRecentActivities", async (query, thunkAPI) => {
   const { activitiesApi } = thunkAPI.extra;
   const timeZone =
     query.timeZone != null
@@ -117,8 +117,8 @@ export const queryRecentActivities = createAsyncThunk<
 export const startCountdown = createAsyncThunk<
   unknown,
   unknown,
-  ActivitiesThunkConfig
->("activities/startCountdown", async (_action, thunkAPI) => {
+  LogThunkConfig
+>("log/startCountdown", async (_action, thunkAPI) => {
   const { notificationClient, timer } = thunkAPI.extra;
   timer.schedule(
     () => thunkAPI.dispatch(progressCountdown({ seconds: 1 })),
@@ -132,8 +132,8 @@ export const startCountdown = createAsyncThunk<
 const progressCountdown = createAsyncThunk<
   unknown,
   { seconds: number },
-  ActivitiesThunkConfig
->("activities/progressCountdown", async ({ seconds }, thunkAPI) => {
+  LogThunkConfig
+>("log/progressCountdown", async ({ seconds }, thunkAPI) => {
   const { notificationClient } = thunkAPI.extra;
   thunkAPI.dispatch(countdownProgressed({ seconds }));
   const countdown = selectCountdown(thunkAPI.getState());
@@ -152,18 +152,17 @@ const progressCountdown = createAsyncThunk<
   }
 });
 
-export const stopCountdown = createAsyncThunk<
-  unknown,
-  unknown,
-  ActivitiesThunkConfig
->("activities/stopCountdown", async (_action, thunkAPI) => {
-  const { timer } = thunkAPI.extra;
-  timer.cancel();
-  thunkAPI.dispatch(countdownStopped());
-});
+export const stopCountdown = createAsyncThunk<unknown, unknown, LogThunkConfig>(
+  "log/stopCountdown",
+  async (_action, thunkAPI) => {
+    const { timer } = thunkAPI.extra;
+    timer.cancel();
+    thunkAPI.dispatch(countdownStopped());
+  },
+);
 
-const activitiesSlice = createSlice({
-  name: "activities",
+const logSlice = createSlice({
+  name: "log",
   initialState,
   reducers: {
     changeText: (
@@ -297,10 +296,10 @@ const {
   countdownStarted,
   countdownProgressed,
   countdownStopped,
-} = activitiesSlice.actions;
+} = logSlice.actions;
 
 export const { changeText, durationSelected, activitySelected } =
-  activitiesSlice.actions;
+  logSlice.actions;
 
 export const {
   selectCountdown,
@@ -309,9 +308,9 @@ export const {
   selectTimeSummary,
   selectTimeZone,
   selectRecentActivities,
-} = activitiesSlice.selectors;
+} = logSlice.selectors;
 
-export default activitiesSlice.reducer;
+export default logSlice.reducer;
 
 function isLoggable({
   client,

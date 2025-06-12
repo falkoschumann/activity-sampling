@@ -2,13 +2,13 @@
 
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { BrowserRouter, Route, Routes } from "react-router";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router";
 
 import { queryAuthentication } from "../application/authentication_slice";
 import { AppDispatch } from "../application/store";
 import AuthenticatedTemplate from "./components/authenticated_template";
 import UnauthenticatedTemplate from "./components/unauthenticated_template";
-import ActivitiesPage from "./pages/activities_page";
+import LogPage from "./pages/log_page";
 import NotFoundPage from "./pages/not_found_page";
 import TimesheetPage from "./pages/timesheet_page";
 import UnauthenticatedPage from "./pages/unauthenticated_page";
@@ -24,7 +24,8 @@ export default function WebApplication() {
     <BrowserRouter>
       <AuthenticatedTemplate>
         <Routes>
-          <Route index element={<ActivitiesPage />} />
+          <Route index element={<Navigate to="/log" replace />} />
+          <Route path="/log" element={<LogPage />} />
           <Route path="/timesheet" element={<TimesheetPage />} />
           <Route path="/*" element={<NotFoundPage />} />
         </Routes>

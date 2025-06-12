@@ -18,7 +18,7 @@ import {
   selectTimeZone,
   startCountdown,
   stopCountdown,
-} from "../../application/activities_slice";
+} from "../../application/log_slice";
 import { AppDispatch } from "../../application/store";
 import { Duration } from "../../common/duration";
 import { EventHandler } from "../../common/events";
@@ -26,7 +26,7 @@ import { Activity, WorkingDay } from "../../domain/activities";
 import ErrorComponent from "../components/error_component";
 import PageLayout from "../layouts/page_layout";
 
-export default function ActivitiesPage() {
+export default function LogPage() {
   const error = useSelector(selectError);
   const dispatch = useDispatch<AppDispatch>();
 

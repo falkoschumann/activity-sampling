@@ -16,7 +16,7 @@ import {
   selectTimeZone,
   startCountdown,
   stopCountdown,
-} from "../../src/application/activities_slice";
+} from "../../src/application/log_slice";
 import { createStore } from "../../src/application/store";
 import { Clock } from "../../src/common/clock";
 import { Duration } from "../../src/common/duration";
@@ -34,7 +34,7 @@ import { ActivitiesApi } from "../../src/infrastructure/activities_api";
 import { AuthenticationApi } from "../../src/infrastructure/authentication_api";
 import { NotificationClient } from "../../src/infrastructure/notification_client";
 
-describe("Activities", () => {
+describe("Log", () => {
   describe("Ask periodically", () => {
     it("Starts countdown with a given interval", () => {
       const { store, timer } = configure();
