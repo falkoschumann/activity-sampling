@@ -47,7 +47,7 @@ analysis.
 - [ ] Summarize hours worked per week
 - [ ] Summarize hours worked per month
 - [x] Summarize the total hours worked
-- [ ] Compare with capacity
+- [x] Compare with capacity
 - [ ] Take holidays into account
 - [ ] Take vacation into account
 
