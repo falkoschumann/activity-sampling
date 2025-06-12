@@ -7,36 +7,27 @@ import { selectError } from "../../application/log_slice";
 import { AppDispatch } from "../../application/store";
 import {
   queryTimesheet,
-  selectTimesheet,
+  selectEntries,
+  selectPeriod,
   selectTimeZone,
   selectWorkingHoursSummary,
 } from "../../application/timesheet_slice";
 import { Duration } from "../../common/duration";
-import { TimesheetEntry } from "../../domain/activities";
 import ErrorComponent from "../components/error_component";
 import PageLayout from "../layouts/page_layout";
 
 export default function TimesheetPage() {
-  const timesheet = useSelector(selectTimesheet);
-  const workingHoursSummary = useSelector(selectWorkingHoursSummary);
-  const timeZone = useSelector(selectTimeZone);
   const error = useSelector(selectError);
-  const dispatch = useDispatch<AppDispatch>();
-
-  useEffect(() => {
-    dispatch(queryTimesheet({ startInclusive: "2025-06-02", endExclusive: "2025-06-09" }));
-  }, [dispatch]);
-
   return (
     <PageLayout>
       <PeriodContainer />
       <main className="container my-4" style={{ paddingTop: "3.5rem", paddingBottom: "3rem" }}>
         <ErrorComponent {...error} />
-        <TimesheetContainer entries={timesheet} timeZone={timeZone} />
+        <TimesheetContainer />
       </main>
       <footer className="fixed-bottom bg-body">
         <div className="container py-2">
-          <CapacityComponent {...workingHoursSummary} />
+          <CapacityComponent />
         </div>
       </footer>
     </PageLayout>
@@ -44,6 +35,14 @@ export default function TimesheetPage() {
 }
 
 function PeriodContainer() {
+  const { from, to } = useSelector(selectPeriod);
+  const timeZone = useSelector(selectTimeZone);
+  const dispatch = useDispatch<AppDispatch>();
+
+  useEffect(() => {
+    dispatch(queryTimesheet({ from, to }));
+  }, [dispatch, from, to]);
+
   return (
     <aside className="fixed-top bg-body-secondary" style={{ marginTop: "3.5rem" }}>
       <div className="container">
@@ -57,7 +56,12 @@ function PeriodContainer() {
             </button>
           </div>
           <div className="align-content-center">
-            <strong>This Week:</strong> 02.06.2025 - 08.06.2025
+            <strong>This Week:</strong>{" "}
+            {new Date(from).toLocaleDateString(undefined, {
+              dateStyle: "medium",
+              timeZone,
+            })}{" "}
+            - {new Date(to).toLocaleDateString(undefined, { dateStyle: "medium", timeZone })}
           </div>
           <div className="dropdown ms-auto">
             <button
@@ -92,7 +96,10 @@ function PeriodContainer() {
   );
 }
 
-function TimesheetContainer({ entries, timeZone }: { entries: TimesheetEntry[]; timeZone: string }) {
+function TimesheetContainer() {
+  const entries = useSelector(selectEntries);
+  const timeZone = useSelector(selectTimeZone);
+
   return (
     <table className="table">
       <thead className="sticky-top" style={{ top: "6.4375rem" }}>
@@ -119,7 +126,8 @@ function TimesheetContainer({ entries, timeZone }: { entries: TimesheetEntry[]; 
   );
 }
 
-function CapacityComponent({ totalHours, offset, capacity }: { totalHours: string; offset: string; capacity: string }) {
+function CapacityComponent() {
+  const { totalHours, offset, capacity } = useSelector(selectWorkingHoursSummary);
   const totalHoursInSeconds = Duration.parse(totalHours).seconds;
   const offsetInSeconds = Duration.parse(offset).seconds;
   const capacityInSeconds = Duration.parse(capacity).seconds;
@@ -127,6 +135,7 @@ function CapacityComponent({ totalHours, offset, capacity }: { totalHours: strin
   const isBehind = offsetInSeconds < 0;
   const isAhead = offsetInSeconds > 0;
   const color = isAhead ? "bg-success" : isBehind ? "bg-warning" : "bg-primary";
+
   return (
     <div className="small text-secondary">
       <div className="d-flex justify-content-end gap-2">

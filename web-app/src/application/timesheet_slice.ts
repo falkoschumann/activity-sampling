@@ -15,6 +15,10 @@ import {
 import { ActivitiesApi } from "../infrastructure/activities_api";
 
 interface TimesheetState {
+  readonly period: {
+    readonly from: string;
+    readonly to: string;
+  };
   readonly entries: TimesheetEntry[];
   readonly workingHoursSummary: {
     readonly totalHours: string;
@@ -26,6 +30,10 @@ interface TimesheetState {
 }
 
 const initialState: TimesheetState = {
+  period: {
+    from: "2025-06-02",
+    to: "2025-06-08",
+  },
   entries: [],
   workingHoursSummary: {
     totalHours: "PT0S",
@@ -49,16 +57,12 @@ export const queryTimesheet = createAsyncThunk<
   TimesheetThunkConfig
 >("timesheet/queryTimesheet", async (query, thunkAPI) => {
   const { activitiesApi } = thunkAPI.extra;
-  const { startInclusive, endExclusive } = query;
+  const { from, to } = query;
   const timeZone =
     query.timeZone != null
       ? query.timeZone
       : Intl.DateTimeFormat().resolvedOptions().timeZone;
-  return activitiesApi.queryTimesheet({
-    startInclusive,
-    endExclusive,
-    timeZone,
-  });
+  return activitiesApi.queryTimesheet({ from, to, timeZone });
 });
 
 const timesheetSlice = createSlice({
@@ -82,7 +86,8 @@ const timesheetSlice = createSlice({
     });
   },
   selectors: {
-    selectTimesheet: (state) => state.entries,
+    selectPeriod: (state) => state.period,
+    selectEntries: (state) => state.entries,
     selectWorkingHoursSummary: (state) => state.workingHoursSummary,
     selectTimeZone: (state) => state.timeZone,
     selectError: (state) => state.error,
@@ -91,7 +96,8 @@ const timesheetSlice = createSlice({
 
 export const {
   selectError,
-  selectTimesheet,
+  selectPeriod,
+  selectEntries,
   selectTimeZone,
   selectWorkingHoursSummary,
 } = timesheetSlice.selectors;

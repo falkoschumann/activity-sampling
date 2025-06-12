@@ -42,9 +42,9 @@ public class ActivitiesController {
 
   @GetMapping("/timesheet")
   public TimesheetQueryResult queryTimesheet(
-      @RequestParam @Valid LocalDate startInclusive,
-      @RequestParam @Valid LocalDate endExclusive,
+      @RequestParam @Valid LocalDate from,
+      @RequestParam @Valid LocalDate to,
       @RequestParam(required = false) @Valid ZoneId timeZone) {
-    return this.service.queryTimesheet(new TimesheetQuery(startInclusive, endExclusive, timeZone));
+    return this.service.queryTimesheet(new TimesheetQuery(from, to, timeZone));
   }
 }

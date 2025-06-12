@@ -31,8 +31,8 @@ class TimesheetProjection {
   private Duration totalHours = Duration.ZERO;
 
   TimesheetProjection(TimesheetQuery query, ActivitiesConfiguration configuration, Clock clock) {
-    startInclusive = query.startInclusive();
-    endExclusive = query.endExclusive();
+    startInclusive = query.from();
+    endExclusive = query.to().plusDays(1);
     timeZone = query.timeZone() != null ? query.timeZone() : ZoneId.systemDefault();
     capacity = configuration.capacity();
     today = clock.instant().atZone(timeZone).toLocalDate();

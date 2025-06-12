@@ -5,8 +5,8 @@ import { describe, expect, it } from "vitest";
 import { createStore } from "../../src/application/store";
 import {
   queryTimesheet,
+  selectEntries,
   selectError,
-  selectTimesheet,
   selectTimeZone,
   selectWorkingHoursSummary,
 } from "../../src/application/timesheet_slice";
@@ -32,7 +32,7 @@ describe("Timesheet", () => {
 
       await store.dispatch(queryTimesheet(createTestTimesheetQuery()));
 
-      expect(selectTimesheet(store.getState())).toEqual(
+      expect(selectEntries(store.getState())).toEqual(
         createTestTimesheetQueryResult().entries,
       );
       expect(selectTimeZone(store.getState())).toEqual(
@@ -82,7 +82,7 @@ describe("Timesheet", () => {
 
       await store.dispatch(queryTimesheet(createTestTimesheetQuery()));
 
-      expect(selectTimesheet(store.getState())).toEqual([]);
+      expect(selectEntries(store.getState())).toEqual([]);
       expect(selectWorkingHoursSummary(store.getState())).toEqual({
         totalHours: "PT0S",
         capacity: "PT40H",

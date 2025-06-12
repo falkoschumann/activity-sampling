@@ -193,8 +193,7 @@ class ApiApplicationTests {
 
       var response =
           restTemplate.getForEntity(
-              "/api/activities/timesheet"
-                  + "?startInclusive=2025-06-02&endExclusive=2025-06-09&timeZone=Europe/Berlin",
+              "/api/activities/timesheet?from=2025-06-02&to=2025-06-08&timeZone=Europe/Berlin",
               TimesheetQueryResult.class);
 
       assertEquals(200, response.getStatusCode().value());

@@ -77,8 +77,8 @@ export function createTestRecentActivitiesQueryResult(
 }
 
 export interface TimesheetQuery {
-  readonly startInclusive: string;
-  readonly endExclusive: string;
+  readonly from: string;
+  readonly to: string;
   readonly timeZone?: string;
 }
 
@@ -86,8 +86,8 @@ export function createTestTimesheetQuery(
   query: Partial<TimesheetQuery> = {},
 ): TimesheetQuery {
   return {
-    startInclusive: "2025-06-02",
-    endExclusive: "2025-06-09",
+    from: "2025-06-02",
+    to: "2025-06-08",
     timeZone: "Europe/Berlin",
     ...query,
   };
