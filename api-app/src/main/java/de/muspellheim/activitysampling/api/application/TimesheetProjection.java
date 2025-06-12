@@ -7,6 +7,7 @@ import de.muspellheim.activitysampling.api.domain.activities.Activity;
 import de.muspellheim.activitysampling.api.domain.activities.TimesheetEntry;
 import de.muspellheim.activitysampling.api.domain.activities.TimesheetQuery;
 import de.muspellheim.activitysampling.api.domain.activities.TimesheetQueryResult;
+import de.muspellheim.activitysampling.api.domain.activities.WorkingHoursSummary;
 import de.muspellheim.activitysampling.api.infrastructure.ActivityLoggedEvent;
 import java.time.Clock;
 import java.time.Duration;
@@ -68,9 +69,12 @@ class TimesheetProjection {
     var offset = totalHours.minus(Duration.ofHours(offsetDays * 8L));
     return TimesheetQueryResult.builder()
         .entries(sortedEntries)
-        .totalHours(totalHours)
-        .capacity(capacity)
-        .offset(offset)
+        .workingHoursSummary(
+            WorkingHoursSummary.builder()
+                .totalHours(totalHours)
+                .capacity(capacity)
+                .offset(offset)
+                .build())
         .timeZone(timeZone)
         .build();
   }

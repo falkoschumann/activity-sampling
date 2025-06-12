@@ -7,11 +7,9 @@ import { selectError } from "../../application/activities_slice";
 import { AppDispatch } from "../../application/store";
 import {
   queryTimesheet,
-  selectCapacity,
-  selectOffset,
   selectTimesheet,
   selectTimeZone,
-  selectTotalHours,
+  selectWorkingHoursSummary,
 } from "../../application/timesheet_slice";
 import { Duration } from "../../common/duration";
 import { TimesheetEntry } from "../../domain/activities";
@@ -20,9 +18,7 @@ import PageLayout from "../layouts/page_layout";
 
 export default function TimesheetPage() {
   const timesheet = useSelector(selectTimesheet);
-  const totalHours = useSelector(selectTotalHours);
-  const capacity = useSelector(selectCapacity);
-  const offset = useSelector(selectOffset);
+  const workingHoursSummary = useSelector(selectWorkingHoursSummary);
   const timeZone = useSelector(selectTimeZone);
   const error = useSelector(selectError);
   const dispatch = useDispatch<AppDispatch>();
@@ -40,7 +36,7 @@ export default function TimesheetPage() {
       </main>
       <footer className="fixed-bottom bg-body">
         <div className="container py-2">
-          <CapacityComponent totalHours={totalHours} offset={offset} capacity={capacity} />
+          <CapacityComponent {...workingHoursSummary} />
         </div>
       </footer>
     </PageLayout>

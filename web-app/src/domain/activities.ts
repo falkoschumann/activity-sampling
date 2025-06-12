@@ -95,9 +95,7 @@ export function createTestTimesheetQuery(
 
 export interface TimesheetQueryResult {
   readonly entries: TimesheetEntry[];
-  readonly totalHours: string;
-  readonly capacity: string;
-  readonly offset: string;
+  readonly workingHoursSummary: WorkingHoursSummary;
   readonly timeZone: string;
 }
 
@@ -109,11 +107,26 @@ export function createTestTimesheetQueryResult(
       createTestTimesheetEntry({ date: "2025-06-02" }),
       createTestTimesheetEntry({ date: "2025-06-03" }),
     ],
+    workingHoursSummary: createTestWorkingHoursSummary(),
+    timeZone: "Europe/Berlin",
+    ...result,
+  };
+}
+
+export interface WorkingHoursSummary {
+  readonly totalHours: string;
+  readonly capacity: string;
+  readonly offset: string;
+}
+
+export function createTestWorkingHoursSummary(
+  summary: Partial<WorkingHoursSummary> = {},
+): WorkingHoursSummary {
+  return {
     totalHours: "PT4H",
     capacity: "PT40H",
     offset: "PT12H",
-    timeZone: "Europe/Berlin",
-    ...result,
+    ...summary,
   };
 }
 

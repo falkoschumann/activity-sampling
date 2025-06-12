@@ -5,17 +5,17 @@ import { describe, expect, it } from "vitest";
 import { createStore } from "../../src/application/store";
 import {
   queryTimesheet,
-  selectCapacity,
   selectError,
   selectTimesheet,
   selectTimeZone,
-  selectTotalHours,
+  selectWorkingHoursSummary,
 } from "../../src/application/timesheet_slice";
 import { Clock } from "../../src/common/clock";
 import { Timer } from "../../src/common/timer";
 import {
   createTestTimesheetQuery,
   createTestTimesheetQueryResult,
+  createTestWorkingHoursSummary,
   TimesheetQueryResult,
 } from "../../src/domain/activities";
 import { ActivitiesApi } from "../../src/infrastructure/activities_api";
@@ -48,8 +48,8 @@ describe("Timesheet", () => {
 
       await store.dispatch(queryTimesheet(createTestTimesheetQuery()));
 
-      expect(selectTotalHours(store.getState())).toEqual(
-        createTestTimesheetQueryResult().totalHours,
+      expect(selectWorkingHoursSummary(store.getState()).totalHours).toEqual(
+        createTestWorkingHoursSummary().totalHours,
       );
     });
 
@@ -61,15 +61,19 @@ describe("Timesheet", () => {
 
       await store.dispatch(queryTimesheet(createTestTimesheetQuery()));
 
-      expect(selectCapacity(store.getState())).toEqual(
-        createTestTimesheetQueryResult().capacity,
+      expect(selectWorkingHoursSummary(store.getState())).toEqual(
+        createTestWorkingHoursSummary(),
       );
     });
 
     it("Queries empty result", async () => {
       const queryResultJson = JSON.stringify({
         entries: [],
-        totalHours: "PT0S",
+        workingHoursSummary: {
+          totalHours: "PT0S",
+          capacity: "PT40H",
+          offset: "PT0S",
+        },
         timeZone: "Europe/Berlin",
       } as TimesheetQueryResult);
       const { store } = configure({
@@ -79,7 +83,11 @@ describe("Timesheet", () => {
       await store.dispatch(queryTimesheet(createTestTimesheetQuery()));
 
       expect(selectTimesheet(store.getState())).toEqual([]);
-      expect(selectTotalHours(store.getState())).toEqual("PT0S");
+      expect(selectWorkingHoursSummary(store.getState())).toEqual({
+        totalHours: "PT0S",
+        capacity: "PT40H",
+        offset: "PT0S",
+      });
       expect(selectTimeZone(store.getState())).toEqual("Europe/Berlin");
     });
 

@@ -16,6 +16,7 @@ import de.muspellheim.activitysampling.api.domain.activities.TimesheetEntry;
 import de.muspellheim.activitysampling.api.domain.activities.TimesheetQuery;
 import de.muspellheim.activitysampling.api.domain.activities.TimesheetQueryResult;
 import de.muspellheim.activitysampling.api.domain.activities.WorkingDay;
+import de.muspellheim.activitysampling.api.domain.activities.WorkingHoursSummary;
 import de.muspellheim.activitysampling.api.infrastructure.ActivitiesStore;
 import de.muspellheim.activitysampling.api.infrastructure.ActivityLoggedEvent;
 import java.time.Clock;
@@ -217,7 +218,7 @@ class ActivitiesServiceTests {
 
       var result = service.queryTimesheet(TimesheetQuery.createTestInstance());
 
-      assertEquals(Duration.parse("PT1H30M"), result.totalHours());
+      assertEquals(Duration.parse("PT1H30M"), result.workingHoursSummary().totalHours());
     }
 
     @Test
@@ -229,9 +230,13 @@ class ActivitiesServiceTests {
 
       var result = service.queryTimesheet(TimesheetQuery.createTestInstance());
 
-      assertEquals(Duration.parse("PT24H"), result.totalHours());
-      assertEquals(Duration.parse("PT0S"), result.offset());
-      assertEquals(Duration.parse("PT40H"), result.capacity());
+      assertEquals(
+          WorkingHoursSummary.builder()
+              .totalHours(Duration.ofHours(24))
+              .offset(Duration.ZERO)
+              .capacity(Duration.ofHours(40))
+              .build(),
+          result.workingHoursSummary());
     }
 
     @Test
@@ -243,9 +248,13 @@ class ActivitiesServiceTests {
 
       var result = service.queryTimesheet(TimesheetQuery.createTestInstance());
 
-      assertEquals(Duration.parse("PT20H"), result.totalHours());
-      assertEquals(Duration.parse("-PT4H"), result.offset());
-      assertEquals(Duration.parse("PT40H"), result.capacity());
+      assertEquals(
+          WorkingHoursSummary.builder()
+              .totalHours(Duration.ofHours(20))
+              .offset(Duration.ofHours(-4))
+              .capacity(Duration.ofHours(40))
+              .build(),
+          result.workingHoursSummary());
     }
 
     @Test
@@ -257,9 +266,13 @@ class ActivitiesServiceTests {
 
       var result = service.queryTimesheet(TimesheetQuery.createTestInstance());
 
-      assertEquals(Duration.parse("PT26H"), result.totalHours());
-      assertEquals(Duration.parse("PT2H"), result.offset());
-      assertEquals(Duration.parse("PT40H"), result.capacity());
+      assertEquals(
+          WorkingHoursSummary.builder()
+              .totalHours(Duration.ofHours(26))
+              .offset(Duration.ofHours(2))
+              .capacity(Duration.ofHours(40))
+              .build(),
+          result.workingHoursSummary());
     }
 
     @Test
@@ -275,9 +288,13 @@ class ActivitiesServiceTests {
 
       var result = service.queryTimesheet(TimesheetQuery.createTestInstance());
 
-      assertEquals(Duration.parse("PT24H"), result.totalHours());
-      assertEquals(Duration.parse("-PT16H"), result.offset());
-      assertEquals(Duration.parse("PT40H"), result.capacity());
+      assertEquals(
+          WorkingHoursSummary.builder()
+              .totalHours(Duration.ofHours(24))
+              .offset(Duration.ofHours(-16))
+              .capacity(Duration.ofHours(40))
+              .build(),
+          result.workingHoursSummary());
     }
 
     @Test
@@ -286,7 +303,10 @@ class ActivitiesServiceTests {
 
       var result = service.queryTimesheet(TimesheetQuery.createTestInstance());
 
-      assertEquals(TimesheetQueryResult.EMPTY.withOffset(Duration.ofHours(-24)), result);
+      assertEquals(
+          TimesheetQueryResult.EMPTY.withWorkingHoursSummary(
+              WorkingHoursSummary.EMPTY.withOffset(Duration.ofHours(-24))),
+          result);
     }
   }
 

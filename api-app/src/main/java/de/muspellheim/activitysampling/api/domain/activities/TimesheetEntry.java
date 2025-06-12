@@ -2,7 +2,6 @@
 
 package de.muspellheim.activitysampling.api.domain.activities;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import java.time.Duration;
 import java.time.LocalDate;
 import lombok.Builder;
@@ -10,7 +9,6 @@ import lombok.With;
 
 @Builder
 @With
-@JsonInclude(JsonInclude.Include.NON_NULL)
 public record TimesheetEntry(
     LocalDate date, String client, String project, String task, Duration hours) {
 
