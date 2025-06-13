@@ -1,5 +1,6 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
+import { Temporal } from "@js-temporal/polyfill";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -12,7 +13,6 @@ import {
   selectTimeZone,
   selectWorkingHoursSummary,
 } from "../../application/timesheet_slice";
-import { Duration } from "../../common/duration";
 import ErrorComponent from "../components/error_component";
 import PageLayout from "../layouts/page_layout";
 
@@ -118,7 +118,7 @@ function TimesheetContainer() {
             <td>{entry.client}</td>
             <td>{entry.project}</td>
             <td>{entry.task}</td>
-            <td>{Duration.parse(entry.hours).toLocaleString()}</td>
+            <td>{formatDuration(entry.hours)}</td>
           </tr>
         ))}
       </tbody>
@@ -128,9 +128,9 @@ function TimesheetContainer() {
 
 function CapacityComponent() {
   const { totalHours, offset, capacity } = useSelector(selectWorkingHoursSummary);
-  const totalHoursInSeconds = Duration.parse(totalHours).seconds;
-  const offsetInSeconds = Duration.parse(offset).seconds;
-  const capacityInSeconds = Duration.parse(capacity).seconds;
+  const totalHoursInSeconds = Temporal.Duration.from(totalHours).total("seconds");
+  const offsetInSeconds = Temporal.Duration.from(offset).total("seconds");
+  const capacityInSeconds = Temporal.Duration.from(capacity).total("seconds");
   const progress = (totalHoursInSeconds / capacityInSeconds) * 100;
   const isBehind = offsetInSeconds < 0;
   const isAhead = offsetInSeconds > 0;
@@ -139,10 +139,10 @@ function CapacityComponent() {
   return (
     <div className="small text-secondary">
       <div className="d-flex justify-content-end gap-2">
-        {isBehind && <div className="text-warning">{Duration.parse(offset).abs().toLocaleString()} Behind</div>}
-        {isAhead && <div className="text-success">{Duration.parse(offset).toLocaleString()} Ahead</div>}
+        {isBehind && <div className="text-warning">{formatDuration(Temporal.Duration.from(offset).abs())} Behind</div>}
+        {isAhead && <div className="text-success">{formatDuration(offset)} Ahead</div>}
         <div>
-          {Duration.parse(totalHours).toLocaleString()} / {Duration.parse(capacity).toLocaleString()}
+          {formatDuration(totalHours)} / {formatDuration(capacity)}
         </div>
       </div>
       <div
@@ -157,4 +157,14 @@ function CapacityComponent() {
       </div>
     </div>
   );
+}
+
+function formatDuration(duration: Temporal.Duration | string): string {
+  return Temporal.Duration.from(duration)
+    .toLocaleString(undefined, {
+      style: "digital",
+      hours: "2-digit",
+      minutes: "2-digit",
+    })
+    .substring(0, 5);
 }

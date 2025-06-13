@@ -1,5 +1,6 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
+import { Temporal } from "@js-temporal/polyfill";
 import * as React from "react";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -20,7 +21,6 @@ import {
   stopCountdown,
 } from "../../application/log_slice";
 import { AppDispatch } from "../../application/store";
-import { Duration } from "../../common/duration";
 import { EventHandler } from "../../common/events";
 import { Activity, WorkingDay } from "../../domain/activities";
 import ErrorComponent from "../components/error_component";
@@ -141,7 +141,7 @@ function CountdownContainer() {
         >
           <div className="progress-bar" style={{ width: `${percentage}%` }}></div>
         </div>
-        <div className="text-center">{Duration.parse(remaining).toLocaleString({ style: "medium" })}</div>
+        <div className="text-center">{formatDurationLong(remaining)}</div>
       </div>
       <div>
         <div className="btn-group">
@@ -201,7 +201,7 @@ function DurationItemComponent({
         href="#"
         onClick={handleClick}
       >
-        {Duration.parse(duration).minutes} min
+        {Temporal.Duration.from(duration).total("minutes")} min
       </a>
     </li>
   );
@@ -295,20 +295,39 @@ function TimeSummaryContainer() {
     <div className="d-flex justify-content-center flex-wrap text-center">
       <div className="flex-fill">
         <div className="small">Hours Today</div>
-        <div>{Duration.parse(hoursToday).toLocaleString()}</div>
+        <div>{formatDurationMedium(hoursToday)}</div>
       </div>
       <div className="flex-fill">
         <div className="small">Hours Yesterday</div>
-        <div>{Duration.parse(hoursYesterday).toLocaleString()}</div>
+        <div>{formatDurationMedium(hoursYesterday)}</div>
       </div>
       <div className="flex-fill">
         <div className="small">Hours this Week</div>
-        <div>{Duration.parse(hoursThisWeek).toLocaleString()}</div>
+        <div>{formatDurationMedium(hoursThisWeek)}</div>
       </div>
       <div className="flex-fill">
         <div className="small">Hours this Month</div>
-        <div>{Duration.parse(hoursThisMonth).toLocaleString()}</div>
+        <div>{formatDurationMedium(hoursThisMonth)}</div>
       </div>
     </div>
   );
+}
+
+function formatDurationLong(duration: Temporal.Duration | string): string {
+  return Temporal.Duration.from(duration).toLocaleString(undefined, {
+    style: "digital",
+    hours: "2-digit",
+    minutes: "2-digit",
+    seconds: "2-digit",
+  });
+}
+
+function formatDurationMedium(duration: Temporal.Duration | string): string {
+  return Temporal.Duration.from(duration)
+    .toLocaleString(undefined, {
+      style: "digital",
+      hours: "2-digit",
+      minutes: "2-digit",
+    })
+    .substring(0, 5);
 }

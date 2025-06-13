@@ -1,16 +1,16 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
+import { Temporal } from "@js-temporal/polyfill";
 import {
   createAsyncThunk,
   createSlice,
   PayloadAction,
   SerializedError,
 } from "@reduxjs/toolkit";
+
 import { Clock } from "../common/clock";
-import { Duration } from "../common/duration";
 import { CommandStatus } from "../common/messages";
 import { Timer } from "../common/timer";
-
 import {
   Activity,
   LogActivityCommand,
@@ -137,8 +137,8 @@ const progressCountdown = createAsyncThunk<
   const { notificationClient } = thunkAPI.extra;
   thunkAPI.dispatch(countdownProgressed({ seconds }));
   const countdown = selectCountdown(thunkAPI.getState());
-  const remaining = Duration.parse(countdown.remaining);
-  const intervalElapsed = !remaining.isPositive();
+  const remaining = Temporal.Duration.from(countdown.remaining);
+  const intervalElapsed = remaining.sign <= 0;
   if (intervalElapsed && notificationClient.isGranted) {
     const currentActivityForm = selectCurrentActivityForm(thunkAPI.getState());
     notificationClient.show("What are you working on?", {
@@ -196,20 +196,20 @@ const logSlice = createSlice({
       state,
       action: PayloadAction<{ seconds: number }>,
     ) => {
-      const duration = Duration.parse(state.countdown.duration);
-      let remaining = Duration.parse(state.countdown.remaining).minusSeconds(
-        action.payload.seconds,
-      );
-      if (remaining.isNegative()) {
+      const duration = Temporal.Duration.from(state.countdown.duration);
+      let remaining = Temporal.Duration.from(
+        state.countdown.remaining,
+      ).subtract({ seconds: action.payload.seconds });
+      if (remaining.sign === -1) {
         state.currentActivityForm.disabled = false;
         state.currentActivityForm.loggable = isLoggable(
           state.currentActivityForm,
         );
-        remaining = duration.minusSeconds(action.payload.seconds);
+        remaining = duration.subtract({ seconds: action.payload.seconds });
       }
       state.countdown.remaining = remaining.toString();
       state.countdown.percentage = Math.round(
-        (1 - remaining.seconds / duration.seconds) * 100,
+        (1 - remaining.total("seconds") / duration.total("seconds")) * 100,
       );
     },
     countdownStopped: (state) => {

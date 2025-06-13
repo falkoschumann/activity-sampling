@@ -1,5 +1,6 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
+import { Temporal } from "@js-temporal/polyfill";
 import { describe, expect, it } from "vitest";
 
 import {
@@ -19,7 +20,6 @@ import {
 } from "../../src/application/log_slice";
 import { createStore } from "../../src/application/store";
 import { Clock } from "../../src/common/clock";
-import { Duration } from "../../src/common/duration";
 import { Failure } from "../../src/common/messages";
 import { Timer } from "../../src/common/timer";
 import {
@@ -72,7 +72,7 @@ describe("Log", () => {
       store.dispatch(durationSelected({ duration: "PT20M" }));
       store.dispatch(startCountdown({}));
 
-      timer.simulateTaskRun(Duration.parse("PT16M").seconds);
+      timer.simulateTaskRun(Temporal.Duration.from("PT16M").total("seconds"));
 
       expect(selectCurrentActivityForm(store.getState())).toEqual({
         client: "",
@@ -96,9 +96,9 @@ describe("Log", () => {
       const shownNotifications = notificationClient.trackNotificationsShown();
       store.dispatch(durationSelected({ duration: "PT20M" }));
       store.dispatch(startCountdown({}));
-      timer.simulateTaskRun(Duration.parse("PT20M").seconds);
+      timer.simulateTaskRun(Temporal.Duration.from("PT20M").total("seconds"));
 
-      timer.simulateTaskRun(Duration.parse("PT1M").seconds);
+      timer.simulateTaskRun(Temporal.Duration.from("PT1M").total("seconds"));
 
       expect(selectCurrentActivityForm(store.getState())).toEqual({
         client: "",
@@ -127,7 +127,7 @@ describe("Log", () => {
       const { store, timer } = configure();
       const cancelledTasks = timer.trackCancelledTasks();
       store.dispatch(startCountdown({}));
-      timer.simulateTaskRun(Duration.parse("PT12M").seconds);
+      timer.simulateTaskRun(Temporal.Duration.from("PT12M").total("seconds"));
 
       store.dispatch(stopCountdown({}));
 
@@ -155,9 +155,9 @@ describe("Log", () => {
       const shownNotifications = notificationClient.trackNotificationsShown();
       store.dispatch(durationSelected({ duration: "PT20M" }));
       store.dispatch(startCountdown({}));
-      timer.simulateTaskRun(Duration.parse("PT16M").seconds);
+      timer.simulateTaskRun(Temporal.Duration.from("PT16M").total("seconds"));
 
-      timer.simulateTaskRun(Duration.parse("PT4M").seconds);
+      timer.simulateTaskRun(Temporal.Duration.from("PT4M").total("seconds"));
 
       expect(selectCountdown(store.getState())).toEqual({
         duration: "PT20M",
@@ -327,7 +327,7 @@ describe("Log", () => {
       const hiddenNotifications = notificationClient.trackNotificationsHidden();
       await store.dispatch(startCountdown({}));
 
-      timer.simulateTaskRun(Duration.parse("PT30M1S").seconds);
+      timer.simulateTaskRun(Temporal.Duration.from("PT30M1S").total("seconds"));
       store.dispatch(changeText({ name: "client", text: "Test client" }));
       store.dispatch(changeText({ name: "project", text: "Test project" }));
       store.dispatch(changeText({ name: "task", text: "Test task" }));
