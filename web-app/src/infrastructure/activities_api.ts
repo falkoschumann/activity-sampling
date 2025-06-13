@@ -85,18 +85,7 @@ export class ActivitiesApi extends EventTarget {
     const response = await this.#fetch(url);
     verifyResponse(response);
     const json = await response.text();
-    let result = JSON.parse(json) as TimesheetQueryResult;
-    if (result.workingHoursSummary.offset.indexOf("-") !== -1) {
-      const offset = "-" + result.workingHoursSummary.offset.replace("-", "");
-      result = {
-        ...result,
-        workingHoursSummary: {
-          ...result.workingHoursSummary,
-          offset,
-        },
-      };
-    }
-    return result;
+    return JSON.parse(json);
   }
 }
 
