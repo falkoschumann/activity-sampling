@@ -26,7 +26,6 @@ interface TimesheetState {
     readonly capacity: string;
     readonly offset: string;
   };
-  readonly timeZone: string;
   readonly error?: SerializedError;
 }
 
@@ -41,7 +40,6 @@ const initialState: TimesheetState = {
     capacity: "PT40H",
     offset: "PT0S",
   },
-  timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
 };
 
 type TimesheetThunkConfig = {
@@ -78,7 +76,6 @@ const timesheetSlice = createSlice({
     builder.addCase(queryTimesheet.fulfilled, (state, action) => {
       state.entries = action.payload.entries;
       state.workingHoursSummary = action.payload.workingHoursSummary;
-      state.timeZone = action.payload.timeZone;
     });
     builder.addCase(queryTimesheet.rejected, (state) => {
       state.error = {
@@ -90,7 +87,6 @@ const timesheetSlice = createSlice({
     selectPeriod: (state) => state.period,
     selectEntries: (state) => state.entries,
     selectWorkingHoursSummary: (state) => state.workingHoursSummary,
-    selectTimeZone: (state) => state.timeZone,
     selectError: (state) => state.error,
   },
 });
@@ -99,7 +95,6 @@ export const {
   selectError,
   selectPeriod,
   selectEntries,
-  selectTimeZone,
   selectWorkingHoursSummary,
 } = timesheetSlice.selectors;
 

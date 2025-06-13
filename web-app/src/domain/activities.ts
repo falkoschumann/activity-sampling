@@ -39,7 +39,6 @@ export interface RecentActivitiesQueryResult {
   readonly lastActivity?: Activity;
   readonly workingDays: WorkingDay[];
   readonly timeSummary: TimeSummary;
-  readonly timeZone: string;
 }
 
 export function createTestRecentActivitiesQueryResult(
@@ -71,7 +70,6 @@ export function createTestRecentActivitiesQueryResult(
       hoursThisWeek: "PT2H",
       hoursThisMonth: "PT2H",
     },
-    timeZone: "Europe/Berlin",
     ...result,
   };
 }
@@ -96,7 +94,6 @@ export function createTestTimesheetQuery(
 export interface TimesheetQueryResult {
   readonly entries: TimesheetEntry[];
   readonly workingHoursSummary: WorkingHoursSummary;
-  readonly timeZone: string;
 }
 
 export function createTestTimesheetQueryResult(
@@ -108,7 +105,6 @@ export function createTestTimesheetQueryResult(
       createTestTimesheetEntry({ date: "2025-06-03" }),
     ],
     workingHoursSummary: createTestWorkingHoursSummary(),
-    timeZone: "Europe/Berlin",
     ...result,
   };
 }

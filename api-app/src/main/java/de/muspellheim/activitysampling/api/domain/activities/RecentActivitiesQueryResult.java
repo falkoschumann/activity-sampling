@@ -7,7 +7,6 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.List;
 import lombok.Builder;
 import lombok.With;
@@ -16,10 +15,10 @@ import lombok.With;
 @With
 @JsonInclude(Include.NON_NULL)
 public record RecentActivitiesQueryResult(
-    Activity lastActivity, List<WorkingDay> workingDays, TimeSummary timeSummary, ZoneId timeZone) {
+    Activity lastActivity, List<WorkingDay> workingDays, TimeSummary timeSummary) {
 
   public static final RecentActivitiesQueryResult EMPTY =
-      new RecentActivitiesQueryResult(null, List.of(), TimeSummary.NULL, ZoneId.systemDefault());
+      new RecentActivitiesQueryResult(null, List.of(), TimeSummary.NULL);
 
   public static RecentActivitiesQueryResult createTestInstance() {
     return RecentActivitiesQueryResult.builder()
@@ -49,7 +48,6 @@ public record RecentActivitiesQueryResult(
                 Duration.ofMinutes(90),
                 Duration.ofMinutes(120),
                 Duration.ofMinutes(120)))
-        .timeZone(ZoneId.of("Europe/Berlin"))
         .build();
   }
 }

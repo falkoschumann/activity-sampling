@@ -66,7 +66,6 @@ class RecentActivitiesProjection {
         .lastActivity(getLastActivity())
         .workingDays(workingDays)
         .timeSummary(getTimeSummary())
-        .timeZone(timeZone)
         .build();
   }
 

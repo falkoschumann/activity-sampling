@@ -7,7 +7,6 @@ import {
   queryTimesheet,
   selectEntries,
   selectError,
-  selectTimeZone,
   selectWorkingHoursSummary,
 } from "../../src/application/timesheet_slice";
 import { Clock } from "../../src/common/clock";
@@ -34,9 +33,6 @@ describe("Timesheet", () => {
 
       expect(selectEntries(store.getState())).toEqual(
         createTestTimesheetQueryResult().entries,
-      );
-      expect(selectTimeZone(store.getState())).toEqual(
-        createTestTimesheetQueryResult().timeZone,
       );
     });
 
@@ -88,7 +84,6 @@ describe("Timesheet", () => {
         capacity: "PT40H",
         offset: "PT0S",
       });
-      expect(selectTimeZone(store.getState())).toEqual("Europe/Berlin");
     });
 
     it("Handles server error", async () => {

@@ -75,7 +75,6 @@ class TimesheetProjection {
                 .capacity(capacity)
                 .offset(offset)
                 .build())
-        .timeZone(timeZone)
         .build();
   }
 

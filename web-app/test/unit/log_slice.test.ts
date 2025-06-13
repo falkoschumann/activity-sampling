@@ -14,7 +14,6 @@ import {
   selectError,
   selectRecentActivities,
   selectTimeSummary,
-  selectTimeZone,
   startCountdown,
   stopCountdown,
 } from "../../src/application/log_slice";
@@ -438,7 +437,6 @@ describe("Log", () => {
           ],
         },
       ]);
-      expect(selectTimeZone(store.getState())).toEqual("Europe/Berlin");
     });
 
     it("Summarizes hours worked today, yesterday, this week and this month", async () => {
@@ -484,7 +482,6 @@ describe("Log", () => {
         loggable: false,
       });
       expect(selectRecentActivities(store.getState())).toEqual([]);
-      expect(selectTimeZone(store.getState())).toEqual("Europe/Berlin");
       expect(selectTimeSummary(store.getState())).toEqual(
         createEmptyTimeSummary(),
       );

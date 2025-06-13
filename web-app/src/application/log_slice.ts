@@ -39,7 +39,6 @@ interface LogState {
   };
   readonly recentActivities: WorkingDay[];
   readonly timeSummary: TimeSummary;
-  readonly timeZone: string;
   readonly error?: SerializedError;
 }
 
@@ -65,7 +64,6 @@ const initialState: LogState = {
     hoursThisWeek: "PT0S",
     hoursThisMonth: "PT0S",
   },
-  timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
 };
 
 type LogThunkConfig = {
@@ -271,9 +269,6 @@ const logSlice = createSlice({
       );
       state.recentActivities = action.payload.workingDays;
       state.timeSummary = action.payload.timeSummary;
-      if (action.payload.timeZone) {
-        state.timeZone = action.payload.timeZone;
-      }
     });
     builder.addCase(queryRecentActivities.rejected, (state) => {
       state.error = {
@@ -286,7 +281,6 @@ const logSlice = createSlice({
     selectCountdown: (state) => state.countdown,
     selectTimeSummary: (state) => state.timeSummary,
     selectRecentActivities: (state) => state.recentActivities,
-    selectTimeZone: (state) => state.timeZone,
     selectError: (state) => state.error,
   },
 });
@@ -306,7 +300,6 @@ export const {
   selectError,
   selectCurrentActivityForm,
   selectTimeSummary,
-  selectTimeZone,
   selectRecentActivities,
 } = logSlice.selectors;
 

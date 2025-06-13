@@ -16,7 +16,6 @@ import {
   selectError,
   selectRecentActivities,
   selectTimeSummary,
-  selectTimeZone,
   startCountdown,
   stopCountdown,
 } from "../../application/log_slice";
@@ -209,7 +208,6 @@ function DurationItemComponent({
 
 function RecentActivitiesContainer() {
   const recentActivities = useSelector(selectRecentActivities);
-  const timeZone = useSelector(selectTimeZone);
   const dispatch = useDispatch<AppDispatch>();
 
   function handleSelect(event: { activity: Activity }) {
@@ -217,17 +215,15 @@ function RecentActivitiesContainer() {
   }
 
   return recentActivities.map((workingDay) => (
-    <WorkingDayComponent key={workingDay.date} workingDay={workingDay} timeZone={timeZone} onSelect={handleSelect} />
+    <WorkingDayComponent key={workingDay.date} workingDay={workingDay} onSelect={handleSelect} />
   ));
 }
 
 function WorkingDayComponent({
   workingDay,
-  timeZone,
   onSelect,
 }: {
   workingDay: WorkingDay;
-  timeZone: string;
   onSelect: EventHandler<{ activity: Activity }>;
 }) {
   return (
@@ -237,27 +233,14 @@ function WorkingDayComponent({
       </h6>
       <div className="list-group list-group-flush">
         {workingDay.activities.map((activity) => (
-          <ActivityComponent
-            key={activity.dateTime}
-            activity={activity}
-            timeZone={timeZone}
-            onSelect={() => onSelect({ activity })}
-          />
+          <ActivityComponent key={activity.dateTime} activity={activity} onSelect={() => onSelect({ activity })} />
         ))}
       </div>
     </div>
   );
 }
 
-function ActivityComponent({
-  activity,
-  timeZone,
-  onSelect,
-}: {
-  activity: Activity;
-  timeZone: string;
-  onSelect: EventHandler;
-}) {
+function ActivityComponent({ activity, onSelect }: { activity: Activity; onSelect: EventHandler }) {
   return (
     <button
       key={activity.dateTime}
@@ -268,7 +251,6 @@ function ActivityComponent({
         {Temporal.PlainDateTime.from(activity.dateTime).toLocaleString(undefined, {
           timeStyle: "short",
           hour12: false,
-          timeZone,
         })}
       </div>
       <div>

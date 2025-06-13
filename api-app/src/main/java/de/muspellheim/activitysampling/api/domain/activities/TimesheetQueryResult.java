@@ -3,7 +3,6 @@
 package de.muspellheim.activitysampling.api.domain.activities;
 
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.List;
 import lombok.Builder;
 import lombok.With;
@@ -11,10 +10,10 @@ import lombok.With;
 @Builder
 @With
 public record TimesheetQueryResult(
-    List<TimesheetEntry> entries, WorkingHoursSummary workingHoursSummary, ZoneId timeZone) {
+    List<TimesheetEntry> entries, WorkingHoursSummary workingHoursSummary) {
 
   public static final TimesheetQueryResult EMPTY =
-      new TimesheetQueryResult(List.of(), WorkingHoursSummary.EMPTY, ZoneId.systemDefault());
+      new TimesheetQueryResult(List.of(), WorkingHoursSummary.EMPTY);
 
   public static TimesheetQueryResult createTestInstance() {
     return TimesheetQueryResult.builder()
@@ -23,7 +22,6 @@ public record TimesheetQueryResult(
                 TimesheetEntry.createTestInstance().withDate(LocalDate.parse("2025-06-02")),
                 TimesheetEntry.createTestInstance().withDate(LocalDate.parse("2025-06-03"))))
         .workingHoursSummary(WorkingHoursSummary.createTestInstance())
-        .timeZone(ZoneId.of("Europe/Berlin"))
         .build();
   }
 }
