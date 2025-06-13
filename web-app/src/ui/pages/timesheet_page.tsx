@@ -10,7 +10,6 @@ import {
   queryTimesheet,
   selectEntries,
   selectPeriod,
-  selectTimeZone,
   selectWorkingHoursSummary,
 } from "../../application/timesheet_slice";
 import ErrorComponent from "../components/error_component";
@@ -36,7 +35,6 @@ export default function TimesheetPage() {
 
 function PeriodContainer() {
   const { from, to } = useSelector(selectPeriod);
-  const timeZone = useSelector(selectTimeZone);
   const dispatch = useDispatch<AppDispatch>();
 
   useEffect(() => {
@@ -57,11 +55,10 @@ function PeriodContainer() {
           </div>
           <div className="align-content-center">
             <strong>This Week:</strong>{" "}
-            {new Date(from).toLocaleDateString(undefined, {
+            {Temporal.PlainDate.from(from).toLocaleString(undefined, {
               dateStyle: "medium",
-              timeZone,
             })}{" "}
-            - {new Date(to).toLocaleDateString(undefined, { dateStyle: "medium", timeZone })}
+            - {Temporal.PlainDate.from(to).toLocaleString(undefined, { dateStyle: "medium" })}
           </div>
           <div className="dropdown ms-auto">
             <button
@@ -98,7 +95,6 @@ function PeriodContainer() {
 
 function TimesheetContainer() {
   const entries = useSelector(selectEntries);
-  const timeZone = useSelector(selectTimeZone);
 
   return (
     <table className="table">
@@ -114,7 +110,7 @@ function TimesheetContainer() {
       <tbody>
         {entries.map((entry, index) => (
           <tr key={index}>
-            <td>{new Date(entry.date).toLocaleDateString(undefined, { dateStyle: "medium", timeZone })}</td>
+            <td>{Temporal.PlainDate.from(entry.date).toLocaleString(undefined, { dateStyle: "medium" })}</td>
             <td>{entry.client}</td>
             <td>{entry.project}</td>
             <td>{entry.task}</td>

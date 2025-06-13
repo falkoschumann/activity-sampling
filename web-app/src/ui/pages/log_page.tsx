@@ -217,12 +217,7 @@ function RecentActivitiesContainer() {
   }
 
   return recentActivities.map((workingDay) => (
-    <WorkingDayComponent
-      key={new Date(workingDay.date).toISOString()}
-      workingDay={workingDay}
-      timeZone={timeZone}
-      onSelect={handleSelect}
-    />
+    <WorkingDayComponent key={workingDay.date} workingDay={workingDay} timeZone={timeZone} onSelect={handleSelect} />
   ));
 }
 
@@ -238,7 +233,7 @@ function WorkingDayComponent({
   return (
     <div className="mt-4">
       <h6 className="m-0 p-2 sticky-top bg-body-tertiary" style={{ top: "3.5rem" }}>
-        {new Date(workingDay.date).toLocaleDateString(undefined, { dateStyle: "full", timeZone })}
+        {Temporal.PlainDate.from(workingDay.date).toLocaleString(undefined, { dateStyle: "full" })}
       </h6>
       <div className="list-group list-group-flush">
         {workingDay.activities.map((activity) => (
@@ -265,12 +260,12 @@ function ActivityComponent({
 }) {
   return (
     <button
-      key={new Date(activity.timestamp).toISOString()}
+      key={activity.timestamp}
       onClick={() => onSelect()}
       className="list-group-item list-group-item-action py-1 d-flex justify-content-start align-items-start"
     >
       <div style={{ width: "3em" }}>
-        {new Date(activity.timestamp).toLocaleTimeString(undefined, {
+        {Temporal.PlainDateTime.from(activity.timestamp).toLocaleString(undefined, {
           timeStyle: "short",
           hour12: false,
           timeZone,
