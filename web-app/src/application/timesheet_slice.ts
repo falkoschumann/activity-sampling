@@ -1,5 +1,6 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
+import { Temporal } from "@js-temporal/polyfill";
 import {
   createAsyncThunk,
   createSlice,
@@ -112,21 +113,11 @@ function initState() {
 }
 
 function initPeriod() {
-  const now = new Date();
-  const startOfWeek = new Date(now);
-  startOfWeek.setDate(now.getDate() - now.getDay() + 1); // Set to Monday
-  startOfWeek.setHours(0, 0, 0, 0); // Set to start of day
-  const endOfWeek = new Date(startOfWeek);
-  endOfWeek.setDate(startOfWeek.getDate() + 6); // Set to Sunday
-  endOfWeek.setHours(23, 59, 59, 999); // Set to end of day
+  const today = Temporal.Now.plainDateISO();
+  const monday = today.subtract({ days: today.dayOfWeek - 1 });
+  const sunday = monday.add({ days: 6 });
   return {
-    from: toISODate(startOfWeek),
-    to: toISODate(endOfWeek),
+    from: monday.toString(),
+    to: sunday.toString(),
   };
-}
-
-function toISODate(date: Date): string {
-  const offset = date.getTimezoneOffset();
-  const isoDate = new Date(date.getTime() - offset * 60 * 1000);
-  return isoDate.toISOString().substring(0, 10);
 }
