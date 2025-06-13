@@ -7,11 +7,8 @@ all: $(SUBDIRS) root
 clean: $(SUBDIRS)
 clean: TARGET=clean
 
-distclean: $(SUBDIRS) distclean-root
+distclean: $(SUBDIRS)
 distclean: TARGET=distclean
-
-distclean-root:
-	docker compose down --volumes --remove-orphans --rmi local
 
 dist: $(SUBDIRS)
 dist: TARGET=dist
@@ -20,7 +17,7 @@ up:
 	docker compose up --build --detach
 
 down:
-	docker compose down
+	docker compose down --volumes --remove-orphans --rmi local
 
 prune:
 	docker container prune
