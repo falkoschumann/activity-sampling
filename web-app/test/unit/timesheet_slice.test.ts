@@ -4,9 +4,13 @@ import { describe, expect, it } from "vitest";
 
 import { createStore } from "../../src/application/store";
 import {
+  initPeriod,
+  nextPeriod,
+  previousPeriod,
   queryTimesheet,
   selectEntries,
   selectError,
+  selectPeriod,
   selectWorkingHoursSummary,
 } from "../../src/application/timesheet_slice";
 import { Clock } from "../../src/common/clock";
@@ -34,6 +38,126 @@ describe("Timesheet", () => {
       expect(selectEntries(store.getState())).toEqual(
         createTestTimesheetQueryResult().entries,
       );
+    });
+
+    it("Summarizes hours worked per day when goto next period", async () => {
+      const queryResultJson = JSON.stringify({
+        entries: [],
+        workingHoursSummary: createTestWorkingHoursSummary(),
+      } as TimesheetQueryResult);
+      const { store } = configure({
+        responses: [new Response(queryResultJson)],
+      });
+      store.dispatch(
+        initPeriod({ from: "2025-06-13", to: "2025-06-13", unit: "Day" }),
+      );
+
+      store.dispatch(nextPeriod());
+      expect(selectPeriod(store.getState())).toEqual({
+        from: "2025-06-14",
+        to: "2025-06-14",
+        unit: "Day",
+      });
+    });
+
+    it("Summarizes hours worked per day when goto previous period", async () => {
+      const queryResultJson = JSON.stringify({
+        entries: [],
+        workingHoursSummary: createTestWorkingHoursSummary(),
+      } as TimesheetQueryResult);
+      const { store } = configure({
+        responses: [new Response(queryResultJson)],
+      });
+      store.dispatch(
+        initPeriod({ from: "2025-06-13", to: "2025-06-13", unit: "Day" }),
+      );
+
+      store.dispatch(previousPeriod());
+      expect(selectPeriod(store.getState())).toEqual({
+        from: "2025-06-12",
+        to: "2025-06-12",
+        unit: "Day",
+      });
+    });
+
+    it("Summarizes hours worked per week when goto next period", async () => {
+      const queryResultJson = JSON.stringify({
+        entries: [],
+        workingHoursSummary: createTestWorkingHoursSummary(),
+      } as TimesheetQueryResult);
+      const { store } = configure({
+        responses: [new Response(queryResultJson)],
+      });
+      store.dispatch(
+        initPeriod({ from: "2025-06-02", to: "2025-06-08", unit: "Week" }),
+      );
+
+      store.dispatch(nextPeriod());
+      expect(selectPeriod(store.getState())).toEqual({
+        from: "2025-06-09",
+        to: "2025-06-15",
+        unit: "Week",
+      });
+    });
+
+    it("Summarizes hours worked per week when goto previous period", async () => {
+      const queryResultJson = JSON.stringify({
+        entries: [],
+        workingHoursSummary: createTestWorkingHoursSummary(),
+      } as TimesheetQueryResult);
+      const { store } = configure({
+        responses: [new Response(queryResultJson)],
+      });
+      store.dispatch(
+        initPeriod({ from: "2025-06-02", to: "2025-06-08", unit: "Week" }),
+      );
+
+      store.dispatch(previousPeriod());
+      expect(selectPeriod(store.getState())).toEqual({
+        from: "2025-05-26",
+        to: "2025-06-01",
+        unit: "Week",
+      });
+    });
+
+    it("Summarizes hours worked per month when goto next period", async () => {
+      const queryResultJson = JSON.stringify({
+        entries: [],
+        workingHoursSummary: createTestWorkingHoursSummary(),
+      } as TimesheetQueryResult);
+      const { store } = configure({
+        responses: [new Response(queryResultJson)],
+      });
+      store.dispatch(
+        initPeriod({ from: "2025-03-01", to: "2025-03-31", unit: "Month" }),
+      );
+
+      store.dispatch(nextPeriod());
+      expect(selectPeriod(store.getState())).toEqual({
+        from: "2025-04-01",
+        to: "2025-04-30",
+        unit: "Month",
+      });
+    });
+
+    it("Summarizes hours worked per month when goto previous period", async () => {
+      const queryResultJson = JSON.stringify({
+        entries: [],
+        workingHoursSummary: createTestWorkingHoursSummary(),
+      } as TimesheetQueryResult);
+      const { store } = configure({
+        responses: [new Response(queryResultJson)],
+      });
+      store.dispatch(
+        initPeriod({ from: "2025-03-01", to: "2025-03-31", unit: "Month" }),
+      );
+
+      store.dispatch(previousPeriod());
+      expect(selectPeriod(store.getState())).toEqual({
+        from: "2025-02-01",
+        to: "2025-02-28",
+        unit: "Month",
+      });
     });
 
     it("Summarizes the total hours worked", async () => {

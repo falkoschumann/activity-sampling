@@ -7,6 +7,9 @@ import { useDispatch, useSelector } from "react-redux";
 import { selectError } from "../../application/log_slice";
 import { AppDispatch } from "../../application/store";
 import {
+  changePeriod,
+  nextPeriod,
+  previousPeriod,
   queryTimesheet,
   selectEntries,
   selectPeriod,
@@ -34,7 +37,7 @@ export default function TimesheetPage() {
 }
 
 function PeriodContainer() {
-  const { from, to } = useSelector(selectPeriod);
+  const { from, to, unit } = useSelector(selectPeriod);
   const dispatch = useDispatch<AppDispatch>();
 
   useEffect(() => {
@@ -46,10 +49,10 @@ function PeriodContainer() {
       <div className="container">
         <div className="btn-toolbar py-2 gap-2" role="toolbar" aria-label="Toolbar with navigation buttons">
           <div className="btn-group btn-group-sm" role="group" aria-label="Navigation buttons">
-            <button type="button" className="btn btn-toolbar">
+            <button type="button" className="btn btn-toolbar" onClick={() => dispatch(previousPeriod())}>
               <i className="bi bi-chevron-left"></i>
             </button>
-            <button type="button" className="btn btn-toolbar">
+            <button type="button" className="btn btn-toolbar" onClick={() => dispatch(nextPeriod())}>
               <i className="bi bi-chevron-right"></i>
             </button>
           </div>
@@ -67,23 +70,23 @@ function PeriodContainer() {
               data-bs-toggle="dropdown"
               aria-expanded="false"
             >
-              Week
+              {unit}
             </button>
             <ul className="dropdown-menu">
               <li>
-                <a className="dropdown-item" href="#">
+                <button className="dropdown-item" onClick={() => dispatch(changePeriod({ unit: "Day" }))}>
                   Day
-                </a>
+                </button>
               </li>
               <li>
-                <a className="dropdown-item" href="#">
+                <button className="dropdown-item" onClick={() => dispatch(changePeriod({ unit: "Week" }))}>
                   Week
-                </a>
+                </button>
               </li>
               <li>
-                <a className="dropdown-item" href="#">
+                <button className="dropdown-item" onClick={() => dispatch(changePeriod({ unit: "Month" }))}>
                   Month
-                </a>
+                </button>
               </li>
             </ul>
           </div>
@@ -162,5 +165,5 @@ function formatDuration(duration: Temporal.Duration | string): string {
       hours: "2-digit",
       minutes: "2-digit",
     })
-    .substring(0, 5);
+    .slice(0, -3); // Remove seconds for a cleaner display
 }

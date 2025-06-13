@@ -5,12 +5,12 @@ package de.muspellheim.activitysampling.api.e2e;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import de.muspellheim.activitysampling.api.common.CommandStatus;
 import de.muspellheim.activitysampling.api.domain.activities.LogActivityCommand;
 import de.muspellheim.activitysampling.api.domain.activities.RecentActivitiesQueryResult;
 import de.muspellheim.activitysampling.api.domain.activities.TimesheetQueryResult;
 import de.muspellheim.activitysampling.api.domain.authentication.AccountInfo;
 import de.muspellheim.activitysampling.api.domain.authentication.AuthenticationQueryResult;
-import de.muspellheim.activitysampling.api.domain.common.CommandStatus;
 import de.muspellheim.activitysampling.api.infrastructure.ActivityLoggedEvent;
 import de.muspellheim.activitysampling.api.infrastructure.CsvActivitiesStore;
 import de.muspellheim.activitysampling.api.infrastructure.FileStoreConfiguration;

@@ -222,7 +222,26 @@ class ActivitiesServiceTests {
     }
 
     @Test
-    void comparesWithCapacity() {
+    void comparesWithCapacityForDay() {
+      var today = LocalDate.parse("2025-06-03");
+      store.record(createEvent("2025-06-03T07:00:00Z"));
+      store.record(createEvent("2025-06-03T07:30:00Z"));
+      store.record(createEvent("2025-06-03T08:00:00Z"));
+      var service = new ActivitiesService(ActivitiesConfiguration.DEFAULT, store, CLOCK);
+
+      var result = service.queryTimesheet(TimesheetQuery.builder().from(today).to(today).build());
+
+      assertEquals(
+          WorkingHoursSummary.builder()
+              .totalHours(Duration.parse("PT1H30M"))
+              .offset(Duration.parse("-PT6H30M"))
+              .capacity(Duration.ofHours(8))
+              .build(),
+          result.workingHoursSummary());
+    }
+
+    @Test
+    void comparesWithCapacityForWeek() {
       store.record(createEvent("2025-06-02T14:00:00Z").withDuration(Duration.ofHours(8)));
       store.record(createEvent("2025-06-03T14:00:00Z").withDuration(Duration.ofHours(8)));
       store.record(createEvent("2025-06-04T14:00:00Z").withDuration(Duration.ofHours(8)));
@@ -235,6 +254,26 @@ class ActivitiesServiceTests {
               .totalHours(Duration.ofHours(24))
               .offset(Duration.ZERO)
               .capacity(Duration.ofHours(40))
+              .build(),
+          result.workingHoursSummary());
+    }
+
+    @Test
+    void comparesWithCapacityForMonth() {
+      var from = LocalDate.parse("2025-06-01");
+      var to = LocalDate.parse("2025-06-30");
+      store.record(createEvent("2025-06-02T14:00:00Z").withDuration(Duration.ofHours(8)));
+      store.record(createEvent("2025-06-03T14:00:00Z").withDuration(Duration.ofHours(8)));
+      store.record(createEvent("2025-06-04T14:00:00Z").withDuration(Duration.ofHours(8)));
+      var service = new ActivitiesService(ActivitiesConfiguration.DEFAULT, store, CLOCK);
+
+      var result = service.queryTimesheet(TimesheetQuery.builder().from(from).to(to).build());
+
+      assertEquals(
+          WorkingHoursSummary.builder()
+              .totalHours(Duration.ofHours(24))
+              .offset(Duration.ZERO)
+              .capacity(Duration.ofHours(168))
               .build(),
           result.workingHoursSummary());
     }

@@ -3,12 +3,12 @@
 package de.muspellheim.activitysampling.api.ui;
 
 import de.muspellheim.activitysampling.api.application.ActivitiesService;
+import de.muspellheim.activitysampling.api.common.CommandStatus;
 import de.muspellheim.activitysampling.api.domain.activities.LogActivityCommand;
 import de.muspellheim.activitysampling.api.domain.activities.RecentActivitiesQuery;
 import de.muspellheim.activitysampling.api.domain.activities.RecentActivitiesQueryResult;
 import de.muspellheim.activitysampling.api.domain.activities.TimesheetQuery;
 import de.muspellheim.activitysampling.api.domain.activities.TimesheetQueryResult;
-import de.muspellheim.activitysampling.api.domain.common.CommandStatus;
 import jakarta.validation.Valid;
 import java.time.LocalDate;
 import java.time.ZoneId;

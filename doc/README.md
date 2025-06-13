@@ -43,9 +43,9 @@ analysis.
 ### Timesheet
 
 - [x] Summarize hours worked on tasks
-- [ ] Summarize hours worked per day
-- [ ] Summarize hours worked per week
-- [ ] Summarize hours worked per month
+- [x] Summarize hours worked per day
+- [x] Summarize hours worked per week
+- [x] Summarize hours worked per month
 - [x] Summarize the total hours worked
 - [x] Compare with capacity
 - [ ] Take holidays into account

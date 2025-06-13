@@ -2,6 +2,7 @@
 
 package de.muspellheim.activitysampling.api.application;
 
+import de.muspellheim.activitysampling.api.common.Calendar;
 import de.muspellheim.activitysampling.api.common.Lists;
 import de.muspellheim.activitysampling.api.domain.activities.Activity;
 import de.muspellheim.activitysampling.api.domain.activities.TimesheetEntry;
@@ -24,7 +25,7 @@ class TimesheetProjection {
   private final LocalDate startInclusive;
   private final LocalDate endExclusive;
   private final ZoneId timeZone;
-  private final Duration capacity;
+  private final Duration defaultCapacity;
   private final LocalDate today;
 
   private final List<TimesheetEntry> entries = new ArrayList<>();
@@ -34,7 +35,7 @@ class TimesheetProjection {
     startInclusive = query.from();
     endExclusive = query.to().plusDays(1);
     timeZone = query.timeZone() != null ? query.timeZone() : ZoneId.systemDefault();
-    capacity = configuration.capacity();
+    defaultCapacity = configuration.capacity();
     today = clock.instant().atZone(timeZone).toLocalDate();
   }
 
@@ -64,9 +65,22 @@ class TimesheetProjection {
                     .thenComparing(TimesheetEntry::project)
                     .thenComparing(TimesheetEntry::task))
             .toList();
-    var offsetDays = startInclusive.until(today.plusDays(1)).getDays();
-    offsetDays = Math.min(Math.max(0, offsetDays), 5);
-    var offset = totalHours.minus(Duration.ofHours(offsetDays * 8L));
+
+    var calendar = new Calendar();
+    var businessDays = calendar.countBusinessDays(startInclusive, endExclusive);
+    var capacity = Duration.ofHours(businessDays * defaultCapacity.toHours() / 5);
+
+    LocalDate end;
+    if (today.isBefore(startInclusive)) {
+      end = startInclusive;
+    } else if (today.plusDays(1).isAfter(endExclusive)) {
+      end = endExclusive;
+    } else {
+      end = today.plusDays(1);
+    }
+    businessDays = calendar.countBusinessDays(startInclusive, end);
+    var offset = totalHours.minusHours(businessDays * 8);
+
     return TimesheetQueryResult.builder()
         .entries(sortedEntries)
         .workingHoursSummary(

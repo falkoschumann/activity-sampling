@@ -306,5 +306,5 @@ function formatDurationMedium(duration: Temporal.Duration | string): string {
       hours: "2-digit",
       minutes: "2-digit",
     })
-    .substring(0, 5);
+    .slice(0, -3);
 }
