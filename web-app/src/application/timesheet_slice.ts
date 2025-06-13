@@ -67,7 +67,7 @@ export const queryTimesheet = createAsyncThunk<
 
 const timesheetSlice = createSlice({
   name: "timesheet",
-  initialState,
+  initialState: initState(),
   reducers: {},
   extraReducers: (builder) => {
     // Query timesheet
@@ -103,3 +103,30 @@ export const {
 } = timesheetSlice.selectors;
 
 export default timesheetSlice.reducer;
+
+function initState() {
+  return {
+    ...initialState,
+    period: initPeriod(),
+  };
+}
+
+function initPeriod() {
+  const now = new Date();
+  const startOfWeek = new Date(now);
+  startOfWeek.setDate(now.getDate() - now.getDay() + 1); // Set to Monday
+  startOfWeek.setHours(0, 0, 0, 0); // Set to start of day
+  const endOfWeek = new Date(startOfWeek);
+  endOfWeek.setDate(startOfWeek.getDate() + 6); // Set to Sunday
+  endOfWeek.setHours(23, 59, 59, 999); // Set to end of day
+  return {
+    from: toISODate(startOfWeek),
+    to: toISODate(endOfWeek),
+  };
+}
+
+function toISODate(date: Date): string {
+  const offset = date.getTimezoneOffset();
+  const isoDate = new Date(date.getTime() - offset * 60 * 1000);
+  return isoDate.toISOString().substring(0, 10);
+}
