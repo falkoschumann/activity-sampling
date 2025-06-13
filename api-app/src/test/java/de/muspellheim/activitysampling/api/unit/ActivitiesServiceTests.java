@@ -319,7 +319,7 @@ class ActivitiesServiceTests {
   }
 
   private Activity createActivity(String timestamp) {
-    return Activity.createTestInstance().withTimestamp(LocalDateTime.parse(timestamp));
+    return Activity.createTestInstance().withDateTime(LocalDateTime.parse(timestamp));
   }
 
   private TimesheetEntry createTimesheetEntry(String date) {

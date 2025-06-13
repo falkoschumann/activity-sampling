@@ -12,7 +12,7 @@ import lombok.With;
 @With
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public record Activity(
-    LocalDateTime timestamp,
+    LocalDateTime dateTime,
     Duration duration,
     String client,
     String project,
@@ -21,7 +21,7 @@ public record Activity(
 
   public static Activity createTestInstance() {
     return Activity.builder()
-        .timestamp(LocalDateTime.parse("2024-12-18T09:30"))
+        .dateTime(LocalDateTime.parse("2024-12-18T09:30"))
         .duration(Duration.ofMinutes(30))
         .client("Test client")
         .project("Test project")

@@ -71,7 +71,7 @@ class RecentActivitiesProjection {
   }
 
   private void updateWorkingDays(Activity activity) {
-    var activityDate = activity.timestamp().toLocalDate();
+    var activityDate = activity.dateTime().toLocalDate();
     if (!activityDate.equals(date)) {
       createWorkingDay();
       date = activityDate;
@@ -81,7 +81,7 @@ class RecentActivitiesProjection {
   }
 
   private void updateTimeSummary(Activity activity) {
-    var date = activity.timestamp().toLocalDate();
+    var date = activity.dateTime().toLocalDate();
     var duration = activity.duration();
     if (date.equals(today)) {
       hoursToday = hoursToday.plus(duration);

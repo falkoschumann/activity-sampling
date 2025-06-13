@@ -238,7 +238,7 @@ function WorkingDayComponent({
       <div className="list-group list-group-flush">
         {workingDay.activities.map((activity) => (
           <ActivityComponent
-            key={activity.timestamp}
+            key={activity.dateTime}
             activity={activity}
             timeZone={timeZone}
             onSelect={() => onSelect({ activity })}
@@ -260,12 +260,12 @@ function ActivityComponent({
 }) {
   return (
     <button
-      key={activity.timestamp}
+      key={activity.dateTime}
       onClick={() => onSelect()}
       className="list-group-item list-group-item-action py-1 d-flex justify-content-start align-items-start"
     >
       <div style={{ width: "3em" }}>
-        {Temporal.PlainDateTime.from(activity.timestamp).toLocaleString(undefined, {
+        {Temporal.PlainDateTime.from(activity.dateTime).toLocaleString(undefined, {
           timeStyle: "short",
           hour12: false,
           timeZone,

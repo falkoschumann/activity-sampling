@@ -423,15 +423,15 @@ describe("Log", () => {
       expect(selectRecentActivities(store.getState())).toEqual([
         {
           date: "2024-12-18",
-          activities: [createTestActivity({ timestamp: "2024-12-18T09:30" })],
+          activities: [createTestActivity({ dateTime: "2024-12-18T09:30" })],
         },
         {
           date: "2024-12-17",
           activities: [
-            createTestActivity({ timestamp: "2024-12-17T17:00" }),
-            createTestActivity({ timestamp: "2024-12-17T16:30" }),
+            createTestActivity({ dateTime: "2024-12-17T17:00" }),
+            createTestActivity({ dateTime: "2024-12-17T16:30" }),
             createTestActivity({
-              timestamp: "2024-12-17T16:00",
+              dateTime: "2024-12-17T16:00",
               task: "Other task",
               notes: "Other notes",
             }),

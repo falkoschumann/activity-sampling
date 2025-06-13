@@ -46,19 +46,19 @@ export function createTestRecentActivitiesQueryResult(
   result: Partial<RecentActivitiesQueryResult> = {},
 ): RecentActivitiesQueryResult {
   return {
-    lastActivity: createTestActivity({ timestamp: "2024-12-18T09:30" }),
+    lastActivity: createTestActivity({ dateTime: "2024-12-18T09:30" }),
     workingDays: [
       {
         date: "2024-12-18",
-        activities: [createTestActivity({ timestamp: "2024-12-18T09:30" })],
+        activities: [createTestActivity({ dateTime: "2024-12-18T09:30" })],
       },
       {
         date: "2024-12-17",
         activities: [
-          createTestActivity({ timestamp: "2024-12-17T17:00" }),
-          createTestActivity({ timestamp: "2024-12-17T16:30" }),
+          createTestActivity({ dateTime: "2024-12-17T17:00" }),
+          createTestActivity({ dateTime: "2024-12-17T16:30" }),
           createTestActivity({
-            timestamp: "2024-12-17T16:00",
+            dateTime: "2024-12-17T16:00",
             task: "Other task",
             notes: "Other notes",
           }),
@@ -131,7 +131,7 @@ export function createTestWorkingHoursSummary(
 }
 
 export interface Activity {
-  readonly timestamp: string;
+  readonly dateTime: string;
   readonly duration: string;
   readonly client: string;
   readonly project: string;
@@ -141,7 +141,7 @@ export interface Activity {
 
 export function createTestActivity(activity: Partial<Activity> = {}): Activity {
   return {
-    timestamp: "2024-12-18T09:30",
+    dateTime: "2024-12-18T09:30",
     duration: "PT30M",
     client: "Test client",
     project: "Test project",

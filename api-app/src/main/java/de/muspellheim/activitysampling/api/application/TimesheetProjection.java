@@ -80,7 +80,7 @@ class TimesheetProjection {
   }
 
   private void updateEntries(Activity activity) {
-    var activityDate = activity.timestamp().toLocalDate();
+    var activityDate = activity.dateTime().toLocalDate();
     var index =
         Lists.indexOf(
             entries,
@@ -92,7 +92,7 @@ class TimesheetProjection {
     if (index == -1) {
       var newEntry =
           TimesheetEntry.builder()
-              .date(activity.timestamp().toLocalDate())
+              .date(activity.dateTime().toLocalDate())
               .client(activity.client())
               .project(activity.project())
               .task(activity.task())

@@ -10,7 +10,7 @@ class ActivityMapping {
 
   static Activity map(ActivityLoggedEvent event, ZoneId timeZone) {
     return Activity.builder()
-        .timestamp(event.timestamp().atZone(timeZone).toLocalDateTime())
+        .dateTime(event.timestamp().atZone(timeZone).toLocalDateTime())
         .duration(event.duration())
         .client(event.client())
         .project(event.project())
