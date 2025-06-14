@@ -2,9 +2,9 @@
 
 package de.muspellheim.activitysampling.api.application;
 
-import de.muspellheim.activitysampling.api.common.Calendar;
 import de.muspellheim.activitysampling.api.common.Lists;
 import de.muspellheim.activitysampling.api.domain.activities.Activity;
+import de.muspellheim.activitysampling.api.domain.activities.Calendar;
 import de.muspellheim.activitysampling.api.domain.activities.TimesheetEntry;
 import de.muspellheim.activitysampling.api.domain.activities.TimesheetQuery;
 import de.muspellheim.activitysampling.api.domain.activities.TimesheetQueryResult;

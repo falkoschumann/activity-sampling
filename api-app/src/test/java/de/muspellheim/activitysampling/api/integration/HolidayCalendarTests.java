@@ -4,7 +4,7 @@ package de.muspellheim.activitysampling.api.integration;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import de.muspellheim.activitysampling.api.infrastructure.Holiday;
+import de.muspellheim.activitysampling.api.domain.activities.Holiday;
 import de.muspellheim.activitysampling.api.infrastructure.HolidayCalendar;
 import java.nio.file.Paths;
 import java.time.LocalDate;

@@ -4,21 +4,11 @@ package de.muspellheim.activitysampling.api.unit;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import de.muspellheim.activitysampling.api.common.Calendar;
-import java.time.DayOfWeek;
+import de.muspellheim.activitysampling.api.domain.activities.Calendar;
 import java.time.LocalDate;
-import java.util.Set;
 import org.junit.jupiter.api.Test;
 
 class CalendarTests {
-
-  private static final Set<DayOfWeek> BUSINESS_DAYS =
-      Set.of(
-          DayOfWeek.MONDAY,
-          DayOfWeek.TUESDAY,
-          DayOfWeek.WEDNESDAY,
-          DayOfWeek.THURSDAY,
-          DayOfWeek.FRIDAY);
 
   @Test
   void determinesWorkingDays() {

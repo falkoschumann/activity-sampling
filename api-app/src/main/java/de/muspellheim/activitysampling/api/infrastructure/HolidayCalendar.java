@@ -2,6 +2,7 @@
 
 package de.muspellheim.activitysampling.api.infrastructure;
 
+import de.muspellheim.activitysampling.api.domain.activities.Holiday;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
