@@ -45,8 +45,7 @@ public class CsvActivitiesStore implements ActivitiesStore {
           event.task(),
           event.notes());
     } catch (IOException e) {
-      throw new UncheckedIOException(
-          "Failed to append activity to file " + configuration.file(), e);
+      throw new UncheckedIOException("Failed writing activity to file " + configuration.file(), e);
     }
   }
 
@@ -58,7 +57,8 @@ public class CsvActivitiesStore implements ActivitiesStore {
     } catch (NoSuchFileException e) {
       return Stream.empty();
     } catch (IOException e) {
-      throw new UncheckedIOException("Error reading CSV file", e);
+      throw new UncheckedIOException(
+          "Failed reading activities from file " + configuration.file(), e);
     }
   }
 

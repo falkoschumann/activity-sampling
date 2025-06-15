@@ -15,11 +15,10 @@ import net.fortuna.ical4j.data.CalendarBuilder;
 import net.fortuna.ical4j.data.ParserException;
 import net.fortuna.ical4j.model.component.CalendarComponent;
 
-public class HolidayCalendar {
-
+public class HolidayImporter {
   private final Path file;
 
-  public HolidayCalendar(Path file) {
+  public HolidayImporter(Path file) {
     this.file = file;
   }
 
@@ -31,7 +30,7 @@ public class HolidayCalendar {
       return calendar.getComponents().stream()
           .map(this::map)
           .filter(it -> !it.date().isBefore(startInclusive))
-          .filter(it -> !it.date().isAfter(endExclusive))
+          .filter(it -> it.date().isBefore(endExclusive))
           .sorted(Comparator.comparing(Holiday::date))
           .toList();
     } catch (IOException e) {
