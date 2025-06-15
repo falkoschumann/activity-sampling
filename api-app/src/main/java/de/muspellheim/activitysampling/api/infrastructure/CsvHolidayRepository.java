@@ -8,25 +8,27 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
-import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.time.LocalDate;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.csv.CSVRecord;
+import org.springframework.stereotype.Component;
 
+@Component
 public class CsvHolidayRepository implements HolidayRepository {
 
   public static final String DATE_COLUMN = "Date";
   public static final String TITLE_COLUMN = "Title";
 
-  private final Path file;
+  private final CsvHolidayRepositoryConfiguration configuration;
 
-  public CsvHolidayRepository(Path file) {
-    this.file = file;
+  public CsvHolidayRepository(CsvHolidayRepositoryConfiguration configuration) {
+    this.configuration = configuration;
   }
 
   @Override
@@ -37,6 +39,7 @@ public class CsvHolidayRepository implements HolidayRepository {
           .map(this::parseRecord)
           .filter(it -> !it.date().isBefore(startInclusive))
           .filter(it -> it.date().isBefore(endExclusive))
+          .sorted(Comparator.comparing(Holiday::date))
           .onClose(() -> tryClose(parser))
           .toList();
     } catch (NoSuchFileException e) {
@@ -53,22 +56,25 @@ public class CsvHolidayRepository implements HolidayRepository {
         printer.printRecord(holiday.date(), holiday.title());
       }
     } catch (IOException e) {
-      throw new UncheckedIOException("Failed writing holidays to file " + file, e);
+      throw new UncheckedIOException("Failed writing holidays to file " + configuration.file(), e);
     }
   }
 
   private CSVPrinter createPrinter() throws IOException {
-    Files.createDirectories(file.getParent());
+    Files.createDirectories(configuration.file().getParent());
     var format = createCsvFormat();
     var writer =
         Files.newBufferedWriter(
-            file, StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.APPEND);
+            configuration.file(),
+            StandardOpenOption.CREATE,
+            StandardOpenOption.WRITE,
+            StandardOpenOption.APPEND);
     return new CSVPrinter(writer, format);
   }
 
   private CSVParser createParser() throws IOException {
     var format = createCsvFormat();
-    var reader = Files.newBufferedReader(file);
+    var reader = Files.newBufferedReader(configuration.file());
     return format.parse(reader);
   }
 
@@ -82,7 +88,7 @@ public class CsvHolidayRepository implements HolidayRepository {
     return CSVFormat.RFC4180
         .builder()
         .setHeader(DATE_COLUMN, TITLE_COLUMN)
-        .setSkipHeaderRecord(Files.exists(file))
+        .setSkipHeaderRecord(Files.exists(configuration.file()))
         .setNullString("")
         .get();
   }

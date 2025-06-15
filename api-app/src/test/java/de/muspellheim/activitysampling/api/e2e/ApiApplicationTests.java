@@ -13,7 +13,7 @@ import de.muspellheim.activitysampling.api.domain.authentication.AccountInfo;
 import de.muspellheim.activitysampling.api.domain.authentication.AuthenticationQueryResult;
 import de.muspellheim.activitysampling.api.infrastructure.ActivityLoggedEvent;
 import de.muspellheim.activitysampling.api.infrastructure.CsvActivitiesStore;
-import de.muspellheim.activitysampling.api.infrastructure.FileStoreConfiguration;
+import de.muspellheim.activitysampling.api.infrastructure.CsvActivitiesStoreConfiguration;
 import java.nio.file.Files;
 import java.time.Clock;
 import java.time.Instant;
@@ -59,7 +59,7 @@ class ApiApplicationTests {
 
   @LocalServerPort int port;
 
-  @Autowired private FileStoreConfiguration configuration;
+  @Autowired private CsvActivitiesStoreConfiguration configuration;
 
   @Autowired private CsvActivitiesStore store;
 

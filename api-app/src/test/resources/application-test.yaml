@@ -1,6 +1,8 @@
 app:
-  file-store:
+  csv-activities-store:
     file: testdata/activities-store-e2e.csv
+  csv-holiday-repository:
+    file: testdata/holidays-e2e.csv
 
 spring:
   security:

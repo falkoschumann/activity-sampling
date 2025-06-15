@@ -10,6 +10,7 @@ import de.muspellheim.activitysampling.api.domain.activities.TimesheetQuery;
 import de.muspellheim.activitysampling.api.domain.activities.TimesheetQueryResult;
 import de.muspellheim.activitysampling.api.infrastructure.ActivitiesStore;
 import de.muspellheim.activitysampling.api.infrastructure.ActivityLoggedEvent;
+import de.muspellheim.activitysampling.api.infrastructure.HolidayRepository;
 import java.time.Clock;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -20,12 +21,17 @@ public class ActivitiesService {
 
   private final ActivitiesConfiguration configuration;
   private final ActivitiesStore store;
+  private final HolidayRepository holidayRepository;
   private final Clock clock;
 
   public ActivitiesService(
-      ActivitiesConfiguration configuration, ActivitiesStore store, Clock clock) {
+      ActivitiesConfiguration configuration,
+      ActivitiesStore store,
+      HolidayRepository holidayRepository,
+      Clock clock) {
     this.configuration = configuration;
     this.store = store;
+    this.holidayRepository = holidayRepository;
     this.clock = clock;
   }
 
@@ -64,7 +70,8 @@ public class ActivitiesService {
   public TimesheetQueryResult queryTimesheet(TimesheetQuery query) {
     try {
       log.info("Query timesheet: {}", query);
-      var projection = new TimesheetProjection(query, configuration, clock);
+      var holidays = holidayRepository.findAllByDate(query.from(), query.to().plusDays(1));
+      var projection = new TimesheetProjection(query, configuration, holidays, clock);
       var replay = store.replay(projection.getStartInclusive(), projection.getEndExclusive());
       return projection.project(replay);
     } catch (Exception e) {

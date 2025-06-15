@@ -5,8 +5,10 @@ spring:
 app:
   activities:
     capacity: PT40H
-  file-store:
+  csv-activities-store:
     file: data/activity-log.csv
+  csv-holiday-repository:
+    file: data/holidays.csv
 
 server:
   servlet:

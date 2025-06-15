@@ -5,6 +5,7 @@ package de.muspellheim.activitysampling.api.application;
 import de.muspellheim.activitysampling.api.common.Lists;
 import de.muspellheim.activitysampling.api.domain.activities.Activity;
 import de.muspellheim.activitysampling.api.domain.activities.Calendar;
+import de.muspellheim.activitysampling.api.domain.activities.Holiday;
 import de.muspellheim.activitysampling.api.domain.activities.TimesheetEntry;
 import de.muspellheim.activitysampling.api.domain.activities.TimesheetQuery;
 import de.muspellheim.activitysampling.api.domain.activities.TimesheetQueryResult;
@@ -18,6 +19,8 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 class TimesheetProjection {
@@ -27,16 +30,22 @@ class TimesheetProjection {
   private final ZoneId timeZone;
   private final Duration defaultCapacity;
   private final LocalDate today;
+  private final Set<LocalDate> holidays;
 
   private final List<TimesheetEntry> entries = new ArrayList<>();
   private Duration totalHours = Duration.ZERO;
 
-  TimesheetProjection(TimesheetQuery query, ActivitiesConfiguration configuration, Clock clock) {
+  TimesheetProjection(
+      TimesheetQuery query,
+      ActivitiesConfiguration configuration,
+      List<Holiday> holidays,
+      Clock clock) {
     startInclusive = query.from();
     endExclusive = query.to().plusDays(1);
     timeZone = query.timeZone() != null ? query.timeZone() : ZoneId.systemDefault();
     defaultCapacity = configuration.capacity();
     today = clock.instant().atZone(timeZone).toLocalDate();
+    this.holidays = holidays.stream().map(Holiday::date).collect(Collectors.toSet());
   }
 
   Instant getStartInclusive() {
@@ -57,16 +66,8 @@ class TimesheetProjection {
               updateTotalHours(it);
             });
 
-    var sortedEntries =
-        entries.stream()
-            .sorted(
-                Comparator.comparing(TimesheetEntry::date)
-                    .thenComparing(TimesheetEntry::client)
-                    .thenComparing(TimesheetEntry::project)
-                    .thenComparing(TimesheetEntry::task))
-            .toList();
-
     var calendar = new Calendar();
+    calendar.initHolidays(holidays);
     var businessDays = calendar.countBusinessDays(startInclusive, endExclusive);
     var capacity = Duration.ofHours(businessDays * defaultCapacity.toHours() / 5);
 
@@ -80,6 +81,15 @@ class TimesheetProjection {
     }
     businessDays = calendar.countBusinessDays(startInclusive, end);
     var offset = totalHours.minusHours(businessDays * 8);
+
+    var sortedEntries =
+        entries.stream()
+            .sorted(
+                Comparator.comparing(TimesheetEntry::date)
+                    .thenComparing(TimesheetEntry::client)
+                    .thenComparing(TimesheetEntry::project)
+                    .thenComparing(TimesheetEntry::task))
+            .toList();
 
     return TimesheetQueryResult.builder()
         .entries(sortedEntries)

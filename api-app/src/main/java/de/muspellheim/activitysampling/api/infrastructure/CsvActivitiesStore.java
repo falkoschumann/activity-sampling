@@ -28,9 +28,9 @@ public class CsvActivitiesStore implements ActivitiesStore {
   public static final String TASK_COLUMN = "Task";
   public static final String NOTES_COLUMN = "Notes";
 
-  private final FileStoreConfiguration configuration;
+  private final CsvActivitiesStoreConfiguration configuration;
 
-  public CsvActivitiesStore(FileStoreConfiguration configuration) {
+  public CsvActivitiesStore(CsvActivitiesStoreConfiguration configuration) {
     this.configuration = configuration;
   }
 

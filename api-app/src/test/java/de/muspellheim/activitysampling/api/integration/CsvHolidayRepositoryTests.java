@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import de.muspellheim.activitysampling.api.domain.activities.Holiday;
 import de.muspellheim.activitysampling.api.infrastructure.CsvHolidayRepository;
+import de.muspellheim.activitysampling.api.infrastructure.CsvHolidayRepositoryConfiguration;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -25,7 +26,8 @@ class CsvHolidayRepositoryTests {
 
   @Test
   void findsAllSavedHolidays() {
-    var repository = new CsvHolidayRepository(TEST_FILE);
+    var configuration = CsvHolidayRepositoryConfiguration.builder().file(TEST_FILE).build();
+    var repository = new CsvHolidayRepository(configuration);
     var karfreitag =
         Holiday.builder().date(LocalDate.parse("2025-04-18")).title("Karfreitag").build();
     var ostermontag =
@@ -40,7 +42,8 @@ class CsvHolidayRepositoryTests {
 
   @Test
   void findsAllByDateWithLowerLimit() {
-    var repository = new CsvHolidayRepository(TEST_FILE);
+    var configuration = CsvHolidayRepositoryConfiguration.builder().file(TEST_FILE).build();
+    var repository = new CsvHolidayRepository(configuration);
     var karfreitag =
         Holiday.builder().date(LocalDate.parse("2025-04-18")).title("Karfreitag").build();
     var ostermontag =
@@ -55,7 +58,8 @@ class CsvHolidayRepositoryTests {
 
   @Test
   void findsAllByDateWithUpperLimit() {
-    var repository = new CsvHolidayRepository(TEST_FILE);
+    var configuration = CsvHolidayRepositoryConfiguration.builder().file(TEST_FILE).build();
+    var repository = new CsvHolidayRepository(configuration);
     var karfreitag =
         Holiday.builder().date(LocalDate.parse("2025-04-18")).title("Karfreitag").build();
     var ostermontag =

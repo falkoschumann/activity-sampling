@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import de.muspellheim.activitysampling.api.infrastructure.ActivityLoggedEvent;
 import de.muspellheim.activitysampling.api.infrastructure.CsvActivitiesStore;
-import de.muspellheim.activitysampling.api.infrastructure.FileStoreConfiguration;
+import de.muspellheim.activitysampling.api.infrastructure.CsvActivitiesStoreConfiguration;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -26,7 +26,7 @@ class CsvActivitiesStoreTests {
 
   @Test
   void recordsAndReplaysEvents() {
-    var configuration = FileStoreConfiguration.builder().file(TEST_FILE).build();
+    var configuration = CsvActivitiesStoreConfiguration.builder().file(TEST_FILE).build();
     var store = new CsvActivitiesStore(configuration);
 
     store.record(

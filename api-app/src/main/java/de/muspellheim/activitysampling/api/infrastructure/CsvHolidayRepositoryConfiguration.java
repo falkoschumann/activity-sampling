@@ -8,5 +8,5 @@ import lombok.Builder;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @Builder
-@ConfigurationProperties(prefix = "app.file-store")
-public record FileStoreConfiguration(@NotNull Path file) {}
+@ConfigurationProperties(prefix = "app.csv-holiday-repository")
+public record CsvHolidayRepositoryConfiguration(@NotNull Path file) {}

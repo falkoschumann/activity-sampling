@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import de.muspellheim.activitysampling.api.application.ActivitiesConfiguration;
 import de.muspellheim.activitysampling.api.application.ActivitiesService;
 import de.muspellheim.activitysampling.api.domain.activities.Activity;
+import de.muspellheim.activitysampling.api.domain.activities.Holiday;
 import de.muspellheim.activitysampling.api.domain.activities.LogActivityCommand;
 import de.muspellheim.activitysampling.api.domain.activities.RecentActivitiesQuery;
 import de.muspellheim.activitysampling.api.domain.activities.RecentActivitiesQueryResult;
@@ -47,7 +48,9 @@ class ActivitiesServiceTests {
 
     @Test
     void logsActivity() {
-      var service = new ActivitiesService(ActivitiesConfiguration.DEFAULT, store, CLOCK);
+      var service =
+          new ActivitiesService(
+              ActivitiesConfiguration.DEFAULT, store, new MemoryHolidayRepository(), CLOCK);
 
       var result = service.logActivity(LogActivityCommand.createTestInstance());
 
@@ -57,7 +60,9 @@ class ActivitiesServiceTests {
 
     @Test
     void logsActivityWithOptionalNotes() {
-      var service = new ActivitiesService(ActivitiesConfiguration.DEFAULT, store, CLOCK);
+      var service =
+          new ActivitiesService(
+              ActivitiesConfiguration.DEFAULT, store, new MemoryHolidayRepository(), CLOCK);
 
       var result =
           service.logActivity(LogActivityCommand.createTestInstance().withNotes("This is a note"));
@@ -76,7 +81,9 @@ class ActivitiesServiceTests {
     void returnsLastActivity() {
       recordEvent("2025-06-09T08:30:00Z");
       recordEvent("2025-06-09T09:00:00Z");
-      var service = new ActivitiesService(ActivitiesConfiguration.DEFAULT, store, CLOCK);
+      var service =
+          new ActivitiesService(
+              ActivitiesConfiguration.DEFAULT, store, new MemoryHolidayRepository(), CLOCK);
 
       var result = service.queryRecentActivities(RecentActivitiesQuery.DEFAULT);
 
@@ -94,6 +101,7 @@ class ActivitiesServiceTests {
           new ActivitiesService(
               ActivitiesConfiguration.DEFAULT,
               store,
+              new MemoryHolidayRepository(),
               Clock.fixed(Instant.parse("2025-06-05T10:00:00Z"), TIME_ZONE));
 
       var result = service.queryRecentActivities(RecentActivitiesQuery.DEFAULT);
@@ -146,6 +154,7 @@ class ActivitiesServiceTests {
           new ActivitiesService(
               ActivitiesConfiguration.DEFAULT,
               store,
+              new MemoryHolidayRepository(),
               Clock.fixed(Instant.parse("2025-06-05T10:00:00Z"), TIME_ZONE));
 
       var result = service.queryRecentActivities(RecentActivitiesQuery.DEFAULT);
@@ -162,7 +171,9 @@ class ActivitiesServiceTests {
 
     @Test
     void queriesEmptyResult() {
-      var service = new ActivitiesService(ActivitiesConfiguration.DEFAULT, store, CLOCK);
+      var service =
+          new ActivitiesService(
+              ActivitiesConfiguration.DEFAULT, store, new MemoryHolidayRepository(), CLOCK);
 
       var result = service.queryRecentActivities(RecentActivitiesQuery.DEFAULT);
 
@@ -187,7 +198,9 @@ class ActivitiesServiceTests {
       // thursday, different clients
       recordEvent("2025-06-05T10:00:00Z");
       store.record(createEvent("2025-06-05T10:30:00Z").withClient("Other client"));
-      var service = new ActivitiesService(ActivitiesConfiguration.DEFAULT, store, CLOCK);
+      var service =
+          new ActivitiesService(
+              ActivitiesConfiguration.DEFAULT, store, new MemoryHolidayRepository(), CLOCK);
 
       var result = service.queryTimesheet(TimesheetQuery.createTestInstance());
 
@@ -214,7 +227,9 @@ class ActivitiesServiceTests {
       recordEvent("2025-06-02T10:00:00Z");
       recordEvent("2025-06-02T10:30:00Z");
       recordEvent("2025-06-02T11:00:00Z");
-      var service = new ActivitiesService(ActivitiesConfiguration.DEFAULT, store, CLOCK);
+      var service =
+          new ActivitiesService(
+              ActivitiesConfiguration.DEFAULT, store, new MemoryHolidayRepository(), CLOCK);
 
       var result = service.queryTimesheet(TimesheetQuery.createTestInstance());
 
@@ -227,7 +242,9 @@ class ActivitiesServiceTests {
       store.record(createEvent("2025-06-03T07:00:00Z"));
       store.record(createEvent("2025-06-03T07:30:00Z"));
       store.record(createEvent("2025-06-03T08:00:00Z"));
-      var service = new ActivitiesService(ActivitiesConfiguration.DEFAULT, store, CLOCK);
+      var service =
+          new ActivitiesService(
+              ActivitiesConfiguration.DEFAULT, store, new MemoryHolidayRepository(), CLOCK);
 
       var result = service.queryTimesheet(TimesheetQuery.builder().from(today).to(today).build());
 
@@ -245,7 +262,9 @@ class ActivitiesServiceTests {
       store.record(createEvent("2025-06-02T14:00:00Z").withDuration(Duration.ofHours(8)));
       store.record(createEvent("2025-06-03T14:00:00Z").withDuration(Duration.ofHours(8)));
       store.record(createEvent("2025-06-04T14:00:00Z").withDuration(Duration.ofHours(8)));
-      var service = new ActivitiesService(ActivitiesConfiguration.DEFAULT, store, CLOCK);
+      var service =
+          new ActivitiesService(
+              ActivitiesConfiguration.DEFAULT, store, new MemoryHolidayRepository(), CLOCK);
 
       var result = service.queryTimesheet(TimesheetQuery.createTestInstance());
 
@@ -265,7 +284,9 @@ class ActivitiesServiceTests {
       store.record(createEvent("2025-06-02T14:00:00Z").withDuration(Duration.ofHours(8)));
       store.record(createEvent("2025-06-03T14:00:00Z").withDuration(Duration.ofHours(8)));
       store.record(createEvent("2025-06-04T14:00:00Z").withDuration(Duration.ofHours(8)));
-      var service = new ActivitiesService(ActivitiesConfiguration.DEFAULT, store, CLOCK);
+      var service =
+          new ActivitiesService(
+              ActivitiesConfiguration.DEFAULT, store, new MemoryHolidayRepository(), CLOCK);
 
       var result = service.queryTimesheet(TimesheetQuery.builder().from(from).to(to).build());
 
@@ -283,7 +304,9 @@ class ActivitiesServiceTests {
       store.record(createEvent("2025-06-02T14:00:00Z").withDuration(Duration.ofHours(8)));
       store.record(createEvent("2025-06-03T14:00:00Z").withDuration(Duration.ofHours(8)));
       store.record(createEvent("2025-06-04T10:00:00Z").withDuration(Duration.ofHours(4)));
-      var service = new ActivitiesService(ActivitiesConfiguration.DEFAULT, store, CLOCK);
+      var service =
+          new ActivitiesService(
+              ActivitiesConfiguration.DEFAULT, store, new MemoryHolidayRepository(), CLOCK);
 
       var result = service.queryTimesheet(TimesheetQuery.createTestInstance());
 
@@ -301,7 +324,9 @@ class ActivitiesServiceTests {
       store.record(createEvent("2025-06-02T14:00:00Z").withDuration(Duration.ofHours(8)));
       store.record(createEvent("2025-06-03T14:00:00Z").withDuration(Duration.ofHours(8)));
       store.record(createEvent("2025-06-04T16:00:00Z").withDuration(Duration.ofHours(10)));
-      var service = new ActivitiesService(ActivitiesConfiguration.DEFAULT, store, CLOCK);
+      var service =
+          new ActivitiesService(
+              ActivitiesConfiguration.DEFAULT, store, new MemoryHolidayRepository(), CLOCK);
 
       var result = service.queryTimesheet(TimesheetQuery.createTestInstance());
 
@@ -323,6 +348,7 @@ class ActivitiesServiceTests {
           new ActivitiesService(
               ActivitiesConfiguration.DEFAULT,
               store,
+              new MemoryHolidayRepository(),
               Clock.fixed(Instant.parse("2025-06-11T10:00:00Z"), TIME_ZONE));
 
       var result = service.queryTimesheet(TimesheetQuery.createTestInstance());
@@ -337,8 +363,42 @@ class ActivitiesServiceTests {
     }
 
     @Test
+    void comparesWeekWithHoliday() {
+      store.record(createEvent("2025-06-10T14:00:00Z").withDuration(Duration.ofHours(8)));
+      store.record(createEvent("2025-06-11T14:00:00Z").withDuration(Duration.ofHours(8)));
+      store.record(createEvent("2025-06-12T14:00:00Z").withDuration(Duration.ofHours(8)));
+      var holidayRepository = new MemoryHolidayRepository();
+      holidayRepository.add(
+          Holiday.builder().date(LocalDate.parse("2025-06-09")).title("Pfingstmontag").build());
+      var service =
+          new ActivitiesService(
+              ActivitiesConfiguration.DEFAULT,
+              store,
+              holidayRepository,
+              Clock.fixed(Instant.parse("2025-06-13T10:00:00Z"), TIME_ZONE));
+
+      var result =
+          service.queryTimesheet(
+              TimesheetQuery.builder()
+                  .from(LocalDate.parse("2025-06-09"))
+                  .to(LocalDate.parse("2025-06-15"))
+                  .timeZone(ZoneId.of("Europe/Berlin"))
+                  .build());
+
+      assertEquals(
+          WorkingHoursSummary.builder()
+              .totalHours(Duration.ofHours(24))
+              .offset(Duration.ofHours(-8))
+              .capacity(Duration.ofHours(32))
+              .build(),
+          result.workingHoursSummary());
+    }
+
+    @Test
     void queriesEmptyResult() {
-      var service = new ActivitiesService(ActivitiesConfiguration.DEFAULT, store, CLOCK);
+      var service =
+          new ActivitiesService(
+              ActivitiesConfiguration.DEFAULT, store, new MemoryHolidayRepository(), CLOCK);
 
       var result = service.queryTimesheet(TimesheetQuery.createTestInstance());
 
