@@ -4,6 +4,7 @@ import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 
 plugins {
   checkstyle
+  distribution
   jacoco
   java
   pmd
@@ -83,6 +84,20 @@ tasks.register<Copy>("processFrontendResources") {
 
 tasks.named("processResources") {
   dependsOn("processFrontendResources")
+}
+
+distributions {
+  main {
+    contents {
+      distributionBaseName = "activity-sampling"
+      from(tasks.named("bootJar"))
+    }
+  }
+}
+
+tasks.withType(Tar::class) {
+  compression = Compression.GZIP
+  archiveExtension = "tar.gz"
 }
 
 checkstyle {

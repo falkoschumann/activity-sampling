@@ -8,8 +8,11 @@ clean:
 
 distclean: clean
 	rm -rf .gradle
+	rm -rf dist
 
 dist: build
+	mkdir -p dist
+	cp build/distributions/* dist/
 
 start:
 	./gradlew bootRun

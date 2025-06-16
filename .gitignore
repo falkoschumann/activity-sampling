@@ -1,6 +1,5 @@
 # see also https://gitignore.io
 
-dist/
 tmp/
 vendor/
 .env.local
