@@ -7,6 +7,19 @@ import { defineConfig } from "vite";
 
 // https://vite.dev/config/
 export default defineConfig({
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: (id: string) => {
+          if (id.includes("node_modules")) {
+            return "vendor";
+          }
+
+          return null;
+        },
+      },
+    },
+  },
   css: {
     preprocessorOptions: {
       scss: {
