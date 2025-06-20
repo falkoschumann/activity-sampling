@@ -10,7 +10,7 @@ plugins {
   pmd
   id("com.diffplug.spotless") version "7.0.4"
   id("io.spring.dependency-management") version "1.1.7"
-  id("org.springframework.boot") version "3.5.1"
+  id("org.springframework.boot") version "3.5.3"
 }
 
 configurations {
