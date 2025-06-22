@@ -12,7 +12,6 @@ export const config: SheriffConfig = {
   enableBarrelLess: true,
   modules: {
     // apply tags to your modules
-    src: "entry-point",
     "src/application": "layer:application",
     "src/common": "layer:common",
     "src/domain": "layer:domain",
@@ -26,7 +25,8 @@ export const config: SheriffConfig = {
   depRules: {
     // root is a virtual module, which contains all files not being part
     // of any module, e.g. application shell, main.ts, etc.
-    root: "noTag",
+    //root: "noTag",
+    root: "layer:*",
     noTag: "noTag",
 
     // add your dependency rules here
@@ -39,7 +39,6 @@ export const config: SheriffConfig = {
     "layer:domain": ["layer:common"],
     "layer:infrastructure": ["layer:domain", "layer:common"],
     "layer:common": sameTag,
-    "entry-point": "layer:*",
     "ui:page": ["ui:layout", "ui:component", "layer:application"],
     "ui:layout": ["ui:component", "layer:application"],
     "ui:component": sameTag,

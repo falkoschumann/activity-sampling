@@ -2,6 +2,7 @@
 
 import { Temporal } from "@js-temporal/polyfill";
 import { describe, expect, it } from "vitest";
+import { Clock } from "../../src/application/clock";
 
 import {
   activitySelected,
@@ -18,9 +19,8 @@ import {
   stopCountdown,
 } from "../../src/application/log_slice";
 import { createStore } from "../../src/application/store";
-import { Clock } from "../../src/common/clock";
+import { Timer } from "../../src/application/timer";
 import { Failure } from "../../src/common/messages";
-import { Timer } from "../../src/common/timer";
 import {
   createEmptyTimeSummary,
   createTestActivity,

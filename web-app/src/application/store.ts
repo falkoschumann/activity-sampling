@@ -2,13 +2,13 @@
 
 import { configureStore } from "@reduxjs/toolkit";
 
-import { Clock } from "../common/clock";
-import { Timer } from "../common/timer";
 import { ActivitiesApi } from "../infrastructure/activities_api";
 import { AuthenticationApi } from "../infrastructure/authentication_api";
 import { NotificationClient } from "../infrastructure/notification_client";
 import authenticationReducer from "./authentication_slice";
+import { Clock } from "./clock";
 import logReducer from "./log_slice";
+import { Timer } from "./timer";
 import timesheetReducer from "./timesheet_slice";
 
 export const store = createStore();

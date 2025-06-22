@@ -2,7 +2,7 @@
 
 import { describe, expect, it } from "vitest";
 
-import { Timer } from "../../src/common/timer";
+import { Timer } from "../../src/application/timer";
 
 describe("Timer", () => {
   it("Schedules task once", async () => {

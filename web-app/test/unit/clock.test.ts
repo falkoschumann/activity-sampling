@@ -2,7 +2,7 @@
 
 import { describe, expect, it } from "vitest";
 
-import { Clock } from "../../src/common/clock";
+import { Clock } from "../../src/application/clock";
 
 describe("Clock", () => {
   it("Returns current date", () => {

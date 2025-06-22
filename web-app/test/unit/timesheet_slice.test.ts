@@ -1,8 +1,10 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
 import { describe, expect, it } from "vitest";
+import { Clock } from "../../src/application/clock";
 
 import { createStore } from "../../src/application/store";
+import { Timer } from "../../src/application/timer";
 import {
   initPeriod,
   nextPeriod,
@@ -13,8 +15,6 @@ import {
   selectPeriod,
   selectWorkingHoursSummary,
 } from "../../src/application/timesheet_slice";
-import { Clock } from "../../src/common/clock";
-import { Timer } from "../../src/common/timer";
 import {
   createTestTimesheetQuery,
   createTestTimesheetQueryResult,
