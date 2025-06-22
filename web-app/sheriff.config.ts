@@ -18,6 +18,10 @@ export const config: SheriffConfig = {
     "src/domain": "layer:domain",
     "src/infrastructure": "layer:infrastructure",
     "src/ui": "layer:ui",
+    "src/ui/components": "ui:component",
+    "src/ui/layouts": "ui:layout",
+    "src/ui/pages": "ui:page",
+    "src/ui/templates": "ui:template",
   },
   depRules: {
     // root is a virtual module, which contains all files not being part
@@ -26,7 +30,7 @@ export const config: SheriffConfig = {
     noTag: "noTag",
 
     // add your dependency rules here
-    "layer:ui": ["layer:application", "layer:domain", "layer:common"],
+    "layer:ui": ["layer:application", "layer:domain", "layer:common", "ui:*"],
     "layer:application": [
       "layer:domain",
       "layer:infrastructure",
@@ -36,5 +40,9 @@ export const config: SheriffConfig = {
     "layer:infrastructure": ["layer:domain", "layer:common"],
     "layer:common": sameTag,
     "entry-point": "layer:*",
+    "ui:page": ["ui:layout", "ui:component", "layer:application"],
+    "ui:layout": ["ui:component", "layer:application"],
+    "ui:component": sameTag,
+    "ui:*": ["layer:domain", "layer:common"],
   },
 };

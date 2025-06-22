@@ -6,8 +6,8 @@ import { BrowserRouter, Navigate, Route, Routes } from "react-router";
 
 import { queryAuthentication } from "../application/authentication_slice";
 import { AppDispatch } from "../application/store";
-import AuthenticatedTemplate from "./components/authenticated_template";
-import UnauthenticatedTemplate from "./components/unauthenticated_template";
+import AuthenticatedTemplate from "./layouts/authenticated_template";
+import UnauthenticatedTemplate from "./layouts/unauthenticated_template";
 import LogPage from "./pages/log_page";
 import NotFoundPage from "./pages/not_found_page";
 import TimesheetPage from "./pages/timesheet_page";

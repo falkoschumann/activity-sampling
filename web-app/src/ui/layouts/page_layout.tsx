@@ -5,8 +5,8 @@ import { useSelector } from "react-redux";
 import { NavLink } from "react-router";
 
 import { selectAuthentication } from "../../application/authentication_slice";
-import AuthenticatedTemplate from "../components/authenticated_template";
-import UnauthenticatedTemplate from "../components/unauthenticated_template";
+import AuthenticatedTemplate from "./authenticated_template";
+import UnauthenticatedTemplate from "./unauthenticated_template";
 
 export default function PageLayout({ children }: { children?: React.ReactNode }) {
   return (
