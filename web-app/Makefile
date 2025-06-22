@@ -20,6 +20,7 @@ start:
 check: test
 	npx eslint .
 	npx prettier . --check
+	npx sheriff verify src/main.tsx
 
 format:
 	npx eslint --fix .

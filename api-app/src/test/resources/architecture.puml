@@ -5,14 +5,13 @@
 [UI] <<..ui..>>
 [Common] <<..common..>>
 
-[Application] --> [Domain]
-[Application] --> [Infrastructure]
-[Infrastructure] --> [Domain]
 [UI] --> [Application]
 [UI] --> [Domain]
-
-[Application] --> [Common]
-[Infrastructure] --> [Common]
 [UI] --> [Common]
+[Application] --> [Domain]
+[Application] --> [Infrastructure]
+[Application] --> [Common]
 [Domain] --> [Common]
+[Infrastructure] --> [Domain]
+[Infrastructure] --> [Common]
 @enduml
