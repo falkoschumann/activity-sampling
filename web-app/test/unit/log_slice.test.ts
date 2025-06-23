@@ -35,12 +35,14 @@ import { NotificationClient } from "../../src/infrastructure/notification_client
 
 describe("Log", () => {
   describe("Ask periodically", () => {
-    it("Starts countdown with a given interval", () => {
-      const { store, timer } = configure();
+    it("Starts countdown with a given interval", async () => {
+      const { store, timer } = configure({
+        fixedDate: new Date("2025-06-23T15:25:00Z"),
+      });
       const scheduledTasks = timer.trackScheduledTasks();
 
       store.dispatch(durationSelected({ duration: "PT20M" }));
-      store.dispatch(startCountdown({}));
+      await store.dispatch(startCountdown({}));
 
       expect(selectCurrentActivity(store.getState())).toEqual({
         client: "",
@@ -55,6 +57,7 @@ describe("Log", () => {
         remaining: "PT20M",
         percentage: 0,
         isRunning: true,
+        end: "2025-06-23T15:45:00Z",
       });
       expect(scheduledTasks.data).toEqual([
         {
@@ -66,7 +69,9 @@ describe("Log", () => {
     });
 
     it("Progresses countdown", () => {
-      const { store, notificationClient, timer } = configure();
+      const { store, notificationClient, timer } = configure({
+        fixedDate: new Date("2025-06-23T15:25:00Z"),
+      });
       const shownNotifications = notificationClient.trackNotificationsShown();
       store.dispatch(durationSelected({ duration: "PT20M" }));
       store.dispatch(startCountdown({}));
@@ -86,12 +91,15 @@ describe("Log", () => {
         remaining: "PT4M",
         percentage: 80,
         isRunning: true,
+        end: "2025-06-23T15:45:00Z",
       });
       expect(shownNotifications.data).toEqual([]);
     });
 
     it("Restarts countdown and enable form when countdown is elapsed", () => {
-      const { store, notificationClient, timer } = configure();
+      const { store, notificationClient, timer } = configure({
+        fixedDate: new Date("2025-06-23T15:25:00Z"),
+      });
       const shownNotifications = notificationClient.trackNotificationsShown();
       store.dispatch(durationSelected({ duration: "PT20M" }));
       store.dispatch(startCountdown({}));
@@ -112,6 +120,7 @@ describe("Log", () => {
         remaining: "PT19M",
         percentage: 5,
         isRunning: true,
+        end: "2025-06-23T15:45:00Z",
       });
       expect(shownNotifications.data).toEqual([
         {
@@ -123,7 +132,9 @@ describe("Log", () => {
     });
 
     it("Stops countdown and enables form", () => {
-      const { store, timer } = configure();
+      const { store, timer } = configure({
+        fixedDate: new Date("2025-06-23T15:25:00Z"),
+      });
       const cancelledTasks = timer.trackCancelledTasks();
       store.dispatch(startCountdown({}));
       timer.simulateTaskRun(Temporal.Duration.from("PT12M").total("seconds"));
@@ -143,6 +154,7 @@ describe("Log", () => {
         remaining: "PT18M",
         percentage: 40,
         isRunning: false,
+        end: "2025-06-23T15:55:00Z",
       });
       expect(cancelledTasks.data).toEqual([{ timeoutId: expect.any(Number) }]);
     });
@@ -150,7 +162,9 @@ describe("Log", () => {
 
   describe("Current interval", () => {
     it("Notify user when an interval is elapsed", () => {
-      const { store, notificationClient, timer } = configure();
+      const { store, notificationClient, timer } = configure({
+        fixedDate: new Date("2025-06-23T15:25:00Z"),
+      });
       const shownNotifications = notificationClient.trackNotificationsShown();
       store.dispatch(durationSelected({ duration: "PT20M" }));
       store.dispatch(startCountdown({}));
@@ -163,6 +177,7 @@ describe("Log", () => {
         remaining: "PT0S",
         percentage: 100,
         isRunning: true,
+        end: "2025-06-23T15:45:00Z",
       });
       expect(shownNotifications.data).toEqual([
         {
@@ -506,11 +521,14 @@ describe("Log", () => {
   });
 });
 
-function configure({ responses }: { responses?: Response | Response[] } = {}) {
+function configure({
+  responses,
+  fixedDate,
+}: { responses?: Response | Response[]; fixedDate?: Date } = {}) {
   const activitiesApi = ActivitiesApi.createNull(responses);
   const authenticationApi = AuthenticationApi.createNull();
   const notificationClient = NotificationClient.createNull();
-  const clock = Clock.createNull();
+  const clock = Clock.createNull(fixedDate);
   const timer = Timer.createNull();
   const store = createStore({
     activitiesApi,

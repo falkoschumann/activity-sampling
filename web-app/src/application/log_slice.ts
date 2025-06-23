@@ -36,6 +36,7 @@ interface LogState {
     readonly remaining: string;
     readonly percentage: number;
     readonly isRunning: boolean;
+    readonly end: string;
   };
   readonly recentActivities: WorkingDay[];
   readonly timeSummary: TimeSummary;
@@ -49,13 +50,14 @@ const initialState: LogState = {
     task: "",
     notes: "",
     disabled: false,
-    loggable: true,
+    loggable: false,
   },
   countdown: {
     duration: "PT30M",
     remaining: "PT30M",
     percentage: 0,
     isRunning: false,
+    end: "1970-01-01T00:00:00Z",
   },
   recentActivities: [],
   timeSummary: {
@@ -117,13 +119,14 @@ export const startCountdown = createAsyncThunk<
   unknown,
   LogThunkConfig
 >("log/startCountdown", async (_action, thunkAPI) => {
-  const { notificationClient, timer } = thunkAPI.extra;
+  const { clock, notificationClient, timer } = thunkAPI.extra;
   timer.schedule(
     () => thunkAPI.dispatch(progressCountdown({ seconds: 1 })),
     0,
     1000,
   );
-  thunkAPI.dispatch(countdownStarted());
+  const start = clock.now().toISOString();
+  thunkAPI.dispatch(countdownStarted({ start }));
   notificationClient.requestPermission();
 });
 
@@ -179,12 +182,15 @@ const logSlice = createSlice({
         state.currentActivity.loggable = true;
       }
     },
-    countdownStarted: (state) => {
+    countdownStarted: (state, action: PayloadAction<{ start: string }>) => {
       state.currentActivity.disabled = true;
       state.currentActivity.loggable = isLoggable(state.currentActivity);
       state.countdown.remaining = state.countdown.duration;
       state.countdown.percentage = 0;
       state.countdown.isRunning = true;
+      state.countdown.end = Temporal.Instant.from(action.payload.start)
+        .add(state.countdown.duration)
+        .toString();
     },
     countdownProgressed: (
       state,
