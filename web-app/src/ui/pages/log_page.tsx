@@ -12,7 +12,7 @@ import {
   logActivity,
   queryRecentActivities,
   selectCountdown,
-  selectCurrentActivityForm,
+  selectCurrentActivity,
   selectError,
   selectRecentActivities,
   selectTimeSummary,
@@ -53,7 +53,7 @@ export default function LogPage() {
 }
 
 function CurrentActivityFormContainer() {
-  const { client, project, task, notes, disabled, loggable } = useSelector(selectCurrentActivityForm);
+  const { client, project, task, notes, disabled, loggable } = useSelector(selectCurrentActivity);
   const dispatch = useDispatch<AppDispatch>();
 
   function handleChange(event: { name: "client" | "project" | "task" | "notes"; text: string }) {

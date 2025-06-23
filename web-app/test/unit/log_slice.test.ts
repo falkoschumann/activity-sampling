@@ -11,7 +11,7 @@ import {
   logActivity,
   queryRecentActivities,
   selectCountdown,
-  selectCurrentActivityForm,
+  selectCurrentActivity,
   selectError,
   selectRecentActivities,
   selectTimeSummary,
@@ -42,7 +42,7 @@ describe("Log", () => {
       store.dispatch(durationSelected({ duration: "PT20M" }));
       store.dispatch(startCountdown({}));
 
-      expect(selectCurrentActivityForm(store.getState())).toEqual({
+      expect(selectCurrentActivity(store.getState())).toEqual({
         client: "",
         project: "",
         task: "",
@@ -73,7 +73,7 @@ describe("Log", () => {
 
       timer.simulateTaskRun(Temporal.Duration.from("PT16M").total("seconds"));
 
-      expect(selectCurrentActivityForm(store.getState())).toEqual({
+      expect(selectCurrentActivity(store.getState())).toEqual({
         client: "",
         project: "",
         task: "",
@@ -99,7 +99,7 @@ describe("Log", () => {
 
       timer.simulateTaskRun(Temporal.Duration.from("PT1M").total("seconds"));
 
-      expect(selectCurrentActivityForm(store.getState())).toEqual({
+      expect(selectCurrentActivity(store.getState())).toEqual({
         client: "",
         project: "",
         task: "",
@@ -130,7 +130,7 @@ describe("Log", () => {
 
       store.dispatch(stopCountdown({}));
 
-      expect(selectCurrentActivityForm(store.getState())).toEqual({
+      expect(selectCurrentActivity(store.getState())).toEqual({
         client: "",
         project: "",
         task: "",
@@ -186,7 +186,7 @@ describe("Log", () => {
       const loggedActivities = activitiesApi.trackActivitiesLogged();
 
       store.dispatch(changeText({ name: "client", text: "Test client" }));
-      expect(selectCurrentActivityForm(store.getState())).toEqual({
+      expect(selectCurrentActivity(store.getState())).toEqual({
         client: "Test client",
         project: "",
         task: "",
@@ -195,7 +195,7 @@ describe("Log", () => {
         loggable: false,
       });
       store.dispatch(changeText({ name: "project", text: "Test project" }));
-      expect(selectCurrentActivityForm(store.getState())).toEqual({
+      expect(selectCurrentActivity(store.getState())).toEqual({
         client: "Test client",
         project: "Test project",
         task: "",
@@ -204,7 +204,7 @@ describe("Log", () => {
         loggable: false,
       });
       store.dispatch(changeText({ name: "task", text: "Test task" }));
-      expect(selectCurrentActivityForm(store.getState())).toEqual({
+      expect(selectCurrentActivity(store.getState())).toEqual({
         client: "Test client",
         project: "Test project",
         task: "Test task",
@@ -231,7 +231,7 @@ describe("Log", () => {
       const loggedActivities = activitiesApi.trackActivitiesLogged();
 
       store.dispatch(changeText({ name: "client", text: "Test client" }));
-      expect(selectCurrentActivityForm(store.getState())).toEqual({
+      expect(selectCurrentActivity(store.getState())).toEqual({
         client: "Test client",
         project: "",
         task: "",
@@ -240,7 +240,7 @@ describe("Log", () => {
         loggable: false,
       });
       store.dispatch(changeText({ name: "project", text: "Test project" }));
-      expect(selectCurrentActivityForm(store.getState())).toEqual({
+      expect(selectCurrentActivity(store.getState())).toEqual({
         client: "Test client",
         project: "Test project",
         task: "",
@@ -249,7 +249,7 @@ describe("Log", () => {
         loggable: false,
       });
       store.dispatch(changeText({ name: "task", text: "Test task" }));
-      expect(selectCurrentActivityForm(store.getState())).toEqual({
+      expect(selectCurrentActivity(store.getState())).toEqual({
         client: "Test client",
         project: "Test project",
         task: "Test task",
@@ -258,7 +258,7 @@ describe("Log", () => {
         loggable: true,
       });
       store.dispatch(changeText({ name: "notes", text: "Test notes" }));
-      expect(selectCurrentActivityForm(store.getState())).toEqual({
+      expect(selectCurrentActivity(store.getState())).toEqual({
         client: "Test client",
         project: "Test project",
         task: "Test task",
@@ -284,7 +284,7 @@ describe("Log", () => {
         activitySelected(createTestActivity({ notes: "Test notes" })),
       );
 
-      expect(selectCurrentActivityForm(store.getState())).toEqual({
+      expect(selectCurrentActivity(store.getState())).toEqual({
         client: "Test client",
         project: "Test project",
         task: "Test task",
@@ -306,7 +306,7 @@ describe("Log", () => {
         queryRecentActivities(createTestRecentActivitiesQuery()),
       );
 
-      expect(selectCurrentActivityForm(store.getState())).toEqual({
+      expect(selectCurrentActivity(store.getState())).toEqual({
         client: "Test client",
         project: "Test project",
         task: "Test task",
@@ -332,7 +332,7 @@ describe("Log", () => {
       store.dispatch(changeText({ name: "task", text: "Test task" }));
       await store.dispatch(logActivity({}));
 
-      expect(selectCurrentActivityForm(store.getState())).toEqual({
+      expect(selectCurrentActivity(store.getState())).toEqual({
         client: "Test client",
         project: "Test project",
         task: "Test task",
@@ -397,7 +397,7 @@ describe("Log", () => {
         queryRecentActivities(createTestRecentActivitiesQuery()),
       );
 
-      expect(selectCurrentActivityForm(store.getState())).toEqual({
+      expect(selectCurrentActivity(store.getState())).toEqual({
         client: "Test client",
         project: "Test project",
         task: "Test task",
@@ -473,7 +473,7 @@ describe("Log", () => {
         queryRecentActivities(createTestRecentActivitiesQuery()),
       );
 
-      expect(selectCurrentActivityForm(store.getState())).toEqual({
+      expect(selectCurrentActivity(store.getState())).toEqual({
         client: "",
         project: "",
         task: "",

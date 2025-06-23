@@ -22,10 +22,8 @@ import { NotificationClient } from "../infrastructure/notification_client";
 import { Clock } from "./clock";
 import { Timer } from "./timer";
 
-// TODO Windows log screen stops countdown, use service worker to keep it running?
-
 interface LogState {
-  readonly currentActivityForm: {
+  readonly currentActivity: {
     readonly client: string;
     readonly project: string;
     readonly task: string;
@@ -45,7 +43,7 @@ interface LogState {
 }
 
 const initialState: LogState = {
-  currentActivityForm: {
+  currentActivity: {
     client: "",
     project: "",
     task: "",
@@ -84,15 +82,15 @@ export const logActivity = createAsyncThunk<
   LogThunkConfig
 >("log/logActivity", async (_action, thunkAPI) => {
   const { activitiesApi, notificationClient, clock } = thunkAPI.extra;
-  const currentActivityForm = selectCurrentActivityForm(thunkAPI.getState());
+  const currentActivity = selectCurrentActivity(thunkAPI.getState());
   const countdown = selectCountdown(thunkAPI.getState());
   const command: LogActivityCommand = {
     timestamp: clock.now().toISOString(),
     duration: countdown.duration,
-    client: currentActivityForm.client.trim(),
-    project: currentActivityForm.project.trim(),
-    task: currentActivityForm.task.trim(),
-    notes: currentActivityForm.notes.trim() || undefined,
+    client: currentActivity.client.trim(),
+    project: currentActivity.project.trim(),
+    task: currentActivity.task.trim(),
+    notes: currentActivity.notes.trim() || undefined,
   };
   const status = await activitiesApi.logActivity(command);
   await thunkAPI.dispatch(queryRecentActivities({}));
@@ -140,11 +138,11 @@ const progressCountdown = createAsyncThunk<
   const remaining = Temporal.Duration.from(countdown.remaining);
   const intervalElapsed = remaining.sign <= 0;
   if (intervalElapsed && notificationClient.isGranted) {
-    const currentActivityForm = selectCurrentActivityForm(thunkAPI.getState());
+    const currentActivity = selectCurrentActivity(thunkAPI.getState());
     notificationClient.show("What are you working on?", {
       body:
-        currentActivityForm.task.length > 0
-          ? `${currentActivityForm.project} (${currentActivityForm.client}) ${currentActivityForm.task}`
+        currentActivity.task.length > 0
+          ? `${currentActivity.project} (${currentActivity.client}) ${currentActivity.task}`
           : undefined,
       icon: "/apple-touch-icon.png",
       requireInteraction: true,
@@ -172,22 +170,18 @@ const logSlice = createSlice({
         text: string;
       }>,
     ) => {
-      state.currentActivityForm[action.payload.name] = action.payload.text;
-      state.currentActivityForm.loggable = isLoggable(
-        state.currentActivityForm,
-      );
+      state.currentActivity[action.payload.name] = action.payload.text;
+      state.currentActivity.loggable = isLoggable(state.currentActivity);
     },
     activityLogged: (state) => {
       if (state.countdown.isRunning) {
-        state.currentActivityForm.disabled = true;
-        state.currentActivityForm.loggable = true;
+        state.currentActivity.disabled = true;
+        state.currentActivity.loggable = true;
       }
     },
     countdownStarted: (state) => {
-      state.currentActivityForm.disabled = true;
-      state.currentActivityForm.loggable = isLoggable(
-        state.currentActivityForm,
-      );
+      state.currentActivity.disabled = true;
+      state.currentActivity.loggable = isLoggable(state.currentActivity);
       state.countdown.remaining = state.countdown.duration;
       state.countdown.percentage = 0;
       state.countdown.isRunning = true;
@@ -201,10 +195,8 @@ const logSlice = createSlice({
         state.countdown.remaining,
       ).subtract({ seconds: action.payload.seconds });
       if (remaining.sign === -1) {
-        state.currentActivityForm.disabled = false;
-        state.currentActivityForm.loggable = isLoggable(
-          state.currentActivityForm,
-        );
+        state.currentActivity.disabled = false;
+        state.currentActivity.loggable = isLoggable(state.currentActivity);
         remaining = duration.subtract({ seconds: action.payload.seconds });
       }
       state.countdown.remaining = remaining.toString();
@@ -213,10 +205,8 @@ const logSlice = createSlice({
       );
     },
     countdownStopped: (state) => {
-      state.currentActivityForm.disabled = false;
-      state.currentActivityForm.loggable = isLoggable(
-        state.currentActivityForm,
-      );
+      state.currentActivity.disabled = false;
+      state.currentActivity.loggable = isLoggable(state.currentActivity);
       state.countdown.isRunning = false;
     },
     durationSelected: (state, action: PayloadAction<{ duration: string }>) => {
@@ -225,13 +215,11 @@ const logSlice = createSlice({
       state.countdown.percentage = 0;
     },
     activitySelected: (state, action: PayloadAction<Activity>) => {
-      state.currentActivityForm.client = action.payload.client;
-      state.currentActivityForm.project = action.payload.project;
-      state.currentActivityForm.task = action.payload.task;
-      state.currentActivityForm.notes = action.payload.notes ?? "";
-      state.currentActivityForm.loggable = isLoggable(
-        state.currentActivityForm,
-      );
+      state.currentActivity.client = action.payload.client;
+      state.currentActivity.project = action.payload.project;
+      state.currentActivity.task = action.payload.task;
+      state.currentActivity.notes = action.payload.notes ?? "";
+      state.currentActivity.loggable = isLoggable(state.currentActivity);
     },
   },
   extraReducers: (builder) => {
@@ -259,16 +247,12 @@ const logSlice = createSlice({
       state.error = undefined;
     });
     builder.addCase(queryRecentActivities.fulfilled, (state, action) => {
-      state.currentActivityForm.client =
-        action.payload.lastActivity?.client ?? "";
-      state.currentActivityForm.project =
+      state.currentActivity.client = action.payload.lastActivity?.client ?? "";
+      state.currentActivity.project =
         action.payload.lastActivity?.project ?? "";
-      state.currentActivityForm.task = action.payload.lastActivity?.task ?? "";
-      state.currentActivityForm.notes =
-        action.payload.lastActivity?.notes ?? "";
-      state.currentActivityForm.loggable = isLoggable(
-        state.currentActivityForm,
-      );
+      state.currentActivity.task = action.payload.lastActivity?.task ?? "";
+      state.currentActivity.notes = action.payload.lastActivity?.notes ?? "";
+      state.currentActivity.loggable = isLoggable(state.currentActivity);
       state.recentActivities = action.payload.workingDays;
       state.timeSummary = action.payload.timeSummary;
     });
@@ -279,7 +263,7 @@ const logSlice = createSlice({
     });
   },
   selectors: {
-    selectCurrentActivityForm: (state) => state.currentActivityForm,
+    selectCurrentActivity: (state) => state.currentActivity,
     selectCountdown: (state) => state.countdown,
     selectTimeSummary: (state) => state.timeSummary,
     selectRecentActivities: (state) => state.recentActivities,
@@ -300,7 +284,7 @@ export const { changeText, durationSelected, activitySelected } =
 export const {
   selectCountdown,
   selectError,
-  selectCurrentActivityForm,
+  selectCurrentActivity,
   selectTimeSummary,
   selectRecentActivities,
 } = logSlice.selectors;
