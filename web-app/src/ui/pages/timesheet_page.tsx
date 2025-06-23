@@ -57,7 +57,7 @@ function PeriodContainer() {
             </button>
           </div>
           <div className="align-content-center">
-            <strong>This Week:</strong>{" "}
+            <strong>This {unit}:</strong>{" "}
             {Temporal.PlainDate.from(from).toLocaleString(undefined, {
               dateStyle: "medium",
             })}{" "}
