@@ -49,23 +49,23 @@ function PeriodContainer() {
       <div className="container">
         <div className="btn-toolbar py-2 gap-2" role="toolbar" aria-label="Toolbar with navigation buttons">
           <div className="btn-group btn-group-sm" role="group" aria-label="Navigation buttons">
-            <button type="button" className="btn btn-toolbar" onClick={() => dispatch(previousPeriod())}>
+            <button type="button" className="btn" onClick={() => dispatch(previousPeriod())}>
               <i className="bi bi-chevron-left"></i>
             </button>
-            <button type="button" className="btn btn-toolbar" onClick={() => dispatch(nextPeriod())}>
+            <button type="button" className="btn" onClick={() => dispatch(nextPeriod())}>
               <i className="bi bi-chevron-right"></i>
             </button>
+            <div className="align-content-center">
+              <strong>This {unit}:</strong>{" "}
+              {Temporal.PlainDate.from(from).toLocaleString(undefined, {
+                dateStyle: "medium",
+              })}{" "}
+              - {Temporal.PlainDate.from(to).toLocaleString(undefined, { dateStyle: "medium" })}
+            </div>
           </div>
-          <div className="align-content-center">
-            <strong>This {unit}:</strong>{" "}
-            {Temporal.PlainDate.from(from).toLocaleString(undefined, {
-              dateStyle: "medium",
-            })}{" "}
-            - {Temporal.PlainDate.from(to).toLocaleString(undefined, { dateStyle: "medium" })}
-          </div>
-          <div className="dropdown ms-auto">
+          <div className="btn-group btn-group-sm ms-auto" role="group" aria-label="Option buttons">
             <button
-              className="btn btn-sm btn-outline-secondary dropdown-toggle"
+              className="btn btn-outline-secondary dropdown-toggle"
               type="button"
               data-bs-toggle="dropdown"
               aria-expanded="false"
