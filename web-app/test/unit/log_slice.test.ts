@@ -1,6 +1,5 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
-import { Temporal } from "@js-temporal/polyfill";
 import { describe, expect, it } from "vitest";
 import { Clock } from "../../src/application/clock";
 
@@ -70,14 +69,15 @@ describe("Log", () => {
     });
 
     it("Progresses countdown", () => {
-      const { store, notificationClient, timer } = configure({
-        fixedDate: new Date("2025-06-23T15:25:00Z"),
+      const { store, clock, notificationClient, timer } = configure({
+        fixedDate: "2025-06-23T15:25:00Z",
       });
       const shownNotifications = notificationClient.trackNotificationsShown();
       store.dispatch(durationSelected({ duration: "PT20M" }));
       store.dispatch(startCountdown({}));
 
-      timer.simulateTaskRun(Temporal.Duration.from("PT16M").total("seconds"));
+      clock.setFixedDate("2025-06-23T15:41:00Z");
+      timer.simulateTaskRun();
 
       expect(selectCurrentActivity(store.getState())).toEqual({
         client: "",
@@ -99,15 +99,15 @@ describe("Log", () => {
     });
 
     it("Restarts countdown and enable form when countdown is elapsed", () => {
-      const { store, notificationClient, timer } = configure({
+      const { store, clock, notificationClient, timer } = configure({
         fixedDate: new Date("2025-06-23T15:25:00Z"),
       });
       const shownNotifications = notificationClient.trackNotificationsShown();
       store.dispatch(durationSelected({ duration: "PT20M" }));
       store.dispatch(startCountdown({}));
-      timer.simulateTaskRun(Temporal.Duration.from("PT20M").total("seconds"));
 
-      timer.simulateTaskRun(Temporal.Duration.from("PT1M").total("seconds"));
+      clock.setFixedDate("2025-06-23T15:46:00Z");
+      timer.simulateTaskRun();
 
       expect(selectCurrentActivity(store.getState())).toEqual({
         client: "",
@@ -135,12 +135,13 @@ describe("Log", () => {
     });
 
     it("Stops countdown and enables form", () => {
-      const { store, timer } = configure({
+      const { store, clock, timer } = configure({
         fixedDate: new Date("2025-06-23T15:25:00Z"),
       });
       const cancelledTasks = timer.trackCancelledTasks();
       store.dispatch(startCountdown({}));
-      timer.simulateTaskRun(Temporal.Duration.from("PT12M").total("seconds"));
+      clock.setFixedDate("2025-06-23T15:37:00Z");
+      timer.simulateTaskRun();
 
       store.dispatch(stopCountdown({}));
 
@@ -166,15 +167,15 @@ describe("Log", () => {
 
   describe("Current interval", () => {
     it("Notify user when an interval is elapsed", () => {
-      const { store, notificationClient, timer } = configure({
+      const { store, clock, notificationClient, timer } = configure({
         fixedDate: new Date("2025-06-23T15:25:00Z"),
       });
       const shownNotifications = notificationClient.trackNotificationsShown();
       store.dispatch(durationSelected({ duration: "PT20M" }));
       store.dispatch(startCountdown({}));
-      timer.simulateTaskRun(Temporal.Duration.from("PT16M").total("seconds"));
 
-      timer.simulateTaskRun(Temporal.Duration.from("PT4M").total("seconds"));
+      clock.setFixedDate("2025-06-23T15:45:00Z");
+      timer.simulateTaskRun();
 
       expect(selectCountdown(store.getState())).toEqual({
         duration: "PT20M",
@@ -337,16 +338,18 @@ describe("Log", () => {
     });
 
     it("Disables form when activity is logged and countdown is running", async () => {
-      const { store, notificationClient, timer } = configure({
+      const { store, clock, notificationClient, timer } = configure({
         responses: [
           new Response(JSON.stringify({ success: true })),
           new Response(JSON.stringify(createTestRecentActivitiesQueryResult())),
         ],
+        fixedDate: "2025-06-23T15:25:00Z",
       });
       const hiddenNotifications = notificationClient.trackNotificationsHidden();
       await store.dispatch(startCountdown({}));
 
-      timer.simulateTaskRun(Temporal.Duration.from("PT30M1S").total("seconds"));
+      clock.setFixedDate("2025-06-23T15:55:01Z");
+      timer.simulateTaskRun();
       store.dispatch(changeText({ name: "client", text: "Test client" }));
       store.dispatch(changeText({ name: "project", text: "Test project" }));
       store.dispatch(changeText({ name: "task", text: "Test task" }));
@@ -531,7 +534,7 @@ function configure({
   fixedDate,
 }: {
   responses?: Response | Response[];
-  fixedDate?: Date;
+  fixedDate?: Date | string;
 } = {}) {
   const activitiesApi = ActivitiesApi.createNull(responses);
   const authenticationApi = AuthenticationApi.createNull();

@@ -132,27 +132,27 @@ export const startCountdown = createAsyncThunk<
   notificationClient.requestPermission();
 });
 
-const progressCountdown = createAsyncThunk<
-  unknown,
-  { seconds: number },
-  LogThunkConfig
->("log/progressCountdown", async ({ seconds }, thunkAPI) => {
-  const { notificationClient } = thunkAPI.extra;
-  thunkAPI.dispatch(countdownProgressed({ seconds }));
-  const { isElapsed } = selectCountdown(thunkAPI.getState());
-  if (isElapsed && notificationClient.isGranted) {
-    const currentActivity = selectCurrentActivity(thunkAPI.getState());
-    notificationClient.show("What are you working on?", {
-      body:
-        currentActivity.task.length > 0
-          ? `${currentActivity.project} (${currentActivity.client}) ${currentActivity.task}`
-          : undefined,
-      icon: "/apple-touch-icon.png",
-      requireInteraction: true,
-    });
-    thunkAPI.dispatch(countdownExpirationNotified());
-  }
-});
+const progressCountdown = createAsyncThunk<unknown, unknown, LogThunkConfig>(
+  "log/progressCountdown",
+  async (_action, thunkAPI) => {
+    const { clock, notificationClient } = thunkAPI.extra;
+    const now = clock.now().toISOString();
+    thunkAPI.dispatch(countdownProgressed({ now }));
+    const { isElapsed } = selectCountdown(thunkAPI.getState());
+    if (isElapsed && notificationClient.isGranted) {
+      const currentActivity = selectCurrentActivity(thunkAPI.getState());
+      notificationClient.show("What are you working on?", {
+        body:
+          currentActivity.task.length > 0
+            ? `${currentActivity.project} (${currentActivity.client}) ${currentActivity.task}`
+            : undefined,
+        icon: "/apple-touch-icon.png",
+        requireInteraction: true,
+      });
+      thunkAPI.dispatch(countdownExpirationNotified());
+    }
+  },
+);
 
 export const stopCountdown = createAsyncThunk<unknown, unknown, LogThunkConfig>(
   "log/stopCountdown",
@@ -193,19 +193,20 @@ const logSlice = createSlice({
         .add(state.countdown.duration)
         .toString();
     },
-    countdownProgressed: (
-      state,
-      action: PayloadAction<{ seconds: number }>,
-    ) => {
+    countdownProgressed: (state, action: PayloadAction<{ now: string }>) => {
       const duration = Temporal.Duration.from(state.countdown.duration);
-      let remaining = Temporal.Duration.from(
-        state.countdown.remaining,
-      ).subtract({ seconds: action.payload.seconds });
-      if (remaining.sign == 0) {
+      const end = Temporal.Instant.from(state.countdown.end);
+      const current = Temporal.Instant.from(action.payload.now);
+      let remaining = end.since(current).round({ largestUnit: "hour" });
+      if (remaining.sign <= 0) {
         state.currentActivity.disabled = false;
         state.currentActivity.loggable = isLoggable(state.currentActivity);
         state.countdown.isElapsed = true;
-        remaining = duration;
+        if (remaining.abs().total("seconds") < duration.total("seconds")) {
+          remaining = duration.subtract(remaining.abs());
+        } else {
+          remaining = duration;
+        }
       }
       state.countdown.remaining = remaining.toString();
       state.countdown.percentage = Math.round(
