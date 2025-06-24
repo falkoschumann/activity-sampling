@@ -48,8 +48,8 @@ describe("Log", () => {
         project: "",
         task: "",
         notes: "",
-        disabled: true,
-        loggable: false,
+        isDisabled: true,
+        isLoggable: false,
       });
       expect(selectCountdown(store.getState())).toEqual({
         duration: "PT20M",
@@ -84,8 +84,8 @@ describe("Log", () => {
         project: "",
         task: "",
         notes: "",
-        disabled: true,
-        loggable: false,
+        isDisabled: true,
+        isLoggable: false,
       });
       expect(selectCountdown(store.getState())).toEqual({
         duration: "PT20M",
@@ -114,8 +114,8 @@ describe("Log", () => {
         project: "",
         task: "",
         notes: "",
-        disabled: false,
-        loggable: false,
+        isDisabled: false,
+        isLoggable: false,
       });
       expect(selectCountdown(store.getState())).toEqual({
         duration: "PT20M",
@@ -150,8 +150,8 @@ describe("Log", () => {
         project: "",
         task: "",
         notes: "",
-        disabled: false,
-        loggable: false,
+        isDisabled: false,
+        isLoggable: false,
       });
       expect(selectCountdown(store.getState())).toEqual({
         duration: "PT30M",
@@ -212,8 +212,8 @@ describe("Log", () => {
         project: "",
         task: "",
         notes: "",
-        disabled: false,
-        loggable: false,
+        isDisabled: false,
+        isLoggable: false,
       });
       store.dispatch(changeText({ name: "project", text: "Test project" }));
       expect(selectCurrentActivity(store.getState())).toEqual({
@@ -221,8 +221,8 @@ describe("Log", () => {
         project: "Test project",
         task: "",
         notes: "",
-        disabled: false,
-        loggable: false,
+        isDisabled: false,
+        isLoggable: false,
       });
       store.dispatch(changeText({ name: "task", text: "Test task" }));
       expect(selectCurrentActivity(store.getState())).toEqual({
@@ -230,8 +230,8 @@ describe("Log", () => {
         project: "Test project",
         task: "Test task",
         notes: "",
-        disabled: false,
-        loggable: true,
+        isDisabled: false,
+        isLoggable: true,
       });
 
       await store.dispatch(logActivity({}));
@@ -257,8 +257,8 @@ describe("Log", () => {
         project: "",
         task: "",
         notes: "",
-        disabled: false,
-        loggable: false,
+        isDisabled: false,
+        isLoggable: false,
       });
       store.dispatch(changeText({ name: "project", text: "Test project" }));
       expect(selectCurrentActivity(store.getState())).toEqual({
@@ -266,8 +266,8 @@ describe("Log", () => {
         project: "Test project",
         task: "",
         notes: "",
-        disabled: false,
-        loggable: false,
+        isDisabled: false,
+        isLoggable: false,
       });
       store.dispatch(changeText({ name: "task", text: "Test task" }));
       expect(selectCurrentActivity(store.getState())).toEqual({
@@ -275,8 +275,8 @@ describe("Log", () => {
         project: "Test project",
         task: "Test task",
         notes: "",
-        disabled: false,
-        loggable: true,
+        isDisabled: false,
+        isLoggable: true,
       });
       store.dispatch(changeText({ name: "notes", text: "Test notes" }));
       expect(selectCurrentActivity(store.getState())).toEqual({
@@ -284,8 +284,8 @@ describe("Log", () => {
         project: "Test project",
         task: "Test task",
         notes: "Test notes",
-        disabled: false,
-        loggable: true,
+        isDisabled: false,
+        isLoggable: true,
       });
 
       await store.dispatch(logActivity({}));
@@ -310,8 +310,8 @@ describe("Log", () => {
         project: "Test project",
         task: "Test task",
         notes: "Test notes",
-        disabled: false,
-        loggable: true,
+        isDisabled: false,
+        isLoggable: true,
       });
     });
 
@@ -332,8 +332,8 @@ describe("Log", () => {
         project: "Test project",
         task: "Test task",
         notes: "",
-        disabled: false,
-        loggable: true,
+        isDisabled: false,
+        isLoggable: true,
       });
     });
 
@@ -360,8 +360,8 @@ describe("Log", () => {
         project: "Test project",
         task: "Test task",
         notes: "",
-        disabled: true,
-        loggable: true,
+        isDisabled: true,
+        isLoggable: true,
       });
       expect(hiddenNotifications.data).toEqual([
         { title: "What are you working on?" },
@@ -425,8 +425,8 @@ describe("Log", () => {
         project: "Test project",
         task: "Test task",
         notes: "",
-        disabled: false,
-        loggable: true,
+        isDisabled: false,
+        isLoggable: true,
       });
     });
 
@@ -501,8 +501,8 @@ describe("Log", () => {
         project: "",
         task: "",
         notes: "",
-        disabled: false,
-        loggable: false,
+        isDisabled: false,
+        isLoggable: false,
       });
       expect(selectRecentActivities(store.getState())).toEqual([]);
       expect(selectTimeSummary(store.getState())).toEqual(

@@ -53,7 +53,7 @@ export default function LogPage() {
 }
 
 function CurrentActivityFormContainer() {
-  const { client, project, task, notes, disabled, loggable } = useSelector(selectCurrentActivity);
+  const { client, project, task, notes, isDisabled, isLoggable } = useSelector(selectCurrentActivity);
   const dispatch = useDispatch<AppDispatch>();
 
   function handleChange(event: { name: "client" | "project" | "task" | "notes"; text: string }) {
@@ -67,11 +67,17 @@ function CurrentActivityFormContainer() {
 
   return (
     <form onSubmit={handleSubmitted}>
-      <FormInputComponent name="client" title="Client" disabled={disabled} value={client} onChange={handleChange} />
-      <FormInputComponent name="project" title="Project" disabled={disabled} value={project} onChange={handleChange} />
-      <FormInputComponent name="task" title="Task" disabled={disabled} value={task} onChange={handleChange} />
-      <FormInputComponent name="notes" title="Notes" disabled={disabled} value={notes} onChange={handleChange} />
-      <button type="submit" className="btn btn-primary btn-sm w-100" disabled={disabled || !loggable}>
+      <FormInputComponent name="client" title="Client" isDisabled={isDisabled} value={client} onChange={handleChange} />
+      <FormInputComponent
+        name="project"
+        title="Project"
+        isDisabled={isDisabled}
+        value={project}
+        onChange={handleChange}
+      />
+      <FormInputComponent name="task" title="Task" isDisabled={isDisabled} value={task} onChange={handleChange} />
+      <FormInputComponent name="notes" title="Notes" isDisabled={isDisabled} value={notes} onChange={handleChange} />
+      <button type="submit" className="btn btn-primary btn-sm w-100" disabled={isDisabled || !isLoggable}>
         Log
       </button>
     </form>
@@ -81,13 +87,13 @@ function CurrentActivityFormContainer() {
 function FormInputComponent({
   name,
   title,
-  disabled,
+  isDisabled,
   value,
   onChange,
 }: {
   name: "client" | "project" | "task" | "notes";
   title: string;
-  disabled: boolean;
+  isDisabled: boolean;
   value: string;
   onChange: EventHandler<{ name: "client" | "project" | "task" | "notes"; text: string }>;
 }) {
@@ -102,7 +108,7 @@ function FormInputComponent({
           id={name}
           name={name}
           className="form-control form-control-sm"
-          disabled={disabled}
+          disabled={isDisabled}
           value={value}
           onChange={(e) => onChange({ name, text: e.target.value })}
         />

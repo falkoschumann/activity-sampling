@@ -28,8 +28,8 @@ interface LogState {
     readonly project: string;
     readonly task: string;
     readonly notes: string;
-    readonly disabled: boolean;
-    readonly loggable: boolean;
+    readonly isDisabled: boolean;
+    readonly isLoggable: boolean;
   };
   readonly countdown: {
     readonly duration: string;
@@ -50,8 +50,8 @@ const initialState: LogState = {
     project: "",
     task: "",
     notes: "",
-    disabled: false,
-    loggable: false,
+    isDisabled: false,
+    isLoggable: false,
   },
   countdown: {
     duration: "PT30M",
@@ -175,17 +175,17 @@ const logSlice = createSlice({
       }>,
     ) => {
       state.currentActivity[action.payload.name] = action.payload.text;
-      state.currentActivity.loggable = isLoggable(state.currentActivity);
+      state.currentActivity.isLoggable = isLoggable(state.currentActivity);
     },
     activityLogged: (state) => {
       if (state.countdown.isRunning) {
-        state.currentActivity.disabled = true;
-        state.currentActivity.loggable = true;
+        state.currentActivity.isDisabled = true;
+        state.currentActivity.isLoggable = true;
       }
     },
     countdownStarted: (state, action: PayloadAction<{ start: string }>) => {
-      state.currentActivity.disabled = true;
-      state.currentActivity.loggable = isLoggable(state.currentActivity);
+      state.currentActivity.isDisabled = true;
+      state.currentActivity.isLoggable = isLoggable(state.currentActivity);
       state.countdown.remaining = state.countdown.duration;
       state.countdown.percentage = 0;
       state.countdown.isRunning = true;
@@ -199,8 +199,8 @@ const logSlice = createSlice({
       const current = Temporal.Instant.from(action.payload.now);
       let remaining = end.since(current).round({ largestUnit: "hour" });
       if (remaining.sign <= 0) {
-        state.currentActivity.disabled = false;
-        state.currentActivity.loggable = isLoggable(state.currentActivity);
+        state.currentActivity.isDisabled = false;
+        state.currentActivity.isLoggable = isLoggable(state.currentActivity);
         state.countdown.isElapsed = true;
         if (remaining.abs().total("seconds") < duration.total("seconds")) {
           remaining = duration.subtract(remaining.abs());
@@ -217,8 +217,8 @@ const logSlice = createSlice({
       state.countdown.isElapsed = false;
     },
     countdownStopped: (state) => {
-      state.currentActivity.disabled = false;
-      state.currentActivity.loggable = isLoggable(state.currentActivity);
+      state.currentActivity.isDisabled = false;
+      state.currentActivity.isLoggable = isLoggable(state.currentActivity);
       state.countdown.isRunning = false;
     },
     durationSelected: (state, action: PayloadAction<{ duration: string }>) => {
@@ -231,7 +231,7 @@ const logSlice = createSlice({
       state.currentActivity.project = action.payload.project;
       state.currentActivity.task = action.payload.task;
       state.currentActivity.notes = action.payload.notes ?? "";
-      state.currentActivity.loggable = isLoggable(state.currentActivity);
+      state.currentActivity.isLoggable = isLoggable(state.currentActivity);
     },
   },
   extraReducers: (builder) => {
@@ -264,7 +264,7 @@ const logSlice = createSlice({
         action.payload.lastActivity?.project ?? "";
       state.currentActivity.task = action.payload.lastActivity?.task ?? "";
       state.currentActivity.notes = action.payload.lastActivity?.notes ?? "";
-      state.currentActivity.loggable = isLoggable(state.currentActivity);
+      state.currentActivity.isLoggable = isLoggable(state.currentActivity);
       state.recentActivities = action.payload.workingDays;
       state.timeSummary = action.payload.timeSummary;
     });
