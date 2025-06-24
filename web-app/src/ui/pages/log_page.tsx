@@ -40,6 +40,12 @@ export default function LogPage() {
         <CountdownContainer />
       </aside>
       <main className="container my-4" style={{ paddingBottom: "3rem" }}>
+        <h5>
+          Logged activities of the last 30 days
+          <button type="button" className="btn" onClick={() => dispatch(queryRecentActivities({}))}>
+            <i className="bi bi-arrow-clockwise"></i>
+          </button>
+        </h5>
         <ErrorComponent {...error} />
         <RecentActivitiesContainer />
       </main>
