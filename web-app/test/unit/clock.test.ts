@@ -31,5 +31,15 @@ describe("Clock", () => {
 
       expect(now).toEqual(fixedDate);
     });
+
+    it("Sets fixed date", () => {
+      const fixedDate = new Date("2025-06-24T09:14Z");
+      const clock = Clock.createNull();
+
+      clock.setFixedDate(fixedDate);
+      const now = clock.now();
+
+      expect(now).toEqual(fixedDate);
+    });
   });
 });

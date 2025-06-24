@@ -5,11 +5,11 @@ export class Clock {
     return new Clock(() => new Date());
   }
 
-  static createNull(fixedDate = new Date(0)) {
+  static createNull(fixedDate: Date | string = new Date(0)) {
     return new Clock(() => new Date(fixedDate));
   }
 
-  readonly #now;
+  #now;
 
   private constructor(now: () => Date) {
     this.#now = now;
@@ -17,5 +17,9 @@ export class Clock {
 
   now(): Date {
     return this.#now();
+  }
+
+  setFixedDate(fixedDate: Date | string) {
+    this.#now = () => new Date(fixedDate);
   }
 }
