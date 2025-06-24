@@ -114,9 +114,14 @@ function TimesheetContainer() {
         {entries.map((entry, index) => (
           <tr key={index}>
             <td>{Temporal.PlainDate.from(entry.date).toLocaleString(undefined, { dateStyle: "medium" })}</td>
-            <td>{entry.client}</td>
-            <td>{entry.project}</td>
-            <td>{entry.task}</td>
+            <td className="text-nowrap">{entry.client}</td>
+            <td className="text-nowrap">{entry.project}</td>
+            <td>
+              {entry.task}
+              <button type="button" className="btn btn-sm" onClick={() => navigator.clipboard.writeText(entry.task)}>
+                <i className="bi bi-copy"></i>
+              </button>
+            </td>
             <td>{formatDuration(entry.hours)}</td>
           </tr>
         ))}

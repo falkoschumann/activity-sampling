@@ -269,6 +269,9 @@ function ActivityComponent({ activity, onSelect }: { activity: Activity; onSelec
         <div className="ms-2 me-auto">
           <div>
             <strong>{activity.project}</strong> ({activity.client}) {activity.task}
+            <button type="button" className="btn btn-sm" onClick={() => navigator.clipboard.writeText(activity.task)}>
+              <i className="bi bi-copy"></i>
+            </button>
           </div>
           {activity.notes && <small className="text-body-tertiary">{activity.notes}</small>}
         </div>
