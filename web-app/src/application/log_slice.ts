@@ -36,6 +36,7 @@ interface LogState {
     readonly remaining: string;
     readonly percentage: number;
     readonly isRunning: boolean;
+    readonly isElapsed: boolean;
     readonly end: string;
   };
   readonly recentActivities: WorkingDay[];
@@ -57,6 +58,7 @@ const initialState: LogState = {
     remaining: "PT30M",
     percentage: 0,
     isRunning: false,
+    isElapsed: false,
     end: "1970-01-01T00:00:00Z",
   },
   recentActivities: [],
@@ -137,10 +139,8 @@ const progressCountdown = createAsyncThunk<
 >("log/progressCountdown", async ({ seconds }, thunkAPI) => {
   const { notificationClient } = thunkAPI.extra;
   thunkAPI.dispatch(countdownProgressed({ seconds }));
-  const countdown = selectCountdown(thunkAPI.getState());
-  const remaining = Temporal.Duration.from(countdown.remaining);
-  const intervalElapsed = remaining.sign <= 0;
-  if (intervalElapsed && notificationClient.isGranted) {
+  const { isElapsed } = selectCountdown(thunkAPI.getState());
+  if (isElapsed && notificationClient.isGranted) {
     const currentActivity = selectCurrentActivity(thunkAPI.getState());
     notificationClient.show("What are you working on?", {
       body:
@@ -150,6 +150,7 @@ const progressCountdown = createAsyncThunk<
       icon: "/apple-touch-icon.png",
       requireInteraction: true,
     });
+    thunkAPI.dispatch(countdownExpirationNotified());
   }
 });
 
@@ -200,15 +201,19 @@ const logSlice = createSlice({
       let remaining = Temporal.Duration.from(
         state.countdown.remaining,
       ).subtract({ seconds: action.payload.seconds });
-      if (remaining.sign === -1) {
+      if (remaining.sign == 0) {
         state.currentActivity.disabled = false;
         state.currentActivity.loggable = isLoggable(state.currentActivity);
-        remaining = duration.subtract({ seconds: action.payload.seconds });
+        state.countdown.isElapsed = true;
+        remaining = duration;
       }
       state.countdown.remaining = remaining.toString();
       state.countdown.percentage = Math.round(
         (1 - remaining.total("seconds") / duration.total("seconds")) * 100,
       );
+    },
+    countdownExpirationNotified: (state) => {
+      state.countdown.isElapsed = false;
     },
     countdownStopped: (state) => {
       state.currentActivity.disabled = false;
@@ -281,6 +286,7 @@ const {
   activityLogged,
   countdownStarted,
   countdownProgressed,
+  countdownExpirationNotified,
   countdownStopped,
 } = logSlice.actions;
 

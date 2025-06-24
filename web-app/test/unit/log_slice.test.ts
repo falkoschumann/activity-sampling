@@ -57,6 +57,7 @@ describe("Log", () => {
         remaining: "PT20M",
         percentage: 0,
         isRunning: true,
+        isElapsed: false,
         end: "2025-06-23T15:45:00Z",
       });
       expect(scheduledTasks.data).toEqual([
@@ -91,6 +92,7 @@ describe("Log", () => {
         remaining: "PT4M",
         percentage: 80,
         isRunning: true,
+        isElapsed: false,
         end: "2025-06-23T15:45:00Z",
       });
       expect(shownNotifications.data).toEqual([]);
@@ -120,6 +122,7 @@ describe("Log", () => {
         remaining: "PT19M",
         percentage: 5,
         isRunning: true,
+        isElapsed: false,
         end: "2025-06-23T15:45:00Z",
       });
       expect(shownNotifications.data).toEqual([
@@ -154,6 +157,7 @@ describe("Log", () => {
         remaining: "PT18M",
         percentage: 40,
         isRunning: false,
+        isElapsed: false,
         end: "2025-06-23T15:55:00Z",
       });
       expect(cancelledTasks.data).toEqual([{ timeoutId: expect.any(Number) }]);
@@ -174,9 +178,10 @@ describe("Log", () => {
 
       expect(selectCountdown(store.getState())).toEqual({
         duration: "PT20M",
-        remaining: "PT0S",
-        percentage: 100,
+        remaining: "PT20M",
+        percentage: 0,
         isRunning: true,
+        isElapsed: false,
         end: "2025-06-23T15:45:00Z",
       });
       expect(shownNotifications.data).toEqual([
@@ -524,7 +529,10 @@ describe("Log", () => {
 function configure({
   responses,
   fixedDate,
-}: { responses?: Response | Response[]; fixedDate?: Date } = {}) {
+}: {
+  responses?: Response | Response[];
+  fixedDate?: Date;
+} = {}) {
   const activitiesApi = ActivitiesApi.createNull(responses);
   const authenticationApi = AuthenticationApi.createNull();
   const notificationClient = NotificationClient.createNull();
