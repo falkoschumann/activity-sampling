@@ -243,20 +243,19 @@ function WorkingDayComponent({
       <h6 className="m-0 p-2 sticky-top bg-body-tertiary" style={{ top: "3.5rem" }}>
         {Temporal.PlainDate.from(workingDay.date).toLocaleString(undefined, { dateStyle: "full" })}
       </h6>
-      <div className="list-group list-group-flush">
+      <ul className="list-group list-group-flush">
         {workingDay.activities.map((activity) => (
           <ActivityComponent key={activity.dateTime} activity={activity} onSelect={() => onSelect({ activity })} />
         ))}
-      </div>
+      </ul>
     </div>
   );
 }
 
 function ActivityComponent({ activity, onSelect }: { activity: Activity; onSelect: EventHandler }) {
   return (
-    <button
+    <li
       key={activity.dateTime}
-      onClick={() => onSelect()}
       className="list-group-item list-group-item-action py-1 d-flex justify-content-start align-items-start"
     >
       <div style={{ width: "3em" }}>
@@ -269,6 +268,9 @@ function ActivityComponent({ activity, onSelect }: { activity: Activity; onSelec
         <div className="ms-2 me-auto">
           <div>
             <strong>{activity.project}</strong> ({activity.client}) {activity.task}
+            <button type="button" className="btn btn-sm" onClick={() => onSelect()}>
+              <i className="bi bi-arrow-repeat"></i>
+            </button>
             <button type="button" className="btn btn-sm" onClick={() => navigator.clipboard.writeText(activity.task)}>
               <i className="bi bi-copy"></i>
             </button>
@@ -276,7 +278,7 @@ function ActivityComponent({ activity, onSelect }: { activity: Activity; onSelec
           {activity.notes && <small className="text-body-tertiary">{activity.notes}</small>}
         </div>
       </div>
-    </button>
+    </li>
   );
 }
 
