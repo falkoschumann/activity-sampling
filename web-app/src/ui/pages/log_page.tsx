@@ -98,7 +98,7 @@ function FormInputComponent({
   onChange: EventHandler<{ name: "client" | "project" | "task" | "notes"; text: string }>;
 }) {
   return (
-    <div className="row mb-3">
+    <div className="row mb-1">
       <label htmlFor={name} className="col-sm-2 col-form-label">
         {title}
       </label>
