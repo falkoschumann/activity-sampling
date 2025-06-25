@@ -1,6 +1,6 @@
 @echo off
 
-SERVER_PORT=8888
+set SERVER_PORT=8888
 
 pushd %~dp0
 
