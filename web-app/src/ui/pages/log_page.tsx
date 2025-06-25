@@ -42,7 +42,12 @@ export default function LogPage() {
       <main className="container my-4" style={{ paddingBottom: "3rem" }}>
         <h5>
           Logged activities of the last 30 days
-          <button type="button" className="btn" onClick={() => dispatch(queryRecentActivities({}))}>
+          <button
+            type="button"
+            className="btn"
+            title="Refresh logged activities."
+            onClick={() => dispatch(queryRecentActivities({}))}
+          >
             <i className="bi bi-arrow-clockwise"></i>
           </button>
         </h5>
@@ -268,10 +273,20 @@ function ActivityComponent({ activity, onSelect }: { activity: Activity; onSelec
         <div className="ms-2 me-auto">
           <div>
             <strong>{activity.project}</strong> ({activity.client}) {activity.task}
-            <button type="button" className="btn btn-sm" onClick={() => onSelect()}>
+            <button
+              type="button"
+              className="btn btn-sm"
+              title="Use this activity as current activity."
+              onClick={() => onSelect()}
+            >
               <i className="bi bi-arrow-repeat"></i>
             </button>
-            <button type="button" className="btn btn-sm" onClick={() => navigator.clipboard.writeText(activity.task)}>
+            <button
+              type="button"
+              className="btn btn-sm"
+              title="Copy task name."
+              onClick={() => navigator.clipboard.writeText(activity.task)}
+            >
               <i className="bi bi-copy"></i>
             </button>
           </div>

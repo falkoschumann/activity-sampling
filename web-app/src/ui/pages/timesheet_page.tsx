@@ -118,7 +118,12 @@ function TimesheetContainer() {
             <td className="text-nowrap">{entry.project}</td>
             <td>
               {entry.task}
-              <button type="button" className="btn btn-sm" onClick={() => navigator.clipboard.writeText(entry.task)}>
+              <button
+                type="button"
+                className="btn btn-sm"
+                title="Copy task name."
+                onClick={() => navigator.clipboard.writeText(entry.task)}
+              >
                 <i className="bi bi-copy"></i>
               </button>
             </td>
