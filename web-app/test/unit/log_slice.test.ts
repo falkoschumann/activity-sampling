@@ -123,7 +123,7 @@ describe("Log", () => {
         percentage: 5,
         isRunning: true,
         isElapsed: false,
-        end: "2025-06-23T15:45:00Z",
+        end: "2025-06-23T16:05:00Z",
       });
       expect(shownNotifications.data).toEqual([
         {
@@ -183,7 +183,7 @@ describe("Log", () => {
         percentage: 0,
         isRunning: true,
         isElapsed: false,
-        end: "2025-06-23T15:45:00Z",
+        end: "2025-06-23T16:05:00Z",
       });
       expect(shownNotifications.data).toEqual([
         {

@@ -204,6 +204,9 @@ const logSlice = createSlice({
         state.currentActivity.isDisabled = false;
         state.currentActivity.isLoggable = isLoggable(state.currentActivity);
         state.countdown.isElapsed = true;
+        state.countdown.end = Temporal.Instant.from(end)
+          .add(state.countdown.duration)
+          .toString();
         if (remaining.abs().total("seconds") < duration.total("seconds")) {
           remaining = duration.subtract(remaining.abs());
         } else {
