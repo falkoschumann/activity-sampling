@@ -23,6 +23,7 @@ import { AppDispatch } from "../../application/store";
 import { EventHandler } from "../../common/events";
 import { Activity, WorkingDay } from "../../domain/activities";
 import ErrorComponent from "../components/error_component";
+import ScrollToTopButton from "../components/scroll_to_top_button";
 import PageLayout from "../layouts/page_layout";
 
 export default function LogPage() {
@@ -35,6 +36,7 @@ export default function LogPage() {
 
   return (
     <PageLayout>
+      <ScrollToTopButton />
       <aside className="container my-4">
         <CurrentActivityFormContainer />
         <CountdownContainer />
