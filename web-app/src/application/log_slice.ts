@@ -197,7 +197,9 @@ const logSlice = createSlice({
       const duration = Temporal.Duration.from(state.countdown.duration);
       const end = Temporal.Instant.from(state.countdown.end);
       const current = Temporal.Instant.from(action.payload.now);
-      let remaining = end.since(current).round({ largestUnit: "hour" });
+      let remaining = end
+        .since(current)
+        .round({ largestUnit: "hour", smallestUnit: "second" });
       if (remaining.sign <= 0) {
         state.currentActivity.isDisabled = false;
         state.currentActivity.isLoggable = isLoggable(state.currentActivity);
