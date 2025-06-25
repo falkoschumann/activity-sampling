@@ -15,3 +15,4 @@ server:
     session:
       cookie:
         same-site: lax
+      timeout: PT60M
