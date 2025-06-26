@@ -141,14 +141,20 @@ const progressCountdown = createAsyncThunk<unknown, unknown, LogThunkConfig>(
     const { isElapsed } = selectCountdown(thunkAPI.getState());
     if (isElapsed && notificationClient.isGranted) {
       const currentActivity = selectCurrentActivity(thunkAPI.getState());
-      notificationClient.show("What are you working on?", {
-        body:
-          currentActivity.task.length > 0
-            ? `${currentActivity.project} (${currentActivity.client}) ${currentActivity.task}`
-            : undefined,
-        icon: "/apple-touch-icon.png",
-        requireInteraction: true,
-      });
+      notificationClient.show(
+        "What are you working on?",
+        {
+          body:
+            currentActivity.task.length > 0
+              ? `${currentActivity.project} (${currentActivity.client}) ${currentActivity.task}`
+              : undefined,
+          icon: "/apple-touch-icon.png",
+          requireInteraction: true,
+        },
+        () => {
+          thunkAPI.dispatch(logActivity({}));
+        },
+      );
       thunkAPI.dispatch(countdownExpirationNotified());
     }
   },
