@@ -8,7 +8,9 @@ import {
   SerializedError,
 } from "@reduxjs/toolkit";
 
+import { Clock } from "../common/clock";
 import { CommandStatus } from "../common/messages";
+import { Timer } from "../common/timer";
 import {
   Activity,
   LogActivityCommand,
@@ -19,8 +21,6 @@ import {
 } from "../domain/activities";
 import { ActivitiesApi } from "../infrastructure/activities_api";
 import { NotificationClient } from "../infrastructure/notification_client";
-import { Clock } from "./clock";
-import { Timer } from "./timer";
 
 interface LogState {
   readonly currentActivity: {

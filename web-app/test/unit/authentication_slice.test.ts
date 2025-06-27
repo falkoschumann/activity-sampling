@@ -6,9 +6,9 @@ import {
   queryAuthentication,
   selectAuthentication,
 } from "../../src/application/authentication_slice";
-import { Clock } from "../../src/application/clock";
 import { createStore } from "../../src/application/store";
-import { Timer } from "../../src/application/timer";
+import { Clock } from "../../src/common/clock";
+import { Timer } from "../../src/common/timer";
 import {
   AuthenticationQueryResult,
   createTestAccountInfo,

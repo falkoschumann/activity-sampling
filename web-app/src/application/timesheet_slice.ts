@@ -8,13 +8,13 @@ import {
   SerializedError,
 } from "@reduxjs/toolkit";
 
+import { Clock } from "../common/clock";
 import {
   TimesheetEntry,
   TimesheetQuery,
   TimesheetQueryResult,
 } from "../domain/activities";
 import { ActivitiesApi } from "../infrastructure/activities_api";
-import { Clock } from "./clock";
 
 export type PeriodUnit = "Day" | "Week" | "Month";
 
