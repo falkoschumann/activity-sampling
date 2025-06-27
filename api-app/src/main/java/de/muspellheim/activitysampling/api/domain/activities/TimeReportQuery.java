@@ -14,8 +14,8 @@ public record TimeReportQuery(Scope scope, LocalDate from, LocalDate to, ZoneId 
   public static TimeReportQuery createTestInstance() {
     return TimeReportQuery.builder()
         .scope(Scope.PROJECT)
-        .from(LocalDate.of(2025, 6, 2))
-        .to(LocalDate.of(2025, 6, 8))
+        .from(LocalDate.of(2025, 6, 1))
+        .to(LocalDate.of(2025, 6, 30))
         .timeZone(ZoneId.of("Europe/Berlin"))
         .build();
   }

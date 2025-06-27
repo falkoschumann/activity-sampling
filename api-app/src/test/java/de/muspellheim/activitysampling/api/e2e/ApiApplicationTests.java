@@ -17,6 +17,7 @@ import de.muspellheim.activitysampling.api.infrastructure.CsvActivitiesStore;
 import de.muspellheim.activitysampling.api.infrastructure.CsvActivitiesStoreConfiguration;
 import java.nio.file.Files;
 import java.time.Clock;
+import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.util.List;
@@ -225,7 +226,7 @@ class ApiApplicationTests {
 
     @Test
     void queriesTimeReport() {
-      var event = ActivityLoggedEvent.createTestInstance();
+      var event = ActivityLoggedEvent.createTestInstance().withDuration(Duration.ofHours(42));
       store.record(event.withTimestamp(Instant.parse("2025-06-02T13:30:00Z")));
 
       var response =

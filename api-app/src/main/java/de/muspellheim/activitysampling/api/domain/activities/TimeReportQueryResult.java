@@ -10,6 +10,9 @@ import lombok.With;
 @With
 public record TimeReportQueryResult(List<TimeReportEntry> entries) {
 
+  public static final TimeReportQueryResult EMPTY =
+      TimeReportQueryResult.builder().entries(List.of()).build();
+
   public static TimeReportQueryResult createTestInstance() {
     return TimeReportQueryResult.builder()
         .entries(List.of(TimeReportEntry.createTestInstance()))

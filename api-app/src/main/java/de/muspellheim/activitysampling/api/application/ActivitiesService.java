@@ -83,6 +83,14 @@ public class ActivitiesService {
   }
 
   public TimeReportQueryResult queryTimeReport(TimeReportQuery query) {
-    return TimeReportQueryResult.createTestInstance();
+    try {
+      log.info("Query time report: {}", query);
+      var projection = new TimeReportProjection(query, configuration);
+      var replay = store.replay(projection.getStartInclusive(), projection.getEndExclusive());
+      return projection.project(replay);
+    } catch (Exception e) {
+      log.error("Query time report failed: {}", e.getMessage(), e);
+      throw e;
+    }
   }
 }

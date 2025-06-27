@@ -12,6 +12,8 @@ import de.muspellheim.activitysampling.api.domain.activities.Holiday;
 import de.muspellheim.activitysampling.api.domain.activities.LogActivityCommand;
 import de.muspellheim.activitysampling.api.domain.activities.RecentActivitiesQuery;
 import de.muspellheim.activitysampling.api.domain.activities.RecentActivitiesQueryResult;
+import de.muspellheim.activitysampling.api.domain.activities.TimeReportQuery;
+import de.muspellheim.activitysampling.api.domain.activities.TimeReportQueryResult;
 import de.muspellheim.activitysampling.api.domain.activities.TimeSummary;
 import de.muspellheim.activitysampling.api.domain.activities.TimesheetEntry;
 import de.muspellheim.activitysampling.api.domain.activities.TimesheetQuery;
@@ -406,6 +408,52 @@ class ActivitiesServiceTests {
           TimesheetQueryResult.EMPTY.withWorkingHoursSummary(
               WorkingHoursSummary.EMPTY.withOffset(Duration.ofHours(-24))),
           result);
+    }
+  }
+
+  @Nested
+  class QueryTimeReport {
+
+    @Test
+    void summarizesHoursWorkedOnProjects() {
+      store.record(
+          ActivityLoggedEvent.createTestInstance()
+              .withTimestamp(Instant.parse("2025-06-02T15:00:00Z"))
+              .withDuration(Duration.ofHours(8)));
+      store.record(
+          ActivityLoggedEvent.createTestInstance()
+              .withTimestamp(Instant.parse("2025-06-03T15:00:00Z"))
+              .withDuration(Duration.ofHours(9)));
+      store.record(
+          ActivityLoggedEvent.createTestInstance()
+              .withTimestamp(Instant.parse("2025-06-04T15:00:00Z"))
+              .withDuration(Duration.ofHours(8)));
+      store.record(
+          ActivityLoggedEvent.createTestInstance()
+              .withTimestamp(Instant.parse("2025-06-05T15:00:00Z"))
+              .withDuration(Duration.ofHours(9)));
+      store.record(
+          ActivityLoggedEvent.createTestInstance()
+              .withTimestamp(Instant.parse("2025-06-06T15:00:00Z"))
+              .withDuration(Duration.ofHours(8)));
+      var service =
+          new ActivitiesService(
+              ActivitiesConfiguration.DEFAULT, store, new MemoryHolidayRepository(), CLOCK);
+
+      var result = service.queryTimeReport(TimeReportQuery.createTestInstance());
+
+      assertEquals(TimeReportQueryResult.createTestInstance(), result);
+    }
+
+    @Test
+    void queriesEmptyResult() {
+      var service =
+          new ActivitiesService(
+              ActivitiesConfiguration.DEFAULT, store, new MemoryHolidayRepository(), CLOCK);
+
+      var result = service.queryTimeReport(TimeReportQuery.createTestInstance());
+
+      assertEquals(TimeReportQueryResult.EMPTY, result);
     }
   }
 
