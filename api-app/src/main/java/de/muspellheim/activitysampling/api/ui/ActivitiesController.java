@@ -7,6 +7,9 @@ import de.muspellheim.activitysampling.api.common.CommandStatus;
 import de.muspellheim.activitysampling.api.domain.activities.LogActivityCommand;
 import de.muspellheim.activitysampling.api.domain.activities.RecentActivitiesQuery;
 import de.muspellheim.activitysampling.api.domain.activities.RecentActivitiesQueryResult;
+import de.muspellheim.activitysampling.api.domain.activities.Scope;
+import de.muspellheim.activitysampling.api.domain.activities.TimeReportQuery;
+import de.muspellheim.activitysampling.api.domain.activities.TimeReportQueryResult;
 import de.muspellheim.activitysampling.api.domain.activities.TimesheetQuery;
 import de.muspellheim.activitysampling.api.domain.activities.TimesheetQueryResult;
 import jakarta.validation.Valid;
@@ -31,13 +34,14 @@ public class ActivitiesController {
 
   @PostMapping("/log-activity")
   public CommandStatus logActivity(@RequestBody @Valid LogActivityCommand command) {
-    return this.service.logActivity(command);
+    return service.logActivity(command);
   }
 
   @GetMapping("/recent-activities")
   public RecentActivitiesQueryResult queryRecentActivities(
       @RequestParam(required = false) @Valid ZoneId timeZone) {
-    return this.service.queryRecentActivities(new RecentActivitiesQuery(timeZone));
+    var query = RecentActivitiesQuery.builder().timeZone(timeZone).build();
+    return service.queryRecentActivities(query);
   }
 
   @GetMapping("/timesheet")
@@ -45,6 +49,17 @@ public class ActivitiesController {
       @RequestParam @Valid LocalDate from,
       @RequestParam @Valid LocalDate to,
       @RequestParam(required = false) @Valid ZoneId timeZone) {
-    return this.service.queryTimesheet(new TimesheetQuery(from, to, timeZone));
+    var query = TimesheetQuery.builder().from(from).to(to).timeZone(timeZone).build();
+    return service.queryTimesheet(query);
+  }
+
+  @GetMapping("/time-report")
+  public TimeReportQueryResult queryTimeReport(
+      @RequestParam @Valid LocalDate from,
+      @RequestParam @Valid LocalDate to,
+      @RequestParam @Valid Scope scope,
+      @RequestParam(required = false) @Valid ZoneId timeZone) {
+    var query = TimeReportQuery.builder().scope(scope).from(from).to(to).timeZone(timeZone).build();
+    return service.queryTimeReport(query);
   }
 }

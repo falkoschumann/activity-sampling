@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import de.muspellheim.activitysampling.api.common.CommandStatus;
 import de.muspellheim.activitysampling.api.domain.activities.LogActivityCommand;
 import de.muspellheim.activitysampling.api.domain.activities.RecentActivitiesQueryResult;
+import de.muspellheim.activitysampling.api.domain.activities.TimeReportQueryResult;
 import de.muspellheim.activitysampling.api.domain.activities.TimesheetQueryResult;
 import de.muspellheim.activitysampling.api.domain.authentication.AccountInfo;
 import de.muspellheim.activitysampling.api.domain.authentication.AuthenticationQueryResult;
@@ -212,9 +213,52 @@ class ApiApplicationTests {
     void failsWhenQueryIsNotValid() {
       var response =
           restTemplate.getForEntity(
-              "/api/activities/timesheet"
-                  + "?startInclusive=foobar&endExclusive=2025-06-09&timeZone=Europe/Berlin",
+              "/api/activities/timesheet?from=foobar&to=2025-06-09&timeZone=Europe/Berlin",
               TimesheetQueryResult.class);
+
+      assertEquals(400, response.getStatusCode().value());
+    }
+  }
+
+  @Nested
+  class QueryTimeReport {
+
+    @Test
+    void queriesTimeReport() {
+      var event = ActivityLoggedEvent.createTestInstance();
+      store.record(event.withTimestamp(Instant.parse("2025-06-02T13:30:00Z")));
+
+      var response =
+          restTemplate.getForEntity(
+              "/api/activities/time-report?"
+                  + "from=2025-06-02"
+                  + "&to=2025-06-08"
+                  + "&scope=project"
+                  + "&timeZone=Europe/Berlin",
+              TimeReportQueryResult.class);
+
+      assertEquals(200, response.getStatusCode().value());
+      assertEquals(TimeReportQueryResult.createTestInstance(), response.getBody());
+    }
+
+    @Test
+    void failsWhenQueryIsNotSet() {
+      var response =
+          restTemplate.getForEntity("/api/activities/time-report", TimeReportQueryResult.class);
+
+      assertEquals(400, response.getStatusCode().value());
+    }
+
+    @Test
+    void failsWhenQueryIsNotValid() {
+      var response =
+          restTemplate.getForEntity(
+              "/api/activities/time-report?"
+                  + "from=foobar"
+                  + "&to=2025-06-09"
+                  + "&scope=project"
+                  + "&timeZone=Europe/Berlin",
+              TimeReportQueryResult.class);
 
       assertEquals(400, response.getStatusCode().value());
     }
