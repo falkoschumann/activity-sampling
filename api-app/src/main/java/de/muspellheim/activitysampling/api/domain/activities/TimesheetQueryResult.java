@@ -13,7 +13,10 @@ public record TimesheetQueryResult(
     List<TimesheetEntry> entries, WorkingHoursSummary workingHoursSummary) {
 
   public static final TimesheetQueryResult EMPTY =
-      new TimesheetQueryResult(List.of(), WorkingHoursSummary.EMPTY);
+      TimesheetQueryResult.builder()
+          .entries(List.of())
+          .workingHoursSummary(WorkingHoursSummary.EMPTY)
+          .build();
 
   public static TimesheetQueryResult createTestInstance() {
     return TimesheetQueryResult.builder()

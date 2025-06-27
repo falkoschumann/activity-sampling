@@ -11,7 +11,11 @@ import lombok.With;
 public record WorkingHoursSummary(Duration totalHours, Duration capacity, Duration offset) {
 
   public static final WorkingHoursSummary EMPTY =
-      new WorkingHoursSummary(Duration.ZERO, Duration.ofHours(40), Duration.ZERO);
+      WorkingHoursSummary.builder()
+          .totalHours(Duration.ZERO)
+          .capacity(Duration.ofHours(40))
+          .offset(Duration.ZERO)
+          .build();
 
   public static WorkingHoursSummary createTestInstance() {
     return WorkingHoursSummary.builder()

@@ -18,7 +18,10 @@ public record RecentActivitiesQueryResult(
     Activity lastActivity, List<WorkingDay> workingDays, TimeSummary timeSummary) {
 
   public static final RecentActivitiesQueryResult EMPTY =
-      new RecentActivitiesQueryResult(null, List.of(), TimeSummary.NULL);
+      RecentActivitiesQueryResult.builder()
+          .workingDays(List.of())
+          .timeSummary(TimeSummary.NULL)
+          .build();
 
   public static RecentActivitiesQueryResult createTestInstance() {
     return RecentActivitiesQueryResult.builder()

@@ -13,7 +13,7 @@ import lombok.With;
 @JsonInclude(Include.NON_NULL)
 public record RecentActivitiesQuery(ZoneId timeZone) {
 
-  public static final RecentActivitiesQuery DEFAULT = new RecentActivitiesQuery(null);
+  public static final RecentActivitiesQuery DEFAULT = RecentActivitiesQuery.builder().build();
 
   public static RecentActivitiesQuery createTestInstance() {
     return RecentActivitiesQuery.builder().timeZone(ZoneId.of("Europe/Berlin")).build();
