@@ -19,7 +19,6 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -30,10 +29,12 @@ class TimesheetProjection {
   private final ZoneId timeZone;
   private final Duration defaultCapacity;
   private final LocalDate today;
-  private final Set<LocalDate> holidays;
+  private final Calendar calendar;
 
-  private final List<TimesheetEntry> entries = new ArrayList<>();
+  private List<TimesheetEntry> entries = new ArrayList<>();
   private Duration totalHours = Duration.ZERO;
+  private Duration capacity;
+  private Duration offset;
 
   TimesheetProjection(
       TimesheetQuery query,
@@ -45,7 +46,9 @@ class TimesheetProjection {
     timeZone = query.timeZone() != null ? query.timeZone() : ZoneId.systemDefault();
     defaultCapacity = configuration.capacity();
     today = clock.instant().atZone(timeZone).toLocalDate();
-    this.holidays = holidays.stream().map(Holiday::date).collect(Collectors.toSet());
+    var holidayDates = holidays.stream().map(Holiday::date).collect(Collectors.toSet());
+    calendar = new Calendar();
+    calendar.initHolidays(holidayDates);
   }
 
   Instant getStartInclusive() {
@@ -65,34 +68,11 @@ class TimesheetProjection {
               updateEntries(it);
               updateTotalHours(it);
             });
-
-    var calendar = new Calendar();
-    calendar.initHolidays(holidays);
-    var businessDays = calendar.countBusinessDays(startInclusive, endExclusive);
-    var capacity = Duration.ofHours(businessDays * defaultCapacity.toHours() / 5);
-
-    LocalDate end;
-    if (today.isBefore(startInclusive)) {
-      end = startInclusive;
-    } else if (today.plusDays(1).isAfter(endExclusive)) {
-      end = endExclusive;
-    } else {
-      end = today.plusDays(1);
-    }
-    businessDays = calendar.countBusinessDays(startInclusive, end);
-    var offset = totalHours.minusHours(businessDays * 8);
-
-    var sortedEntries =
-        entries.stream()
-            .sorted(
-                Comparator.comparing(TimesheetEntry::date)
-                    .thenComparing(TimesheetEntry::client)
-                    .thenComparing(TimesheetEntry::project)
-                    .thenComparing(TimesheetEntry::task))
-            .toList();
-
+    determineCapacity();
+    determineOffset();
+    sortEntries();
     return TimesheetQueryResult.builder()
-        .entries(sortedEntries)
+        .entries(entries)
         .workingHoursSummary(
             WorkingHoursSummary.builder()
                 .totalHours(totalHours)
@@ -132,5 +112,34 @@ class TimesheetProjection {
 
   private void updateTotalHours(Activity activity) {
     totalHours = totalHours.plus(activity.duration());
+  }
+
+  private void determineCapacity() {
+    var businessDays = calendar.countBusinessDays(startInclusive, endExclusive);
+    capacity = Duration.ofHours(businessDays * defaultCapacity.toHours() / 5);
+  }
+
+  private void determineOffset() {
+    LocalDate end;
+    if (today.isBefore(startInclusive)) {
+      end = startInclusive;
+    } else if (today.plusDays(1).isAfter(endExclusive)) {
+      end = endExclusive;
+    } else {
+      end = today.plusDays(1);
+    }
+    var businessDays = calendar.countBusinessDays(startInclusive, end);
+    offset = totalHours.minusHours(businessDays * 8);
+  }
+
+  private void sortEntries() {
+    entries =
+        entries.stream()
+            .sorted(
+                Comparator.comparing(TimesheetEntry::date)
+                    .thenComparing(TimesheetEntry::client)
+                    .thenComparing(TimesheetEntry::project)
+                    .thenComparing(TimesheetEntry::task))
+            .toList();
   }
 }
