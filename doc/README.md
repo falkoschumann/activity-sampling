@@ -28,7 +28,7 @@ analysis.
 - [x] Group activities by working days for the last 30 days
 - [x] Summarize hours worked today, yesterday, this week and this month
 
-### Time Report
+### Reports
 
 - [ ] Summarize hours worked for clients
 - [ ] Summarize hours worked on projects

@@ -7,9 +7,9 @@ import de.muspellheim.activitysampling.api.common.CommandStatus;
 import de.muspellheim.activitysampling.api.domain.activities.LogActivityCommand;
 import de.muspellheim.activitysampling.api.domain.activities.RecentActivitiesQuery;
 import de.muspellheim.activitysampling.api.domain.activities.RecentActivitiesQueryResult;
+import de.muspellheim.activitysampling.api.domain.activities.ReportQuery;
+import de.muspellheim.activitysampling.api.domain.activities.ReportQueryResult;
 import de.muspellheim.activitysampling.api.domain.activities.Scope;
-import de.muspellheim.activitysampling.api.domain.activities.TimeReportQuery;
-import de.muspellheim.activitysampling.api.domain.activities.TimeReportQueryResult;
 import de.muspellheim.activitysampling.api.domain.activities.TimesheetQuery;
 import de.muspellheim.activitysampling.api.domain.activities.TimesheetQueryResult;
 import jakarta.validation.Valid;
@@ -53,13 +53,13 @@ public class ActivitiesController {
     return service.queryTimesheet(query);
   }
 
-  @GetMapping("/time-report")
-  public TimeReportQueryResult queryTimeReport(
+  @GetMapping("/report")
+  public ReportQueryResult queryReport(
       @RequestParam @Valid LocalDate from,
       @RequestParam @Valid LocalDate to,
       @RequestParam @Valid Scope scope,
       @RequestParam(required = false) @Valid ZoneId timeZone) {
-    var query = TimeReportQuery.builder().scope(scope).from(from).to(to).timeZone(timeZone).build();
-    return service.queryTimeReport(query);
+    var query = ReportQuery.builder().scope(scope).from(from).to(to).timeZone(timeZone).build();
+    return service.queryReport(query);
   }
 }

@@ -4,9 +4,9 @@ package de.muspellheim.activitysampling.api.application;
 
 import de.muspellheim.activitysampling.api.common.Lists;
 import de.muspellheim.activitysampling.api.domain.activities.Activity;
-import de.muspellheim.activitysampling.api.domain.activities.TimeReportEntry;
-import de.muspellheim.activitysampling.api.domain.activities.TimeReportQuery;
-import de.muspellheim.activitysampling.api.domain.activities.TimeReportQueryResult;
+import de.muspellheim.activitysampling.api.domain.activities.ReportEntry;
+import de.muspellheim.activitysampling.api.domain.activities.ReportQuery;
+import de.muspellheim.activitysampling.api.domain.activities.ReportQueryResult;
 import de.muspellheim.activitysampling.api.infrastructure.ActivityLoggedEvent;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -15,15 +15,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
-class TimeReportProjection {
+class ReportProjection {
 
   private final LocalDate startInclusive;
   private final LocalDate endExclusive;
   private final ZoneId timeZone;
 
-  private final List<TimeReportEntry> entries = new ArrayList<>();
+  private final List<ReportEntry> entries = new ArrayList<>();
 
-  public TimeReportProjection(TimeReportQuery query, ActivitiesConfiguration configuration) {
+  public ReportProjection(ReportQuery query, ActivitiesConfiguration configuration) {
     startInclusive = query.from();
     endExclusive = query.to().plusDays(1);
     timeZone = query.timeZone() != null ? query.timeZone() : ZoneId.systemDefault();
@@ -37,9 +37,9 @@ class TimeReportProjection {
     return endExclusive.atStartOfDay(timeZone).toInstant();
   }
 
-  public TimeReportQueryResult project(Stream<ActivityLoggedEvent> events) {
+  public ReportQueryResult project(Stream<ActivityLoggedEvent> events) {
     events.map(it -> ActivityMapping.map(it, timeZone)).forEach(this::updateEntries);
-    return TimeReportQueryResult.builder().entries(entries).build();
+    return ReportQueryResult.builder().entries(entries).build();
   }
 
   private void updateEntries(Activity activity) {
@@ -49,11 +49,7 @@ class TimeReportProjection {
         Lists.indexOf(entries, it -> it.name().equals(project) && it.client().equals(client));
     if (index == -1) {
       entries.add(
-          TimeReportEntry.builder()
-              .name(project)
-              .client(client)
-              .hours(activity.duration())
-              .build());
+          ReportEntry.builder().name(project).client(client).hours(activity.duration()).build());
     } else {
       var existingEntry = entries.get(index);
       var accumulatedHours = existingEntry.hours().plus(activity.duration());

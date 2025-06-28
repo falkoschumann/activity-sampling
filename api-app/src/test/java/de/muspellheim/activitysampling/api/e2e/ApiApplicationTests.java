@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import de.muspellheim.activitysampling.api.common.CommandStatus;
 import de.muspellheim.activitysampling.api.domain.activities.LogActivityCommand;
 import de.muspellheim.activitysampling.api.domain.activities.RecentActivitiesQueryResult;
-import de.muspellheim.activitysampling.api.domain.activities.TimeReportQueryResult;
+import de.muspellheim.activitysampling.api.domain.activities.ReportQueryResult;
 import de.muspellheim.activitysampling.api.domain.activities.TimesheetQueryResult;
 import de.muspellheim.activitysampling.api.domain.authentication.AccountInfo;
 import de.muspellheim.activitysampling.api.domain.authentication.AuthenticationQueryResult;
@@ -222,30 +222,29 @@ class ApiApplicationTests {
   }
 
   @Nested
-  class QueryTimeReport {
+  class QueryReport {
 
     @Test
-    void queriesTimeReport() {
+    void queriesReport() {
       var event = ActivityLoggedEvent.createTestInstance().withDuration(Duration.ofHours(42));
       store.record(event.withTimestamp(Instant.parse("2025-06-02T13:30:00Z")));
 
       var response =
           restTemplate.getForEntity(
-              "/api/activities/time-report?"
+              "/api/activities/report?"
                   + "from=2025-06-02"
                   + "&to=2025-06-08"
-                  + "&scope=project"
+                  + "&scope=projects"
                   + "&timeZone=Europe/Berlin",
-              TimeReportQueryResult.class);
+              ReportQueryResult.class);
 
       assertEquals(200, response.getStatusCode().value());
-      assertEquals(TimeReportQueryResult.createTestInstance(), response.getBody());
+      assertEquals(ReportQueryResult.createTestInstance(), response.getBody());
     }
 
     @Test
     void failsWhenQueryIsNotSet() {
-      var response =
-          restTemplate.getForEntity("/api/activities/time-report", TimeReportQueryResult.class);
+      var response = restTemplate.getForEntity("/api/activities/report", ReportQueryResult.class);
 
       assertEquals(400, response.getStatusCode().value());
     }
@@ -254,12 +253,12 @@ class ApiApplicationTests {
     void failsWhenQueryIsNotValid() {
       var response =
           restTemplate.getForEntity(
-              "/api/activities/time-report?"
+              "/api/activities/report?"
                   + "from=foobar"
                   + "&to=2025-06-09"
                   + "&scope=project"
                   + "&timeZone=Europe/Berlin",
-              TimeReportQueryResult.class);
+              ReportQueryResult.class);
 
       assertEquals(400, response.getStatusCode().value());
     }

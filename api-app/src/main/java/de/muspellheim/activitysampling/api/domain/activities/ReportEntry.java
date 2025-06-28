@@ -11,10 +11,10 @@ import lombok.With;
 @Builder
 @With
 @JsonInclude(Include.NON_NULL)
-public record TimeReportEntry(String name, String client, Duration hours) {
+public record ReportEntry(String name, String client, Duration hours) {
 
-  public static TimeReportEntry createTestInstance() {
-    return TimeReportEntry.builder()
+  public static ReportEntry createTestInstance() {
+    return ReportEntry.builder()
         .name("Test project")
         .client("Test client")
         .hours(Duration.ofHours(42))

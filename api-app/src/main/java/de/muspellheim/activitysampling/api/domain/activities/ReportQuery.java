@@ -9,11 +9,11 @@ import lombok.With;
 
 @Builder
 @With
-public record TimeReportQuery(Scope scope, LocalDate from, LocalDate to, ZoneId timeZone) {
+public record ReportQuery(Scope scope, LocalDate from, LocalDate to, ZoneId timeZone) {
 
-  public static TimeReportQuery createTestInstance() {
-    return TimeReportQuery.builder()
-        .scope(Scope.PROJECT)
+  public static ReportQuery createTestInstance() {
+    return ReportQuery.builder()
+        .scope(Scope.PROJECTS)
         .from(LocalDate.of(2025, 6, 1))
         .to(LocalDate.of(2025, 6, 30))
         .timeZone(ZoneId.of("Europe/Berlin"))

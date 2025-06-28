@@ -3,7 +3,7 @@
 package de.muspellheim.activitysampling.api.domain.activities;
 
 public enum Scope {
-  CLIENT,
-  PROJECT,
-  TASK,
+  CLIENTS,
+  PROJECTS,
+  TASKS,
 }

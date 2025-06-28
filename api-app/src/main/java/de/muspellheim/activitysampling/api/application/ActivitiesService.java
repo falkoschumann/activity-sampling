@@ -6,8 +6,8 @@ import de.muspellheim.activitysampling.api.common.CommandStatus;
 import de.muspellheim.activitysampling.api.domain.activities.LogActivityCommand;
 import de.muspellheim.activitysampling.api.domain.activities.RecentActivitiesQuery;
 import de.muspellheim.activitysampling.api.domain.activities.RecentActivitiesQueryResult;
-import de.muspellheim.activitysampling.api.domain.activities.TimeReportQuery;
-import de.muspellheim.activitysampling.api.domain.activities.TimeReportQueryResult;
+import de.muspellheim.activitysampling.api.domain.activities.ReportQuery;
+import de.muspellheim.activitysampling.api.domain.activities.ReportQueryResult;
 import de.muspellheim.activitysampling.api.domain.activities.TimesheetQuery;
 import de.muspellheim.activitysampling.api.domain.activities.TimesheetQueryResult;
 import de.muspellheim.activitysampling.api.infrastructure.ActivitiesStore;
@@ -82,10 +82,10 @@ public class ActivitiesService {
     }
   }
 
-  public TimeReportQueryResult queryTimeReport(TimeReportQuery query) {
+  public ReportQueryResult queryReport(ReportQuery query) {
     try {
       log.info("Query time report: {}", query);
-      var projection = new TimeReportProjection(query, configuration);
+      var projection = new ReportProjection(query, configuration);
       var replay = store.replay(projection.getStartInclusive(), projection.getEndExclusive());
       return projection.project(replay);
     } catch (Exception e) {

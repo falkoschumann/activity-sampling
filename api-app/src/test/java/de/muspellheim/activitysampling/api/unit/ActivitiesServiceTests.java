@@ -12,8 +12,8 @@ import de.muspellheim.activitysampling.api.domain.activities.Holiday;
 import de.muspellheim.activitysampling.api.domain.activities.LogActivityCommand;
 import de.muspellheim.activitysampling.api.domain.activities.RecentActivitiesQuery;
 import de.muspellheim.activitysampling.api.domain.activities.RecentActivitiesQueryResult;
-import de.muspellheim.activitysampling.api.domain.activities.TimeReportQuery;
-import de.muspellheim.activitysampling.api.domain.activities.TimeReportQueryResult;
+import de.muspellheim.activitysampling.api.domain.activities.ReportQuery;
+import de.muspellheim.activitysampling.api.domain.activities.ReportQueryResult;
 import de.muspellheim.activitysampling.api.domain.activities.TimeSummary;
 import de.muspellheim.activitysampling.api.domain.activities.TimesheetEntry;
 import de.muspellheim.activitysampling.api.domain.activities.TimesheetQuery;
@@ -412,7 +412,7 @@ class ActivitiesServiceTests {
   }
 
   @Nested
-  class QueryTimeReport {
+  class QueryReport {
 
     @Test
     void summarizesHoursWorkedOnProjects() {
@@ -440,9 +440,9 @@ class ActivitiesServiceTests {
           new ActivitiesService(
               ActivitiesConfiguration.DEFAULT, store, new MemoryHolidayRepository(), CLOCK);
 
-      var result = service.queryTimeReport(TimeReportQuery.createTestInstance());
+      var result = service.queryReport(ReportQuery.createTestInstance());
 
-      assertEquals(TimeReportQueryResult.createTestInstance(), result);
+      assertEquals(ReportQueryResult.createTestInstance(), result);
     }
 
     @Test
@@ -451,9 +451,9 @@ class ActivitiesServiceTests {
           new ActivitiesService(
               ActivitiesConfiguration.DEFAULT, store, new MemoryHolidayRepository(), CLOCK);
 
-      var result = service.queryTimeReport(TimeReportQuery.createTestInstance());
+      var result = service.queryReport(ReportQuery.createTestInstance());
 
-      assertEquals(TimeReportQueryResult.EMPTY, result);
+      assertEquals(ReportQueryResult.EMPTY, result);
     }
   }
 
