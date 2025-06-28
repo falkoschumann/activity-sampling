@@ -1,9 +1,20 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+
+import { queryReport, selectEntries } from "../../application/reports_slice";
+import { AppDispatch } from "../../application/store";
 import { formatDuration } from "../components/formatters";
 import PageLayout from "../layouts/page_layout";
 
 export default function ReportsPage() {
+  const dispatch = useDispatch<AppDispatch>();
+
+  useEffect(() => {
+    dispatch(queryReport({ scope: "projects", from: "2025-06-01", to: "2025-06-30" }));
+  }, [dispatch]);
+
   return (
     <PageLayout>
       <main className="container my-4">
@@ -14,55 +25,7 @@ export default function ReportsPage() {
 }
 
 function TimeReportContainer() {
-  const { entries } = {
-    entries: [
-      {
-        name: "Fleetboard",
-        client: "IT Sonix",
-        hours: "PT45H15M",
-      },
-      {
-        name: "bitcontrol(R) Map Server",
-        client: "DB SEV",
-        hours: "PT5H30M",
-      },
-      {
-        name: "bitcontrol(R) Map Server",
-        client: "ecoVista",
-        hours: "PT12H",
-      },
-      {
-        name: "Vehicle Map",
-        client: "Hochbahn",
-        hours: "PT15M",
-      },
-      {
-        name: "Planning Meeting",
-        client: "MBTA",
-        hours: "PT1H",
-      },
-      {
-        name: "Grundlinien",
-        client: "BVG",
-        hours: "PT7H",
-      },
-      {
-        name: "Abwesend",
-        client: "BitCtrl",
-        hours: "PT80H",
-      },
-      {
-        name: "Dashboard",
-        client: "TheBus",
-        hours: "PT30M",
-      },
-      {
-        name: "ABSOLUT II",
-        client: "LVB",
-        hours: "PT30M",
-      },
-    ],
-  };
+  const entries = useSelector(selectEntries);
 
   return (
     <table className="table">

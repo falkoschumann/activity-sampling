@@ -6,7 +6,7 @@ import {
   queryAuthentication,
   selectAuthentication,
 } from "../../src/application/authentication_slice";
-import { configureNullStore } from "../../src/application/store";
+import { createNullStore } from "../../src/application/store";
 import {
   AuthenticationQueryResult,
   createTestAccountInfo,
@@ -18,7 +18,7 @@ describe("Authentication", () => {
       isAuthenticated: true,
       account: createTestAccountInfo(),
     } as AuthenticationQueryResult);
-    const { store } = configureNullStore({
+    const { store } = createNullStore({
       authenticationResponses: [new Response(json)],
     });
 
@@ -34,7 +34,7 @@ describe("Authentication", () => {
     const json = JSON.stringify({
       isAuthenticated: false,
     } as AuthenticationQueryResult);
-    const { store } = configureNullStore({
+    const { store } = createNullStore({
       authenticationResponses: [new Response(json)],
     });
 
@@ -46,7 +46,7 @@ describe("Authentication", () => {
   });
 
   it("Handles server error", async () => {
-    const { store } = configureNullStore({
+    const { store } = createNullStore({
       authenticationResponses: [
         new Response("", {
           status: 500,

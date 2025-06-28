@@ -187,3 +187,52 @@ export function createTestTimesheetEntry(
     ...entry,
   };
 }
+
+export interface ReportQuery {
+  readonly scope: "clients" | "projects" | "tasks";
+  readonly from: string;
+  readonly to: string;
+  readonly timeZone?: string;
+}
+
+export function createTestReportQuery(
+  query: Partial<ReportQuery> = {},
+): ReportQuery {
+  return {
+    scope: "projects",
+    from: "2025-06-01",
+    to: "2025-06-30",
+    timeZone: "Europe/Berlin",
+    ...query,
+  };
+}
+
+export interface ReportQueryResult {
+  readonly entries: ReportEntry[];
+}
+
+export function createTestReportQueryResult(
+  result: Partial<ReportQueryResult> = {},
+): ReportQueryResult {
+  return {
+    entries: [createTestReportEntry()],
+    ...result,
+  };
+}
+
+export interface ReportEntry {
+  readonly name: string;
+  readonly client?: string;
+  readonly hours: string;
+}
+
+export function createTestReportEntry(
+  entry: Partial<ReportEntry> = {},
+): ReportEntry {
+  return {
+    name: "Test project",
+    client: "Test client",
+    hours: "PT42H",
+    ...entry,
+  };
+}

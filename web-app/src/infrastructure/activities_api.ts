@@ -7,6 +7,8 @@ import {
   LogActivityCommand,
   RecentActivitiesQuery,
   RecentActivitiesQueryResult,
+  ReportQuery,
+  ReportQueryResult,
   TimesheetQuery,
   TimesheetQueryResult,
 } from "../domain/activities";
@@ -77,6 +79,20 @@ export class ActivitiesApi extends EventTarget {
 
   async queryTimesheet(query: TimesheetQuery): Promise<TimesheetQueryResult> {
     const url = new URL(`${this.#baseUrl}/timesheet`, window.location.href);
+    url.searchParams.append("from", query.from);
+    url.searchParams.append("to", query.to);
+    if (query.timeZone) {
+      url.searchParams.append("timeZone", query.timeZone);
+    }
+    const response = await this.#fetch(url);
+    verifyResponse(response);
+    const json = await response.text();
+    return JSON.parse(json);
+  }
+
+  async queryReport(query: ReportQuery): Promise<ReportQueryResult> {
+    const url = new URL(`${this.#baseUrl}/report`, window.location.href);
+    url.searchParams.append("scope", query.scope);
     url.searchParams.append("from", query.from);
     url.searchParams.append("to", query.to);
     if (query.timeZone) {

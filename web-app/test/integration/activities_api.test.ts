@@ -7,6 +7,8 @@ import {
   createTestLogActivityCommand,
   createTestRecentActivitiesQuery,
   createTestRecentActivitiesQueryResult,
+  createTestReportQuery,
+  createTestReportQueryResult,
   createTestTimesheetQuery,
   createTestTimesheetQueryResult,
 } from "../../src/domain/activities";
@@ -110,6 +112,38 @@ describe("Activities API", () => {
       const api = ActivitiesApi.createNull(new Error("Network Error"));
 
       const result = api.queryTimesheet(createTestTimesheetQuery());
+
+      await expect(result).rejects.toThrow("Network Error");
+    });
+  });
+
+  describe("Report", () => {
+    it("Queries report", async () => {
+      const api = ActivitiesApi.createNull(
+        new Response(JSON.stringify(createTestReportQueryResult()), {
+          status: 200,
+        }),
+      );
+
+      const result = await api.queryReport(createTestReportQuery());
+
+      expect(result).toEqual(createTestReportQueryResult());
+    });
+
+    it("Handles server error", async () => {
+      const api = ActivitiesApi.createNull(
+        new Response("", { status: 500, statusText: "Internal Server Error" }),
+      );
+
+      const result = api.queryReport(createTestReportQuery());
+
+      await expect(result).rejects.toThrow("500: Internal Server Error");
+    });
+
+    it("Handles network error", async () => {
+      const api = ActivitiesApi.createNull(new Error("Network Error"));
+
+      const result = api.queryReport(createTestReportQuery());
 
       await expect(result).rejects.toThrow("Network Error");
     });

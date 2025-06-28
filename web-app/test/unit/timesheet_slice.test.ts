@@ -2,7 +2,7 @@
 
 import { describe, expect, it } from "vitest";
 
-import { configureNullStore } from "../../src/application/store";
+import { createNullStore } from "../../src/application/store";
 import {
   initPeriod,
   nextPeriod,
@@ -24,7 +24,7 @@ describe("Timesheet", () => {
   describe("Timesheet", () => {
     it("Summarizes hours worked on tasks", async () => {
       const queryResultJson = JSON.stringify(createTestTimesheetQueryResult());
-      const { store } = configureNullStore({
+      const { store } = createNullStore({
         activitiesResponses: [new Response(queryResultJson)],
       });
 
@@ -40,7 +40,7 @@ describe("Timesheet", () => {
         entries: [],
         workingHoursSummary: createTestWorkingHoursSummary(),
       } as TimesheetQueryResult);
-      const { store } = configureNullStore({
+      const { store } = createNullStore({
         activitiesResponses: [new Response(queryResultJson)],
       });
       store.dispatch(
@@ -60,7 +60,7 @@ describe("Timesheet", () => {
         entries: [],
         workingHoursSummary: createTestWorkingHoursSummary(),
       } as TimesheetQueryResult);
-      const { store } = configureNullStore({
+      const { store } = createNullStore({
         activitiesResponses: [new Response(queryResultJson)],
       });
       store.dispatch(
@@ -80,7 +80,7 @@ describe("Timesheet", () => {
         entries: [],
         workingHoursSummary: createTestWorkingHoursSummary(),
       } as TimesheetQueryResult);
-      const { store } = configureNullStore({
+      const { store } = createNullStore({
         activitiesResponses: [new Response(queryResultJson)],
       });
       store.dispatch(
@@ -100,7 +100,7 @@ describe("Timesheet", () => {
         entries: [],
         workingHoursSummary: createTestWorkingHoursSummary(),
       } as TimesheetQueryResult);
-      const { store } = configureNullStore({
+      const { store } = createNullStore({
         activitiesResponses: [new Response(queryResultJson)],
       });
       store.dispatch(
@@ -120,7 +120,7 @@ describe("Timesheet", () => {
         entries: [],
         workingHoursSummary: createTestWorkingHoursSummary(),
       } as TimesheetQueryResult);
-      const { store } = configureNullStore({
+      const { store } = createNullStore({
         activitiesResponses: [new Response(queryResultJson)],
       });
       store.dispatch(
@@ -140,7 +140,7 @@ describe("Timesheet", () => {
         entries: [],
         workingHoursSummary: createTestWorkingHoursSummary(),
       } as TimesheetQueryResult);
-      const { store } = configureNullStore({
+      const { store } = createNullStore({
         activitiesResponses: [new Response(queryResultJson)],
       });
       store.dispatch(
@@ -157,7 +157,7 @@ describe("Timesheet", () => {
 
     it("Summarizes the total hours worked", async () => {
       const queryResultJson = JSON.stringify(createTestTimesheetQueryResult());
-      const { store } = configureNullStore({
+      const { store } = createNullStore({
         activitiesResponses: [new Response(queryResultJson)],
       });
 
@@ -170,7 +170,7 @@ describe("Timesheet", () => {
 
     it("Compares with capacity", async () => {
       const queryResultJson = JSON.stringify(createTestTimesheetQueryResult());
-      const { store } = configureNullStore({
+      const { store } = createNullStore({
         activitiesResponses: [new Response(queryResultJson)],
       });
 
@@ -189,9 +189,8 @@ describe("Timesheet", () => {
           capacity: "PT40H",
           offset: "PT0S",
         },
-        timeZone: "Europe/Berlin",
       } as TimesheetQueryResult);
-      const { store } = configureNullStore({
+      const { store } = createNullStore({
         activitiesResponses: [new Response(queryResultJson)],
       });
 
@@ -206,7 +205,7 @@ describe("Timesheet", () => {
     });
 
     it("Handles server error", async () => {
-      const { store } = configureNullStore({
+      const { store } = createNullStore({
         activitiesResponses: [
           new Response("", {
             status: 500,

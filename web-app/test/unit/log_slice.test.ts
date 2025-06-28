@@ -16,7 +16,7 @@ import {
   startCountdown,
   stopCountdown,
 } from "../../src/application/log_slice";
-import { configureNullStore } from "../../src/application/store";
+import { createNullStore } from "../../src/application/store";
 import { Failure } from "../../src/common/messages";
 import {
   createEmptyTimeSummary,
@@ -30,7 +30,7 @@ import {
 describe("Log", () => {
   describe("Ask periodically", () => {
     it("Starts countdown with a given interval", async () => {
-      const { store, timer } = configureNullStore({
+      const { store, timer } = createNullStore({
         fixedDate: new Date("2025-06-23T15:25:00Z"),
       });
       const scheduledTasks = timer.trackScheduledTasks();
@@ -64,7 +64,7 @@ describe("Log", () => {
     });
 
     it("Progresses countdown", () => {
-      const { store, clock, notificationClient, timer } = configureNullStore({
+      const { store, clock, notificationClient, timer } = createNullStore({
         fixedDate: "2025-06-23T15:25:00Z",
       });
       const shownNotifications = notificationClient.trackNotificationsShown();
@@ -94,7 +94,7 @@ describe("Log", () => {
     });
 
     it("Restarts countdown and enable form when countdown is elapsed", () => {
-      const { store, clock, notificationClient, timer } = configureNullStore({
+      const { store, clock, notificationClient, timer } = createNullStore({
         fixedDate: new Date("2025-06-23T15:25:00Z"),
       });
       const shownNotifications = notificationClient.trackNotificationsShown();
@@ -130,7 +130,7 @@ describe("Log", () => {
     });
 
     it("Stops countdown and enables form", () => {
-      const { store, clock, timer } = configureNullStore({
+      const { store, clock, timer } = createNullStore({
         fixedDate: new Date("2025-06-23T15:25:00Z"),
       });
       const cancelledTasks = timer.trackCancelledTasks();
@@ -162,7 +162,7 @@ describe("Log", () => {
 
   describe("Current interval", () => {
     it("Notify user when an interval is elapsed", () => {
-      const { store, clock, notificationClient, timer } = configureNullStore({
+      const { store, clock, notificationClient, timer } = createNullStore({
         fixedDate: new Date("2025-06-23T15:25:00Z"),
       });
       const shownNotifications = notificationClient.trackNotificationsShown();
@@ -196,7 +196,7 @@ describe("Log", () => {
       const queryResultJson = JSON.stringify(
         createTestRecentActivitiesQueryResult(),
       );
-      const { store, activitiesApi, clock } = configureNullStore({
+      const { store, activitiesApi, clock } = createNullStore({
         activitiesResponses: [
           new Response(commandStatus),
           new Response(queryResultJson),
@@ -244,7 +244,7 @@ describe("Log", () => {
       const queryResultJson = JSON.stringify(
         createTestRecentActivitiesQueryResult(),
       );
-      const { store, activitiesApi, clock } = configureNullStore({
+      const { store, activitiesApi, clock } = createNullStore({
         activitiesResponses: [
           new Response(commandStatus),
           new Response(queryResultJson),
@@ -300,7 +300,7 @@ describe("Log", () => {
     });
 
     it("Selects an activity from recent activities", () => {
-      const { store } = configureNullStore();
+      const { store } = createNullStore();
 
       store.dispatch(
         activitySelected(createTestActivity({ notes: "Test notes" })),
@@ -320,7 +320,7 @@ describe("Log", () => {
       const queryResultJson = JSON.stringify(
         createTestRecentActivitiesQueryResult(),
       );
-      const { store } = configureNullStore({
+      const { store } = createNullStore({
         activitiesResponses: [new Response(queryResultJson)],
       });
 
@@ -339,7 +339,7 @@ describe("Log", () => {
     });
 
     it("Disables form when activity is logged and countdown is running", async () => {
-      const { store, clock, notificationClient, timer } = configureNullStore({
+      const { store, clock, notificationClient, timer } = createNullStore({
         activitiesResponses: [
           new Response(JSON.stringify({ success: true })),
           new Response(JSON.stringify(createTestRecentActivitiesQueryResult())),
@@ -370,7 +370,7 @@ describe("Log", () => {
     });
 
     it("Handles domain error", async () => {
-      const { store } = configureNullStore({
+      const { store } = createNullStore({
         activitiesResponses: [
           new Response(JSON.stringify(new Failure("Domain error."))),
           new Response(JSON.stringify(createTestRecentActivitiesQueryResult())),
@@ -388,7 +388,7 @@ describe("Log", () => {
     });
 
     it("Handles server error", async () => {
-      const { store } = configureNullStore({
+      const { store } = createNullStore({
         activitiesResponses: [
           new Response("", {
             status: 500,
@@ -413,7 +413,7 @@ describe("Log", () => {
       const queryResultJson = JSON.stringify(
         createTestRecentActivitiesQueryResult(),
       );
-      const { store } = configureNullStore({
+      const { store } = createNullStore({
         activitiesResponses: [new Response(queryResultJson)],
       });
 
@@ -435,7 +435,7 @@ describe("Log", () => {
       const queryResultJson = JSON.stringify(
         createTestRecentActivitiesQueryResult(),
       );
-      const { store } = configureNullStore({
+      const { store } = createNullStore({
         activitiesResponses: [new Response(queryResultJson)],
       });
 
@@ -467,7 +467,7 @@ describe("Log", () => {
       const queryResultJson = JSON.stringify(
         createTestRecentActivitiesQueryResult(),
       );
-      const { store } = configureNullStore({
+      const { store } = createNullStore({
         activitiesResponses: [new Response(queryResultJson)],
       });
 
@@ -489,7 +489,7 @@ describe("Log", () => {
         timeSummary: createEmptyTimeSummary(),
         timeZone: "Europe/Berlin",
       } as RecentActivitiesQueryResult);
-      const { store } = configureNullStore({
+      const { store } = createNullStore({
         activitiesResponses: [new Response(queryResultJson)],
       });
 
@@ -512,7 +512,7 @@ describe("Log", () => {
     });
 
     it("Handles server error", async () => {
-      const { store } = configureNullStore({
+      const { store } = createNullStore({
         activitiesResponses: [
           new Response("", {
             status: 500,
