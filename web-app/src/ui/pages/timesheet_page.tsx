@@ -16,6 +16,7 @@ import {
   selectWorkingHoursSummary,
 } from "../../application/timesheet_slice";
 import ErrorComponent from "../components/error_component";
+import { formatDate, formatDuration } from "../components/formatters";
 import PageLayout from "../layouts/page_layout";
 
 export default function TimesheetPage() {
@@ -56,11 +57,7 @@ function PeriodContainer() {
               <i className="bi bi-chevron-right"></i>
             </button>
             <div className="align-content-center">
-              <strong>This {unit}:</strong>{" "}
-              {Temporal.PlainDate.from(from).toLocaleString(undefined, {
-                dateStyle: "medium",
-              })}{" "}
-              - {Temporal.PlainDate.from(to).toLocaleString(undefined, { dateStyle: "medium" })}
+              <strong>This {unit}:</strong> {formatDate(from)} - {formatDate(to)}
             </div>
           </div>
           <div className="btn-group btn-group-sm ms-auto" role="group" aria-label="Option buttons">
@@ -113,7 +110,7 @@ function TimesheetContainer() {
       <tbody>
         {entries.map((entry, index) => (
           <tr key={index}>
-            <td>{Temporal.PlainDate.from(entry.date).toLocaleString(undefined, { dateStyle: "medium" })}</td>
+            <td>{formatDate(entry.date)}</td>
             <td className="text-nowrap">{entry.client}</td>
             <td className="text-nowrap">{entry.project}</td>
             <td>
@@ -166,14 +163,4 @@ function CapacityComponent() {
       </div>
     </div>
   );
-}
-
-function formatDuration(duration: Temporal.Duration | string): string {
-  return Temporal.Duration.from(duration)
-    .toLocaleString(undefined, {
-      style: "digital",
-      hours: "2-digit",
-      minutes: "2-digit",
-    })
-    .slice(0, -3); // Remove seconds for a cleaner display
 }

@@ -23,6 +23,7 @@ import { AppDispatch } from "../../application/store";
 import { EventHandler } from "../../common/events";
 import { Activity, WorkingDay } from "../../domain/activities";
 import ErrorComponent from "../components/error_component";
+import { formatDuration, FormatStyle } from "../components/formatters";
 import ScrollToTopButton from "../components/scroll_to_top_button";
 import PageLayout from "../layouts/page_layout";
 
@@ -159,7 +160,7 @@ function CountdownContainer() {
         >
           <div className="progress-bar" style={{ width: `${percentage}%` }}></div>
         </div>
-        <div className="text-center">{formatDurationLong(remaining)}</div>
+        <div className="text-center">{formatDuration(remaining, FormatStyle.FULL)}</div>
       </div>
       <div>
         <div className="btn-group">
@@ -306,39 +307,20 @@ function TimeSummaryContainer() {
     <div className="d-flex justify-content-center flex-wrap text-center">
       <div className="flex-fill">
         <div className="small">Hours Today</div>
-        <div>{formatDurationMedium(hoursToday)}</div>
+        <div>{formatDuration(hoursToday)}</div>
       </div>
       <div className="flex-fill">
         <div className="small">Hours Yesterday</div>
-        <div>{formatDurationMedium(hoursYesterday)}</div>
+        <div>{formatDuration(hoursYesterday)}</div>
       </div>
       <div className="flex-fill">
         <div className="small">Hours this Week</div>
-        <div>{formatDurationMedium(hoursThisWeek)}</div>
+        <div>{formatDuration(hoursThisWeek)}</div>
       </div>
       <div className="flex-fill">
         <div className="small">Hours this Month</div>
-        <div>{formatDurationMedium(hoursThisMonth)}</div>
+        <div>{formatDuration(hoursThisMonth)}</div>
       </div>
     </div>
   );
-}
-
-function formatDurationLong(duration: Temporal.Duration | string): string {
-  return Temporal.Duration.from(duration).toLocaleString(undefined, {
-    style: "digital",
-    hours: "2-digit",
-    minutes: "2-digit",
-    seconds: "2-digit",
-  });
-}
-
-function formatDurationMedium(duration: Temporal.Duration | string): string {
-  return Temporal.Duration.from(duration)
-    .toLocaleString(undefined, {
-      style: "digital",
-      hours: "2-digit",
-      minutes: "2-digit",
-    })
-    .slice(0, -3);
 }
