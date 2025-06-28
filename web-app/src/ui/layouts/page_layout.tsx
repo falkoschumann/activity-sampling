@@ -41,6 +41,11 @@ export default function PageLayout({ children }: { children?: React.ReactNode })
                       Timesheet
                     </NavLink>
                   </li>
+                  <li>
+                    <NavLink className="nav-link" to="/reports">
+                      Reports
+                    </NavLink>
+                  </li>
                 </ul>
                 <div className="d-flex gap-2">
                   <Profile />
