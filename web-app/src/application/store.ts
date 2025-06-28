@@ -49,3 +49,29 @@ export function createStore({
       }),
   });
 }
+
+export function configureNullStore({
+  activitiesResponses,
+  authenticationResponses,
+  fixedDate,
+}: {
+  activitiesResponses?: Response | Response[];
+  authenticationResponses?: Response | Response[];
+  fixedDate?: Date | string;
+} = {}) {
+  const activitiesApi = ActivitiesApi.createNull(activitiesResponses);
+  const authenticationApi = AuthenticationApi.createNull(
+    authenticationResponses,
+  );
+  const notificationClient = NotificationClient.createNull();
+  const clock = Clock.createNull(fixedDate);
+  const timer = Timer.createNull();
+  const store = createStore({
+    activitiesApi,
+    authenticationApi,
+    notificationClient,
+    clock,
+    timer,
+  });
+  return { store, activitiesApi, notificationClient, clock, timer };
+}

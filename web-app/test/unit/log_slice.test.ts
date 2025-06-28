@@ -16,10 +16,8 @@ import {
   startCountdown,
   stopCountdown,
 } from "../../src/application/log_slice";
-import { createStore } from "../../src/application/store";
-import { Clock } from "../../src/common/clock";
+import { configureNullStore } from "../../src/application/store";
 import { Failure } from "../../src/common/messages";
-import { Timer } from "../../src/common/timer";
 import {
   createEmptyTimeSummary,
   createTestActivity,
@@ -28,14 +26,11 @@ import {
   createTestRecentActivitiesQueryResult,
   RecentActivitiesQueryResult,
 } from "../../src/domain/activities";
-import { ActivitiesApi } from "../../src/infrastructure/activities_api";
-import { AuthenticationApi } from "../../src/infrastructure/authentication_api";
-import { NotificationClient } from "../../src/infrastructure/notification_client";
 
 describe("Log", () => {
   describe("Ask periodically", () => {
     it("Starts countdown with a given interval", async () => {
-      const { store, timer } = configure({
+      const { store, timer } = configureNullStore({
         fixedDate: new Date("2025-06-23T15:25:00Z"),
       });
       const scheduledTasks = timer.trackScheduledTasks();
@@ -69,7 +64,7 @@ describe("Log", () => {
     });
 
     it("Progresses countdown", () => {
-      const { store, clock, notificationClient, timer } = configure({
+      const { store, clock, notificationClient, timer } = configureNullStore({
         fixedDate: "2025-06-23T15:25:00Z",
       });
       const shownNotifications = notificationClient.trackNotificationsShown();
@@ -99,7 +94,7 @@ describe("Log", () => {
     });
 
     it("Restarts countdown and enable form when countdown is elapsed", () => {
-      const { store, clock, notificationClient, timer } = configure({
+      const { store, clock, notificationClient, timer } = configureNullStore({
         fixedDate: new Date("2025-06-23T15:25:00Z"),
       });
       const shownNotifications = notificationClient.trackNotificationsShown();
@@ -135,7 +130,7 @@ describe("Log", () => {
     });
 
     it("Stops countdown and enables form", () => {
-      const { store, clock, timer } = configure({
+      const { store, clock, timer } = configureNullStore({
         fixedDate: new Date("2025-06-23T15:25:00Z"),
       });
       const cancelledTasks = timer.trackCancelledTasks();
@@ -167,7 +162,7 @@ describe("Log", () => {
 
   describe("Current interval", () => {
     it("Notify user when an interval is elapsed", () => {
-      const { store, clock, notificationClient, timer } = configure({
+      const { store, clock, notificationClient, timer } = configureNullStore({
         fixedDate: new Date("2025-06-23T15:25:00Z"),
       });
       const shownNotifications = notificationClient.trackNotificationsShown();
@@ -201,8 +196,11 @@ describe("Log", () => {
       const queryResultJson = JSON.stringify(
         createTestRecentActivitiesQueryResult(),
       );
-      const { store, activitiesApi, clock } = configure({
-        responses: [new Response(commandStatus), new Response(queryResultJson)],
+      const { store, activitiesApi, clock } = configureNullStore({
+        activitiesResponses: [
+          new Response(commandStatus),
+          new Response(queryResultJson),
+        ],
       });
       const loggedActivities = activitiesApi.trackActivitiesLogged();
 
@@ -246,8 +244,11 @@ describe("Log", () => {
       const queryResultJson = JSON.stringify(
         createTestRecentActivitiesQueryResult(),
       );
-      const { store, activitiesApi, clock } = configure({
-        responses: [new Response(commandStatus), new Response(queryResultJson)],
+      const { store, activitiesApi, clock } = configureNullStore({
+        activitiesResponses: [
+          new Response(commandStatus),
+          new Response(queryResultJson),
+        ],
       });
       const loggedActivities = activitiesApi.trackActivitiesLogged();
 
@@ -299,7 +300,7 @@ describe("Log", () => {
     });
 
     it("Selects an activity from recent activities", () => {
-      const { store } = configure();
+      const { store } = configureNullStore();
 
       store.dispatch(
         activitySelected(createTestActivity({ notes: "Test notes" })),
@@ -319,8 +320,8 @@ describe("Log", () => {
       const queryResultJson = JSON.stringify(
         createTestRecentActivitiesQueryResult(),
       );
-      const { store } = configure({
-        responses: [new Response(queryResultJson)],
+      const { store } = configureNullStore({
+        activitiesResponses: [new Response(queryResultJson)],
       });
 
       await store.dispatch(
@@ -338,8 +339,8 @@ describe("Log", () => {
     });
 
     it("Disables form when activity is logged and countdown is running", async () => {
-      const { store, clock, notificationClient, timer } = configure({
-        responses: [
+      const { store, clock, notificationClient, timer } = configureNullStore({
+        activitiesResponses: [
           new Response(JSON.stringify({ success: true })),
           new Response(JSON.stringify(createTestRecentActivitiesQueryResult())),
         ],
@@ -369,8 +370,8 @@ describe("Log", () => {
     });
 
     it("Handles domain error", async () => {
-      const { store } = configure({
-        responses: [
+      const { store } = configureNullStore({
+        activitiesResponses: [
           new Response(JSON.stringify(new Failure("Domain error."))),
           new Response(JSON.stringify(createTestRecentActivitiesQueryResult())),
         ],
@@ -387,8 +388,8 @@ describe("Log", () => {
     });
 
     it("Handles server error", async () => {
-      const { store } = configure({
-        responses: [
+      const { store } = configureNullStore({
+        activitiesResponses: [
           new Response("", {
             status: 500,
             statusText: "Internal Server Error",
@@ -412,8 +413,8 @@ describe("Log", () => {
       const queryResultJson = JSON.stringify(
         createTestRecentActivitiesQueryResult(),
       );
-      const { store } = configure({
-        responses: [new Response(queryResultJson)],
+      const { store } = configureNullStore({
+        activitiesResponses: [new Response(queryResultJson)],
       });
 
       await store.dispatch(
@@ -434,8 +435,8 @@ describe("Log", () => {
       const queryResultJson = JSON.stringify(
         createTestRecentActivitiesQueryResult(),
       );
-      const { store } = configure({
-        responses: [new Response(queryResultJson)],
+      const { store } = configureNullStore({
+        activitiesResponses: [new Response(queryResultJson)],
       });
 
       await store.dispatch(
@@ -466,8 +467,8 @@ describe("Log", () => {
       const queryResultJson = JSON.stringify(
         createTestRecentActivitiesQueryResult(),
       );
-      const { store } = configure({
-        responses: [new Response(queryResultJson)],
+      const { store } = configureNullStore({
+        activitiesResponses: [new Response(queryResultJson)],
       });
 
       await store.dispatch(
@@ -488,8 +489,8 @@ describe("Log", () => {
         timeSummary: createEmptyTimeSummary(),
         timeZone: "Europe/Berlin",
       } as RecentActivitiesQueryResult);
-      const { store } = configure({
-        responses: [new Response(queryResultJson)],
+      const { store } = configureNullStore({
+        activitiesResponses: [new Response(queryResultJson)],
       });
 
       await store.dispatch(
@@ -511,8 +512,8 @@ describe("Log", () => {
     });
 
     it("Handles server error", async () => {
-      const { store } = configure({
-        responses: [
+      const { store } = configureNullStore({
+        activitiesResponses: [
           new Response("", {
             status: 500,
             statusText: "Internal Server Error",
@@ -528,25 +529,3 @@ describe("Log", () => {
     });
   });
 });
-
-function configure({
-  responses,
-  fixedDate,
-}: {
-  responses?: Response | Response[];
-  fixedDate?: Date | string;
-} = {}) {
-  const activitiesApi = ActivitiesApi.createNull(responses);
-  const authenticationApi = AuthenticationApi.createNull();
-  const notificationClient = NotificationClient.createNull();
-  const clock = Clock.createNull(fixedDate);
-  const timer = Timer.createNull();
-  const store = createStore({
-    activitiesApi,
-    authenticationApi,
-    notificationClient,
-    clock,
-    timer,
-  });
-  return { store, activitiesApi, notificationClient, clock, timer };
-}

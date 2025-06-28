@@ -2,7 +2,7 @@
 
 import { describe, expect, it } from "vitest";
 
-import { createStore } from "../../src/application/store";
+import { configureNullStore } from "../../src/application/store";
 import {
   initPeriod,
   nextPeriod,
@@ -13,24 +13,19 @@ import {
   selectPeriod,
   selectWorkingHoursSummary,
 } from "../../src/application/timesheet_slice";
-import { Clock } from "../../src/common/clock";
-import { Timer } from "../../src/common/timer";
 import {
   createTestTimesheetQuery,
   createTestTimesheetQueryResult,
   createTestWorkingHoursSummary,
   TimesheetQueryResult,
 } from "../../src/domain/activities";
-import { ActivitiesApi } from "../../src/infrastructure/activities_api";
-import { AuthenticationApi } from "../../src/infrastructure/authentication_api";
-import { NotificationClient } from "../../src/infrastructure/notification_client";
 
 describe("Timesheet", () => {
   describe("Timesheet", () => {
     it("Summarizes hours worked on tasks", async () => {
       const queryResultJson = JSON.stringify(createTestTimesheetQueryResult());
-      const { store } = configure({
-        responses: [new Response(queryResultJson)],
+      const { store } = configureNullStore({
+        activitiesResponses: [new Response(queryResultJson)],
       });
 
       await store.dispatch(queryTimesheet(createTestTimesheetQuery()));
@@ -45,8 +40,8 @@ describe("Timesheet", () => {
         entries: [],
         workingHoursSummary: createTestWorkingHoursSummary(),
       } as TimesheetQueryResult);
-      const { store } = configure({
-        responses: [new Response(queryResultJson)],
+      const { store } = configureNullStore({
+        activitiesResponses: [new Response(queryResultJson)],
       });
       store.dispatch(
         initPeriod({ from: "2025-06-13", to: "2025-06-13", unit: "Day" }),
@@ -65,8 +60,8 @@ describe("Timesheet", () => {
         entries: [],
         workingHoursSummary: createTestWorkingHoursSummary(),
       } as TimesheetQueryResult);
-      const { store } = configure({
-        responses: [new Response(queryResultJson)],
+      const { store } = configureNullStore({
+        activitiesResponses: [new Response(queryResultJson)],
       });
       store.dispatch(
         initPeriod({ from: "2025-06-13", to: "2025-06-13", unit: "Day" }),
@@ -85,8 +80,8 @@ describe("Timesheet", () => {
         entries: [],
         workingHoursSummary: createTestWorkingHoursSummary(),
       } as TimesheetQueryResult);
-      const { store } = configure({
-        responses: [new Response(queryResultJson)],
+      const { store } = configureNullStore({
+        activitiesResponses: [new Response(queryResultJson)],
       });
       store.dispatch(
         initPeriod({ from: "2025-06-02", to: "2025-06-08", unit: "Week" }),
@@ -105,8 +100,8 @@ describe("Timesheet", () => {
         entries: [],
         workingHoursSummary: createTestWorkingHoursSummary(),
       } as TimesheetQueryResult);
-      const { store } = configure({
-        responses: [new Response(queryResultJson)],
+      const { store } = configureNullStore({
+        activitiesResponses: [new Response(queryResultJson)],
       });
       store.dispatch(
         initPeriod({ from: "2025-06-02", to: "2025-06-08", unit: "Week" }),
@@ -125,8 +120,8 @@ describe("Timesheet", () => {
         entries: [],
         workingHoursSummary: createTestWorkingHoursSummary(),
       } as TimesheetQueryResult);
-      const { store } = configure({
-        responses: [new Response(queryResultJson)],
+      const { store } = configureNullStore({
+        activitiesResponses: [new Response(queryResultJson)],
       });
       store.dispatch(
         initPeriod({ from: "2025-03-01", to: "2025-03-31", unit: "Month" }),
@@ -145,8 +140,8 @@ describe("Timesheet", () => {
         entries: [],
         workingHoursSummary: createTestWorkingHoursSummary(),
       } as TimesheetQueryResult);
-      const { store } = configure({
-        responses: [new Response(queryResultJson)],
+      const { store } = configureNullStore({
+        activitiesResponses: [new Response(queryResultJson)],
       });
       store.dispatch(
         initPeriod({ from: "2025-03-01", to: "2025-03-31", unit: "Month" }),
@@ -162,8 +157,8 @@ describe("Timesheet", () => {
 
     it("Summarizes the total hours worked", async () => {
       const queryResultJson = JSON.stringify(createTestTimesheetQueryResult());
-      const { store } = configure({
-        responses: [new Response(queryResultJson)],
+      const { store } = configureNullStore({
+        activitiesResponses: [new Response(queryResultJson)],
       });
 
       await store.dispatch(queryTimesheet(createTestTimesheetQuery()));
@@ -175,8 +170,8 @@ describe("Timesheet", () => {
 
     it("Compares with capacity", async () => {
       const queryResultJson = JSON.stringify(createTestTimesheetQueryResult());
-      const { store } = configure({
-        responses: [new Response(queryResultJson)],
+      const { store } = configureNullStore({
+        activitiesResponses: [new Response(queryResultJson)],
       });
 
       await store.dispatch(queryTimesheet(createTestTimesheetQuery()));
@@ -196,8 +191,8 @@ describe("Timesheet", () => {
         },
         timeZone: "Europe/Berlin",
       } as TimesheetQueryResult);
-      const { store } = configure({
-        responses: [new Response(queryResultJson)],
+      const { store } = configureNullStore({
+        activitiesResponses: [new Response(queryResultJson)],
       });
 
       await store.dispatch(queryTimesheet(createTestTimesheetQuery()));
@@ -211,8 +206,8 @@ describe("Timesheet", () => {
     });
 
     it("Handles server error", async () => {
-      const { store } = configure({
-        responses: [
+      const { store } = configureNullStore({
+        activitiesResponses: [
           new Response("", {
             status: 500,
             statusText: "Internal Server Error",
@@ -228,19 +223,3 @@ describe("Timesheet", () => {
     });
   });
 });
-
-function configure({ responses }: { responses?: Response | Response[] } = {}) {
-  const activitiesApi = ActivitiesApi.createNull(responses);
-  const authenticationApi = AuthenticationApi.createNull();
-  const notificationClient = NotificationClient.createNull();
-  const clock = Clock.createNull();
-  const timer = Timer.createNull();
-  const store = createStore({
-    activitiesApi,
-    authenticationApi,
-    notificationClient,
-    clock,
-    timer,
-  });
-  return { store, activitiesApi, notificationClient, clock, timer };
-}
