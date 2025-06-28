@@ -137,9 +137,9 @@ class TimesheetProjection {
         entries.stream()
             .sorted(
                 Comparator.comparing(TimesheetEntry::date)
-                    .thenComparing(TimesheetEntry::client)
-                    .thenComparing(TimesheetEntry::project)
-                    .thenComparing(TimesheetEntry::task))
+                    .thenComparing(it -> it.client().toLowerCase())
+                    .thenComparing(it -> it.project().toLowerCase())
+                    .thenComparing(it -> it.task().toLowerCase()))
             .toList();
   }
 }

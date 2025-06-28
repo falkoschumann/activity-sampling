@@ -12,6 +12,7 @@ import de.muspellheim.activitysampling.api.domain.activities.Holiday;
 import de.muspellheim.activitysampling.api.domain.activities.LogActivityCommand;
 import de.muspellheim.activitysampling.api.domain.activities.RecentActivitiesQuery;
 import de.muspellheim.activitysampling.api.domain.activities.RecentActivitiesQueryResult;
+import de.muspellheim.activitysampling.api.domain.activities.ReportEntry;
 import de.muspellheim.activitysampling.api.domain.activities.ReportQuery;
 import de.muspellheim.activitysampling.api.domain.activities.ReportQueryResult;
 import de.muspellheim.activitysampling.api.domain.activities.TimeSummary;
@@ -416,26 +417,11 @@ class ActivitiesServiceTests {
 
     @Test
     void summarizesHoursWorkedOnProjects() {
-      store.record(
-          ActivityLoggedEvent.createTestInstance()
-              .withTimestamp(Instant.parse("2025-06-02T15:00:00Z"))
-              .withDuration(Duration.ofHours(8)));
-      store.record(
-          ActivityLoggedEvent.createTestInstance()
-              .withTimestamp(Instant.parse("2025-06-03T15:00:00Z"))
-              .withDuration(Duration.ofHours(9)));
-      store.record(
-          ActivityLoggedEvent.createTestInstance()
-              .withTimestamp(Instant.parse("2025-06-04T15:00:00Z"))
-              .withDuration(Duration.ofHours(8)));
-      store.record(
-          ActivityLoggedEvent.createTestInstance()
-              .withTimestamp(Instant.parse("2025-06-05T15:00:00Z"))
-              .withDuration(Duration.ofHours(9)));
-      store.record(
-          ActivityLoggedEvent.createTestInstance()
-              .withTimestamp(Instant.parse("2025-06-06T15:00:00Z"))
-              .withDuration(Duration.ofHours(8)));
+      store.record(createEvent("2025-06-02T15:00:00Z").withDuration(Duration.ofHours(8)));
+      store.record(createEvent("2025-06-03T15:00:00Z").withDuration(Duration.ofHours(9)));
+      store.record(createEvent("2025-06-04T15:00:00Z").withDuration(Duration.ofHours(8)));
+      store.record(createEvent("2025-06-05T15:00:00Z").withDuration(Duration.ofHours(9)));
+      store.record(createEvent("2025-06-06T15:00:00Z").withDuration(Duration.ofHours(8)));
       var service =
           new ActivitiesService(
               ActivitiesConfiguration.DEFAULT, store, new MemoryHolidayRepository(), CLOCK);
@@ -443,6 +429,41 @@ class ActivitiesServiceTests {
       var result = service.queryReport(ReportQuery.createTestInstance());
 
       assertEquals(ReportQueryResult.createTestInstance(), result);
+    }
+
+    @Test
+    void combinesProjectsWithMultipleClients() {
+      store.record(
+          createEvent("2025-06-02T15:00:00Z")
+              .withDuration(Duration.ofHours(8))
+              .withClient("Client A"));
+      store.record(
+          createEvent("2025-06-03T15:00:00Z")
+              .withDuration(Duration.ofHours(9))
+              .withClient("Client B"));
+      store.record(
+          createEvent("2025-06-04T15:00:00Z")
+              .withDuration(Duration.ofHours(8))
+              .withClient("Client A"));
+      store.record(
+          createEvent("2025-06-05T15:00:00Z")
+              .withDuration(Duration.ofHours(9))
+              .withClient("Client B"));
+      store.record(
+          createEvent("2025-06-06T15:00:00Z")
+              .withDuration(Duration.ofHours(8))
+              .withClient("Client A"));
+      var service =
+          new ActivitiesService(
+              ActivitiesConfiguration.DEFAULT, store, new MemoryHolidayRepository(), CLOCK);
+
+      var result = service.queryReport(ReportQuery.createTestInstance());
+
+      assertEquals(
+          ReportQueryResult.builder()
+              .entries(List.of(ReportEntry.createTestInstance().withClient("Client A, Client B")))
+              .build(),
+          result);
     }
 
     @Test

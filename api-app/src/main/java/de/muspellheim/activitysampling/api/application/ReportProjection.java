@@ -12,6 +12,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -39,19 +40,24 @@ class ReportProjection {
 
   public ReportQueryResult project(Stream<ActivityLoggedEvent> events) {
     events.map(it -> ActivityMapping.map(it, timeZone)).forEach(this::updateEntries);
+    entries.sort(Comparator.comparing(it -> it.name().toLowerCase()));
     return ReportQueryResult.builder().entries(entries).build();
   }
 
   private void updateEntries(Activity activity) {
     var project = activity.project();
     var client = activity.client();
-    var index =
-        Lists.indexOf(entries, it -> it.name().equals(project) && it.client().equals(client));
+    var index = Lists.indexOf(entries, it -> it.name().equals(project));
     if (index == -1) {
       entries.add(
           ReportEntry.builder().name(project).client(client).hours(activity.duration()).build());
     } else {
       var existingEntry = entries.get(index);
+      var existingClient = existingEntry.client();
+      if (!existingClient.contains(client)) {
+        existingClient += ", " + client;
+        existingEntry = existingEntry.withClient(existingClient);
+      }
       var accumulatedHours = existingEntry.hours().plus(activity.duration());
       var updatedEntry = existingEntry.withHours(accumulatedHours);
       entries.set(index, updatedEntry);
