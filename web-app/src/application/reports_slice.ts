@@ -3,15 +3,17 @@
 import {
   createAsyncThunk,
   createSlice,
+  type PayloadAction,
   type SerializedError,
 } from "@reduxjs/toolkit";
 
-import type {
-  ReportEntry,
-  ReportQuery,
-  ReportQueryResult,
+import {
+  PeriodUnit,
+  type ReportEntry,
+  type ReportQuery,
+  type ReportQueryResult,
+  Scope,
 } from "../domain/activities";
-import { PeriodUnit } from "../domain/activities";
 import { ActivitiesApi } from "../infrastructure/activities_api";
 import periodReducers, {
   initialPeriodState,
@@ -20,6 +22,7 @@ import periodReducers, {
 
 interface ReportsState {
   readonly period: PeriodState;
+  readonly scope: Scope;
   readonly entries: ReportEntry[];
   readonly error?: SerializedError;
 }
@@ -27,6 +30,7 @@ interface ReportsState {
 function initialState(): ReportsState {
   return {
     period: initialPeriodState(PeriodUnit.WEEK),
+    scope: Scope.PROJECTS,
     entries: [],
   };
 }
@@ -57,6 +61,10 @@ const reportsSlice = createSlice({
   initialState,
   reducers: {
     ...periodReducers,
+    changeScope: (state, action: PayloadAction<{ scope: Scope }>) => {
+      const { scope } = action.payload;
+      state.scope = scope;
+    },
   },
   extraReducers: (builder) => {
     // Query report
@@ -74,15 +82,16 @@ const reportsSlice = createSlice({
   },
   selectors: {
     selectPeriod: (state) => state.period,
+    selectScope: (state) => state.scope,
     selectEntries: (state) => state.entries,
     selectError: (state) => state.error,
   },
 });
 
-export const { changePeriod, nextPeriod, previousPeriod } =
+export const { changePeriod, changeScope, nextPeriod, previousPeriod } =
   reportsSlice.actions;
 
-export const { selectEntries, selectError, selectPeriod } =
+export const { selectEntries, selectError, selectPeriod, selectScope } =
   reportsSlice.selectors;
 
 export default reportsSlice.reducer;

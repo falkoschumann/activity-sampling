@@ -5,15 +5,17 @@ import { useSelector } from "react-redux";
 
 import {
   changePeriod,
+  changeScope,
   nextPeriod,
   previousPeriod,
   queryReport,
   selectEntries,
   selectError,
   selectPeriod,
+  selectScope,
 } from "../../application/reports_slice";
 import { useAppDispatch } from "../../application/store";
-import { PeriodUnit, Scope } from "../../domain/activities";
+import { PeriodUnit, type ReportEntry, Scope } from "../../domain/activities";
 import ErrorComponent from "../components/error_component";
 import { formatDuration } from "../components/formatters";
 import { PeriodComponent } from "../components/period_component";
@@ -21,12 +23,13 @@ import PageLayout from "../layouts/page_layout";
 
 export default function ReportsPage() {
   const period = useSelector(selectPeriod);
+  const scope = useSelector(selectScope);
   const error = useSelector(selectError);
+  const entries = useSelector(selectEntries);
   const dispatch = useAppDispatch();
 
-  const scope = Scope.PROJECTS;
   useEffect(() => {
-    dispatch(queryReport({ scope, ...period }));
+    dispatch(queryReport({ ...period, scope }));
   }, [dispatch, period, scope]);
 
   return (
@@ -39,25 +42,23 @@ export default function ReportsPage() {
           onNextPeriod={() => dispatch(nextPeriod({}))}
           onChangePeriod={(unit) => dispatch(changePeriod({ unit }))}
         />
-        <ScopeComponent scope={scope} />
+        <ScopeComponent scope={scope} onChangeScope={(scope) => dispatch(changeScope({ scope }))} />
       </aside>
       <main className="container my-4" style={{ paddingTop: "6.4375rem" }}>
         <ErrorComponent {...error} />
-        <TimeReportContainer />
+        <TimeReportComponent scope={scope} entries={entries} />
       </main>
     </PageLayout>
   );
 }
 
-function TimeReportContainer() {
-  const entries = useSelector(selectEntries);
-
+function TimeReportComponent({ scope, entries }: { scope: Scope; entries: ReportEntry[] }) {
   return (
     <table className="table">
       <thead className="sticky-top" style={{ top: "9.8125rem" }}>
         <tr>
           <th scope="col">Name</th>
-          <th scope="col">Client</th>
+          {scope === Scope.PROJECTS && <th scope="col">Client</th>}
           <th scope="col">Hours</th>
         </tr>
       </thead>
@@ -65,7 +66,7 @@ function TimeReportContainer() {
         {entries.map((entry, index) => (
           <tr key={index}>
             <td className="text-nowrap">{entry.name}</td>
-            <td>{entry.client}</td>
+            {scope === Scope.PROJECTS && <td>{entry.client}</td>}
             <td>{formatDuration(entry.hours)}</td>
           </tr>
         ))}
@@ -74,20 +75,20 @@ function TimeReportContainer() {
   );
 }
 
-function ScopeComponent({ scope }: { scope: Scope }) {
+function ScopeComponent({ scope, onChangeScope }: { scope: Scope; onChangeScope: (scope: Scope) => void }) {
   return (
     <div className="container">
       <div className="btn-toolbar py-2 gap-2" role="toolbar" aria-label="Toolbar with scope buttons">
         <div className="btn-group btn-group-sm">
           {Object.values(Scope).map((it) => (
-            <a
+            <button
               key={it}
-              href="#"
               className={`btn btn-outline-secondary${scope === it ? " active" : ""}`}
               aria-current={scope === it ? "page" : undefined}
+              onClick={() => onChangeScope(it)}
             >
               {it}
-            </a>
+            </button>
           ))}
         </div>
       </div>

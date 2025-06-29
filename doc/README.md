@@ -30,9 +30,9 @@ analysis.
 
 ### Reports
 
-- [ ] Summarize hours worked for clients
+- [x] Summarize hours worked for clients
 - [x] Summarize hours worked on projects
-- [ ] Summarize hours worked on tasks
+- [x] Summarize hours worked on tasks
 - [x] Summarize hours worked per day
 - [x] Summarize hours worked per week
 - [x] Summarize hours worked per month

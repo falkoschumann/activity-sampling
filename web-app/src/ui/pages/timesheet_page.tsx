@@ -15,7 +15,7 @@ import {
   selectPeriod,
   selectWorkingHoursSummary,
 } from "../../application/timesheet_slice";
-import { PeriodUnit } from "../../domain/activities";
+import { PeriodUnit, type TimesheetEntry } from "../../domain/activities";
 import ErrorComponent from "../components/error_component";
 import { formatDate, formatDuration } from "../components/formatters";
 import { PeriodComponent } from "../components/period_component";
@@ -24,6 +24,7 @@ import PageLayout from "../layouts/page_layout";
 export default function TimesheetPage() {
   const period = useSelector(selectPeriod);
   const error = useSelector(selectError);
+  const entries = useSelector(selectEntries);
   const dispatch = useAppDispatch();
 
   useEffect(() => {
@@ -43,7 +44,7 @@ export default function TimesheetPage() {
       </aside>
       <main className="container my-4" style={{ paddingTop: "3.5rem", paddingBottom: "3rem" }}>
         <ErrorComponent {...error} />
-        <TimesheetContainer />
+        <TimesheetComponent entries={entries} />
       </main>
       <footer className="fixed-bottom bg-body">
         <div className="container py-2">
@@ -54,9 +55,7 @@ export default function TimesheetPage() {
   );
 }
 
-function TimesheetContainer() {
-  const entries = useSelector(selectEntries);
-
+function TimesheetComponent({ entries }: { entries: TimesheetEntry[] }) {
   return (
     <table className="table">
       <thead className="sticky-top" style={{ top: "6.4375rem" }}>

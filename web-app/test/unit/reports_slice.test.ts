@@ -4,12 +4,14 @@ import { describe, expect, it } from "vitest";
 
 import {
   changePeriod,
+  changeScope,
   nextPeriod,
   previousPeriod,
   queryReport,
   selectEntries,
   selectError,
   selectPeriod,
+  selectScope,
 } from "../../src/application/reports_slice";
 import { createNullStore } from "../../src/application/store";
 import {
@@ -17,18 +19,57 @@ import {
   createTestReportQueryResult,
   PeriodUnit,
   type ReportQueryResult,
+  Scope,
 } from "../../src/domain/activities";
 
 describe("Reports", () => {
   describe("Reports", () => {
+    it("Summarize hours worked for clients", async () => {
+      const queryResultJson = JSON.stringify(createTestReportQueryResult());
+      const { store } = createNullStore({
+        activitiesResponses: [new Response(queryResultJson)],
+      });
+      store.dispatch(changeScope({ scope: Scope.CLIENTS }));
+
+      await store.dispatch(
+        queryReport(createTestReportQuery({ scope: Scope.CLIENTS })),
+      );
+
+      expect(selectScope(store.getState())).toEqual(Scope.CLIENTS);
+      expect(selectEntries(store.getState())).toEqual(
+        createTestReportQueryResult().entries,
+      );
+    });
+
     it("Summarize hours worked on projects", async () => {
       const queryResultJson = JSON.stringify(createTestReportQueryResult());
       const { store } = createNullStore({
         activitiesResponses: [new Response(queryResultJson)],
       });
+      // Projects is the default scope, so no need to change it.
 
-      await store.dispatch(queryReport(createTestReportQuery()));
+      await store.dispatch(
+        queryReport(createTestReportQuery({ scope: Scope.PROJECTS })),
+      );
 
+      expect(selectScope(store.getState())).toEqual(Scope.PROJECTS);
+      expect(selectEntries(store.getState())).toEqual(
+        createTestReportQueryResult().entries,
+      );
+    });
+
+    it("Summarize hours worked on tasks", async () => {
+      const queryResultJson = JSON.stringify(createTestReportQueryResult());
+      const { store } = createNullStore({
+        activitiesResponses: [new Response(queryResultJson)],
+      });
+      store.dispatch(changeScope({ scope: Scope.TASKS }));
+
+      await store.dispatch(
+        queryReport(createTestReportQuery({ scope: Scope.TASKS })),
+      );
+
+      expect(selectScope(store.getState())).toEqual(Scope.TASKS);
       expect(selectEntries(store.getState())).toEqual(
         createTestReportQueryResult().entries,
       );
