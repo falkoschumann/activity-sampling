@@ -1,7 +1,7 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
 import { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 
 import {
   changePeriod,
@@ -12,7 +12,7 @@ import {
   selectError,
   selectPeriod,
 } from "../../application/reports_slice";
-import { AppDispatch } from "../../application/store";
+import { useAppDispatch } from "../../application/store";
 import ErrorComponent from "../components/error_component";
 import { formatDate, formatDuration } from "../components/formatters";
 import PageLayout from "../layouts/page_layout";
@@ -32,7 +32,7 @@ export default function ReportsPage() {
 
 function PeriodContainer() {
   const { from, to, unit } = useSelector(selectPeriod);
-  const dispatch = useDispatch<AppDispatch>();
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
     dispatch(queryReport({ scope: "projects", from, to }));

@@ -1,6 +1,7 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
 import { configureStore } from "@reduxjs/toolkit";
+import { useDispatch } from "react-redux";
 
 import { Clock } from "../common/clock";
 import { Timer } from "../common/timer";
@@ -16,6 +17,7 @@ export const store = createStore();
 
 export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;
+export const useAppDispatch = useDispatch.withTypes<AppDispatch>();
 
 export function createStore({
   activitiesApi = ActivitiesApi.create(),

@@ -1,11 +1,10 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
 import { useEffect } from "react";
-import { useDispatch } from "react-redux";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router";
 
 import { queryAuthentication } from "../application/authentication_slice";
-import { AppDispatch } from "../application/store";
+import { useAppDispatch } from "../application/store";
 import AuthenticatedTemplate from "./layouts/authenticated_template";
 import UnauthenticatedTemplate from "./layouts/unauthenticated_template";
 import LogPage from "./pages/log_page";
@@ -15,7 +14,7 @@ import TimesheetPage from "./pages/timesheet_page";
 import UnauthenticatedPage from "./pages/unauthenticated_page";
 
 export default function WebApplication() {
-  const dispatch = useDispatch<AppDispatch>();
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
     dispatch(queryAuthentication({}));

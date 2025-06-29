@@ -2,10 +2,10 @@
 
 import { Temporal } from "@js-temporal/polyfill";
 import { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 
 import { selectError } from "../../application/log_slice";
-import { AppDispatch } from "../../application/store";
+import { useAppDispatch } from "../../application/store";
 import {
   changePeriod,
   nextPeriod,
@@ -39,7 +39,7 @@ export default function TimesheetPage() {
 
 function PeriodContainer() {
   const { from, to, unit } = useSelector(selectPeriod);
-  const dispatch = useDispatch<AppDispatch>();
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
     dispatch(queryTimesheet({ from, to }));

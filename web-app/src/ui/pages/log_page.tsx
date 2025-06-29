@@ -3,7 +3,7 @@
 import { Temporal } from "@js-temporal/polyfill";
 import * as React from "react";
 import { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 
 import {
   activitySelected,
@@ -19,7 +19,7 @@ import {
   startCountdown,
   stopCountdown,
 } from "../../application/log_slice";
-import { AppDispatch } from "../../application/store";
+import { useAppDispatch } from "../../application/store";
 import { EventHandler } from "../../common/events";
 import { Activity, WorkingDay } from "../../domain/activities";
 import ErrorComponent from "../components/error_component";
@@ -29,7 +29,7 @@ import PageLayout from "../layouts/page_layout";
 
 export default function LogPage() {
   const error = useSelector(selectError);
-  const dispatch = useDispatch<AppDispatch>();
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
     dispatch(queryRecentActivities({}));
@@ -68,7 +68,7 @@ export default function LogPage() {
 
 function CurrentActivityFormContainer() {
   const { client, project, task, notes, isDisabled, isLoggable } = useSelector(selectCurrentActivity);
-  const dispatch = useDispatch<AppDispatch>();
+  const dispatch = useAppDispatch();
 
   function handleChange(event: { name: "client" | "project" | "task" | "notes"; text: string }) {
     dispatch(changeText(event));
@@ -133,7 +133,7 @@ function FormInputComponent({
 
 function CountdownContainer() {
   const { duration, remaining, percentage, isRunning } = useSelector(selectCountdown);
-  const dispatch = useDispatch<AppDispatch>();
+  const dispatch = useAppDispatch();
 
   function handleChange(event: { duration: string }) {
     dispatch(durationSelected(event));
@@ -228,7 +228,7 @@ function DurationItemComponent({
 
 function RecentActivitiesContainer() {
   const recentActivities = useSelector(selectRecentActivities);
-  const dispatch = useDispatch<AppDispatch>();
+  const dispatch = useAppDispatch();
 
   function handleSelect(event: { activity: Activity }) {
     dispatch(activitySelected(event.activity));
