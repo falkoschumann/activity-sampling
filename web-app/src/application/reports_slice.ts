@@ -24,6 +24,7 @@ interface ReportsState {
   readonly period: PeriodState;
   readonly scope: Scope;
   readonly entries: ReportEntry[];
+  readonly totalHours: string;
   readonly error?: SerializedError;
 }
 
@@ -32,6 +33,7 @@ function initialState(): ReportsState {
     period: initialPeriodState(PeriodUnit.WEEK),
     scope: Scope.PROJECTS,
     entries: [],
+    totalHours: "PT0S",
   };
 }
 
@@ -73,6 +75,7 @@ const reportsSlice = createSlice({
     });
     builder.addCase(queryReport.fulfilled, (state, action) => {
       state.entries = action.payload.entries;
+      state.totalHours = action.payload.totalHours;
     });
     builder.addCase(queryReport.rejected, (state) => {
       state.error = {
@@ -84,6 +87,7 @@ const reportsSlice = createSlice({
     selectPeriod: (state) => state.period,
     selectScope: (state) => state.scope,
     selectEntries: (state) => state.entries,
+    selectTotalHours: (state) => state.totalHours,
     selectError: (state) => state.error,
   },
 });
@@ -91,7 +95,12 @@ const reportsSlice = createSlice({
 export const { changePeriod, changeScope, nextPeriod, previousPeriod } =
   reportsSlice.actions;
 
-export const { selectEntries, selectError, selectPeriod, selectScope } =
-  reportsSlice.selectors;
+export const {
+  selectEntries,
+  selectError,
+  selectPeriod,
+  selectScope,
+  selectTotalHours,
+} = reportsSlice.selectors;
 
 export default reportsSlice.reducer;

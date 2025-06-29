@@ -230,8 +230,8 @@ describe("Timesheet", () => {
 
       await store.dispatch(queryTimesheet(createTestTimesheetQuery()));
 
-      expect(selectWorkingHoursSummary(store.getState()).totalHours).toEqual(
-        createTestWorkingHoursSummary().totalHours,
+      expect(selectWorkingHoursSummary(store.getState())).toEqual(
+        createTestWorkingHoursSummary(),
       );
     });
 

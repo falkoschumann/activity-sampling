@@ -12,6 +12,7 @@ import {
   selectError,
   selectPeriod,
   selectScope,
+  selectTotalHours,
 } from "../../src/application/reports_slice";
 import { createNullStore } from "../../src/application/store";
 import {
@@ -78,6 +79,7 @@ describe("Reports", () => {
     it("Summarizes hours worked per week", async () => {
       const queryResultJson = JSON.stringify({
         entries: [],
+        totalHours: "PT0S",
       } as ReportQueryResult);
       const { store } = createNullStore({
         activitiesResponses: [new Response(queryResultJson)],
@@ -97,6 +99,7 @@ describe("Reports", () => {
     it("Summarizes hours worked per week when goto next period", async () => {
       const queryResultJson = JSON.stringify({
         entries: [],
+        totalHours: "PT0S",
       } as ReportQueryResult);
       const { store } = createNullStore({
         activitiesResponses: [new Response(queryResultJson)],
@@ -117,6 +120,7 @@ describe("Reports", () => {
     it("Summarizes hours worked per week when goto previous period", async () => {
       const queryResultJson = JSON.stringify({
         entries: [],
+        totalHours: "PT0S",
       } as ReportQueryResult);
       const { store } = createNullStore({
         activitiesResponses: [new Response(queryResultJson)],
@@ -137,6 +141,7 @@ describe("Reports", () => {
     it("Summarizes hours worked per month", async () => {
       const queryResultJson = JSON.stringify({
         entries: [],
+        totalHours: "PT0S",
       } as ReportQueryResult);
       const { store } = createNullStore({
         activitiesResponses: [new Response(queryResultJson)],
@@ -156,6 +161,7 @@ describe("Reports", () => {
     it("Summarizes hours worked per month when goto next period", async () => {
       const queryResultJson = JSON.stringify({
         entries: [],
+        totalHours: "PT0S",
       } as ReportQueryResult);
       const { store } = createNullStore({
         activitiesResponses: [new Response(queryResultJson)],
@@ -176,6 +182,7 @@ describe("Reports", () => {
     it("Summarizes hours worked per month when goto previous period", async () => {
       const queryResultJson = JSON.stringify({
         entries: [],
+        totalHours: "PT0S",
       } as ReportQueryResult);
       const { store } = createNullStore({
         activitiesResponses: [new Response(queryResultJson)],
@@ -196,6 +203,7 @@ describe("Reports", () => {
     it("Summarizes hours worked per year", async () => {
       const queryResultJson = JSON.stringify({
         entries: [],
+        totalHours: "PT0S",
       } as ReportQueryResult);
       const { store } = createNullStore({
         activitiesResponses: [new Response(queryResultJson)],
@@ -215,6 +223,7 @@ describe("Reports", () => {
     it("Summarizes hours worked per year when goto next period", async () => {
       const queryResultJson = JSON.stringify({
         entries: [],
+        totalHours: "PT0S",
       } as ReportQueryResult);
       const { store } = createNullStore({
         activitiesResponses: [new Response(queryResultJson)],
@@ -235,6 +244,7 @@ describe("Reports", () => {
     it("Summarizes hours worked per year when goto previous period", async () => {
       const queryResultJson = JSON.stringify({
         entries: [],
+        totalHours: "PT0S",
       } as ReportQueryResult);
       const { store } = createNullStore({
         activitiesResponses: [new Response(queryResultJson)],
@@ -255,6 +265,7 @@ describe("Reports", () => {
     it("Summarizes hours worked all the time", async () => {
       const queryResultJson = JSON.stringify({
         entries: [],
+        totalHours: "PT0S",
       } as ReportQueryResult);
       const { store } = createNullStore({
         activitiesResponses: [new Response(queryResultJson)],
@@ -271,9 +282,23 @@ describe("Reports", () => {
       });
     });
 
+    it("Summarizes the total hours worked", async () => {
+      const queryResultJson = JSON.stringify(createTestReportQueryResult());
+      const { store } = createNullStore({
+        activitiesResponses: [new Response(queryResultJson)],
+      });
+
+      await store.dispatch(queryReport(createTestReportQuery()));
+
+      expect(selectTotalHours(store.getState())).toEqual(
+        createTestReportQueryResult().totalHours,
+      );
+    });
+
     it("Queries empty result", async () => {
       const queryResultJson = JSON.stringify({
         entries: [],
+        totalHours: "PT0S",
       } as ReportQueryResult);
       const { store } = createNullStore({
         activitiesResponses: [new Response(queryResultJson)],

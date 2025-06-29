@@ -13,6 +13,7 @@ import {
   selectError,
   selectPeriod,
   selectScope,
+  selectTotalHours,
 } from "../../application/reports_slice";
 import { useAppDispatch } from "../../application/store";
 import { PeriodUnit, type ReportEntry, Scope } from "../../domain/activities";
@@ -26,6 +27,7 @@ export default function ReportsPage() {
   const scope = useSelector(selectScope);
   const error = useSelector(selectError);
   const entries = useSelector(selectEntries);
+  const totalHours = useSelector(selectTotalHours);
   const dispatch = useAppDispatch();
 
   useEffect(() => {
@@ -44,10 +46,15 @@ export default function ReportsPage() {
         />
         <ScopeComponent scope={scope} onChangeScope={(scope) => dispatch(changeScope({ scope }))} />
       </aside>
-      <main className="container my-4" style={{ paddingTop: "6.4375rem" }}>
+      <main className="container my-4" style={{ paddingTop: "6rem", paddingBottom: "2.5rem" }}>
         <ErrorComponent {...error} />
         <TimeReportComponent scope={scope} entries={entries} />
       </main>
+      <footer className="fixed-bottom bg-body-secondary">
+        <div className="container py-2">
+          <TotalHoursComponent totalHours={totalHours} />
+        </div>
+      </footer>
     </PageLayout>
   );
 }
@@ -55,7 +62,7 @@ export default function ReportsPage() {
 function TimeReportComponent({ scope, entries }: { scope: Scope; entries: ReportEntry[] }) {
   return (
     <table className="table">
-      <thead className="sticky-top" style={{ top: "9.8125rem" }}>
+      <thead className="sticky-top" style={{ top: "9.375rem" }}>
         <tr>
           <th scope="col">Name</th>
           {scope === Scope.PROJECTS && <th scope="col">Client</th>}
@@ -92,6 +99,14 @@ function ScopeComponent({ scope, onChangeScope }: { scope: Scope; onChangeScope:
           ))}
         </div>
       </div>
+    </div>
+  );
+}
+
+function TotalHoursComponent({ totalHours }: { totalHours: string }) {
+  return (
+    <div className="text-end">
+      <strong>Total hours:</strong> {formatDuration(totalHours)}
     </div>
   );
 }

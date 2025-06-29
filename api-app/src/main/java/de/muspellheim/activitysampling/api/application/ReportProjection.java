@@ -26,6 +26,7 @@ class ReportProjection {
   private final ZoneId timeZone;
 
   private final List<ReportEntry> entries = new ArrayList<>();
+  private Duration totalHours = Duration.ZERO;
 
   public ReportProjection(ReportQuery query) {
     scope = query.scope();
@@ -43,9 +44,15 @@ class ReportProjection {
   }
 
   public ReportQueryResult project(Stream<ActivityLoggedEvent> events) {
-    events.map(it -> ActivityMapping.map(it, timeZone)).forEach(this::updateEntries);
+    events
+        .map(it -> ActivityMapping.map(it, timeZone))
+        .forEach(
+            it -> {
+              updateEntries(it);
+              updateTotalHours(it);
+            });
     entries.sort(Comparator.comparing(it -> it.name().toLowerCase()));
-    return ReportQueryResult.builder().entries(entries).build();
+    return ReportQueryResult.builder().entries(entries).totalHours(totalHours).build();
   }
 
   private void updateEntries(Activity activity) {
@@ -87,5 +94,9 @@ class ReportProjection {
       var updatedEntry = existingEntry.withHours(accumulatedHours);
       entries.set(index, updatedEntry);
     }
+  }
+
+  private void updateTotalHours(Activity activity) {
+    totalHours = totalHours.plus(activity.duration());
   }
 }

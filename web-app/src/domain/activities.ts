@@ -209,6 +209,7 @@ export function createTestReportQuery(
 
 export interface ReportQueryResult {
   readonly entries: ReportEntry[];
+  readonly totalHours: string;
 }
 
 export function createTestReportQueryResult(
@@ -216,6 +217,7 @@ export function createTestReportQueryResult(
 ): ReportQueryResult {
   return {
     entries: [createTestReportEntry()],
+    totalHours: "PT42H",
     ...result,
   };
 }

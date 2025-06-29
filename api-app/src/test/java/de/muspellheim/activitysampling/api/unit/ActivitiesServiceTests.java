@@ -437,13 +437,10 @@ class ActivitiesServiceTests {
       var result = service.queryReport(ReportQuery.createTestInstance().withScope(Scope.CLIENTS));
 
       assertEquals(
-          ReportQueryResult.builder()
-              .entries(
-                  List.of(
-                      ReportEntry.builder().name("Client 1").hours(Duration.ofHours(8)).build(),
-                      ReportEntry.builder().name("Client 2").hours(Duration.ofHours(7)).build()))
-              .build(),
-          result);
+          List.of(
+              ReportEntry.builder().name("Client 1").hours(Duration.ofHours(8)).build(),
+              ReportEntry.builder().name("Client 2").hours(Duration.ofHours(7)).build()),
+          result.entries());
     }
 
     @Test
@@ -491,10 +488,8 @@ class ActivitiesServiceTests {
       var result = service.queryReport(ReportQuery.createTestInstance());
 
       assertEquals(
-          ReportQueryResult.builder()
-              .entries(List.of(ReportEntry.createTestInstance().withClient("Client 1, Client 2")))
-              .build(),
-          result);
+          List.of(ReportEntry.createTestInstance().withClient("Client 1, Client 2")),
+          result.entries());
     }
 
     @Test
@@ -512,13 +507,26 @@ class ActivitiesServiceTests {
       var result = service.queryReport(ReportQuery.createTestInstance().withScope(Scope.TASKS));
 
       assertEquals(
-          ReportQueryResult.builder()
-              .entries(
-                  List.of(
-                      ReportEntry.builder().name("Task 1").hours(Duration.ofHours(8)).build(),
-                      ReportEntry.builder().name("Task 2").hours(Duration.ofHours(7)).build()))
-              .build(),
-          result);
+          List.of(
+              ReportEntry.builder().name("Task 1").hours(Duration.ofHours(8)).build(),
+              ReportEntry.builder().name("Task 2").hours(Duration.ofHours(7)).build()),
+          result.entries());
+    }
+
+    @Test
+    void summarizesTheTotalHoursWorked() {
+      store.record(createEvent("2025-06-02T15:00:00Z").withDuration(Duration.ofHours(8)));
+      store.record(createEvent("2025-06-03T15:00:00Z").withDuration(Duration.ofHours(9)));
+      store.record(createEvent("2025-06-04T15:00:00Z").withDuration(Duration.ofHours(8)));
+      store.record(createEvent("2025-06-05T15:00:00Z").withDuration(Duration.ofHours(9)));
+      store.record(createEvent("2025-06-06T15:00:00Z").withDuration(Duration.ofHours(8)));
+      var service =
+          new ActivitiesService(
+              ActivitiesConfiguration.DEFAULT, store, new MemoryHolidayRepository(), CLOCK);
+
+      var result = service.queryReport(ReportQuery.createTestInstance());
+
+      assertEquals(Duration.parse("PT42H"), result.totalHours());
     }
 
     @Test
