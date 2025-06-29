@@ -84,12 +84,12 @@ public class ActivitiesService {
 
   public ReportQueryResult queryReport(ReportQuery query) {
     try {
-      log.info("Query time report: {}", query);
+      log.info("Query report: {}", query);
       var projection = new ReportProjection(query, configuration);
       var replay = store.replay(projection.getStartInclusive(), projection.getEndExclusive());
       return projection.project(replay);
     } catch (Exception e) {
-      log.error("Query time report failed: {}", e.getMessage(), e);
+      log.error("Query report failed: {}", e.getMessage(), e);
       throw e;
     }
   }
