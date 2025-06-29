@@ -5,7 +5,6 @@ import {
   createSlice,
   SerializedError,
 } from "@reduxjs/toolkit";
-
 import { Clock } from "../common/clock";
 import {
   ReportEntry,
@@ -14,12 +13,25 @@ import {
 } from "../domain/activities";
 import { ActivitiesApi } from "../infrastructure/activities_api";
 
+import * as periodReducer from "./period_reducer";
+import { PeriodUnit } from "./timesheet_slice";
+
 interface ReportsState {
+  readonly period: {
+    readonly from: string;
+    readonly to: string;
+    readonly unit: PeriodUnit;
+  };
   readonly entries: ReportEntry[];
   readonly error?: SerializedError;
 }
 
 const initialState: ReportsState = {
+  period: {
+    from: "2025-06-01",
+    to: "2025-06-30",
+    unit: "Month",
+  },
   entries: [],
 };
 
@@ -48,7 +60,9 @@ export const queryReport = createAsyncThunk<
 const reportsSlice = createSlice({
   name: "reports",
   initialState,
-  reducers: {},
+  reducers: {
+    ...periodReducer,
+  },
   extraReducers: (builder) => {
     // Query report
     builder.addCase(queryReport.pending, (state) => {
@@ -64,11 +78,16 @@ const reportsSlice = createSlice({
     });
   },
   selectors: {
+    selectPeriod: (state) => state.period,
     selectEntries: (state) => state.entries,
     selectError: (state) => state.error,
   },
 });
 
-export const { selectEntries, selectError } = reportsSlice.selectors;
+export const { changePeriod, initPeriod, nextPeriod, previousPeriod } =
+  reportsSlice.actions;
+
+export const { selectEntries, selectError, selectPeriod } =
+  reportsSlice.selectors;
 
 export default reportsSlice.reducer;

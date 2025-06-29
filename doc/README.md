@@ -33,9 +33,9 @@ analysis.
 - [ ] Summarize hours worked for clients
 - [x] Summarize hours worked on projects
 - [ ] Summarize hours worked on tasks
-- [ ] Summarize hours worked per day
-- [ ] Summarize hours worked per week
-- [ ] Summarize hours worked per month
+- [x] Summarize hours worked per day
+- [x] Summarize hours worked per week
+- [x] Summarize hours worked per month
 - [ ] Summarize hours worked per year
 - [ ] Summarize hours worked overall
 - [ ] Summarize the total hours worked

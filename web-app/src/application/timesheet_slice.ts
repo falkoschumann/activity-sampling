@@ -4,10 +4,8 @@ import { Temporal } from "@js-temporal/polyfill";
 import {
   createAsyncThunk,
   createSlice,
-  PayloadAction,
   SerializedError,
 } from "@reduxjs/toolkit";
-
 import { Clock } from "../common/clock";
 import {
   TimesheetEntry,
@@ -15,6 +13,8 @@ import {
   TimesheetQueryResult,
 } from "../domain/activities";
 import { ActivitiesApi } from "../infrastructure/activities_api";
+
+import * as periodReducer from "./period_reducer";
 
 export type PeriodUnit = "Day" | "Week" | "Month";
 
@@ -73,75 +73,7 @@ const timesheetSlice = createSlice({
   name: "timesheet",
   initialState: initState(),
   reducers: {
-    initPeriod: (
-      state,
-      action: PayloadAction<{
-        from: string;
-        to: string;
-        unit: PeriodUnit;
-      }>,
-    ) => {
-      state.period = action.payload;
-    },
-    changePeriod: (state, action: PayloadAction<{ unit: PeriodUnit }>) => {
-      const { from } = state.period;
-      const startDate = Temporal.PlainDate.from(from);
-      if (action.payload.unit === "Day") {
-        state.period.from = startDate.toString();
-        state.period.to = startDate.toString();
-        state.period.unit = "Day";
-      } else if (action.payload.unit === "Week") {
-        const monday = startDate.subtract({ days: startDate.dayOfWeek - 1 });
-        const sunday = monday.add({ days: 6 });
-        state.period.from = monday.toString();
-        state.period.to = sunday.toString();
-        state.period.unit = "Week";
-      } else if (action.payload.unit === "Month") {
-        const firstDayOfMonth = startDate.with({ day: 1 });
-        const lastDayOfMonth = firstDayOfMonth.add({ months: 1 }).subtract({
-          days: 1,
-        });
-        state.period.from = firstDayOfMonth.toString();
-        state.period.to = lastDayOfMonth.toString();
-        state.period.unit = "Month";
-      }
-    },
-    nextPeriod: (state) => {
-      const { from, to, unit } = state.period;
-      const startDate = Temporal.PlainDate.from(from);
-      const endDate = Temporal.PlainDate.from(to);
-      if (unit === "Day") {
-        state.period.from = startDate.add({ days: 1 }).toString();
-        state.period.to = endDate.add({ days: 1 }).toString();
-      } else if (unit === "Week") {
-        state.period.from = startDate.add({ weeks: 1 }).toString();
-        state.period.to = endDate.add({ weeks: 1 }).toString();
-      } else if (unit === "Month") {
-        state.period.from = startDate.add({ months: 1 }).toString();
-        state.period.to = endDate
-          .add({ months: 1 })
-          .with({ day: 31 })
-          .toString();
-      }
-    },
-    previousPeriod: (state) => {
-      const { from, to, unit } = state.period;
-      const startDate = Temporal.PlainDate.from(from);
-      const endDate = Temporal.PlainDate.from(to);
-      if (unit === "Day") {
-        state.period.from = startDate.subtract({ days: 1 }).toString();
-        state.period.to = endDate.subtract({ days: 1 }).toString();
-      } else if (unit === "Week") {
-        state.period.from = startDate.subtract({ weeks: 1 }).toString();
-        state.period.to = endDate.subtract({ weeks: 1 }).toString();
-      } else if (unit === "Month") {
-        state.period.from = startDate.subtract({ months: 1 }).toString();
-        state.period.to = endDate
-          .subtract({ months: 1 })
-          .with({ day: 31 })
-          .toString();
-      }
-    },
+    ...periodReducer,
   },
   extraReducers: (builder) => {
     // Query timesheet
@@ -170,9 +102,9 @@ export const { changePeriod, initPeriod, nextPeriod, previousPeriod } =
   timesheetSlice.actions;
 
 export const {
+  selectEntries,
   selectError,
   selectPeriod,
-  selectEntries,
   selectWorkingHoursSummary,
 } = timesheetSlice.selectors;
 
