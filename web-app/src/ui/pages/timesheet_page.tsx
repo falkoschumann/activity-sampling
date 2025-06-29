@@ -35,8 +35,8 @@ export default function TimesheetPage() {
       <PeriodComponent
         {...period}
         units={[PeriodUnit.DAY, PeriodUnit.WEEK, PeriodUnit.MONTH]}
-        onPreviousPeriod={() => dispatch(previousPeriod())}
-        onNextPeriod={() => dispatch(nextPeriod())}
+        onPreviousPeriod={() => dispatch(previousPeriod({}))}
+        onNextPeriod={() => dispatch(nextPeriod({}))}
         onChangePeriod={(unit) => dispatch(changePeriod({ unit }))}
       />
       <main className="container my-4" style={{ paddingTop: "3.5rem", paddingBottom: "3rem" }}>

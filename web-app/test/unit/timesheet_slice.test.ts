@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 
 import { createNullStore } from "../../src/application/store";
 import {
-  initPeriod,
+  changePeriod,
   nextPeriod,
   previousPeriod,
   queryTimesheet,
@@ -17,6 +17,7 @@ import {
   createTestTimesheetQuery,
   createTestTimesheetQueryResult,
   createTestWorkingHoursSummary,
+  PeriodUnit,
   type TimesheetQueryResult,
 } from "../../src/domain/activities";
 
@@ -35,6 +36,26 @@ describe("Timesheet", () => {
       );
     });
 
+    it("Summarizes hours worked per day", async () => {
+      const queryResultJson = JSON.stringify({
+        entries: [],
+        workingHoursSummary: createTestWorkingHoursSummary(),
+      } as TimesheetQueryResult);
+      const { store } = createNullStore({
+        activitiesResponses: [new Response(queryResultJson)],
+      });
+      const today = "2025-06-13";
+
+      store.dispatch(changePeriod({ unit: PeriodUnit.DAY, today }));
+
+      expect(selectPeriod(store.getState())).toEqual({
+        from: "2025-06-13",
+        to: "2025-06-13",
+        unit: PeriodUnit.DAY,
+        isCurrent: true,
+      });
+    });
+
     it("Summarizes hours worked per day when goto next period", async () => {
       const queryResultJson = JSON.stringify({
         entries: [],
@@ -43,15 +64,16 @@ describe("Timesheet", () => {
       const { store } = createNullStore({
         activitiesResponses: [new Response(queryResultJson)],
       });
-      store.dispatch(
-        initPeriod({ from: "2025-06-13", to: "2025-06-13", unit: "Day" }),
-      );
+      const today = "2025-06-13";
+      store.dispatch(changePeriod({ unit: PeriodUnit.DAY, today }));
 
-      store.dispatch(nextPeriod());
+      store.dispatch(nextPeriod({ today }));
+
       expect(selectPeriod(store.getState())).toEqual({
         from: "2025-06-14",
         to: "2025-06-14",
-        unit: "Day",
+        unit: PeriodUnit.DAY,
+        isCurrent: false,
       });
     });
 
@@ -63,15 +85,36 @@ describe("Timesheet", () => {
       const { store } = createNullStore({
         activitiesResponses: [new Response(queryResultJson)],
       });
-      store.dispatch(
-        initPeriod({ from: "2025-06-13", to: "2025-06-13", unit: "Day" }),
-      );
+      const today = "2025-06-13";
+      store.dispatch(changePeriod({ unit: PeriodUnit.DAY, today }));
 
-      store.dispatch(previousPeriod());
+      store.dispatch(previousPeriod({ today }));
+
       expect(selectPeriod(store.getState())).toEqual({
         from: "2025-06-12",
         to: "2025-06-12",
-        unit: "Day",
+        unit: PeriodUnit.DAY,
+        isCurrent: false,
+      });
+    });
+
+    it("Summarizes hours worked per week", async () => {
+      const queryResultJson = JSON.stringify({
+        entries: [],
+        workingHoursSummary: createTestWorkingHoursSummary(),
+      } as TimesheetQueryResult);
+      const { store } = createNullStore({
+        activitiesResponses: [new Response(queryResultJson)],
+      });
+      const today = "2025-06-13";
+
+      store.dispatch(changePeriod({ unit: PeriodUnit.WEEK, today }));
+
+      expect(selectPeriod(store.getState())).toEqual({
+        from: "2025-06-09",
+        to: "2025-06-15",
+        unit: PeriodUnit.WEEK,
+        isCurrent: true,
       });
     });
 
@@ -83,15 +126,16 @@ describe("Timesheet", () => {
       const { store } = createNullStore({
         activitiesResponses: [new Response(queryResultJson)],
       });
-      store.dispatch(
-        initPeriod({ from: "2025-06-02", to: "2025-06-08", unit: "Week" }),
-      );
+      const today = "2025-06-13";
+      store.dispatch(changePeriod({ unit: PeriodUnit.WEEK, today }));
 
-      store.dispatch(nextPeriod());
+      store.dispatch(nextPeriod({ today }));
+
       expect(selectPeriod(store.getState())).toEqual({
-        from: "2025-06-09",
-        to: "2025-06-15",
-        unit: "Week",
+        from: "2025-06-16",
+        to: "2025-06-22",
+        unit: PeriodUnit.WEEK,
+        isCurrent: false,
       });
     });
 
@@ -103,15 +147,36 @@ describe("Timesheet", () => {
       const { store } = createNullStore({
         activitiesResponses: [new Response(queryResultJson)],
       });
-      store.dispatch(
-        initPeriod({ from: "2025-06-02", to: "2025-06-08", unit: "Week" }),
-      );
+      const today = "2025-06-13";
+      store.dispatch(changePeriod({ unit: PeriodUnit.WEEK, today }));
 
-      store.dispatch(previousPeriod());
+      store.dispatch(previousPeriod({ today }));
+
       expect(selectPeriod(store.getState())).toEqual({
-        from: "2025-05-26",
-        to: "2025-06-01",
-        unit: "Week",
+        from: "2025-06-02",
+        to: "2025-06-08",
+        unit: PeriodUnit.WEEK,
+        isCurrent: false,
+      });
+    });
+
+    it("Summarizes hours worked per month", async () => {
+      const queryResultJson = JSON.stringify({
+        entries: [],
+        workingHoursSummary: createTestWorkingHoursSummary(),
+      } as TimesheetQueryResult);
+      const { store } = createNullStore({
+        activitiesResponses: [new Response(queryResultJson)],
+      });
+      const today = "2025-06-13";
+
+      store.dispatch(changePeriod({ unit: PeriodUnit.MONTH, today }));
+
+      expect(selectPeriod(store.getState())).toEqual({
+        from: "2025-06-01",
+        to: "2025-06-30",
+        unit: PeriodUnit.MONTH,
+        isCurrent: true,
       });
     });
 
@@ -123,15 +188,16 @@ describe("Timesheet", () => {
       const { store } = createNullStore({
         activitiesResponses: [new Response(queryResultJson)],
       });
-      store.dispatch(
-        initPeriod({ from: "2025-03-01", to: "2025-03-31", unit: "Month" }),
-      );
+      const today = "2025-06-13";
+      store.dispatch(changePeriod({ unit: PeriodUnit.MONTH, today }));
 
-      store.dispatch(nextPeriod());
+      store.dispatch(nextPeriod({ today }));
+
       expect(selectPeriod(store.getState())).toEqual({
-        from: "2025-04-01",
-        to: "2025-04-30",
-        unit: "Month",
+        from: "2025-07-01",
+        to: "2025-07-31",
+        unit: PeriodUnit.MONTH,
+        isCurrent: false,
       });
     });
 
@@ -143,15 +209,16 @@ describe("Timesheet", () => {
       const { store } = createNullStore({
         activitiesResponses: [new Response(queryResultJson)],
       });
-      store.dispatch(
-        initPeriod({ from: "2025-03-01", to: "2025-03-31", unit: "Month" }),
-      );
+      const today = "2025-06-13";
+      store.dispatch(changePeriod({ unit: PeriodUnit.MONTH, today }));
 
-      store.dispatch(previousPeriod());
+      store.dispatch(previousPeriod({ today }));
+
       expect(selectPeriod(store.getState())).toEqual({
-        from: "2025-02-01",
-        to: "2025-02-28",
-        unit: "Month",
+        from: "2025-05-01",
+        to: "2025-05-31",
+        unit: PeriodUnit.MONTH,
+        isCurrent: false,
       });
     });
 

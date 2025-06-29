@@ -1,28 +1,25 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
-import { Temporal } from "@js-temporal/polyfill";
 import {
   createAsyncThunk,
   createSlice,
   type SerializedError,
 } from "@reduxjs/toolkit";
 
-import { Clock } from "../common/clock";
-import type {
-  TimesheetEntry,
-  TimesheetQuery,
-  TimesheetQueryResult,
+import {
+  PeriodUnit,
+  type TimesheetEntry,
+  type TimesheetQuery,
+  type TimesheetQueryResult,
 } from "../domain/activities";
-import { PeriodUnit } from "../domain/activities";
 import { ActivitiesApi } from "../infrastructure/activities_api";
-import * as periodReducer from "./period_reducer";
+import periodReducers, {
+  initialPeriodState,
+  type PeriodState,
+} from "./period_reducer";
 
 interface TimesheetState {
-  readonly period: {
-    readonly from: string;
-    readonly to: string;
-    readonly unit: PeriodUnit;
-  };
+  readonly period: PeriodState;
   readonly entries: TimesheetEntry[];
   readonly workingHoursSummary: {
     readonly totalHours: string;
@@ -32,24 +29,21 @@ interface TimesheetState {
   readonly error?: SerializedError;
 }
 
-const initialState: TimesheetState = {
-  period: {
-    from: "2025-06-02",
-    to: "2025-06-08",
-    unit: PeriodUnit.WEEK,
-  },
-  entries: [],
-  workingHoursSummary: {
-    totalHours: "PT0S",
-    capacity: "PT40H",
-    offset: "PT0S",
-  },
-};
+function initialState(): TimesheetState {
+  return {
+    period: initialPeriodState(PeriodUnit.WEEK),
+    entries: [],
+    workingHoursSummary: {
+      totalHours: "PT0S",
+      capacity: "PT40H",
+      offset: "PT0S",
+    },
+  };
+}
 
 type TimesheetThunkConfig = {
   extra: {
     readonly activitiesApi: ActivitiesApi;
-    readonly clock: Clock;
   };
   state: { readonly timesheet: TimesheetState };
 };
@@ -70,9 +64,9 @@ export const queryTimesheet = createAsyncThunk<
 
 const timesheetSlice = createSlice({
   name: "timesheet",
-  initialState: initState(),
+  initialState,
   reducers: {
-    ...periodReducer,
+    ...periodReducers,
   },
   extraReducers: (builder) => {
     // Query timesheet
@@ -97,7 +91,7 @@ const timesheetSlice = createSlice({
   },
 });
 
-export const { changePeriod, initPeriod, nextPeriod, previousPeriod } =
+export const { changePeriod, nextPeriod, previousPeriod } =
   timesheetSlice.actions;
 
 export const {
@@ -108,17 +102,3 @@ export const {
 } = timesheetSlice.selectors;
 
 export default timesheetSlice.reducer;
-
-function initState(): TimesheetState {
-  const today = Temporal.Now.plainDateISO();
-  const monday = today.subtract({ days: today.dayOfWeek - 1 });
-  const sunday = monday.add({ days: 6 });
-  return {
-    ...initialState,
-    period: {
-      from: monday.toString(),
-      to: sunday.toString(),
-      unit: PeriodUnit.WEEK,
-    },
-  };
-}

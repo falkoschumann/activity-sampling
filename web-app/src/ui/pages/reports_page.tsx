@@ -33,8 +33,8 @@ export default function ReportsPage() {
       <PeriodComponent
         {...period}
         units={[PeriodUnit.WEEK, PeriodUnit.MONTH, PeriodUnit.YEAR, PeriodUnit.ALL_TIME]}
-        onPreviousPeriod={() => dispatch(previousPeriod())}
-        onNextPeriod={() => dispatch(nextPeriod())}
+        onPreviousPeriod={() => dispatch(previousPeriod({}))}
+        onNextPeriod={() => dispatch(nextPeriod({}))}
         onChangePeriod={(unit) => dispatch(changePeriod({ unit }))}
       />
       <main className="container my-4" style={{ paddingTop: "3.5rem", paddingBottom: "3rem" }}>

@@ -6,7 +6,6 @@ import {
   type SerializedError,
 } from "@reduxjs/toolkit";
 
-import { Clock } from "../common/clock";
 import type {
   ReportEntry,
   ReportQuery,
@@ -14,31 +13,27 @@ import type {
 } from "../domain/activities";
 import { PeriodUnit } from "../domain/activities";
 import { ActivitiesApi } from "../infrastructure/activities_api";
-import * as periodReducer from "./period_reducer";
+import periodReducers, {
+  initialPeriodState,
+  type PeriodState,
+} from "./period_reducer";
 
 interface ReportsState {
-  readonly period: {
-    readonly from: string;
-    readonly to: string;
-    readonly unit: PeriodUnit;
-  };
+  readonly period: PeriodState;
   readonly entries: ReportEntry[];
   readonly error?: SerializedError;
 }
 
-const initialState: ReportsState = {
-  period: {
-    from: "2025-06-01",
-    to: "2025-06-30",
-    unit: PeriodUnit.MONTH,
-  },
-  entries: [],
-};
+function initialState(): ReportsState {
+  return {
+    period: initialPeriodState(PeriodUnit.WEEK),
+    entries: [],
+  };
+}
 
 type ReportThunkConfig = {
   extra: {
     readonly activitiesApi: ActivitiesApi;
-    readonly clock: Clock;
   };
   state: { readonly reports: ReportsState };
 };
@@ -61,7 +56,7 @@ const reportsSlice = createSlice({
   name: "reports",
   initialState,
   reducers: {
-    ...periodReducer,
+    ...periodReducers,
   },
   extraReducers: (builder) => {
     // Query report
@@ -84,7 +79,7 @@ const reportsSlice = createSlice({
   },
 });
 
-export const { changePeriod, initPeriod, nextPeriod, previousPeriod } =
+export const { changePeriod, nextPeriod, previousPeriod } =
   reportsSlice.actions;
 
 export const { selectEntries, selectError, selectPeriod } =
