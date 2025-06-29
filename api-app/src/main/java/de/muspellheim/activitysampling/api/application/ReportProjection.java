@@ -7,7 +7,9 @@ import de.muspellheim.activitysampling.api.domain.activities.Activity;
 import de.muspellheim.activitysampling.api.domain.activities.ReportEntry;
 import de.muspellheim.activitysampling.api.domain.activities.ReportQuery;
 import de.muspellheim.activitysampling.api.domain.activities.ReportQueryResult;
+import de.muspellheim.activitysampling.api.domain.activities.Scope;
 import de.muspellheim.activitysampling.api.infrastructure.ActivityLoggedEvent;
+import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -18,13 +20,15 @@ import java.util.stream.Stream;
 
 class ReportProjection {
 
+  private final Scope scope;
   private final LocalDate startInclusive;
   private final LocalDate endExclusive;
   private final ZoneId timeZone;
 
   private final List<ReportEntry> entries = new ArrayList<>();
 
-  public ReportProjection(ReportQuery query, ActivitiesConfiguration configuration) {
+  public ReportProjection(ReportQuery query) {
+    scope = query.scope();
     startInclusive = query.from();
     endExclusive = query.to().plusDays(1);
     timeZone = query.timeZone() != null ? query.timeZone() : ZoneId.systemDefault();
@@ -45,6 +49,27 @@ class ReportProjection {
   }
 
   private void updateEntries(Activity activity) {
+    switch (scope) {
+      case CLIENTS -> updateEntry(activity.client(), activity.duration());
+      case PROJECTS -> updateProjects(activity);
+      case TASKS -> updateEntry(activity.task(), activity.duration());
+      default -> throw new IllegalArgumentException("Unknown scope: " + scope);
+    }
+  }
+
+  private void updateEntry(String name, Duration hours) {
+    var index = Lists.indexOf(entries, it -> it.name().equals(name));
+    if (index == -1) {
+      entries.add(ReportEntry.builder().name(name).hours(hours).build());
+    } else {
+      var existingEntry = entries.get(index);
+      var accumulatedHours = existingEntry.hours().plus(hours);
+      var updatedEntry = existingEntry.withHours(accumulatedHours);
+      entries.set(index, updatedEntry);
+    }
+  }
+
+  private void updateProjects(Activity activity) {
     var project = activity.project();
     var client = activity.client();
     var index = Lists.indexOf(entries, it -> it.name().equals(project));

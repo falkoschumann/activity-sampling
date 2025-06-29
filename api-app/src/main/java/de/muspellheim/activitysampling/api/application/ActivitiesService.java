@@ -85,7 +85,7 @@ public class ActivitiesService {
   public ReportQueryResult queryReport(ReportQuery query) {
     try {
       log.info("Query report: {}", query);
-      var projection = new ReportProjection(query, configuration);
+      var projection = new ReportProjection(query);
       var replay = store.replay(projection.getStartInclusive(), projection.getEndExclusive());
       return projection.project(replay);
     } catch (Exception e) {
