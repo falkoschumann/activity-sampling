@@ -6,14 +6,15 @@ import {
   createSlice,
   type SerializedError,
 } from "@reduxjs/toolkit";
+
 import { Clock } from "../common/clock";
 import type {
   TimesheetEntry,
   TimesheetQuery,
   TimesheetQueryResult,
 } from "../domain/activities";
+import { PeriodUnit } from "../domain/activities";
 import { ActivitiesApi } from "../infrastructure/activities_api";
-import type { PeriodUnit } from "./period_reducer";
 import * as periodReducer from "./period_reducer";
 
 interface TimesheetState {
@@ -35,7 +36,7 @@ const initialState: TimesheetState = {
   period: {
     from: "2025-06-02",
     to: "2025-06-08",
-    unit: "Week",
+    unit: PeriodUnit.WEEK,
   },
   entries: [],
   workingHoursSummary: {
@@ -117,7 +118,7 @@ function initState(): TimesheetState {
     period: {
       from: monday.toString(),
       to: sunday.toString(),
-      unit: "Week" as const,
+      unit: PeriodUnit.WEEK,
     },
   };
 }

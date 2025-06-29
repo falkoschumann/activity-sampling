@@ -5,15 +5,15 @@ import {
   createSlice,
   type SerializedError,
 } from "@reduxjs/toolkit";
+
 import { Clock } from "../common/clock";
 import type {
   ReportEntry,
   ReportQuery,
   ReportQueryResult,
 } from "../domain/activities";
+import { PeriodUnit } from "../domain/activities";
 import { ActivitiesApi } from "../infrastructure/activities_api";
-
-import type { PeriodUnit } from "./period_reducer";
 import * as periodReducer from "./period_reducer";
 
 interface ReportsState {
@@ -30,7 +30,7 @@ const initialState: ReportsState = {
   period: {
     from: "2025-06-01",
     to: "2025-06-30",
-    unit: "Month",
+    unit: PeriodUnit.MONTH,
   },
   entries: [],
 };

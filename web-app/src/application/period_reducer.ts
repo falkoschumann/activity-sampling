@@ -3,7 +3,7 @@
 import { Temporal } from "@js-temporal/polyfill";
 import type { PayloadAction } from "@reduxjs/toolkit";
 
-export type PeriodUnit = "Day" | "Week" | "Month" | "Year" | "All time";
+import { PeriodUnit } from "../domain/activities";
 
 export interface PeriodState {
   period: {
@@ -32,36 +32,36 @@ export function changePeriod(
 ) {
   const { from } = state.period;
   const startDate = Temporal.PlainDate.from(from);
-  if (action.payload.unit === "Day") {
+  if (action.payload.unit === PeriodUnit.DAY) {
     state.period.from = startDate.toString();
     state.period.to = startDate.toString();
-    state.period.unit = "Day";
-  } else if (action.payload.unit === "Week") {
+    state.period.unit = PeriodUnit.DAY;
+  } else if (action.payload.unit === PeriodUnit.WEEK) {
     const monday = startDate.subtract({ days: startDate.dayOfWeek - 1 });
     const sunday = monday.add({ days: 6 });
     state.period.from = monday.toString();
     state.period.to = sunday.toString();
-    state.period.unit = "Week";
-  } else if (action.payload.unit === "Month") {
+    state.period.unit = PeriodUnit.WEEK;
+  } else if (action.payload.unit === PeriodUnit.MONTH) {
     const firstDayOfMonth = startDate.with({ day: 1 });
     const lastDayOfMonth = firstDayOfMonth.add({ months: 1 }).subtract({
       days: 1,
     });
     state.period.from = firstDayOfMonth.toString();
     state.period.to = lastDayOfMonth.toString();
-    state.period.unit = "Month";
-  } else if (action.payload.unit === "Year") {
+    state.period.unit = PeriodUnit.MONTH;
+  } else if (action.payload.unit === PeriodUnit.YEAR) {
     const firstDayOfYear = startDate.with({ month: 1, day: 1 });
     const lastDayOfYear = startDate.with({ month: 12, day: 31 });
     state.period.from = firstDayOfYear.toString();
     state.period.to = lastDayOfYear.toString();
-    state.period.unit = "Year";
-  } else if (action.payload.unit === "All time") {
+    state.period.unit = PeriodUnit.YEAR;
+  } else if (action.payload.unit === PeriodUnit.ALL_TIME) {
     const firstDay = Temporal.PlainDate.from("0000-01-01");
     const lastDay = Temporal.PlainDate.from("9999-12-31");
     state.period.from = firstDay.toString();
     state.period.to = lastDay.toString();
-    state.period.unit = "All time";
+    state.period.unit = PeriodUnit.ALL_TIME;
   }
 }
 
@@ -69,16 +69,16 @@ export function nextPeriod(state: PeriodState) {
   const { from, to, unit } = state.period;
   const startDate = Temporal.PlainDate.from(from);
   const endDate = Temporal.PlainDate.from(to);
-  if (unit === "Day") {
+  if (unit === PeriodUnit.DAY) {
     state.period.from = startDate.add({ days: 1 }).toString();
     state.period.to = endDate.add({ days: 1 }).toString();
-  } else if (unit === "Week") {
+  } else if (unit === PeriodUnit.WEEK) {
     state.period.from = startDate.add({ weeks: 1 }).toString();
     state.period.to = endDate.add({ weeks: 1 }).toString();
-  } else if (unit === "Month") {
+  } else if (unit === PeriodUnit.MONTH) {
     state.period.from = startDate.add({ months: 1 }).toString();
     state.period.to = endDate.add({ months: 1 }).with({ day: 31 }).toString();
-  } else if (unit === "Year") {
+  } else if (unit === PeriodUnit.YEAR) {
     state.period.from = startDate
       .add({ years: 1 })
       .with({ month: 1, day: 1 })
@@ -94,19 +94,19 @@ export function previousPeriod(state: PeriodState) {
   const { from, to, unit } = state.period;
   const startDate = Temporal.PlainDate.from(from);
   const endDate = Temporal.PlainDate.from(to);
-  if (unit === "Day") {
+  if (unit === PeriodUnit.DAY) {
     state.period.from = startDate.subtract({ days: 1 }).toString();
     state.period.to = endDate.subtract({ days: 1 }).toString();
-  } else if (unit === "Week") {
+  } else if (unit === PeriodUnit.WEEK) {
     state.period.from = startDate.subtract({ weeks: 1 }).toString();
     state.period.to = endDate.subtract({ weeks: 1 }).toString();
-  } else if (unit === "Month") {
+  } else if (unit === PeriodUnit.MONTH) {
     state.period.from = startDate.subtract({ months: 1 }).toString();
     state.period.to = endDate
       .subtract({ months: 1 })
       .with({ day: 31 })
       .toString();
-  } else if (unit === "Year") {
+  } else if (unit === PeriodUnit.YEAR) {
     state.period.from = startDate
       .subtract({ years: 1 })
       .with({ month: 1, day: 1 })
