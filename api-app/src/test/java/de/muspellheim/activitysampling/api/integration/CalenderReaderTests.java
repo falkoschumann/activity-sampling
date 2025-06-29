@@ -34,7 +34,6 @@ class CalenderReaderTests {
   @Test
   @Disabled
   void importHolidays() {
-    // TODO Move to an application service
     var eventsReader = new CalenderReader(Paths.get("data/sachsen.ics"));
     var events = eventsReader.readEvents();
 
