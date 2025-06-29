@@ -36,8 +36,8 @@ analysis.
 - [x] Summarize hours worked per day
 - [x] Summarize hours worked per week
 - [x] Summarize hours worked per month
-- [ ] Summarize hours worked per year
-- [ ] Summarize hours worked overall
+- [x] Summarize hours worked per year
+- [x] Summarize hours worked all the time
 - [ ] Summarize the total hours worked
 
 ### Timesheet

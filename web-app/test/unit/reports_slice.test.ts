@@ -3,6 +3,7 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  changePeriod,
   initPeriod,
   nextPeriod,
   previousPeriod,
@@ -145,6 +146,64 @@ describe("Reports", () => {
       from: "2025-02-01",
       to: "2025-02-28",
       unit: "Month",
+    });
+  });
+
+  it("Summarizes hours worked per year when goto next period", async () => {
+    const queryResultJson = JSON.stringify({
+      entries: [],
+    } as ReportQueryResult);
+    const { store } = createNullStore({
+      activitiesResponses: [new Response(queryResultJson)],
+    });
+    store.dispatch(
+      initPeriod({ from: "2025-01-01", to: "2025-12-31", unit: "Year" }),
+    );
+
+    store.dispatch(nextPeriod());
+    expect(selectPeriod(store.getState())).toEqual({
+      from: "2026-01-01",
+      to: "2026-12-31",
+      unit: "Year",
+    });
+  });
+
+  it("Summarizes hours worked per year when goto previous period", async () => {
+    const queryResultJson = JSON.stringify({
+      entries: [],
+    } as ReportQueryResult);
+    const { store } = createNullStore({
+      activitiesResponses: [new Response(queryResultJson)],
+    });
+    store.dispatch(
+      initPeriod({ from: "2025-01-01", to: "2025-12-31", unit: "Year" }),
+    );
+
+    store.dispatch(previousPeriod());
+    expect(selectPeriod(store.getState())).toEqual({
+      from: "2024-01-01",
+      to: "2024-12-31",
+      unit: "Year",
+    });
+  });
+
+  it("Summarizes hours worked all the time", async () => {
+    const queryResultJson = JSON.stringify({
+      entries: [],
+    } as ReportQueryResult);
+    const { store } = createNullStore({
+      activitiesResponses: [new Response(queryResultJson)],
+    });
+    store.dispatch(
+      initPeriod({ from: "2025-06-13", to: "2025-06-13", unit: "Day" }),
+    );
+
+    store.dispatch(changePeriod({ unit: "All time" }));
+
+    expect(selectPeriod(store.getState())).toEqual({
+      from: "0000-01-01",
+      to: "9999-12-31",
+      unit: "All time",
     });
   });
 

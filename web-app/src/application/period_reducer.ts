@@ -3,7 +3,7 @@
 import { Temporal } from "@js-temporal/polyfill";
 import type { PayloadAction } from "@reduxjs/toolkit";
 
-export type PeriodUnit = "Day" | "Week" | "Month";
+export type PeriodUnit = "Day" | "Week" | "Month" | "Year" | "All time";
 
 export interface PeriodState {
   period: {
@@ -50,6 +50,18 @@ export function changePeriod(
     state.period.from = firstDayOfMonth.toString();
     state.period.to = lastDayOfMonth.toString();
     state.period.unit = "Month";
+  } else if (action.payload.unit === "Year") {
+    const firstDayOfYear = startDate.with({ month: 1, day: 1 });
+    const lastDayOfYear = startDate.with({ month: 12, day: 31 });
+    state.period.from = firstDayOfYear.toString();
+    state.period.to = lastDayOfYear.toString();
+    state.period.unit = "Year";
+  } else if (action.payload.unit === "All time") {
+    const firstDay = Temporal.PlainDate.from("0000-01-01");
+    const lastDay = Temporal.PlainDate.from("9999-12-31");
+    state.period.from = firstDay.toString();
+    state.period.to = lastDay.toString();
+    state.period.unit = "All time";
   }
 }
 
@@ -66,6 +78,15 @@ export function nextPeriod(state: PeriodState) {
   } else if (unit === "Month") {
     state.period.from = startDate.add({ months: 1 }).toString();
     state.period.to = endDate.add({ months: 1 }).with({ day: 31 }).toString();
+  } else if (unit === "Year") {
+    state.period.from = startDate
+      .add({ years: 1 })
+      .with({ month: 1, day: 1 })
+      .toString();
+    state.period.to = startDate
+      .add({ years: 1 })
+      .with({ month: 12, day: 31 })
+      .toString();
   }
 }
 
@@ -84,6 +105,15 @@ export function previousPeriod(state: PeriodState) {
     state.period.to = endDate
       .subtract({ months: 1 })
       .with({ day: 31 })
+      .toString();
+  } else if (unit === "Year") {
+    state.period.from = startDate
+      .subtract({ years: 1 })
+      .with({ month: 1, day: 1 })
+      .toString();
+    state.period.to = startDate
+      .subtract({ years: 1 })
+      .with({ month: 12, day: 31 })
       .toString();
   }
 }

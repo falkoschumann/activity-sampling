@@ -42,17 +42,23 @@ function PeriodContainer() {
     <aside className="fixed-top bg-body-secondary" style={{ marginTop: "3.5rem" }}>
       <div className="container">
         <div className="btn-toolbar py-2 gap-2" role="toolbar" aria-label="Toolbar with navigation buttons">
-          <div className="btn-group btn-group-sm" role="group" aria-label="Navigation buttons">
-            <button type="button" className="btn" onClick={() => dispatch(previousPeriod())}>
-              <i className="bi bi-chevron-left"></i>
-            </button>
-            <button type="button" className="btn" onClick={() => dispatch(nextPeriod())}>
-              <i className="bi bi-chevron-right"></i>
-            </button>
+          {unit === "All time" ? (
             <div className="align-content-center">
-              <strong>This {unit}:</strong> {formatDate(from)} - {formatDate(to)}
+              <strong>{unit}</strong>
             </div>
-          </div>
+          ) : (
+            <div className="btn-group btn-group-sm" role="group" aria-label="Navigation buttons">
+              <button type="button" className="btn" onClick={() => dispatch(previousPeriod())}>
+                <i className="bi bi-chevron-left"></i>
+              </button>
+              <button type="button" className="btn" onClick={() => dispatch(nextPeriod())}>
+                <i className="bi bi-chevron-right"></i>
+              </button>
+              <div className="align-content-center">
+                <strong>This {unit}:</strong> {formatDate(from)} - {formatDate(to)}
+              </div>
+            </div>
+          )}
           <div className="btn-group btn-group-sm ms-auto" role="group" aria-label="Option buttons">
             <button
               className="btn btn-outline-secondary dropdown-toggle"
@@ -76,6 +82,16 @@ function PeriodContainer() {
               <li>
                 <button className="dropdown-item" onClick={() => dispatch(changePeriod({ unit: "Month" }))}>
                   Month
+                </button>
+              </li>
+              <li>
+                <button className="dropdown-item" onClick={() => dispatch(changePeriod({ unit: "Year" }))}>
+                  Year
+                </button>
+              </li>
+              <li>
+                <button className="dropdown-item" onClick={() => dispatch(changePeriod({ unit: "All time" }))}>
+                  All time
                 </button>
               </li>
             </ul>
@@ -102,7 +118,7 @@ function TimeReportContainer() {
         {entries.map((entry, index) => (
           <tr key={index}>
             <td className="text-nowrap">{entry.name}</td>
-            <td className="text-nowrap">{entry.client}</td>
+            <td>{entry.client}</td>
             <td>{formatDuration(entry.hours)}</td>
           </tr>
         ))}
