@@ -12,7 +12,7 @@ analysis.
 Go to https://entra.microsoft.com.
 
 Create a new _app registration_ "Activity Sampling" under _applications_. Under
-_authentication_ add SPA platform with redirect URI your start page or
+_authentication_ add an SPA platform with redirect URI your start page or
 `http://localhost:3000` for local testing. Select neither _access tokens_ nor
 _ID tokens_ under _Implicit grant and hybrid flows_. Under _token configuration_
 add the claim _groups ID_ for each type. Create the _app roles_ `user` and
