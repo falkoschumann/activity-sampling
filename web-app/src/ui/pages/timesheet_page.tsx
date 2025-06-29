@@ -32,13 +32,15 @@ export default function TimesheetPage() {
 
   return (
     <PageLayout>
-      <PeriodComponent
-        {...period}
-        units={[PeriodUnit.DAY, PeriodUnit.WEEK, PeriodUnit.MONTH]}
-        onPreviousPeriod={() => dispatch(previousPeriod({}))}
-        onNextPeriod={() => dispatch(nextPeriod({}))}
-        onChangePeriod={(unit) => dispatch(changePeriod({ unit }))}
-      />
+      <aside className="fixed-top bg-body-secondary" style={{ marginTop: "3.5rem" }}>
+        <PeriodComponent
+          {...period}
+          units={[PeriodUnit.DAY, PeriodUnit.WEEK, PeriodUnit.MONTH]}
+          onPreviousPeriod={() => dispatch(previousPeriod({}))}
+          onNextPeriod={() => dispatch(nextPeriod({}))}
+          onChangePeriod={(unit) => dispatch(changePeriod({ unit }))}
+        />
+      </aside>
       <main className="container my-4" style={{ paddingTop: "3.5rem", paddingBottom: "3rem" }}>
         <ErrorComponent {...error} />
         <TimesheetContainer />

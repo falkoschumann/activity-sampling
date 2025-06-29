@@ -189,7 +189,7 @@ export function createTestTimesheetEntry(
 }
 
 export interface ReportQuery {
-  readonly scope: "clients" | "projects" | "tasks";
+  readonly scope: Scope;
   readonly from: string;
   readonly to: string;
   readonly timeZone?: string;
@@ -199,7 +199,7 @@ export function createTestReportQuery(
   query: Partial<ReportQuery> = {},
 ): ReportQuery {
   return {
-    scope: "projects",
+    scope: Scope.PROJECTS,
     from: "2025-06-01",
     to: "2025-06-30",
     timeZone: "Europe/Berlin",
@@ -219,6 +219,14 @@ export function createTestReportQueryResult(
     ...result,
   };
 }
+
+export const Scope = Object.freeze({
+  CLIENTS: "Clients",
+  PROJECTS: "Projects",
+  TASKS: "Tasks",
+});
+
+export type Scope = (typeof Scope)[keyof typeof Scope];
 
 export interface ReportEntry {
   readonly name: string;

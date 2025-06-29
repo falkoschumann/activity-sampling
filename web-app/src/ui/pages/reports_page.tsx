@@ -13,7 +13,7 @@ import {
   selectPeriod,
 } from "../../application/reports_slice";
 import { useAppDispatch } from "../../application/store";
-import { PeriodUnit } from "../../domain/activities";
+import { PeriodUnit, Scope } from "../../domain/activities";
 import ErrorComponent from "../components/error_component";
 import { formatDuration } from "../components/formatters";
 import { PeriodComponent } from "../components/period_component";
@@ -24,20 +24,24 @@ export default function ReportsPage() {
   const error = useSelector(selectError);
   const dispatch = useAppDispatch();
 
+  const scope = Scope.PROJECTS;
   useEffect(() => {
-    dispatch(queryReport({ scope: "projects", ...period }));
-  }, [dispatch, period]);
+    dispatch(queryReport({ scope, ...period }));
+  }, [dispatch, period, scope]);
 
   return (
     <PageLayout>
-      <PeriodComponent
-        {...period}
-        units={[PeriodUnit.WEEK, PeriodUnit.MONTH, PeriodUnit.YEAR, PeriodUnit.ALL_TIME]}
-        onPreviousPeriod={() => dispatch(previousPeriod({}))}
-        onNextPeriod={() => dispatch(nextPeriod({}))}
-        onChangePeriod={(unit) => dispatch(changePeriod({ unit }))}
-      />
-      <main className="container my-4" style={{ paddingTop: "3.5rem", paddingBottom: "3rem" }}>
+      <aside className="fixed-top bg-body-secondary" style={{ marginTop: "3.5rem" }}>
+        <PeriodComponent
+          {...period}
+          units={[PeriodUnit.WEEK, PeriodUnit.MONTH, PeriodUnit.YEAR, PeriodUnit.ALL_TIME]}
+          onPreviousPeriod={() => dispatch(previousPeriod({}))}
+          onNextPeriod={() => dispatch(nextPeriod({}))}
+          onChangePeriod={(unit) => dispatch(changePeriod({ unit }))}
+        />
+        <ScopeComponent scope={scope} />
+      </aside>
+      <main className="container my-4" style={{ paddingTop: "6.4375rem" }}>
         <ErrorComponent {...error} />
         <TimeReportContainer />
       </main>
@@ -50,7 +54,7 @@ function TimeReportContainer() {
 
   return (
     <table className="table">
-      <thead>
+      <thead className="sticky-top" style={{ top: "9.8125rem" }}>
         <tr>
           <th scope="col">Name</th>
           <th scope="col">Client</th>
@@ -67,5 +71,26 @@ function TimeReportContainer() {
         ))}
       </tbody>
     </table>
+  );
+}
+
+function ScopeComponent({ scope }: { scope: Scope }) {
+  return (
+    <div className="container">
+      <div className="btn-toolbar py-2 gap-2" role="toolbar" aria-label="Toolbar with scope buttons">
+        <div className="btn-group btn-group-sm">
+          {Object.values(Scope).map((it) => (
+            <a
+              key={it}
+              href="#"
+              className={`btn btn-outline-secondary${scope === it ? " active" : ""}`}
+              aria-current={scope === it ? "page" : undefined}
+            >
+              {it}
+            </a>
+          ))}
+        </div>
+      </div>
+    </div>
   );
 }
