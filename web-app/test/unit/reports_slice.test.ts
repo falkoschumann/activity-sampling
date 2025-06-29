@@ -15,7 +15,7 @@ import { createNullStore } from "../../src/application/store";
 import {
   createTestReportQuery,
   createTestReportQueryResult,
-  ReportQueryResult,
+  type ReportQueryResult,
 } from "../../src/domain/activities";
 
 describe("Reports", () => {

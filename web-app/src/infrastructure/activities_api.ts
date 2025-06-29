@@ -1,9 +1,9 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
 import { ConfigurableResponses } from "../common/configurable_responses";
-import { CommandStatus } from "../common/messages";
+import type { CommandStatus } from "../common/messages";
 import { OutputTracker } from "../common/output_tracker";
-import {
+import type {
   LogActivityCommand,
   RecentActivitiesQuery,
   RecentActivitiesQueryResult,

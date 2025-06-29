@@ -17,7 +17,7 @@ import {
   createTestTimesheetQuery,
   createTestTimesheetQueryResult,
   createTestWorkingHoursSummary,
-  TimesheetQueryResult,
+  type TimesheetQueryResult,
 } from "../../src/domain/activities";
 
 describe("Timesheet", () => {

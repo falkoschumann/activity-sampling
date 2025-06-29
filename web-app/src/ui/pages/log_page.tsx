@@ -20,8 +20,8 @@ import {
   stopCountdown,
 } from "../../application/log_slice";
 import { useAppDispatch } from "../../application/store";
-import { EventHandler } from "../../common/events";
-import { Activity, WorkingDay } from "../../domain/activities";
+import type { EventHandler } from "../../common/events";
+import type { Activity, WorkingDay } from "../../domain/activities";
 import ErrorComponent from "../components/error_component";
 import { formatDuration, FormatStyle } from "../components/formatters";
 import ScrollToTopButton from "../components/scroll_to_top_button";

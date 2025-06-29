@@ -4,14 +4,14 @@ import { Temporal } from "@js-temporal/polyfill";
 import {
   createAsyncThunk,
   createSlice,
-  PayloadAction,
-  SerializedError,
+  type PayloadAction,
+  type SerializedError,
 } from "@reduxjs/toolkit";
 
 import { Clock } from "../common/clock";
-import { CommandStatus } from "../common/messages";
+import type { CommandStatus } from "../common/messages";
 import { Timer } from "../common/timer";
-import {
+import type {
   Activity,
   LogActivityCommand,
   RecentActivitiesQuery,

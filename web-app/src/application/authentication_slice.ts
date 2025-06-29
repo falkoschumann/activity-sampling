@@ -2,7 +2,7 @@
 
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
-import {
+import type {
   AccountInfo,
   AuthenticationQuery,
   AuthenticationQueryResult,

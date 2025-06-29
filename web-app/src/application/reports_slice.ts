@@ -3,18 +3,18 @@
 import {
   createAsyncThunk,
   createSlice,
-  SerializedError,
+  type SerializedError,
 } from "@reduxjs/toolkit";
 import { Clock } from "../common/clock";
-import {
+import type {
   ReportEntry,
   ReportQuery,
   ReportQueryResult,
 } from "../domain/activities";
 import { ActivitiesApi } from "../infrastructure/activities_api";
 
+import type { PeriodUnit } from "./period_reducer";
 import * as periodReducer from "./period_reducer";
-import { PeriodUnit } from "./timesheet_slice";
 
 interface ReportsState {
   readonly period: {

@@ -2,16 +2,18 @@
 
 import { Temporal } from "@js-temporal/polyfill";
 
-export enum FormatStyle {
+export const FormatStyle = Object.freeze({
   // Example: Samstag, 28. Juni 2025
-  FULL = "full",
+  FULL: "full",
   // Example: 28. Juni 2025
-  LONG = "long",
+  LONG: "long",
   // Examples: 28.06.2025, 12:02:38
-  MEDIUM = "medium",
+  MEDIUM: "medium",
   // Examples: 28.06.25, 12:02
-  SHORT = "short",
-}
+  SHORT: "short",
+});
+
+export type FormatStyle = (typeof FormatStyle)[keyof typeof FormatStyle];
 
 export function formatDateTime(
   dateTime: Temporal.PlainDateTime | string,

@@ -3,7 +3,7 @@
 import { describe, expect, it } from "vitest";
 
 import {
-  AuthenticationQueryResult,
+  type AuthenticationQueryResult,
   createTestAccountInfo,
 } from "../../src/domain/authentication";
 import { AuthenticationApi } from "../../src/infrastructure/authentication_api";

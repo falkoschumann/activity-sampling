@@ -24,7 +24,7 @@ import {
   createTestLogActivityCommand,
   createTestRecentActivitiesQuery,
   createTestRecentActivitiesQueryResult,
-  RecentActivitiesQueryResult,
+  type RecentActivitiesQueryResult,
 } from "../../src/domain/activities";
 
 describe("Log", () => {

@@ -1,7 +1,7 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
 import { Temporal } from "@js-temporal/polyfill";
-import { PayloadAction } from "@reduxjs/toolkit";
+import type { PayloadAction } from "@reduxjs/toolkit";
 
 export type PeriodUnit = "Day" | "Week" | "Month";
 

@@ -2,7 +2,7 @@
 
 import { ConfigurableResponses } from "../common/configurable_responses";
 
-import {
+import type {
   AuthenticationQuery,
   AuthenticationQueryResult,
 } from "../domain/authentication";

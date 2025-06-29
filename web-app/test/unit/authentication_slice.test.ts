@@ -8,7 +8,7 @@ import {
 } from "../../src/application/authentication_slice";
 import { createNullStore } from "../../src/application/store";
 import {
-  AuthenticationQueryResult,
+  type AuthenticationQueryResult,
   createTestAccountInfo,
 } from "../../src/domain/authentication";
 
