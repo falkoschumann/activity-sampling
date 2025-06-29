@@ -30,7 +30,7 @@ export default function TimesheetPage() {
       </main>
       <footer className="fixed-bottom bg-body">
         <div className="container py-2">
-          <CapacityComponent />
+          <CapacityContainer />
         </div>
       </footer>
     </PageLayout>
@@ -132,7 +132,7 @@ function TimesheetContainer() {
   );
 }
 
-function CapacityComponent() {
+function CapacityContainer() {
   const { totalHours, offset, capacity } = useSelector(selectWorkingHoursSummary);
   const totalHoursInSeconds = Temporal.Duration.from(totalHours).total("seconds");
   const offsetInSeconds = Temporal.Duration.from(offset).total("seconds");
