@@ -24,7 +24,7 @@
     "react-router": "7.6.3"
   },
   "devDependencies": {
-    "@eslint/js": "9.29.0",
+    "@eslint/js": "9.30.0",
     "@softarc/sheriff-core": "0.18.1",
     "@types/node": "24.0.7",
     "@types/react": "19.1.8",
