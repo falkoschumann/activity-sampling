@@ -1,0 +1,20 @@
+@startuml
+
+title "Events for Activity Sampling System"
+
+class IntervalElapsed {
+  timestamp: Timestamp
+  duration: Duration
+  activity?: Activity
+}
+
+class ActivityLogged {
+  timestamp: Timestamp
+  duration: Duration
+  client: String
+  project: String
+  task: String
+  notes?: String
+}
+
+@enduml

@@ -54,23 +54,7 @@ analysis.
 
 ## Events
 
-```mermaid
-classDiagram
-    class IntervalElapsed {
-        timestamp: Timestamp
-        duration: Duration
-        activity?: Activity
-    }
-
-    class ActivityLogged {
-        timestamp: Timestamp
-        duration: Duration
-        client: String
-        project: String
-        task: String
-        notes?: String
-    }
-```
+![Events](events.png)
 
 ## Architecture
 
