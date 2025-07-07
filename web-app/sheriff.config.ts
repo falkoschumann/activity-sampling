@@ -2,16 +2,9 @@
 
 import { sameTag, SheriffConfig } from "@softarc/sheriff-core";
 
-/**
- * Minimal configuration for Sheriff
- * Assigns the 'noTag' tag to all modules and
- * allows all modules to depend on each other.
- */
-
 export const config: SheriffConfig = {
   enableBarrelLess: true,
   modules: {
-    // apply tags to your modules
     "src/application": "layer:application",
     "src/common": "layer:common",
     "src/domain": "layer:domain",
@@ -25,20 +18,14 @@ export const config: SheriffConfig = {
   depRules: {
     // root is a virtual module, which contains all files not being part
     // of any module, e.g. application shell, main.ts, etc.
-    //root: "noTag",
     root: "layer:*",
     noTag: "noTag",
 
     // add your dependency rules here
-    "layer:ui": ["layer:application", "layer:domain", "layer:common", "ui:*"],
-    "layer:application": [
-      "layer:domain",
-      "layer:infrastructure",
-      "layer:common",
-    ],
-    "layer:domain": ["layer:common"],
-    "layer:infrastructure": ["layer:domain", "layer:common"],
-    "layer:common": sameTag,
+    "layer:ui": ["layer:application", "layer:domain", "ui:*"],
+    "layer:application": ["layer:domain", "layer:infrastructure"],
+    "layer:infrastructure": ["layer:domain"],
+    "layer:*": ["layer:common"],
     "ui:page": ["ui:layout", "ui:component", "layer:application"],
     "ui:layout": ["ui:component", "layer:application"],
     "ui:component": sameTag,
