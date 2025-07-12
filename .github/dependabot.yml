@@ -7,20 +7,22 @@ updates:
   - package-ecosystem: gradle
     directory: "/api-app"
     schedule:
-      interval: "daily"
-  - package-ecosystem: npm
+      interval: "weekly"
+    groups:
+      minor-and-patch:
+        patterns:
+          - "*"
+      update-types:
+        - "minor"
+        - "patch"
+  - package-ecosystem: "npm"
     directory: "/web-app"
     schedule:
-      interval: "daily"
+      interval: "weekly"
     groups:
-      react:
+      minor-and-patch:
         patterns:
-          - "react"
-          - "react-dom"
-        update-types:
-          - "major"
-          - "minor"
-      vitest:
-        patterns:
-          - "vitest"
-          - "@vitest/coverage-v8"
+          - "*"
+      update-types:
+        - "minor"
+        - "patch"
