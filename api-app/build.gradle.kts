@@ -8,9 +8,9 @@ plugins {
   jacoco
   java
   pmd
-  id("com.diffplug.spotless") version "7.2.0"
+  id("com.diffplug.spotless") version "7.2.1"
   id("io.spring.dependency-management") version "1.1.7"
-  id("org.springframework.boot") version "3.5.3"
+  id("org.springframework.boot") version "3.5.4"
 }
 
 configurations {
@@ -30,7 +30,7 @@ dependencyManagement {
 }
 
 dependencies {
-  implementation("org.apache.commons:commons-csv:1.14.0")
+  implementation("org.apache.commons:commons-csv:1.14.1")
   implementation("com.azure.spring:spring-cloud-azure-starter-active-directory")
   implementation("com.azure.spring:spring-cloud-azure-starter-actuator")
   implementation("org.mnode.ical4j:ical4j:4.1.1")
