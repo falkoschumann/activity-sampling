@@ -30,7 +30,7 @@ dependencyManagement {
 }
 
 dependencies {
-  implementation("org.apache.commons:commons-csv:1.14.0")
+  implementation("org.apache.commons:commons-csv:1.14.1")
   implementation("com.azure.spring:spring-cloud-azure-starter-active-directory")
   implementation("com.azure.spring:spring-cloud-azure-starter-actuator")
   implementation("org.mnode.ical4j:ical4j:4.1.1")
@@ -42,6 +42,8 @@ dependencies {
   implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
   implementation("org.thymeleaf.extras:thymeleaf-extras-springsecurity6")
   compileOnly("org.projectlombok:lombok")
+  compileOnly("com.google.code.findbugs:annotations:3.0.1")
+  compileOnly("com.google.code.findbugs:jsr305:3.0.1")
   developmentOnly("org.springframework.boot:spring-boot-devtools")
   annotationProcessor("org.projectlombok:lombok")
   annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
