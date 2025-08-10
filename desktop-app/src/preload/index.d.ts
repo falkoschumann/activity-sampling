@@ -3,17 +3,17 @@
 declare global {
   interface Window {
     electron: {
-      ping: () => void
+      ping: () => void;
       process: {
         versions: {
-          electron: string
-          chrome: string
-          node: string
-        }
-      }
-    }
-    api: unknown
+          electron: string;
+          chrome: string;
+          node: string;
+        };
+      };
+    };
+    api: unknown;
   }
 }
 
-export {}
+export {};

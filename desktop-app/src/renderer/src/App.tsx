@@ -1,10 +1,10 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
-import electronLogo from './assets/electron.svg'
-import Versions from './components/Versions'
+import electronLogo from "./assets/electron.svg";
+import Versions from "./components/Versions";
 
 function App(): React.JSX.Element {
-  const ping = (): void => window.electron.ping()
+  const ping = (): void => window.electron.ping();
 
   return (
     <>
@@ -31,7 +31,7 @@ function App(): React.JSX.Element {
       </div>
       <Versions></Versions>
     </>
-  )
+  );
 }
 
-export default App
+export default App;

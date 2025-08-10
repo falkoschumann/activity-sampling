@@ -28,11 +28,7 @@
     "target": "ES2022",
     "useDefineForClassFields": true,
     // Projects
-    "lib": [
-      "ES2022",
-      "DOM",
-      "DOM.Iterable"
-    ],
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.web.tsbuildinfo",
     // Completeness
     "skipLibCheck": true
