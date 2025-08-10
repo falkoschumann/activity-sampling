@@ -1,31 +1,46 @@
-import tseslint from '@electron-toolkit/eslint-config-ts'
-import eslintConfigPrettier from '@electron-toolkit/eslint-config-prettier'
-import eslintPluginReact from 'eslint-plugin-react'
-import eslintPluginReactHooks from 'eslint-plugin-react-hooks'
-import eslintPluginReactRefresh from 'eslint-plugin-react-refresh'
+// Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
-export default tseslint.config(
-  { ignores: ['**/node_modules', '**/dist', '**/out'] },
-  tseslint.configs.recommended,
-  eslintPluginReact.configs.flat.recommended,
-  eslintPluginReact.configs.flat['jsx-runtime'],
+import js from '@eslint/js'
+import headers from 'eslint-plugin-headers'
+import react from 'eslint-plugin-react'
+import reactHooks from 'eslint-plugin-react-hooks'
+import reactRefresh from 'eslint-plugin-react-refresh'
+import globals from 'globals'
+import ts from 'typescript-eslint'
+
+export default ts.config(
+  { ignores: ['coverage', 'dist', 'out'] },
   {
-    settings: {
-      react: {
-        version: 'detect'
+    extends: [js.configs.recommended, ...ts.configs.recommended],
+    files: ['**/*.{cjs,mjs,js,jsx,ts,tsx}'],
+    languageOptions: {
+      ecmaVersion: 2020,
+      globals: globals.browser,
+      parserOptions: {
+        ecmaFeatures: {
+          jsx: true
+        }
       }
-    }
-  },
-  {
-    files: ['**/*.{ts,tsx}'],
+    },
     plugins: {
-      'react-hooks': eslintPluginReactHooks,
-      'react-refresh': eslintPluginReactRefresh
+      headers,
+      react,
+      'react-hooks': reactHooks,
+      'react-refresh': reactRefresh
     },
     rules: {
-      ...eslintPluginReactHooks.configs.recommended.rules,
-      ...eslintPluginReactRefresh.configs.vite.rules
+      ...reactHooks.configs.recommended.rules,
+      'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
+      'headers/header-format': [
+        'error',
+        {
+          source: 'string',
+          style: 'line',
+          trailingNewlines: 2,
+          content: `Copyright (c) ${new Date().getUTCFullYear()} Falko Schumann. All rights reserved. MIT license.`
+        }
+      ],
+      '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }]
     }
-  },
-  eslintConfigPrettier
+  }
 )

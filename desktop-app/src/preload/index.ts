@@ -1,3 +1,5 @@
+// Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
+
 import { contextBridge, ipcRenderer } from 'electron'
 
 // Custom APIs for renderer
@@ -23,10 +25,10 @@ if (process.contextIsolated) {
     console.error(error)
   }
 } else {
-  // @ts-ignore (define in dts)
+  // @ts-expect-error define in dts
   window.electron = {
     ping: () => ipcRenderer.send('ping')
   }
-  // @ts-ignore (define in dts)
+  // @ts-expect-error define in dts
   window.api = api
 }
