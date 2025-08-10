@@ -61,3 +61,23 @@ The `Makefile` runs the built as default task. Other tasks are
 - `format`: format source code
 
 ## Credits
+
+## Open Issues
+
+- Store view parameters in URL query
+- Add return to "this month" button when period is not this month, same for
+  other units
+- Create detailed timesheet with timestamp instead of only date
+- Import holidays from an iCalendar file (currently via `CalenderReader.main()`)
+- Use the list of vacation days to automatically create activity entries
+- Handle null or non-null values
+- use 20-minute sampling interval
+- create a report with normalized start time and end time for 30 minutes
+- center duration around timestamp
+- use a task as category:
+    - fix, feat, build, chore, ci, docs, style, refactor, perf, test
+      (conventional commits)
+    - business development, design, marketing, programming, project management,
+      vacation (Harvest)
+    - epic, story, task, bug (Jira)
+    - vacation, illness, meeting

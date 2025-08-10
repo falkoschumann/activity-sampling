@@ -28,7 +28,7 @@ export default function TimesheetPage() {
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    dispatch(queryTimesheet({ ...period }));
+    void dispatch(queryTimesheet({ ...period }));
   }, [dispatch, period]);
 
   return (
@@ -93,6 +93,7 @@ function TimesheetComponent({ entries }: { entries: TimesheetEntry[] }) {
 }
 
 function CapacityContainer() {
+  // TODO move logic to slice
   const { totalHours, offset, capacity } = useSelector(selectWorkingHoursSummary);
   const totalHoursInSeconds = Temporal.Duration.from(totalHours).total("seconds");
   const offsetInSeconds = Temporal.Duration.from(offset).total("seconds");
