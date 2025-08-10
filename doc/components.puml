@@ -12,16 +12,21 @@ System_Boundary(activitySampling, "Activity Sampling System") {
   Container_Ext(proxy, "Proxy", "Nginx", "Handles the incoming requests.")
   Container(webApp, "Static Web App", "TypeScript, React", "Provides a graphical user interface for the API.")
   Container(apiApp, "API App", "Java, Spring", "Handles all the business logic and data storage.")
-  ContainerDb_Ext(database, "Database", "Filesystem, CSV", "Stores the logged activities.")
+  Container(desktopApp, "Desktop App", "TypeScript, Electron", "Combines a graphical user interface and handling the business logic and datas storage.")
+  ContainerDb_Ext(eventStore, "Event　Store", "Filesystem, CSV", "Stores the logged activities.")
 
   Rel(proxy, webApp, "Delivers", "HTTPS")
   Rel(proxy, apiApp, "Routes public endpoints", "HTTPS")
-  Rel_Up(webApp, apiApp, "Uses", "JSON/HTTPS")
-  Rel(apiApp, database, "Record activities", "SQL/TCP")
+  Rel(webApp, apiApp, "Uses", "JSON/HTTPS")
+  Rel(apiApp, eventStore, "Record activities", "File")
+  Rel(desktopApp, eventStore, "Record activities", "File")
 }
 
 Rel(softwareDeveloper, proxy, "Log activity", "HTTPS")
+Rel(softwareDeveloper, desktopApp, "Log activity")
+
 Rel(productOwner, proxy, "Analyze effort", "HTTPS")
+Rel(productOwner, desktopApp, "Analyze effort")
 
 SHOW_FLOATING_LEGEND()
 @enduml

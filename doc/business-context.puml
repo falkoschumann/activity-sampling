@@ -10,12 +10,12 @@ Person(productOwner, "Product Owner", "Wants to analyze the effort.")
 
 System(activitySampling, "Activity Sampling", "Periodically asks the user about their current activity and log it for analysis.")
 
-SystemDb_Ext(database, "Database", "Stores the logged activities.")
+SystemDb_Ext(eventStore, "Event Store", "Stores the logged activities.")
 
 Rel(softwareDeveloper, activitySampling, "Log activity")
 Rel(productOwner, activitySampling, "Analyze effort")
-Rel(activitySampling, database, "Store protocol")
+Rel(activitySampling, eventStore, "Store protocol")
 
 SHOW_FLOATING_LEGEND()
-Lay_Left(LEGEND(), database)
+Lay_Left(LEGEND(), eventStore)
 @enduml
