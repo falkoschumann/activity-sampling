@@ -43,7 +43,7 @@ dependencies {
   implementation("org.thymeleaf.extras:thymeleaf-extras-springsecurity6")
   compileOnly("org.projectlombok:lombok")
   compileOnly("com.google.code.findbugs:annotations:3.0.1")
-  compileOnly("com.google.code.findbugs:jsr305:3.0.1")
+  compileOnly("com.google.code.findbugs:jsr305:3.0.2")
   developmentOnly("org.springframework.boot:spring-boot-devtools")
   annotationProcessor("org.projectlombok:lombok")
   annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
