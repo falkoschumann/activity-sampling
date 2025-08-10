@@ -7,6 +7,7 @@ all: dist check
 
 clean:
 	rm -rf coverage
+	rm -rf out
 
 distclean: clean
 	rm -rf dist
@@ -15,19 +16,19 @@ distclean: clean
 dist: build
 
 start:
-	npm run preview
+	npm start
 
 check: test
 	npx eslint .
 	npx prettier . --check
-	npx sheriff verify src/main.tsx
+	npx sheriff verify
 
 format:
 	npx eslint --fix .
 	npx prettier . --write
 
 dev: prepare
-	npx vite
+	npm run dev
 
 test: prepare
 	npx vitest run
