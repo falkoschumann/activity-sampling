@@ -25,7 +25,7 @@ export class ActivitiesService {
   }
 
   async logActivity(command: LogActivityCommand): Promise<CommandStatus> {
-    this.#eventStore.record(command);
+    await this.#eventStore.record(command);
     return createSuccess();
   }
 }

@@ -3,10 +3,10 @@
 import { describe, expect, it } from "vitest";
 
 import { ActivitiesService } from "../../src/main/application/activities_service";
-import { createTestLogActivityCommand } from "../../src/shared/domain/activities";
-import { createSuccess } from "../../src/shared/domain/messages";
 import { EventStore } from "../../src/main/infrastructure/event_store";
 import { createTestActivityLoggedEvent } from "../../src/main/infrastructure/events";
+import { createTestLogActivityCommand } from "../../src/shared/domain/activities";
+import { createSuccess } from "../../src/shared/domain/messages";
 
 describe("Activities service", () => {
   describe("Log activity", () => {
