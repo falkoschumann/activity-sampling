@@ -4,7 +4,7 @@ import { SheriffConfig } from "@softarc/sheriff-core";
 
 export const config: SheriffConfig = {
   entryPoints: {
-    common: "src/common/index.ts",
+    common: "src/shared/index.ts",
     main: "src/main/index.ts",
     preload: "src/preload/index.ts",
     renderer: "src/renderer/index.tsx",
@@ -34,11 +34,11 @@ export const config: SheriffConfig = {
       "component:renderer",
     ],
 
-    "src/common": ["layer:entry", "component:common"],
-    "src/common/application": ["layer:application", "component:common"],
-    "src/common/common": ["layer:common", "component:common"],
-    "src/common/domain": ["layer:domain", "component:common"],
-    "src/common/infrastructure": ["layer:infrastructure", "component:common"],
+    "src/shared": ["layer:entry", "component:shared"],
+    "src/shared/application": ["layer:application", "component:shared"],
+    "src/shared/common": ["layer:common", "component:shared"],
+    "src/shared/domain": ["layer:domain", "component:shared"],
+    "src/shared/infrastructure": ["layer:infrastructure", "component:shared"],
   },
   depRules: {
     // root is a virtual module, which contains all files not being part
@@ -52,8 +52,8 @@ export const config: SheriffConfig = {
     "layer:application": ["layer:domain", "layer:infrastructure"],
     "layer:infrastructure": ["layer:domain"],
     "layer:*": ["layer:common"],
-    "component:main": ["layer:*", "component:common"],
-    "component:preload": ["layer:*", "component:common"],
-    "component:renderer": ["layer:*", "component:common"],
+    "component:main": ["layer:*", "component:shared"],
+    "component:preload": ["layer:*", "component:shared"],
+    "component:renderer": ["layer:*", "component:shared"],
   },
 };
