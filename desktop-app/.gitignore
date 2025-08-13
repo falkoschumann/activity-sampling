@@ -1,4 +1,6 @@
 coverage/
+data/
+testdata/
 
 !build/
 .vscode/

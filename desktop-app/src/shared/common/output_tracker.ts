@@ -1,6 +1,6 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
-export class OutputTracker<T> {
+export class OutputTracker<T = unknown> {
   static create<T>(eventTarget: EventTarget, event: string) {
     return new OutputTracker<T>(eventTarget, event);
   }

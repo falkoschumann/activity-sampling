@@ -1,6 +1,6 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
-export class ConfigurableResponses<T> {
+export class ConfigurableResponses<T = unknown> {
   static create<T>(responses?: T | T[], name?: string) {
     return new ConfigurableResponses<T>(responses, name);
   }
