@@ -108,9 +108,7 @@ class FsPromiseStub {
     return Promise.resolve(new FileHandleStub(this.#configurableResponses));
   }
 
-  async writeFile() {
-    return Promise.resolve();
-  }
+  async writeFile() {}
 }
 
 class FileHandleStub {
