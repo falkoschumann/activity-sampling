@@ -9,6 +9,17 @@ export interface ActivityLoggedEvent {
   readonly notes?: string;
 }
 
+export function createActivityLoggedEvent({
+  timestamp,
+  duration,
+  client,
+  project,
+  task,
+  notes,
+}: ActivityLoggedEvent): ActivityLoggedEvent {
+  return { timestamp, duration, client, project, task, notes };
+}
+
 export function createTestActivityLoggedEvent({
   timestamp = "2025-08-11T12:30:00Z",
   duration = "PT30M",
