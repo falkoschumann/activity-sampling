@@ -9,18 +9,18 @@ analysis.
 
 ### Ask periodically
 
-- [x] Start countdown with a given interval
+- [x] Start the countdown with a given interval
 - [ ] Start countdown with the default interval when the application starts
 
 ### Current Interval
 
-- [x] Notify user when an interval is elapsed
+- [x] Notify the user when an interval is elapsed
 
 ### Log Activity
 
-- [x] Log the activity with client, project, task and optional notes
+- [x] Log the activity with a client, a project, a task and an optional notes
 - [x] Select an activity from recent activities
-- [x] Select last activity when the application starts
+- [x] Select the last activity when the application starts
 
 ### Recent Activities
 

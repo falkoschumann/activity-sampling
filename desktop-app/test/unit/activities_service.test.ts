@@ -10,30 +10,34 @@ import { createSuccess } from "../../src/shared/domain/messages";
 
 describe("Activities service", () => {
   describe("Log activity", () => {
-    it("Log the activity with client, project and task", async () => {
-      const eventStore = EventStore.createNull();
-      const service = ActivitiesService.createNull({ eventStore });
-      const recordEvents = eventStore.trackRecorded();
+    describe("Log the activity with a client, a project, a task and an optional notes", () => {
+      it("Logs without an optional notes", async () => {
+        const eventStore = EventStore.createNull();
+        const service = ActivitiesService.createNull({ eventStore });
+        const recordEvents = eventStore.trackRecorded();
 
-      const status = await service.logActivity(createTestLogActivityCommand());
+        const status = await service.logActivity(
+          createTestLogActivityCommand(),
+        );
 
-      expect(status).toEqual(createSuccess());
-      expect(recordEvents.data).toEqual([createTestActivityLoggedEvent()]);
-    });
+        expect(status).toEqual(createSuccess());
+        expect(recordEvents.data).toEqual([createTestActivityLoggedEvent()]);
+      });
 
-    it("Log the activity with client, project, task and optional notes", async () => {
-      const eventStore = EventStore.createNull();
-      const service = ActivitiesService.createNull({ eventStore });
-      const recordEvents = eventStore.trackRecorded();
+      it("Logs with an optional notes", async () => {
+        const eventStore = EventStore.createNull();
+        const service = ActivitiesService.createNull({ eventStore });
+        const recordEvents = eventStore.trackRecorded();
 
-      const status = await service.logActivity(
-        createTestLogActivityCommand({ notes: "Lorem ipsum" }),
-      );
+        const status = await service.logActivity(
+          createTestLogActivityCommand({ notes: "Lorem ipsum" }),
+        );
 
-      expect(status).toEqual(createSuccess());
-      expect(recordEvents.data).toEqual([
-        createTestActivityLoggedEvent({ notes: "Lorem ipsum" }),
-      ]);
+        expect(status).toEqual(createSuccess());
+        expect(recordEvents.data).toEqual([
+          createTestActivityLoggedEvent({ notes: "Lorem ipsum" }),
+        ]);
+      });
     });
   });
 });
