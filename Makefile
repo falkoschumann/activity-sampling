@@ -1,5 +1,5 @@
 export NPM_CONFIG_YES=true
-SUBDIRS = web-app api-app
+SUBDIRS = desktop-app web-app api-app
 ROOT_FILES = .github/ doc/ README.md
 PLANTUML_FILES = $(wildcard doc/*.puml)
 DIAGRAM_FILES = $(subst .puml,.png,$(PLANTUML_FILES))
