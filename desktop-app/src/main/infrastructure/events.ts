@@ -2,7 +2,7 @@
 
 export class ActivityLoggedEvent {
   static createTestData({
-    timestamp = "2025-08-11T12:30:00Z",
+    timestamp = "2025-08-14T11:00:00Z",
     duration = "PT30M",
     client = "Test client",
     project = "Test project",

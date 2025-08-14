@@ -5,7 +5,10 @@ import { describe, expect, it } from "vitest";
 import { ActivitiesService } from "../../src/main/application/activities_service";
 import { EventStore } from "../../src/main/infrastructure/event_store";
 import { ActivityLoggedEvent } from "../../src/main/infrastructure/events";
-import { createTestLogActivityCommand } from "../../src/main/domain/activities";
+import {
+  createTestActivity,
+  createTestLogActivityCommand,
+} from "../../src/main/domain/activities";
 import { createSuccess } from "../../src/main/common/messages";
 
 describe("Activities service", () => {
@@ -40,6 +43,19 @@ describe("Activities service", () => {
           ActivityLoggedEvent.createTestData({ notes: "Lorem ipsum" }),
         ]);
       });
+    });
+  });
+
+  describe("Recent activities", () => {
+    it("Return last activity", async () => {
+      const eventStore = EventStore.createNull({
+        events: [[ActivityLoggedEvent.createTestData()]],
+      });
+      const service = ActivitiesService.createNull({ eventStore });
+
+      const result = await service.queryRecentActivities({});
+
+      expect(result.lastActivity).toEqual(createTestActivity());
     });
   });
 });

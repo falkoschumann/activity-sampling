@@ -1,9 +1,15 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
-import type { LogActivityCommand } from "../domain/activities";
+import {
+  createActivity,
+  type LogActivityCommand,
+  type RecentActivitiesQuery,
+  type RecentActivitiesQueryResult,
+} from "../domain/activities";
 import { type CommandStatus, createSuccess } from "../common/messages";
 import { EventStore } from "../infrastructure/event_store";
 import { ActivityLoggedEvent } from "../infrastructure/events";
+import { Temporal } from "@js-temporal/polyfill";
 
 export class ActivitiesService {
   static create({ eventStore = EventStore.create() }): ActivitiesService {
@@ -26,5 +32,35 @@ export class ActivitiesService {
     const event = new ActivityLoggedEvent(command);
     await this.#eventStore.record(event);
     return createSuccess();
+  }
+
+  async queryRecentActivities(
+    _query: RecentActivitiesQuery,
+  ): Promise<RecentActivitiesQueryResult> {
+    const replay = this.#eventStore.replay();
+    let lastEvent: ActivityLoggedEvent | undefined;
+    for await (const event of replay) {
+      // TODO validate event
+      lastEvent = event as ActivityLoggedEvent;
+    }
+    const lastActivity =
+      lastEvent &&
+      createActivity({
+        ...lastEvent,
+        dateTime: Temporal.Instant.from(lastEvent.timestamp).toString({
+          timeZone: Temporal.Now.timeZoneId(),
+        }),
+      });
+
+    return {
+      lastActivity,
+      workingDays: [],
+      timeSummary: {
+        hoursToday: "PT0S",
+        hoursYesterday: "PT0S",
+        hoursThisWeek: "PT0S",
+        hoursThisMonth: "PT0S",
+      },
+    };
   }
 }

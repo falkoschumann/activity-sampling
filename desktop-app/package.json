@@ -17,6 +17,7 @@
   },
   "devDependencies": {
     "@eslint/js": "9.33.0",
+    "@js-temporal/polyfill": "0.5.1",
     "@softarc/sheriff-core": "0.19.0",
     "@types/node": "22.16.5",
     "@types/react": "19.1.8",
