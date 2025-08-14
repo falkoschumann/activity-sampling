@@ -45,8 +45,8 @@ export class ActivitiesService {
   async queryRecentActivities(
     query: RecentActivitiesQuery,
   ): Promise<RecentActivitiesQueryResult> {
-    const replay = this.#eventStore.replay();
     const projection = new RecentActivitiesProjection(query, this.#clock);
+    const replay = this.#eventStore.replay();
     return projection.project(replay);
   }
 }
