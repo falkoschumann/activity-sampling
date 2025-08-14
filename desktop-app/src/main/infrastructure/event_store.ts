@@ -4,8 +4,8 @@ import fsPromise from "node:fs/promises";
 import path from "node:path";
 import { parse, stringify } from "csv";
 
-import { ConfigurableResponses } from "../../shared/common/configurable_responses";
-import { OutputTracker } from "../../shared/common/output_tracker";
+import { ConfigurableResponses } from "../common/configurable_responses";
+import { OutputTracker } from "../common/output_tracker";
 
 const RECORDED_EVENT = "recorded";
 

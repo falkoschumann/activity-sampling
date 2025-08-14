@@ -1,10 +1,7 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
-import type { LogActivityCommand } from "../../shared/domain/activities";
-import {
-  type CommandStatus,
-  createSuccess,
-} from "../../shared/domain/messages";
+import type { LogActivityCommand } from "../domain/activities";
+import { type CommandStatus, createSuccess } from "../common/messages";
 import { EventStore } from "../infrastructure/event_store";
 import { ActivityLoggedEvent } from "../infrastructure/events";
 

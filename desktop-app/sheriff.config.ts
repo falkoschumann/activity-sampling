@@ -4,7 +4,6 @@ import { SheriffConfig } from "@softarc/sheriff-core";
 
 export const config: SheriffConfig = {
   entryPoints: {
-    common: "src/shared/index.ts",
     main: "src/main/index.ts",
     preload: "src/preload/index.ts",
     renderer: "src/renderer/index.tsx",
@@ -13,32 +12,13 @@ export const config: SheriffConfig = {
   enableBarrelLess: true,
   excludeRoot: true,
   modules: {
-    "src/main": ["layer:entry", "component:main"],
-    "src/main/application": ["layer:application", "component:main"],
-    "src/main/common": ["layer:common", "component:main"],
-    "src/main/domain": ["layer:domain", "component:main"],
-    "src/main/infrastructure": ["layer:infrastructure", "component:main"],
-
-    "src/preload": ["layer:entry", "component:preload"],
-    "src/preload/application": ["layer:application", "component:preload"],
-    "src/preload/common": ["layer:common", "component:preload"],
-    "src/preload/domain": ["layer:domain", "component:preload"],
-    "src/preload/infrastructure": ["layer:infrastructure", "component:preload"],
-
-    "src/renderer": ["layer:entry", "component:renderer"],
-    "src/renderer/application": ["layer:application", "component:renderer"],
-    "src/renderer/common": ["layer:common", "component:renderer"],
-    "src/renderer/domain": ["layer:domain", "component:renderer"],
-    "src/renderer/infrastructure": [
-      "layer:infrastructure",
-      "component:renderer",
-    ],
-
-    "src/shared": ["layer:entry", "component:shared"],
-    "src/shared/application": ["layer:application", "component:shared"],
-    "src/shared/common": ["layer:common", "component:shared"],
-    "src/shared/domain": ["layer:domain", "component:shared"],
-    "src/shared/infrastructure": ["layer:infrastructure", "component:shared"],
+    "src/main": ["layer:entry"],
+    "src/main/application": ["layer:application"],
+    "src/main/common": ["layer:common"],
+    "src/main/domain": ["layer:domain"],
+    "src/main/infrastructure": ["layer:infrastructure"],
+    "src/preload": ["layer:ui"],
+    "src/renderer": ["layer:humble-view"],
   },
   depRules: {
     // root is a virtual module, which contains all files not being part
@@ -49,11 +29,9 @@ export const config: SheriffConfig = {
     // add your dependency rules here
     "layer:entry": ["layer:*"],
     "layer:ui": ["layer:application", "layer:domain"],
+    "layer:humble-view": ["layer:domain"],
     "layer:application": ["layer:domain", "layer:infrastructure"],
     "layer:infrastructure": ["layer:domain"],
     "layer:*": ["layer:common"],
-    "component:main": ["layer:*", "component:shared"],
-    "component:preload": ["layer:*", "component:shared"],
-    "component:renderer": ["layer:*", "component:shared"],
   },
 };

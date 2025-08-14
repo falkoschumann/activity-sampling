@@ -2,7 +2,7 @@
 
 import { describe, expect, it } from "vitest";
 
-import { ConfigurableResponses } from "../../src/shared/common/configurable_responses";
+import { ConfigurableResponses } from "../../src/main/common/configurable_responses";
 
 describe("Configurable responses", () => {
   describe("Single value", () => {
