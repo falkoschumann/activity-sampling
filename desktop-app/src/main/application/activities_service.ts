@@ -29,7 +29,7 @@ export class ActivitiesService {
   }
 
   async logActivity(command: LogActivityCommand): Promise<CommandStatus> {
-    const event = new ActivityLoggedEvent(command);
+    const event = ActivityLoggedEvent.create(command);
     await this.#eventStore.record(event);
     return createSuccess();
   }
@@ -40,8 +40,8 @@ export class ActivitiesService {
     const replay = this.#eventStore.replay();
     let lastEvent: ActivityLoggedEvent | undefined;
     for await (const event of replay) {
-      // TODO validate event
-      lastEvent = event as ActivityLoggedEvent;
+      // TODO handle type error
+      lastEvent = ActivityLoggedEvent.from(event);
     }
     const lastActivity =
       lastEvent &&

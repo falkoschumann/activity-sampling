@@ -1,6 +1,41 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
+import Ajv from "ajv";
+import addFormats from "ajv-formats";
+
+const schema = {
+  type: "object",
+  properties: {
+    timestamp: { type: "string", format: "date-time" },
+    duration: { type: "string", format: "duration" },
+    client: { type: "string" },
+    project: { type: "string" },
+    task: { type: "string" },
+    notes: { type: "string" },
+  },
+  required: ["timestamp", "duration", "client", "project", "task"],
+  additionalProperties: false,
+};
+
 export class ActivityLoggedEvent {
+  static create({
+    timestamp,
+    duration,
+    client,
+    project,
+    task,
+    notes,
+  }: ActivityLoggedEvent): ActivityLoggedEvent {
+    return new ActivityLoggedEvent({
+      timestamp,
+      duration,
+      client,
+      project,
+      task,
+      notes,
+    });
+  }
+
   static createTestData({
     timestamp = "2025-08-14T11:00:00Z",
     duration = "PT30M",
@@ -10,6 +45,18 @@ export class ActivityLoggedEvent {
     notes,
   }: Partial<ActivityLoggedEvent> = {}): ActivityLoggedEvent {
     return { timestamp, duration, client, project, task, notes };
+  }
+
+  static from(data: unknown): ActivityLoggedEvent {
+    const ajv = new Ajv();
+    addFormats(ajv);
+    const valid = ajv.validate(schema, data);
+    if (valid) {
+      return ActivityLoggedEvent.create(data as ActivityLoggedEvent);
+    }
+
+    const errors = JSON.stringify(ajv.errors, null, 2);
+    throw new TypeError(`Invalid activity logged event data:\n${errors}`);
   }
 
   readonly timestamp: string;
