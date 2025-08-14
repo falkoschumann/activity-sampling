@@ -57,5 +57,53 @@ describe("Activities service", () => {
 
       expect(result.lastActivity).toEqual(createTestActivity());
     });
+
+    it.todo("Group activities by working days for the last 30 days");
+
+    it.todo(
+      "Summarize hours worked today, yesterday, this week and this month",
+      async () => {
+        const timestamps = [
+          // the end of last month
+          "2025-05-31T14:00:00Z", // is not included
+          // start of this month
+          "2025-06-01T14:00:00Z",
+          // end of last week
+          "2025-06-01T10:00:00Z",
+          // start of this week
+          "2025-06-02T10:00:00Z",
+          // the day before yesterday
+          "2025-06-03T10:00:00Z",
+          // yesterday
+          "2025-06-04T10:00:00Z",
+          "2025-06-04T10:30:00Z",
+          "2025-06-04T11:00:00Z",
+          // today
+          "2025-06-05T09:00:00Z",
+          "2025-06-05T09:30:00Z",
+          // tomorrow
+          "2025-06-06T08:30:00Z", // is included in week and month
+          // the first day of next month
+          "2025-07-01T10:30:00Z", // is not included
+        ];
+        const eventStore = EventStore.createNull({
+          events: [
+            timestamps.map((timestamp) =>
+              ActivityLoggedEvent.createTestData({ timestamp }),
+            ),
+          ],
+        });
+        const service = ActivitiesService.createNull({ eventStore });
+
+        const result = await service.queryRecentActivities({});
+
+        expect(result.timeSummary).toEqual({
+          hoursToday: "PT1H",
+          hoursYesterday: "PT1H30M",
+          hoursThisWeek: "PT4H00M",
+          hoursThisMonth: "PT5H",
+        });
+      },
+    );
   });
 });
