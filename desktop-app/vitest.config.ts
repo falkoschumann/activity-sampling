@@ -10,5 +10,6 @@ export default defineConfig({
       provider: "v8",
       include: ["src/**/*"],
     },
+    globalSetup: "./test/global-setup.ts",
   },
 });
