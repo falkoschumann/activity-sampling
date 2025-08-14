@@ -83,6 +83,8 @@ describe("Activities service", () => {
           "2025-06-05T09:30:00Z",
           // tomorrow
           "2025-06-06T08:30:00Z", // is included in week and month
+          // last day of this month
+          "2025-06-30T08:30:00Z",
           // the first day of next month
           "2025-07-01T10:30:00Z", // is not included
         ];
@@ -100,8 +102,8 @@ describe("Activities service", () => {
         expect(result.timeSummary).toEqual({
           hoursToday: "PT1H",
           hoursYesterday: "PT1H30M",
-          hoursThisWeek: "PT4H00M",
-          hoursThisMonth: "PT5H",
+          hoursThisWeek: "PT4H",
+          hoursThisMonth: "PT5H30M",
         });
       },
     );

@@ -152,6 +152,8 @@ class ActivitiesServiceTests {
       recordEvent("2025-06-05T09:30:00Z");
       // tomorrow
       recordEvent("2025-06-06T08:30:00Z"); // is included in week and month
+      // last day of this month
+      recordEvent("2025-06-30T08:30:00Z"); //
       // first day of next month
       recordEvent("2025-07-01T10:30:00Z"); // is not included
       var service =
@@ -167,8 +169,8 @@ class ActivitiesServiceTests {
           TimeSummary.builder()
               .hoursToday(Duration.parse("PT1H"))
               .hoursYesterday((Duration.parse("PT1H30M")))
-              .hoursThisWeek((Duration.parse("PT4H00M")))
-              .hoursThisMonth((Duration.parse("PT5H")))
+              .hoursThisWeek((Duration.parse("PT4H")))
+              .hoursThisMonth((Duration.parse("PT5H30M")))
               .build(),
           result.timeSummary());
     }
