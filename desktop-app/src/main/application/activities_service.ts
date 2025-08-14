@@ -6,7 +6,7 @@ import {
   createSuccess,
 } from "../../shared/domain/messages";
 import { EventStore } from "../infrastructure/event_store";
-import { createActivityLoggedEvent } from "../infrastructure/events";
+import { ActivityLoggedEvent } from "../infrastructure/events";
 
 export class ActivitiesService {
   static create({ eventStore = EventStore.create() }): ActivitiesService {
@@ -26,7 +26,7 @@ export class ActivitiesService {
   }
 
   async logActivity(command: LogActivityCommand): Promise<CommandStatus> {
-    const event = createActivityLoggedEvent(command);
+    const event = new ActivityLoggedEvent(command);
     await this.#eventStore.record(event);
     return createSuccess();
   }
