@@ -3,29 +3,42 @@
 import { Temporal } from "@js-temporal/polyfill";
 
 export class Clock {
-  static create() {
-    return new Clock(() => Temporal.Now.instant());
+  static systemUtc() {
+    return Clock.system("UTC");
   }
 
-  static createNull(
-    fixed: Temporal.Instant | string = Temporal.Instant.fromEpochMilliseconds(
-      0,
-    ),
+  static systemDefaultZone() {
+    return Clock.system(Temporal.Now.timeZoneId());
+  }
+
+  static system(zone: Temporal.TimeZoneLike) {
+    return new Clock(Temporal.Now.instant(), zone);
+  }
+
+  static fixed(
+    fixedInstant: Temporal.Instant | string,
+    zone: Temporal.TimeZoneLike,
   ) {
-    return new Clock(() => Temporal.Instant.from(fixed));
+    return new Clock(Temporal.Instant.from(fixedInstant), zone);
   }
 
-  #now;
+  #instant: Temporal.Instant;
+  #zone: Temporal.TimeZoneLike;
 
-  private constructor(now: () => Temporal.Instant) {
-    this.#now = now;
+  private constructor(instant: Temporal.Instant, zone: Temporal.TimeZoneLike) {
+    this.#instant = instant;
+    this.#zone = zone;
   }
 
-  now(): Temporal.Instant {
-    return this.#now();
+  get zone(): Temporal.TimeZoneLike {
+    return this.#zone;
   }
 
-  setFixed(fixed: Temporal.Instant | string) {
-    this.#now = () => Temporal.Instant.from(fixed);
+  instant(): Temporal.Instant {
+    return this.#instant;
+  }
+
+  millis(): number {
+    return this.#instant.epochMilliseconds;
   }
 }
