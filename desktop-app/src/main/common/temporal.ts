@@ -42,3 +42,12 @@ export class Clock {
     return this.#instant.epochMilliseconds;
   }
 }
+
+export function normalizeDuration(
+  duration: Temporal.Duration,
+): Temporal.Duration {
+  return duration.round({
+    largestUnit: "days",
+    smallestUnit: "nanoseconds",
+  });
+}

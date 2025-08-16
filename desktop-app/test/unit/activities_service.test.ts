@@ -47,6 +47,26 @@ describe("Activities service", () => {
   });
 
   describe("Recent activities", () => {
+    it("Return empty result when no activities are logged", async () => {
+      const eventStore = EventStore.createNull({
+        events: [[]],
+      });
+      const service = ActivitiesService.createNull({ eventStore });
+
+      const result = await service.queryRecentActivities({});
+
+      expect(result).toEqual({
+        lastActivity: undefined,
+        workingDays: [],
+        timeSummary: {
+          hoursToday: "PT0S",
+          hoursYesterday: "PT0S",
+          hoursThisWeek: "PT0S",
+          hoursThisMonth: "PT0S",
+        },
+      });
+    });
+
     it("Return last activity", async () => {
       const eventStore = EventStore.createNull({
         events: [[ActivityLoggedEvent.createTestData()]],
@@ -58,7 +78,46 @@ describe("Activities service", () => {
       expect(result.lastActivity).toEqual(createTestActivity());
     });
 
-    it.todo("Group activities by working days for the last 30 days");
+    it("Group activities by working days for the last 30 days", async () => {
+      const timestamps = [
+        "2025-05-05T14:00:00Z",
+        "2025-05-06T14:00:00Z",
+        "2025-06-04T14:00:00Z",
+        "2025-06-05T08:30:00Z",
+        "2025-06-05T09:00:00Z",
+      ];
+      const eventStore = EventStore.createNull({
+        events: [
+          timestamps.map((timestamp) =>
+            ActivityLoggedEvent.createTestData({ timestamp }),
+          ),
+        ],
+      });
+      const service = ActivitiesService.createNull({
+        eventStore,
+        fixedInstant: "2025-06-05T10:00:00Z",
+      });
+
+      const result = await service.queryRecentActivities({});
+
+      expect(result.workingDays).toEqual([
+        {
+          date: "2025-06-05",
+          activities: [
+            createTestActivity({ dateTime: "2025-06-05T11:00" }),
+            createTestActivity({ dateTime: "2025-06-05T10:30" }),
+          ],
+        },
+        {
+          date: "2025-06-04",
+          activities: [createTestActivity({ dateTime: "2025-06-04T16:00" })],
+        },
+        {
+          date: "2025-05-06",
+          activities: [createTestActivity({ dateTime: "2025-05-06T16:00" })],
+        },
+      ]);
+    });
 
     it("Summarize hours worked today, yesterday, this week and this month", async () => {
       const timestamps = [

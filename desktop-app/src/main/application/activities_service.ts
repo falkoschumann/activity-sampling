@@ -1,15 +1,16 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
 import { Temporal } from "@js-temporal/polyfill";
-
-import { Clock } from "../common/clock";
 import { type CommandStatus, createSuccess } from "../common/messages";
+
+import { Clock, normalizeDuration } from "../common/temporal";
 import {
   type Activity,
   createActivity,
   type LogActivityCommand,
   type RecentActivitiesQuery,
   type RecentActivitiesQueryResult,
+  type WorkingDay,
 } from "../domain/activities";
 import { EventStore } from "../infrastructure/event_store";
 import { ActivityLoggedEvent } from "../infrastructure/events";
@@ -65,6 +66,12 @@ class RecentActivitiesProjection {
 
   #lastActivity?: Activity;
 
+  // working days
+  #workingDays: WorkingDay[] = [];
+  #date?: Temporal.PlainDate;
+  #activities: Activity[] = [];
+
+  // time summary
   #hoursToday = Temporal.Duration.from("PT0S");
   #hoursYesterday = Temporal.Duration.from("PT0S");
   #hoursThisWeek = Temporal.Duration.from("PT0S");
@@ -85,32 +92,42 @@ class RecentActivitiesProjection {
     this.#nextMonthStart = this.#thisMonthStart.add({ months: 1 });
   }
   async project(events: AsyncGenerator): Promise<RecentActivitiesQueryResult> {
+    const from = this.#today
+      .subtract({ days: 30 })
+      .toZonedDateTime({ plainTime: "00:00", timeZone: this.#timeZone })
+      .toInstant();
     for await (const e of events) {
       // TODO handle type error
       const event = ActivityLoggedEvent.from(e);
+      const timestamp = Temporal.Instant.from(event.timestamp);
+      if (Temporal.Instant.compare(timestamp, from) < 0) {
+        continue;
+      }
+
       const activity = createActivityFromActivityLoggedEvent(
         event,
         this.#timeZone,
       );
       this.#updateLastActivity(activity);
+      this.#updateWorkingDays(activity);
       this.#updateTimeSummary(activity);
     }
+    this.#createWorkingDay();
+
+    this.#workingDays = this.#workingDays.sort((d1, d2) =>
+      Temporal.PlainDate.compare(
+        Temporal.PlainDate.from(d2.date),
+        Temporal.PlainDate.from(d1.date),
+      ),
+    );
     return {
       lastActivity: this.#lastActivity,
-      workingDays: [],
+      workingDays: this.#workingDays,
       timeSummary: {
-        hoursToday: this.#hoursToday
-          .round({ largestUnit: "hours", smallestUnit: "minutes" })
-          .toString(),
-        hoursYesterday: this.#hoursYesterday
-          .round({ largestUnit: "hours", smallestUnit: "minutes" })
-          .toString(),
-        hoursThisWeek: this.#hoursThisWeek
-          .round({ largestUnit: "hours", smallestUnit: "minutes" })
-          .toString(),
-        hoursThisMonth: this.#hoursThisMonth
-          .round({ largestUnit: "hours", smallestUnit: "minutes" })
-          .toString(),
+        hoursToday: normalizeDuration(this.#hoursToday).toString(),
+        hoursYesterday: normalizeDuration(this.#hoursYesterday).toString(),
+        hoursThisWeek: normalizeDuration(this.#hoursThisWeek).toString(),
+        hoursThisMonth: normalizeDuration(this.#hoursThisMonth).toString(),
       },
     };
   }
@@ -125,6 +142,31 @@ class RecentActivitiesProjection {
     ) {
       this.#lastActivity = activity;
     }
+  }
+
+  #updateWorkingDays(activity: Activity) {
+    const activityDate = Temporal.PlainDate.from(activity.dateTime);
+    if (this.#date == null || !activityDate.equals(this.#date)) {
+      this.#createWorkingDay();
+      this.#date = activityDate;
+      this.#activities = [];
+    }
+    this.#activities.push(activity);
+  }
+
+  #createWorkingDay() {
+    if (this.#date == null) {
+      return;
+    }
+
+    this.#activities = this.#activities.sort((a1, a2) =>
+      Temporal.PlainDateTime.compare(
+        Temporal.PlainDateTime.from(a2.dateTime),
+        Temporal.PlainDateTime.from(a1.dateTime),
+      ),
+    );
+    const day = { date: this.#date.toString(), activities: this.#activities };
+    this.#workingDays.push(day);
   }
 
   #updateTimeSummary(activity: Activity) {
@@ -157,8 +199,9 @@ function createActivityFromActivityLoggedEvent(
 ) {
   return createActivity({
     ...event,
-    dateTime: Temporal.Instant.from(event.timestamp).toString({
-      timeZone,
-    }),
+    dateTime: Temporal.Instant.from(event.timestamp)
+      .toZonedDateTimeISO(timeZone)
+      .toPlainDateTime()
+      .toString({ smallestUnit: "minutes" }),
   });
 }

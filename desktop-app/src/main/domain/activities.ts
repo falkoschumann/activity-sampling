@@ -90,7 +90,7 @@ export function createActivity({
 }
 
 export function createTestActivity({
-  dateTime = "2025-08-14T13:00:00+02:00",
+  dateTime = "2025-08-14T13:00",
   duration = "PT30M",
   client = "Test client",
   project = "Test project",
@@ -105,9 +105,25 @@ export interface WorkingDay {
   readonly activities: Activity[];
 }
 
+export function createWorkingDay({
+  date = "2025-08-14",
+  activities = [createTestActivity()],
+}: Partial<WorkingDay> = {}): WorkingDay {
+  return { date, activities };
+}
+
 export interface TimeSummary {
   readonly hoursToday: string;
   readonly hoursYesterday: string;
   readonly hoursThisWeek: string;
   readonly hoursThisMonth: string;
+}
+
+export function createTimeSummary({
+  hoursToday = "PT0S",
+  hoursYesterday = "PT0S",
+  hoursThisWeek = "PT0S",
+  hoursThisMonth = "PT0S",
+}: Partial<TimeSummary> = {}): TimeSummary {
+  return { hoursToday, hoursYesterday, hoursThisWeek, hoursThisMonth };
 }
