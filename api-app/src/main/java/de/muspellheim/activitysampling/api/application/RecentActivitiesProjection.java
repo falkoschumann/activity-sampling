@@ -53,7 +53,6 @@ class RecentActivitiesProjection {
 
   RecentActivitiesQueryResult project(Stream<ActivityLoggedEvent> events) {
     events
-        .sorted(Comparator.comparing(ActivityLoggedEvent::timestamp).reversed())
         .map(it -> ActivityMapping.map(it, timeZone))
         .forEach(
             it -> {
@@ -62,6 +61,7 @@ class RecentActivitiesProjection {
             });
     createWorkingDay();
 
+    workingDays.sort(Comparator.comparing(WorkingDay::date).reversed());
     return RecentActivitiesQueryResult.builder()
         .lastActivity(getLastActivity())
         .workingDays(workingDays)
@@ -79,6 +79,16 @@ class RecentActivitiesProjection {
     activities.add(activity);
   }
 
+  private void createWorkingDay() {
+    if (date == null) {
+      return;
+    }
+
+    activities.sort(Comparator.comparing(Activity::dateTime).reversed());
+    var day = new WorkingDay(date, List.copyOf(activities));
+    workingDays.add(day);
+  }
+
   private void updateTimeSummary(Activity activity) {
     var date = activity.dateTime().toLocalDate();
     var duration = activity.duration();
@@ -94,15 +104,6 @@ class RecentActivitiesProjection {
     if (!date.isBefore(thisMonthStart) && date.isBefore(nextMonthStart)) {
       hoursThisMonth = hoursThisMonth.plus(duration);
     }
-  }
-
-  private void createWorkingDay() {
-    if (date == null) {
-      return;
-    }
-
-    var day = new WorkingDay(date, List.copyOf(activities));
-    workingDays.add(day);
   }
 
   private Activity getLastActivity() {
