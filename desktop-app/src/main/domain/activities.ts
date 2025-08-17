@@ -36,37 +36,84 @@ export interface RecentActivitiesQueryResult {
   readonly timeSummary: TimeSummary;
 }
 
-export function createTestRecentActivitiesQueryResult(
-  result: Partial<RecentActivitiesQueryResult> = {},
-): RecentActivitiesQueryResult {
-  return {
-    lastActivity: createTestActivity({ dateTime: "2025-08-14T13:00" }),
-    workingDays: [
-      {
-        date: "2025-08-14",
-        activities: [createTestActivity({ dateTime: "2025-08-14T13:00" })],
-      },
-      {
-        date: "2025-08-13",
-        activities: [
-          createTestActivity({ dateTime: "2025-08-13T16:00" }),
-          createTestActivity({ dateTime: "2025-08-13T15:30" }),
-          createTestActivity({
-            dateTime: "2025-08-13T15:00",
-            task: "Other task",
-            notes: "Other notes",
-          }),
-        ],
-      },
-    ],
-    timeSummary: {
-      hoursToday: "PT30M",
-      hoursYesterday: "PT1H30M",
-      hoursThisWeek: "PT2H",
-      hoursThisMonth: "PT2H",
+export function createTestRecentActivitiesQueryResult({
+  lastActivity = createTestActivity({ dateTime: "2025-08-14T13:00" }),
+  workingDays = [
+    {
+      date: "2025-08-14",
+      activities: [createTestActivity({ dateTime: "2025-08-14T13:00" })],
     },
-    ...result,
-  };
+    {
+      date: "2025-08-13",
+      activities: [
+        createTestActivity({ dateTime: "2025-08-13T16:00" }),
+        createTestActivity({ dateTime: "2025-08-13T15:30" }),
+        createTestActivity({
+          dateTime: "2025-08-13T15:00",
+          task: "Other task",
+          notes: "Other notes",
+        }),
+      ],
+    },
+  ],
+  timeSummary = {
+    hoursToday: "PT30M",
+    hoursYesterday: "PT1H30M",
+    hoursThisWeek: "PT2H",
+    hoursThisMonth: "PT2H",
+  },
+}: Partial<RecentActivitiesQueryResult> = {}): RecentActivitiesQueryResult {
+  return { lastActivity, workingDays, timeSummary };
+}
+
+export interface ReportQuery {
+  readonly scope: Scope;
+  readonly from: string;
+  readonly to: string;
+  readonly timeZone?: string;
+}
+
+export function createTestReportQuery({
+  scope = Scope.PROJECTS,
+  from = "2025-06-01",
+  to = "2025-06-30",
+  timeZone = "Europe/Berlin",
+}: Partial<ReportQuery> = {}): ReportQuery {
+  return { scope, from, to, timeZone };
+}
+
+export interface ReportQueryResult {
+  readonly entries: ReportEntry[];
+  readonly totalHours: string;
+}
+
+export function createTestReportQueryResult({
+  entries = [createTestReportEntry()],
+  totalHours = "PT42H",
+}: Partial<ReportQueryResult> = {}): ReportQueryResult {
+  return { entries, totalHours };
+}
+
+export const Scope = Object.freeze({
+  CLIENTS: "Clients",
+  PROJECTS: "Projects",
+  TASKS: "Tasks",
+});
+
+export type Scope = (typeof Scope)[keyof typeof Scope];
+
+export interface ReportEntry {
+  readonly name: string;
+  readonly client?: string;
+  readonly hours: string;
+}
+
+export function createTestReportEntry({
+  name = "Test client",
+  client,
+  hours = "PT42H",
+}: Partial<ReportEntry> = {}): ReportEntry {
+  return { name, client, hours };
 }
 
 export interface Activity {

@@ -10,6 +10,9 @@ import {
   type LogActivityCommand,
   type RecentActivitiesQuery,
   type RecentActivitiesQueryResult,
+  type ReportEntry,
+  type ReportQuery,
+  type ReportQueryResult,
   type WorkingDay,
 } from "../domain/activities";
 import { EventStore } from "../infrastructure/event_store";
@@ -53,10 +56,16 @@ export class ActivitiesService {
     const replay = this.#eventStore.replay();
     return projection.project(replay);
   }
+
+  async queryReport(query: ReportQuery): Promise<ReportQueryResult> {
+    const projection = new ReportProjection(query, this.#clock);
+    const replay = this.#eventStore.replay();
+    return projection.project(replay);
+  }
 }
 
 class RecentActivitiesProjection {
-  readonly #timeZone: string;
+  readonly #timeZone: Temporal.TimeZoneLike;
   readonly #today: Temporal.PlainDate;
   readonly #yesterday: Temporal.PlainDate;
   readonly #thisWeekStart: Temporal.PlainDate;
@@ -78,7 +87,7 @@ class RecentActivitiesProjection {
   #hoursThisMonth = Temporal.Duration.from("PT0S");
 
   constructor(query: RecentActivitiesQuery, clock: Clock) {
-    this.#timeZone = query.timeZone ?? Temporal.Now.timeZoneId();
+    this.#timeZone = query.timeZone ?? clock.zone;
     this.#today = clock
       .instant()
       .toZonedDateTimeISO(this.#timeZone)
@@ -204,4 +213,65 @@ function createActivityFromActivityLoggedEvent(
       .toPlainDateTime()
       .toString({ smallestUnit: "minutes" }),
   });
+}
+
+class ReportProjection {
+  readonly #startInclusive: Temporal.PlainDate;
+  readonly #endExclusive: Temporal.PlainDate;
+  readonly #timeZone: Temporal.TimeZoneLike;
+
+  #entries: ReportEntry[] = [];
+
+  constructor(query: ReportQuery, clock: Clock) {
+    this.#startInclusive = Temporal.PlainDate.from(query.from);
+    this.#endExclusive = Temporal.PlainDate.from(query.to);
+    this.#timeZone = query.timeZone ?? clock.zone;
+  }
+
+  async project(events: AsyncGenerator): Promise<ReportQueryResult> {
+    for await (const e of events) {
+      // TODO handle type error
+      const event = ActivityLoggedEvent.from(e);
+      const date = Temporal.Instant.from(event.timestamp)
+        .toZonedDateTimeISO(this.#timeZone)
+        .toPlainDate();
+      if (
+        Temporal.PlainDate.compare(date, this.#startInclusive) < 0 ||
+        Temporal.PlainDate.compare(date, this.#endExclusive) >= 0
+      ) {
+        continue;
+      }
+
+      const activity = createActivityFromActivityLoggedEvent(
+        event,
+        this.#timeZone,
+      );
+      this.#updateEntries(activity);
+    }
+
+    this.#entries = this.#entries.sort((e1, e2) =>
+      e1.name.localeCompare(e2.name),
+    );
+    return { entries: this.#entries, totalHours: "PT0S" };
+  }
+
+  #updateEntries(activity: Activity) {
+    this.#updateEntry(activity.client, activity.duration);
+  }
+
+  #updateEntry(name: string, duration: string) {
+    const index = this.#entries.findIndex((entry) => entry.name === name);
+    if (index == -1) {
+      this.#entries.push({ name, hours: duration });
+    } else {
+      const existingEntry = this.#entries[index];
+      const accumulatedHours = Temporal.Duration.from(existingEntry.hours).add(
+        Temporal.Duration.from(duration),
+      );
+      this.#entries[index] = {
+        ...existingEntry,
+        hours: accumulatedHours.toString(),
+      };
+    }
+  }
 }

@@ -8,6 +8,9 @@ import { ActivityLoggedEvent } from "../../src/main/infrastructure/events";
 import {
   createTestActivity,
   createTestLogActivityCommand,
+  createTestReportEntry,
+  createTestReportQuery,
+  Scope,
 } from "../../src/main/domain/activities";
 import { createSuccess } from "../../src/main/common/messages";
 
@@ -166,5 +169,64 @@ describe("Activities service", () => {
         hoursThisMonth: "PT5H30M",
       });
     });
+  });
+
+  describe("Reports", () => {
+    it("Summarize hours worked for clients", async () => {
+      const eventStore = EventStore.createNull({
+        events: [
+          [
+            ActivityLoggedEvent.createTestData({
+              timestamp: "2025-06-25T15:00:00Z",
+              client: "Client 2",
+              duration: "PT7H",
+            }),
+            ActivityLoggedEvent.createTestData({
+              timestamp: "2025-06-26T15:00:00Z",
+              client: "Client 1",
+              duration: "PT5H",
+            }),
+            ActivityLoggedEvent.createTestData({
+              timestamp: "2025-06-27T15:00:00Z",
+              client: "Client 1",
+              duration: "PT3H",
+            }),
+          ],
+        ],
+      });
+      const service = ActivitiesService.createNull({ eventStore });
+
+      const result = await service.queryReport(
+        createTestReportQuery({
+          scope: Scope.CLIENTS,
+        }),
+      );
+
+      expect(result.entries).toEqual([
+        createTestReportEntry({ name: "Client 1", hours: "PT8H" }),
+        createTestReportEntry({ name: "Client 2", hours: "PT7H" }),
+      ]);
+    });
+
+    it.todo("Summarize hours worked on projects");
+    it.todo("Summarize hours worked on tasks");
+    it.todo("Summarize hours worked per day");
+    it.todo("Summarize hours worked per week");
+    it.todo("Summarize hours worked per month");
+    it.todo("Summarize hours worked per year");
+    it.todo("Summarize hours worked all the time");
+    it.todo("Summarize hours worked in a custom period");
+    it.todo("Summarize the total hours worked");
+  });
+
+  describe("Timesheet", () => {
+    it.todo("Summarize hours worked on tasks");
+    it.todo("Summarize hours worked per day");
+    it.todo("Summarize hours worked per week");
+    it.todo("Summarize hours worked per month");
+    it.todo("Summarize the total hours worked");
+    it.todo("Compare with capacity");
+    it.todo("Take holidays into account");
+    it.todo("Take vacation into account");
   });
 });
