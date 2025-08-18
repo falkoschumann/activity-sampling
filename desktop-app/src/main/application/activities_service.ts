@@ -36,8 +36,8 @@ export class ActivitiesService {
     return new ActivitiesService(eventStore, Clock.fixed(fixedInstant, zone));
   }
 
-  #eventStore: EventStore;
-  #clock: Clock;
+  readonly #eventStore: EventStore;
+  readonly #clock: Clock;
 
   constructor(eventStore: EventStore, clock: Clock) {
     this.#eventStore = eventStore;
@@ -223,6 +223,7 @@ class ReportProjection {
   readonly #timeZone: Temporal.TimeZoneLike;
 
   #entries: ReportEntry[] = [];
+  #totalHours = Temporal.Duration.from("PT0S");
 
   constructor(query: ReportQuery, clock: Clock) {
     this.#startInclusive = Temporal.PlainDate.from(query.from);
@@ -250,12 +251,13 @@ class ReportProjection {
         this.#timeZone,
       );
       this.#updateEntries(activity);
+      this.#updateTotalHours(activity);
     }
 
     this.#entries = this.#entries.sort((e1, e2) =>
       e1.name.localeCompare(e2.name),
     );
-    return { entries: this.#entries, totalHours: "PT0S" };
+    return { entries: this.#entries, totalHours: this.#totalHours.toString() };
   }
 
   #updateEntries(activity: Activity) {
@@ -288,5 +290,10 @@ class ReportProjection {
         hours: accumulatedHours.toString(),
       };
     }
+  }
+
+  #updateTotalHours(activity: Activity) {
+    const duration = Temporal.Duration.from(activity.duration);
+    this.#totalHours = this.#totalHours.add(duration);
   }
 }

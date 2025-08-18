@@ -265,7 +265,40 @@ describe("Activities service", () => {
     it.todo("Summarize hours worked per year");
     it.todo("Summarize hours worked all the time");
     it.todo("Summarize hours worked in a custom period");
-    it.todo("Summarize the total hours worked");
+
+    it("Summarize the total hours worked", async () => {
+      const eventStore = EventStore.createNull({
+        events: [
+          [
+            ActivityLoggedEvent.createTestData({
+              timestamp: "2025-06-02T15:00:00Z",
+              duration: "PT8H",
+            }),
+            ActivityLoggedEvent.createTestData({
+              timestamp: "2025-06-03T15:00:00Z",
+              duration: "PT9H",
+            }),
+            ActivityLoggedEvent.createTestData({
+              timestamp: "2025-06-04T15:00:00Z",
+              duration: "PT8H",
+            }),
+            ActivityLoggedEvent.createTestData({
+              timestamp: "2025-06-05T15:00:00Z",
+              duration: "PT9H",
+            }),
+            ActivityLoggedEvent.createTestData({
+              timestamp: "2025-06-06T15:00:00Z",
+              duration: "PT8H",
+            }),
+          ],
+        ],
+      });
+      const service = ActivitiesService.createNull({ eventStore });
+
+      const result = await service.queryReport(createTestReportQuery({}));
+
+      expect(result.totalHours).toEqual("PT42H");
+    });
   });
 
   describe("Timesheet", () => {
