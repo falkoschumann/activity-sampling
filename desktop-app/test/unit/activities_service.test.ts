@@ -172,6 +172,19 @@ describe("Activities service", () => {
   });
 
   describe("Reports", () => {
+    it("Returns empty result when no activities are logged", async () => {
+      const eventStore = EventStore.createNull({ events: [[]] });
+      const service = ActivitiesService.createNull({ eventStore });
+
+      const result = await service.queryReport(
+        createTestReportQuery({
+          scope: Scope.TASKS,
+        }),
+      );
+
+      expect(result).toEqual({ entries: [], totalHours: "PT0S" });
+    });
+
     it("Summarize hours worked for clients", async () => {
       const eventStore = EventStore.createNull({
         events: [
