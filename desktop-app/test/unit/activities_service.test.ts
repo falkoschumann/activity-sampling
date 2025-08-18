@@ -209,7 +209,43 @@ describe("Activities service", () => {
     });
 
     it.todo("Summarize hours worked on projects");
-    it.todo("Summarize hours worked on tasks");
+
+    it("Summarize hours worked on tasks", async () => {
+      const eventStore = EventStore.createNull({
+        events: [
+          [
+            ActivityLoggedEvent.createTestData({
+              timestamp: "2025-06-25T15:00:00Z",
+              task: "Task 2",
+              duration: "PT7H",
+            }),
+            ActivityLoggedEvent.createTestData({
+              timestamp: "2025-06-26T15:00:00Z",
+              task: "Task 1",
+              duration: "PT5H",
+            }),
+            ActivityLoggedEvent.createTestData({
+              timestamp: "2025-06-27T15:00:00Z",
+              task: "Task 1",
+              duration: "PT3H",
+            }),
+          ],
+        ],
+      });
+      const service = ActivitiesService.createNull({ eventStore });
+
+      const result = await service.queryReport(
+        createTestReportQuery({
+          scope: Scope.TASKS,
+        }),
+      );
+
+      expect(result.entries).toEqual([
+        createTestReportEntry({ name: "Task 1", hours: "PT8H" }),
+        createTestReportEntry({ name: "Task 2", hours: "PT7H" }),
+      ]);
+    });
+
     it.todo("Summarize hours worked per day");
     it.todo("Summarize hours worked per week");
     it.todo("Summarize hours worked per month");

@@ -13,6 +13,7 @@ import {
   type ReportEntry,
   type ReportQuery,
   type ReportQueryResult,
+  Scope,
   type WorkingDay,
 } from "../domain/activities";
 import { EventStore } from "../infrastructure/event_store";
@@ -218,6 +219,7 @@ function createActivityFromActivityLoggedEvent(
 class ReportProjection {
   readonly #startInclusive: Temporal.PlainDate;
   readonly #endExclusive: Temporal.PlainDate;
+  readonly #scope: Scope;
   readonly #timeZone: Temporal.TimeZoneLike;
 
   #entries: ReportEntry[] = [];
@@ -225,6 +227,7 @@ class ReportProjection {
   constructor(query: ReportQuery, clock: Clock) {
     this.#startInclusive = Temporal.PlainDate.from(query.from);
     this.#endExclusive = Temporal.PlainDate.from(query.to);
+    this.#scope = query.scope;
     this.#timeZone = query.timeZone ?? clock.zone;
   }
 
@@ -256,7 +259,19 @@ class ReportProjection {
   }
 
   #updateEntries(activity: Activity) {
-    this.#updateEntry(activity.client, activity.duration);
+    switch (this.#scope) {
+      case Scope.CLIENTS:
+        this.#updateEntry(activity.client, activity.duration);
+        break;
+      case Scope.PROJECTS:
+        this.#updateEntry(activity.project, activity.duration);
+        break;
+      case Scope.TASKS:
+        this.#updateEntry(activity.task, activity.duration);
+        break;
+      default:
+        throw new Error(`Unknown scope: ${this.#scope}`);
+    }
   }
 
   #updateEntry(name: string, duration: string) {
