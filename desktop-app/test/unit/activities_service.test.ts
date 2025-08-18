@@ -15,6 +15,17 @@ import {
 import { createSuccess } from "../../src/main/common/messages";
 
 describe("Activities service", () => {
+  describe("Ask periodically", () => {
+    it.todo("Start the countdown with a given interval");
+    it.todo(
+      "Start countdown with the default interval when the application starts",
+    );
+  });
+
+  describe("Current Interval", () => {
+    it.todo("Notify the user when an interval is elapsed");
+  });
+
   describe("Log activity", () => {
     describe("Log the activity with a client, a project, a task and an optional notes", () => {
       it("Logs without an optional notes", async () => {
@@ -46,6 +57,9 @@ describe("Activities service", () => {
           ActivityLoggedEvent.createTestData({ notes: "Lorem ipsum" }),
         ]);
       });
+
+      it.todo("Select an activity from recent activities");
+      it.todo("Select the last activity when the application starts");
     });
   });
 
@@ -221,7 +235,60 @@ describe("Activities service", () => {
       ]);
     });
 
-    it.todo("Summarize hours worked on projects");
+    it("Summarize hours worked on projects", async () => {
+      const eventStore = EventStore.createNull({
+        events: [
+          [
+            ActivityLoggedEvent.createTestData({
+              timestamp: "2025-06-02T15:00:00Z",
+              client: "Client 2",
+              project: "Project B",
+              duration: "PT8H",
+            }),
+            ActivityLoggedEvent.createTestData({
+              timestamp: "2025-06-03T15:00:00Z",
+              client: "Client 1",
+              project: "Project A",
+              duration: "PT9H",
+            }),
+            ActivityLoggedEvent.createTestData({
+              timestamp: "2025-06-04T15:00:00Z",
+              client: "Client 2",
+              project: "Project B",
+              duration: "PT8H",
+            }),
+            ActivityLoggedEvent.createTestData({
+              timestamp: "2025-06-05T15:00:00Z",
+              client: "Client 1",
+              project: "Project A",
+              duration: "PT9H",
+            }),
+            ActivityLoggedEvent.createTestData({
+              timestamp: "2025-06-06T15:00:00Z",
+              client: "Client 2",
+              project: "Project B",
+              duration: "PT8H",
+            }),
+          ],
+        ],
+      });
+      const service = ActivitiesService.createNull({ eventStore });
+
+      const result = await service.queryReport(createTestReportQuery({}));
+
+      expect(result.entries).toEqual([
+        createTestReportEntry({
+          name: "Project A",
+          client: "Client 1",
+          hours: "PT18H",
+        }),
+        createTestReportEntry({
+          name: "Project B",
+          client: "Client 2",
+          hours: "PT24H",
+        }),
+      ]);
+    });
 
     it("Summarize hours worked on tasks", async () => {
       const eventStore = EventStore.createNull({

@@ -266,7 +266,11 @@ class ReportProjection {
         this.#updateEntry(activity.client, activity.duration);
         break;
       case Scope.PROJECTS:
-        this.#updateEntry(activity.project, activity.duration);
+        this.#updateProjects(
+          activity.project,
+          activity.client,
+          activity.duration,
+        );
         break;
       case Scope.TASKS:
         this.#updateEntry(activity.task, activity.duration);
@@ -287,6 +291,29 @@ class ReportProjection {
       );
       this.#entries[index] = {
         ...existingEntry,
+        hours: accumulatedHours.toString(),
+      };
+    }
+  }
+
+  #updateProjects(project: string, client: string, duration: string) {
+    const index = this.#entries.findIndex((entry) => entry.name === project);
+    if (index == -1) {
+      this.#entries.push({ name: project, client, hours: duration });
+    } else {
+      const existingEntry = this.#entries[index];
+      let existingClient = existingEntry.client;
+      if (!existingClient!.includes(client)) {
+        existingClient = existingClient
+          ? `${existingClient}, ${client}`
+          : client;
+      }
+      const accumulatedHours = Temporal.Duration.from(existingEntry.hours).add(
+        Temporal.Duration.from(duration),
+      );
+      this.#entries[index] = {
+        ...existingEntry,
+        client: existingClient,
         hours: accumulatedHours.toString(),
       };
     }
