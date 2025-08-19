@@ -476,7 +476,41 @@ describe("Activities service", () => {
       expect(result.workingHoursSummary.totalHours).toEqual("PT1H30M");
     });
 
-    it.todo("Compare with capacity");
+    it("Compare with capacity", async () => {
+      const eventStore = EventStore.createNull({
+        events: [
+          [
+            ActivityLoggedEvent.createTestData({
+              timestamp: "2025-06-10T14:00:00Z",
+              duration: "PT8H",
+            }),
+            ActivityLoggedEvent.createTestData({
+              timestamp: "2025-06-11T14:00:00Z",
+              duration: "PT8H",
+            }),
+            ActivityLoggedEvent.createTestData({
+              timestamp: "2025-06-12T14:00:00Z",
+              duration: "PT8H",
+            }),
+          ],
+        ],
+      });
+      const service = ActivitiesService.createNull({
+        eventStore,
+        fixedInstant: "2025-06-12T16:00:00Z",
+      });
+
+      const result = await service.queryTimesheet(
+        createTestTimesheetQuery({ from: "2025-06-09", to: "2025-06-15" }),
+      );
+
+      expect(result.workingHoursSummary).toEqual({
+        totalHours: "PT24H",
+        capacity: "PT40H",
+        offset: "PT0S",
+      });
+    });
+
     it.todo("Take holidays into account");
     it.todo("Take vacation into account");
   });

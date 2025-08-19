@@ -339,6 +339,8 @@ class TimesheetProjection {
   readonly #startInclusive: Temporal.PlainDate;
   readonly #endExclusive: Temporal.PlainDate;
   readonly #timeZone: Temporal.TimeZoneLike;
+  // TODO read default capacity from configuration
+  readonly #defaultCapacity = Temporal.Duration.from("PT40H");
 
   #entries: TimesheetEntry[] = [];
   #totalHours = Temporal.Duration.from("PT0S");
@@ -371,6 +373,7 @@ class TimesheetProjection {
       this.#updateTotalHours(activity);
     }
 
+    const capacity = this.#determineCapacity();
     this.#entries = this.#entries.sort((entry1, entry2) => {
       const dateComparison = Temporal.PlainDate.compare(
         Temporal.PlainDate.from(entry1.date),
@@ -392,7 +395,7 @@ class TimesheetProjection {
       entries: this.#entries,
       workingHoursSummary: {
         totalHours: normalizeDuration(this.#totalHours).toString(),
-        capacity: "PT40H",
+        capacity: capacity.toString(),
         offset: "PT0S",
       },
     };
@@ -431,5 +434,14 @@ class TimesheetProjection {
   #updateTotalHours(activity: Activity) {
     const duration = Temporal.Duration.from(activity.duration);
     this.#totalHours = this.#totalHours.add(duration);
+  }
+
+  #determineCapacity(): Temporal.Duration {
+    const businessDays = 5;
+    const defaultCapacityPerDay = this.#defaultCapacity.hours / 5;
+    const capacity = Temporal.Duration.from({
+      hours: businessDays * defaultCapacityPerDay,
+    });
+    return normalizeDuration(capacity);
   }
 }

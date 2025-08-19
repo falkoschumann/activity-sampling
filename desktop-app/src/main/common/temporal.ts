@@ -47,7 +47,7 @@ export function normalizeDuration(
   duration: Temporal.Duration,
 ): Temporal.Duration {
   return duration.round({
-    largestUnit: "days",
+    largestUnit: "hours",
     smallestUnit: "nanoseconds",
   });
 }
