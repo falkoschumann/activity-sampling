@@ -26,7 +26,7 @@ export class EventStore<T = unknown> extends EventTarget {
   }
 
   readonly #fileName: string;
-  #fs: typeof fsPromise;
+  readonly #fs: typeof fsPromise;
 
   constructor(fileName: string, fs: typeof fsPromise) {
     super();

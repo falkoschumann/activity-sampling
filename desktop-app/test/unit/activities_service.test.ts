@@ -158,7 +158,7 @@ describe("Activities service", () => {
         "2025-06-05T09:00:00Z",
         "2025-06-05T09:30:00Z",
         // tomorrow
-        "2025-06-06T08:30:00Z", // is included in week and month
+        "2025-06-06T08:30:00Z",
         // last day of this month
         "2025-06-30T08:30:00Z",
         // the first day of next month

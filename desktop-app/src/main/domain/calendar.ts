@@ -4,6 +4,11 @@ import { Temporal } from "@js-temporal/polyfill";
 
 // TODO Always allow string, temporal or temporal-like
 
+export interface Holiday {
+  date: string;
+  title: string;
+}
+
 export class Calendar {
   static create({
     holidays = [],

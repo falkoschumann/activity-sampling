@@ -1,6 +1,6 @@
-coverage/
-data/
-testdata/
+/coverage/
+/data/
+/testdata/
 
 !build/
 .vscode/
