@@ -66,7 +66,7 @@ describe("Activities service", () => {
   });
 
   describe("Recent activities", () => {
-    it("Return empty result when no activities are logged", async () => {
+    it("Returns empty result when no activities are logged", async () => {
       const eventStore = EventStore.createNull({
         events: [[]],
       });
@@ -86,7 +86,7 @@ describe("Activities service", () => {
       });
     });
 
-    it("Return last activity", async () => {
+    it("Returns last activity", async () => {
       const eventStore = EventStore.createNull({
         events: [[ActivityLoggedEvent.createTestData()]],
       });
@@ -97,7 +97,7 @@ describe("Activities service", () => {
       expect(result.lastActivity).toEqual(createTestActivity());
     });
 
-    it("Group activities by working days for the last 30 days", async () => {
+    it("Groups activities by working days for the last 30 days", async () => {
       const timestamps = [
         "2025-05-05T14:00:00Z",
         "2025-05-06T14:00:00Z",
@@ -138,7 +138,7 @@ describe("Activities service", () => {
       ]);
     });
 
-    it("Summarize hours worked today, yesterday, this week and this month", async () => {
+    it("Summarizes hours worked today, yesterday, this week and this month", async () => {
       const timestamps = [
         // the end of last month
         "2025-05-31T14:00:00Z", // is not included
@@ -201,7 +201,7 @@ describe("Activities service", () => {
       expect(result).toEqual({ entries: [], totalHours: "PT0S" });
     });
 
-    it("Summarize hours worked for clients", async () => {
+    it("Summarizes hours worked for clients", async () => {
       const eventStore = EventStore.createNull({
         events: [
           [
@@ -237,7 +237,7 @@ describe("Activities service", () => {
       ]);
     });
 
-    it("Summarize hours worked on projects", async () => {
+    it("Summarizes hours worked on projects", async () => {
       const eventStore = EventStore.createNull({
         events: [
           [
@@ -292,7 +292,7 @@ describe("Activities service", () => {
       ]);
     });
 
-    it("Summarize hours worked on tasks", async () => {
+    it("Summarizes hours worked on tasks", async () => {
       const eventStore = EventStore.createNull({
         events: [
           [
@@ -335,7 +335,7 @@ describe("Activities service", () => {
     it.todo("Summarize hours worked all the time");
     it.todo("Summarize hours worked in a custom period");
 
-    it("Summarize the total hours worked", async () => {
+    it("Summarizes the total hours worked", async () => {
       const eventStore = EventStore.createNull({
         events: [
           [
@@ -387,7 +387,7 @@ describe("Activities service", () => {
       });
     });
 
-    it("Summarize hours worked on tasks", async () => {
+    it("Summarizes hours worked on tasks", async () => {
       const eventStore = EventStore.createNull({
         events: [
           [
@@ -456,7 +456,7 @@ describe("Activities service", () => {
     it.todo("Summarize hours worked per week");
     it.todo("Summarize hours worked per month");
 
-    it("Summarize the total hours worked", async () => {
+    it("Summarizes the total hours worked", async () => {
       const timestamps = [
         "2025-06-02T10:00:00Z",
         "2025-06-02T10:30:00Z",
@@ -476,10 +476,14 @@ describe("Activities service", () => {
       expect(result.workingHoursSummary.totalHours).toEqual("PT1H30M");
     });
 
-    it("Compare with capacity", async () => {
+    it("Compares with capacity", async () => {
       const eventStore = EventStore.createNull({
         events: [
           [
+            ActivityLoggedEvent.createTestData({
+              timestamp: "2025-06-09T14:00:00Z",
+              duration: "PT8H",
+            }),
             ActivityLoggedEvent.createTestData({
               timestamp: "2025-06-10T14:00:00Z",
               duration: "PT8H",
@@ -488,16 +492,12 @@ describe("Activities service", () => {
               timestamp: "2025-06-11T14:00:00Z",
               duration: "PT8H",
             }),
-            ActivityLoggedEvent.createTestData({
-              timestamp: "2025-06-12T14:00:00Z",
-              duration: "PT8H",
-            }),
           ],
         ],
       });
       const service = ActivitiesService.createNull({
         eventStore,
-        fixedInstant: "2025-06-12T16:00:00Z",
+        fixedInstant: "2025-06-11T16:00:00Z",
       });
 
       const result = await service.queryTimesheet(
@@ -511,7 +511,113 @@ describe("Activities service", () => {
       });
     });
 
-    it.todo("Take holidays into account");
+    describe.todo("Take holidays into account", () => {
+      it("Returns offset 0 when capacity is reached", async () => {
+        const eventStore = EventStore.createNull({
+          events: [
+            [
+              ActivityLoggedEvent.createTestData({
+                timestamp: "2025-06-10T14:00:00Z",
+                duration: "PT8H",
+              }),
+              ActivityLoggedEvent.createTestData({
+                timestamp: "2025-06-11T14:00:00Z",
+                duration: "PT8H",
+              }),
+              ActivityLoggedEvent.createTestData({
+                timestamp: "2025-06-12T14:00:00Z",
+                duration: "PT8H",
+              }),
+            ],
+          ],
+        });
+        const service = ActivitiesService.createNull({
+          eventStore,
+          fixedInstant: "2025-06-12T16:00:00Z",
+        });
+
+        const result = await service.queryTimesheet(
+          createTestTimesheetQuery({ from: "2025-06-09", to: "2025-06-15" }),
+        );
+
+        expect(result.workingHoursSummary).toEqual({
+          totalHours: "PT24H",
+          capacity: "PT32H",
+          offset: "PT0S",
+        });
+      });
+
+      it("Returns negative offset when hours is behind of the capacity", async () => {
+        const eventStore = EventStore.createNull({
+          events: [
+            [
+              ActivityLoggedEvent.createTestData({
+                timestamp: "2025-06-10T14:00:00Z",
+                duration: "PT6H",
+              }),
+              ActivityLoggedEvent.createTestData({
+                timestamp: "2025-06-11T14:00:00Z",
+                duration: "PT6H",
+              }),
+              ActivityLoggedEvent.createTestData({
+                timestamp: "2025-06-12T14:00:00Z",
+                duration: "PT6H",
+              }),
+            ],
+          ],
+        });
+        const service = ActivitiesService.createNull({
+          eventStore,
+          fixedInstant: "2025-06-12T16:00:00Z",
+        });
+
+        const result = await service.queryTimesheet(
+          createTestTimesheetQuery({ from: "2025-06-09", to: "2025-06-15" }),
+        );
+
+        expect(result.workingHoursSummary).toEqual({
+          totalHours: "PT18H",
+          capacity: "PT24H",
+          offset: "-PT6S",
+        });
+      });
+
+      it("Returns positive offset when hours is ahead of the capacity", async () => {
+        const eventStore = EventStore.createNull({
+          events: [
+            [
+              ActivityLoggedEvent.createTestData({
+                timestamp: "2025-06-10T14:00:00Z",
+                duration: "PT10H",
+              }),
+              ActivityLoggedEvent.createTestData({
+                timestamp: "2025-06-11T14:00:00Z",
+                duration: "PT10H",
+              }),
+              ActivityLoggedEvent.createTestData({
+                timestamp: "2025-06-12T14:00:00Z",
+                duration: "PT10H",
+              }),
+            ],
+          ],
+        });
+        const service = ActivitiesService.createNull({
+          eventStore,
+          fixedInstant: "2025-06-12T16:00:00Z",
+        });
+
+        const result = await service.queryTimesheet(
+          createTestTimesheetQuery({ from: "2025-06-09", to: "2025-06-15" }),
+        );
+
+        expect(result.workingHoursSummary).toEqual({
+          totalHours: "PT30H",
+          capacity: "PT32H",
+          offset: "PT6S",
+        });
+      });
+    });
+
     it.todo("Take vacation into account");
   });
 });

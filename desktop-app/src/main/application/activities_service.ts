@@ -21,28 +21,51 @@ import {
 } from "../domain/activities";
 import { EventStore } from "../infrastructure/event_store";
 import { ActivityLoggedEvent } from "../infrastructure/events";
+import { Calendar } from "../domain/calendar";
+
+export interface ActivitiesConfiguration {
+  readonly capacity: Temporal.Duration;
+}
 
 export class ActivitiesService {
-  static create({ eventStore = EventStore.create() }): ActivitiesService {
-    return new ActivitiesService(eventStore, Clock.systemUtc());
+  static create({
+    configuration = { capacity: Temporal.Duration.from("PT40H") },
+    eventStore = EventStore.create(),
+  }: {
+    configuration?: ActivitiesConfiguration;
+    eventStore?: EventStore;
+  } = {}): ActivitiesService {
+    return new ActivitiesService(configuration, eventStore, Clock.systemUtc());
   }
 
   static createNull({
+    configuration = { capacity: Temporal.Duration.from("PT40H") },
     eventStore = EventStore.createNull(),
     fixedInstant = "1970-01-01T00:00:00Z",
     zone = "Europe/Berlin",
   }: {
+    configuration?: ActivitiesConfiguration;
     eventStore?: EventStore;
     fixedInstant?: Temporal.Instant | string;
     zone?: Temporal.TimeZoneLike;
   } = {}): ActivitiesService {
-    return new ActivitiesService(eventStore, Clock.fixed(fixedInstant, zone));
+    return new ActivitiesService(
+      configuration,
+      eventStore,
+      Clock.fixed(fixedInstant, zone),
+    );
   }
 
+  readonly #configuration: ActivitiesConfiguration;
   readonly #eventStore: EventStore;
   readonly #clock: Clock;
 
-  constructor(eventStore: EventStore, clock: Clock) {
+  constructor(
+    configuration: ActivitiesConfiguration,
+    eventStore: EventStore,
+    clock: Clock,
+  ) {
+    this.#configuration = configuration;
     this.#eventStore = eventStore;
     this.#clock = clock;
   }
@@ -68,7 +91,11 @@ export class ActivitiesService {
   }
 
   queryTimesheet(query: TimesheetQuery): Promise<TimesheetQueryResult> {
-    const projection = new TimesheetProjection(query, this.#clock);
+    const projection = new TimesheetProjection(
+      query,
+      this.#configuration,
+      this.#clock,
+    );
     const replay = this.#eventStore.replay();
     return projection.project(replay);
   }
@@ -339,16 +366,27 @@ class TimesheetProjection {
   readonly #startInclusive: Temporal.PlainDate;
   readonly #endExclusive: Temporal.PlainDate;
   readonly #timeZone: Temporal.TimeZoneLike;
-  // TODO read default capacity from configuration
-  readonly #defaultCapacity = Temporal.Duration.from("PT40H");
+  readonly #defaultCapacity: Temporal.Duration;
+  readonly #today: Temporal.PlainDate;
+  readonly #calendar: Calendar;
 
   #entries: TimesheetEntry[] = [];
   #totalHours = Temporal.Duration.from("PT0S");
 
-  constructor(query: TimesheetQuery, clock: Clock) {
+  constructor(
+    query: TimesheetQuery,
+    configuration: ActivitiesConfiguration,
+    clock: Clock,
+  ) {
     this.#startInclusive = Temporal.PlainDate.from(query.from);
     this.#endExclusive = Temporal.PlainDate.from(query.to).add("P1D");
     this.#timeZone = query.timeZone ?? clock.zone;
+    this.#defaultCapacity = configuration.capacity;
+    this.#today = clock
+      .instant()
+      .toZonedDateTimeISO(this.#timeZone)
+      .toPlainDate();
+    this.#calendar = Calendar.create();
   }
 
   async project(events: AsyncGenerator): Promise<TimesheetQueryResult> {
@@ -374,6 +412,7 @@ class TimesheetProjection {
     }
 
     const capacity = this.#determineCapacity();
+    const offset = this.#determineOffset();
     this.#entries = this.#entries.sort((entry1, entry2) => {
       const dateComparison = Temporal.PlainDate.compare(
         Temporal.PlainDate.from(entry1.date),
@@ -396,7 +435,7 @@ class TimesheetProjection {
       workingHoursSummary: {
         totalHours: normalizeDuration(this.#totalHours).toString(),
         capacity: capacity.toString(),
-        offset: "PT0S",
+        offset: offset.toString(),
       },
     };
   }
@@ -443,5 +482,24 @@ class TimesheetProjection {
       hours: businessDays * defaultCapacityPerDay,
     });
     return normalizeDuration(capacity);
+  }
+
+  #determineOffset(): Temporal.Duration {
+    let end: Temporal.PlainDate;
+    if (Temporal.PlainDate.compare(this.#today, this.#startInclusive) < 0) {
+      end = this.#startInclusive;
+    } else if (
+      Temporal.PlainDate.compare(this.#today, this.#endExclusive) >= 0
+    ) {
+      end = this.#endExclusive;
+    } else {
+      end = this.#today.add("P1D");
+    }
+    const businessDays = this.#calendar.countBusinessDays(
+      this.#startInclusive,
+      end,
+    );
+    const offset = this.#totalHours.subtract({ hours: businessDays * 8 });
+    return normalizeDuration(offset);
   }
 }
