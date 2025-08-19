@@ -3,7 +3,7 @@
 import Ajv from "ajv";
 import addFormats from "ajv-formats";
 
-const schema = {
+const ACTIVITY_LOGGED_EVENT_SCHEMA = {
   type: "object",
   properties: {
     timestamp: { type: "string", format: "date-time" },
@@ -50,7 +50,7 @@ export class ActivityLoggedEvent {
   static from(data: unknown): ActivityLoggedEvent {
     const ajv = new Ajv();
     addFormats(ajv);
-    const valid = ajv.validate(schema, data);
+    const valid = ajv.validate(ACTIVITY_LOGGED_EVENT_SCHEMA, data);
     if (valid) {
       return ActivityLoggedEvent.create(data as ActivityLoggedEvent);
     }
