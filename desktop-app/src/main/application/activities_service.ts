@@ -14,6 +14,9 @@ import {
   type ReportQuery,
   type ReportQueryResult,
   Scope,
+  type TimesheetEntry,
+  type TimesheetQuery,
+  type TimesheetQueryResult,
   type WorkingDay,
 } from "../domain/activities";
 import { EventStore } from "../infrastructure/event_store";
@@ -63,6 +66,12 @@ export class ActivitiesService {
     const replay = this.#eventStore.replay();
     return projection.project(replay);
   }
+
+  queryTimesheet(query: TimesheetQuery): Promise<TimesheetQueryResult> {
+    const projection = new TimesheetProjection(query, this.#clock);
+    const replay = this.#eventStore.replay();
+    return projection.project(replay);
+  }
 }
 
 class RecentActivitiesProjection {
@@ -97,10 +106,11 @@ class RecentActivitiesProjection {
     this.#thisWeekStart = this.#today.subtract({
       days: this.#today.dayOfWeek - 1,
     });
-    this.#thisWeekEnd = this.#thisWeekStart.add({ days: 6 });
+    this.#thisWeekEnd = this.#thisWeekStart.add("P6D");
     this.#thisMonthStart = this.#today.with({ day: 1 });
-    this.#nextMonthStart = this.#thisMonthStart.add({ months: 1 });
+    this.#nextMonthStart = this.#thisMonthStart.add("P1M");
   }
+
   async project(events: AsyncGenerator): Promise<RecentActivitiesQueryResult> {
     const from = this.#today
       .subtract({ days: 30 })
@@ -315,6 +325,105 @@ class ReportProjection {
         ...existingEntry,
         client: existingClient,
         hours: accumulatedHours.toString(),
+      };
+    }
+  }
+
+  #updateTotalHours(activity: Activity) {
+    const duration = Temporal.Duration.from(activity.duration);
+    this.#totalHours = this.#totalHours.add(duration);
+  }
+}
+
+class TimesheetProjection {
+  readonly #startInclusive: Temporal.PlainDate;
+  readonly #endExclusive: Temporal.PlainDate;
+  readonly #timeZone: Temporal.TimeZoneLike;
+
+  #entries: TimesheetEntry[] = [];
+  #totalHours = Temporal.Duration.from("PT0S");
+
+  constructor(query: TimesheetQuery, clock: Clock) {
+    this.#startInclusive = Temporal.PlainDate.from(query.from);
+    this.#endExclusive = Temporal.PlainDate.from(query.to).add("P1D");
+    this.#timeZone = query.timeZone ?? clock.zone;
+  }
+
+  async project(events: AsyncGenerator): Promise<TimesheetQueryResult> {
+    for await (const e of events) {
+      // TODO handle type error
+      const event = ActivityLoggedEvent.from(e);
+      const date = Temporal.Instant.from(event.timestamp)
+        .toZonedDateTimeISO(this.#timeZone)
+        .toPlainDate();
+      if (
+        Temporal.PlainDate.compare(date, this.#startInclusive) < 0 ||
+        Temporal.PlainDate.compare(date, this.#endExclusive) >= 0
+      ) {
+        continue;
+      }
+
+      const activity = createActivityFromActivityLoggedEvent(
+        event,
+        this.#timeZone,
+      );
+      this.#updateEntries(activity);
+      this.#updateTotalHours(activity);
+    }
+
+    this.#entries = this.#entries.sort((entry1, entry2) => {
+      const dateComparison = Temporal.PlainDate.compare(
+        Temporal.PlainDate.from(entry1.date),
+        Temporal.PlainDate.from(entry2.date),
+      );
+      if (dateComparison !== 0) {
+        return dateComparison;
+      }
+      if (entry1.client !== entry2.client) {
+        return entry1.client.localeCompare(entry2.client);
+      }
+      if (entry1.project !== entry2.project) {
+        return entry1.project.localeCompare(entry2.project);
+      }
+      return entry1.task.localeCompare(entry2.task);
+    });
+
+    return {
+      entries: this.#entries,
+      workingHoursSummary: {
+        totalHours: normalizeDuration(this.#totalHours).toString(),
+        capacity: "PT40H",
+        offset: "PT0S",
+      },
+    };
+  }
+
+  #updateEntries(activity: Activity) {
+    const date = Temporal.PlainDate.from(activity.dateTime);
+    const index = this.#entries.findIndex(
+      (entry) =>
+        entry.date === date.toString() &&
+        entry.client === activity.client &&
+        entry.project === activity.project &&
+        entry.task === activity.task,
+    );
+    if (index === -1) {
+      const newEntry: TimesheetEntry = {
+        date: date.toString(),
+        client: activity.client,
+        project: activity.project,
+        task: activity.task,
+        hours: activity.duration,
+      };
+      this.#entries.push(newEntry);
+    } else {
+      const existingEntry = this.#entries[index];
+      const accumulatedHours = Temporal.Duration.from(existingEntry.hours).add(
+        Temporal.Duration.from(activity.duration),
+      );
+      this.#entries[index] = {
+        ...existingEntry,
+        hours: normalizeDuration(accumulatedHours).toString(),
       };
     }
   }

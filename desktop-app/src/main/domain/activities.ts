@@ -116,6 +116,67 @@ export function createTestReportEntry({
   return { name, client, hours };
 }
 
+export interface TimesheetQuery {
+  readonly from: string;
+  readonly to: string;
+  readonly timeZone?: string;
+}
+
+export function createTestTimesheetQuery({
+  from = "2025-06-02",
+  to = "2025-06-08",
+  timeZone = "Europe/Berlin",
+}: Partial<TimesheetQuery> = {}): TimesheetQuery {
+  return { from, to, timeZone };
+}
+
+export interface TimesheetQueryResult {
+  readonly entries: TimesheetEntry[];
+  readonly workingHoursSummary: WorkingHoursSummary;
+}
+
+export function createTestTimesheetQueryResult({
+  entries = [
+    createTestTimesheetEntry({ date: "2025-06-02" }),
+    createTestTimesheetEntry({ date: "2025-06-03" }),
+  ],
+  workingHoursSummary = createTestWorkingHoursSummary(),
+}: Partial<TimesheetQueryResult> = {}): TimesheetQueryResult {
+  return { entries, workingHoursSummary };
+}
+
+export interface TimesheetEntry {
+  readonly date: string;
+  readonly client: string;
+  readonly project: string;
+  readonly task: string;
+  readonly hours: string;
+}
+
+export function createTestTimesheetEntry({
+  date = "2025-06-04",
+  client = "Test client",
+  project = "Test project",
+  task = "Test task",
+  hours = "PT2H",
+}: Partial<TimesheetEntry> = {}): TimesheetEntry {
+  return { date, client, project, task, hours };
+}
+
+export interface WorkingHoursSummary {
+  readonly totalHours: string;
+  readonly capacity: string;
+  readonly offset: string;
+}
+
+export function createTestWorkingHoursSummary({
+  totalHours = "PT4H",
+  capacity = "PT40H",
+  offset = "PT12H",
+}: Partial<WorkingHoursSummary> = {}): WorkingHoursSummary {
+  return { totalHours, capacity, offset };
+}
+
 export interface Activity {
   readonly dateTime: string;
   readonly duration: string;

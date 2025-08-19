@@ -10,6 +10,8 @@ import {
   createTestLogActivityCommand,
   createTestReportEntry,
   createTestReportQuery,
+  createTestTimesheetEntry,
+  createTestTimesheetQuery,
   Scope,
 } from "../../src/main/domain/activities";
 import { createSuccess } from "../../src/main/common/messages";
@@ -369,11 +371,111 @@ describe("Activities service", () => {
   });
 
   describe("Timesheet", () => {
-    it.todo("Summarize hours worked on tasks");
+    it("Returns empty result when no activities are logged", async () => {
+      const eventStore = EventStore.createNull({ events: [[]] });
+      const service = ActivitiesService.createNull({ eventStore });
+
+      const result = await service.queryTimesheet(createTestTimesheetQuery());
+
+      expect(result).toEqual({
+        entries: [],
+        workingHoursSummary: {
+          totalHours: "PT0S",
+          capacity: "PT40H",
+          offset: "PT0S",
+        },
+      });
+    });
+
+    it("Summarize hours worked on tasks", async () => {
+      const eventStore = EventStore.createNull({
+        events: [
+          [
+            // monday, only same tasks
+            ActivityLoggedEvent.createTestData({
+              timestamp: "2025-06-02T10:00:00Z",
+            }),
+            ActivityLoggedEvent.createTestData({
+              timestamp: "2025-06-02T10:30:00Z",
+            }),
+            // tuesday, different tasks
+            ActivityLoggedEvent.createTestData({
+              timestamp: "2025-06-03T10:00:00Z",
+            }),
+            ActivityLoggedEvent.createTestData({
+              timestamp: "2025-06-03T10:30:00Z",
+              task: "Other task",
+            }),
+            // wednesday, different projects
+            ActivityLoggedEvent.createTestData({
+              timestamp: "2025-06-04T10:00:00Z",
+            }),
+            ActivityLoggedEvent.createTestData({
+              timestamp: "2025-06-04T10:30:00Z",
+              project: "Other project",
+            }),
+            // thursday, different clients
+            ActivityLoggedEvent.createTestData({
+              timestamp: "2025-06-05T10:00:00Z",
+            }),
+            ActivityLoggedEvent.createTestData({
+              timestamp: "2025-06-05T10:30:00Z",
+              client: "Other client",
+            }),
+          ],
+        ],
+      });
+      const service = ActivitiesService.createNull({ eventStore });
+
+      const result = await service.queryTimesheet(createTestTimesheetQuery({}));
+
+      expect(result.entries).toEqual([
+        createTestTimesheetEntry({ date: "2025-06-02", hours: "PT1H" }),
+        createTestTimesheetEntry({
+          date: "2025-06-03",
+          task: "Other task",
+          hours: "PT30M",
+        }),
+        createTestTimesheetEntry({ date: "2025-06-03", hours: "PT30M" }),
+        createTestTimesheetEntry({
+          date: "2025-06-04",
+          project: "Other project",
+          hours: "PT30M",
+        }),
+        createTestTimesheetEntry({ date: "2025-06-04", hours: "PT30M" }),
+        createTestTimesheetEntry({
+          date: "2025-06-05",
+          client: "Other client",
+          hours: "PT30M",
+        }),
+        createTestTimesheetEntry({ date: "2025-06-05", hours: "PT30M" }),
+      ]);
+    });
+
     it.todo("Summarize hours worked per day");
     it.todo("Summarize hours worked per week");
     it.todo("Summarize hours worked per month");
-    it.todo("Summarize the total hours worked");
+
+    it("Summarize the total hours worked", async () => {
+      const timestamps = [
+        "2025-06-02T10:00:00Z",
+        "2025-06-02T10:30:00Z",
+        "2025-06-02T11:00:00Z",
+      ];
+      const eventStore = EventStore.createNull({
+        events: [
+          timestamps.map((timestamp) =>
+            ActivityLoggedEvent.createTestData({ timestamp }),
+          ),
+        ],
+      });
+      const service = ActivitiesService.createNull({ eventStore });
+
+      const result = await service.queryTimesheet(createTestTimesheetQuery({}));
+
+      expect(result.workingHoursSummary.totalHours).toEqual("PT1H30M");
+    });
+
     it.todo("Compare with capacity");
     it.todo("Take holidays into account");
     it.todo("Take vacation into account");
