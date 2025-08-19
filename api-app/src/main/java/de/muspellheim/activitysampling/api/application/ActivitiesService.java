@@ -61,6 +61,7 @@ public class ActivitiesService {
     try {
       log.info("Query recent activities: {}", query);
       var projection = new RecentActivitiesProjection(query, clock);
+      // TODO filter and sort in projection
       var replay = store.replay(projection.getFrom());
       return projection.project(replay);
     } catch (Exception e) {
@@ -73,6 +74,7 @@ public class ActivitiesService {
     try {
       log.info("Query timesheet: {}", query);
       var holidays = holidayRepository.findAllByDate(query.from(), query.to().plusDays(1));
+      // TODO filter and sort in projection
       var projection = new TimesheetProjection(query, configuration, holidays, clock);
       var replay = store.replay(projection.getStartInclusive(), projection.getEndExclusive());
       return projection.project(replay);
@@ -86,6 +88,7 @@ public class ActivitiesService {
     try {
       log.info("Query report: {}", query);
       var projection = new ReportProjection(query);
+      // TODO filter and sort in projection
       var replay = store.replay(projection.getStartInclusive(), projection.getEndExclusive());
       return projection.project(replay);
     } catch (Exception e) {
