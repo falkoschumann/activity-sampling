@@ -296,6 +296,10 @@ describe("Activities service", () => {
       ]);
     });
 
+    it.todo(
+      "Summarizes hours worked on projects and combines projects with multiple clients",
+    );
+
     it("Summarizes hours worked on tasks", async () => {
       const eventStore = EventStore.createNull({
         events: [
