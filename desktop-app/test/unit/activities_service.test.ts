@@ -91,7 +91,10 @@ describe("Activities service", () => {
       const eventStore = EventStore.createNull({
         events: [[ActivityLoggedEvent.createTestData()]],
       });
-      const service = ActivitiesService.createNull({ eventStore });
+      const service = ActivitiesService.createNull({
+        eventStore,
+        fixedInstant: "2025-08-20T09:03:00Z",
+      });
 
       const result = await service.queryRecentActivities({});
 

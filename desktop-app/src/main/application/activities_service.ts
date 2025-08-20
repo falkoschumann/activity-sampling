@@ -161,19 +161,10 @@ class RecentActivitiesProjection {
     const from = this.#today
       .subtract({ days: 30 })
       .toZonedDateTime({ plainTime: "00:00", timeZone: this.#timeZone })
-      .toInstant();
-    for await (const e of events) {
-      // TODO handle type error
-      const event = ActivityLoggedEvent.from(e);
-      const timestamp = Temporal.Instant.from(event.timestamp);
-      if (Temporal.Instant.compare(timestamp, from) < 0) {
-        continue;
-      }
-
-      const activity = createActivityFromActivityLoggedEvent(
-        event,
-        this.#timeZone,
-      );
+      .toPlainDate();
+    const to = this.#today.with({ day: this.#today.daysInMonth }).add("P1D");
+    const activities = project(events, this.#timeZone, from, to);
+    for await (const activity of activities) {
       this.#updateLastActivity(activity);
       this.#updateWorkingDays(activity);
       this.#updateTimeSummary(activity);
@@ -259,19 +250,6 @@ class RecentActivitiesProjection {
   }
 }
 
-function createActivityFromActivityLoggedEvent(
-  event: ActivityLoggedEvent,
-  timeZone: Temporal.TimeZoneLike,
-) {
-  return createActivity({
-    ...event,
-    dateTime: Temporal.Instant.from(event.timestamp)
-      .toZonedDateTimeISO(timeZone)
-      .toPlainDateTime()
-      .toString({ smallestUnit: "minutes" }),
-  });
-}
-
 class ReportProjection {
   readonly #startInclusive: Temporal.PlainDate;
   readonly #endExclusive: Temporal.PlainDate;
@@ -289,23 +267,13 @@ class ReportProjection {
   }
 
   async project(events: AsyncGenerator): Promise<ReportQueryResult> {
-    for await (const e of events) {
-      // TODO handle type error
-      const event = ActivityLoggedEvent.from(e);
-      const date = Temporal.Instant.from(event.timestamp)
-        .toZonedDateTimeISO(this.#timeZone)
-        .toPlainDate();
-      if (
-        Temporal.PlainDate.compare(date, this.#startInclusive) < 0 ||
-        Temporal.PlainDate.compare(date, this.#endExclusive) >= 0
-      ) {
-        continue;
-      }
-
-      const activity = createActivityFromActivityLoggedEvent(
-        event,
-        this.#timeZone,
-      );
+    const activities = project(
+      events,
+      this.#timeZone,
+      this.#startInclusive,
+      this.#endExclusive,
+    );
+    for await (const activity of activities) {
       this.#updateEntries(activity);
       this.#updateTotalHours(activity);
     }
@@ -411,23 +379,13 @@ class TimesheetProjection {
   }
 
   async project(events: AsyncGenerator): Promise<TimesheetQueryResult> {
-    for await (const e of events) {
-      // TODO handle type error
-      const event = ActivityLoggedEvent.from(e);
-      const date = Temporal.Instant.from(event.timestamp)
-        .toZonedDateTimeISO(this.#timeZone)
-        .toPlainDate();
-      if (
-        Temporal.PlainDate.compare(date, this.#startInclusive) < 0 ||
-        Temporal.PlainDate.compare(date, this.#endExclusive) >= 0
-      ) {
-        continue;
-      }
-
-      const activity = createActivityFromActivityLoggedEvent(
-        event,
-        this.#timeZone,
-      );
+    const activities = project(
+      events,
+      this.#timeZone,
+      this.#startInclusive,
+      this.#endExclusive,
+    );
+    for await (const activity of activities) {
       this.#updateEntries(activity);
       this.#updateTotalHours(activity);
     }
@@ -525,5 +483,35 @@ class TimesheetProjection {
     );
     const offset = this.#totalHours.subtract({ hours: businessDays * 8 });
     return normalizeDuration(offset);
+  }
+}
+
+async function* project(
+  events: AsyncGenerator,
+  timeZone: Temporal.TimeZoneLike,
+  startInclusive: Temporal.PlainDate | Temporal.PlainDateLike | string,
+  endExclusive: Temporal.PlainDate | Temporal.PlainDateLike | string,
+): AsyncGenerator<Activity> {
+  for await (const e of events) {
+    // TODO handle type error
+    const event = ActivityLoggedEvent.from(e);
+    const date = Temporal.Instant.from(event.timestamp)
+      .toZonedDateTimeISO(timeZone)
+      .toPlainDate();
+    if (
+      Temporal.PlainDate.compare(date, startInclusive) < 0 ||
+      Temporal.PlainDate.compare(date, endExclusive) >= 0
+    ) {
+      continue;
+    }
+
+    const activity = createActivity({
+      ...event,
+      dateTime: Temporal.Instant.from(event.timestamp)
+        .toZonedDateTimeISO(timeZone)
+        .toPlainDateTime()
+        .toString({ smallestUnit: "minutes" }),
+    });
+    yield activity;
   }
 }
