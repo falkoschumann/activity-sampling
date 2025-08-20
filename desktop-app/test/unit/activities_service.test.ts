@@ -15,6 +15,7 @@ import {
   Scope,
 } from "../../src/main/domain/activities";
 import { createSuccess } from "../../src/main/common/messages";
+import { HolidayRepository } from "../../src/main/infrastructure/holiday_repository";
 
 describe("Activities service", () => {
   describe("Ask periodically", () => {
@@ -511,7 +512,7 @@ describe("Activities service", () => {
       });
     });
 
-    describe.todo("Take holidays into account", () => {
+    describe("Take holidays into account", () => {
       it("Returns offset 0 when capacity is reached", async () => {
         const eventStore = EventStore.createNull({
           events: [
@@ -531,8 +532,12 @@ describe("Activities service", () => {
             ],
           ],
         });
+        const holidayRepository = HolidayRepository.createNull({
+          holidays: [[{ date: "2025-06-09", title: "Pfingstmontag" }]],
+        });
         const service = ActivitiesService.createNull({
           eventStore,
+          holidayRepository,
           fixedInstant: "2025-06-12T16:00:00Z",
         });
 
@@ -566,8 +571,13 @@ describe("Activities service", () => {
             ],
           ],
         });
+        const holidayRepository = HolidayRepository.createNull({
+          holidays: [[{ date: "2025-06-09", title: "Pfingstmontag" }]],
+        });
+
         const service = ActivitiesService.createNull({
           eventStore,
+          holidayRepository,
           fixedInstant: "2025-06-12T16:00:00Z",
         });
 
@@ -577,8 +587,8 @@ describe("Activities service", () => {
 
         expect(result.workingHoursSummary).toEqual({
           totalHours: "PT18H",
-          capacity: "PT24H",
-          offset: "-PT6S",
+          capacity: "PT32H",
+          offset: "-PT6H",
         });
       });
 
@@ -601,8 +611,12 @@ describe("Activities service", () => {
             ],
           ],
         });
+        const holidayRepository = HolidayRepository.createNull({
+          holidays: [[{ date: "2025-06-09", title: "Pfingstmontag" }]],
+        });
         const service = ActivitiesService.createNull({
           eventStore,
+          holidayRepository,
           fixedInstant: "2025-06-12T16:00:00Z",
         });
 
@@ -613,7 +627,7 @@ describe("Activities service", () => {
         expect(result.workingHoursSummary).toEqual({
           totalHours: "PT30H",
           capacity: "PT32H",
-          offset: "PT6S",
+          offset: "PT6H",
         });
       });
     });

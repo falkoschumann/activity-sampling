@@ -1,8 +1,8 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
 import { Temporal } from "@js-temporal/polyfill";
-import { type CommandStatus, createSuccess } from "../common/messages";
 
+import { type CommandStatus, createSuccess } from "../common/messages";
 import { Clock, normalizeDuration } from "../common/temporal";
 import {
   type Activity,
@@ -19,9 +19,10 @@ import {
   type TimesheetQueryResult,
   type WorkingDay,
 } from "../domain/activities";
+import { Calendar, type Holiday } from "../domain/calendar";
 import { EventStore } from "../infrastructure/event_store";
 import { ActivityLoggedEvent } from "../infrastructure/events";
-import { Calendar } from "../domain/calendar";
+import { HolidayRepository } from "../infrastructure/holiday_repository";
 
 export interface ActivitiesConfiguration {
   readonly capacity: Temporal.Duration;
@@ -31,42 +32,55 @@ export class ActivitiesService {
   static create({
     configuration = { capacity: Temporal.Duration.from("PT40H") },
     eventStore = EventStore.create(),
+    holidayRepository = HolidayRepository.create(),
   }: {
     configuration?: ActivitiesConfiguration;
     eventStore?: EventStore;
+    holidayRepository?: HolidayRepository;
   } = {}): ActivitiesService {
-    return new ActivitiesService(configuration, eventStore, Clock.systemUtc());
+    return new ActivitiesService(
+      configuration,
+      eventStore,
+      holidayRepository,
+      Clock.systemUtc(),
+    );
   }
 
   static createNull({
     configuration = { capacity: Temporal.Duration.from("PT40H") },
     eventStore = EventStore.createNull(),
+    holidayRepository = HolidayRepository.createNull({ holidays: [[]] }),
     fixedInstant = "1970-01-01T00:00:00Z",
     zone = "Europe/Berlin",
   }: {
     configuration?: ActivitiesConfiguration;
     eventStore?: EventStore;
+    holidayRepository?: HolidayRepository;
     fixedInstant?: Temporal.Instant | string;
     zone?: Temporal.TimeZoneLike;
   } = {}): ActivitiesService {
     return new ActivitiesService(
       configuration,
       eventStore,
+      holidayRepository,
       Clock.fixed(fixedInstant, zone),
     );
   }
 
   readonly #configuration: ActivitiesConfiguration;
   readonly #eventStore: EventStore;
+  readonly #holidayRepository: HolidayRepository;
   readonly #clock: Clock;
 
   constructor(
     configuration: ActivitiesConfiguration,
     eventStore: EventStore,
+    holidayRepository: HolidayRepository,
     clock: Clock,
   ) {
     this.#configuration = configuration;
     this.#eventStore = eventStore;
+    this.#holidayRepository = holidayRepository;
     this.#clock = clock;
   }
 
@@ -90,10 +104,15 @@ export class ActivitiesService {
     return projection.project(replay);
   }
 
-  queryTimesheet(query: TimesheetQuery): Promise<TimesheetQueryResult> {
+  async queryTimesheet(query: TimesheetQuery): Promise<TimesheetQueryResult> {
+    const holidays = await this.#holidayRepository.findAllByDate(
+      query.from,
+      query.to,
+    );
     const projection = new TimesheetProjection(
       query,
       this.#configuration,
+      holidays,
       this.#clock,
     );
     const replay = this.#eventStore.replay();
@@ -376,6 +395,7 @@ class TimesheetProjection {
   constructor(
     query: TimesheetQuery,
     configuration: ActivitiesConfiguration,
+    holidays: Holiday[],
     clock: Clock,
   ) {
     this.#startInclusive = Temporal.PlainDate.from(query.from);
@@ -386,7 +406,8 @@ class TimesheetProjection {
       .instant()
       .toZonedDateTimeISO(this.#timeZone)
       .toPlainDate();
-    this.#calendar = Calendar.create();
+    const holidaysDates = holidays.map((h) => h.date);
+    this.#calendar = Calendar.create({ holidays: holidaysDates });
   }
 
   async project(events: AsyncGenerator): Promise<TimesheetQueryResult> {
@@ -476,7 +497,10 @@ class TimesheetProjection {
   }
 
   #determineCapacity(): Temporal.Duration {
-    const businessDays = 5;
+    const businessDays = this.#calendar.countBusinessDays(
+      this.#startInclusive,
+      this.#endExclusive,
+    );
     const defaultCapacityPerDay = this.#defaultCapacity.hours / 5;
     const capacity = Temporal.Duration.from({
       hours: businessDays * defaultCapacityPerDay,

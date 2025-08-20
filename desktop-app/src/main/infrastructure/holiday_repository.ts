@@ -1,20 +1,24 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
+import fsPromise from "node:fs/promises";
 import { Temporal } from "@js-temporal/polyfill";
 import Ajv from "ajv";
 import addFormats from "ajv-formats";
 import { parse } from "csv";
-import fsPromise from "node:fs/promises";
+import { stringify as syncStringify } from "csv-stringify/sync";
+import { ConfigurableResponses } from "../common/configurable_responses";
 
 import type { Holiday } from "../domain/calendar";
+
+// TODO use upper case properties for CSV header
 
 const schema = {
   type: "object",
   properties: {
-    Date: { type: "string", format: "date" },
-    Title: { type: "string" },
+    title: { type: "string" },
+    date: { type: "string", format: "date" },
   },
-  required: ["Date", "Title"],
+  required: ["date", "title"],
   additionalProperties: false,
 };
 
@@ -23,6 +27,15 @@ export class HolidayRepository extends EventTarget {
     fileName = "data/holidays.csv",
   }: { fileName?: string } = {}) {
     return new HolidayRepository(fileName, fsPromise);
+  }
+
+  static createNull({
+    holidays,
+  }: { holidays?: Holiday[][] } = {}): HolidayRepository {
+    return new HolidayRepository(
+      "null-file-csv",
+      new FsPromiseStub(holidays) as unknown as typeof fsPromise,
+    );
   }
 
   readonly #fileName: string;
@@ -48,14 +61,14 @@ export class HolidayRepository extends EventTarget {
       const holidays: Holiday[] = [];
       for await (const record of records) {
         const holiday = HolidayDto.from(record);
-        const date = Temporal.PlainDate.from(holiday.Date);
+        const date = Temporal.PlainDate.from(holiday.date);
         if (
           Temporal.PlainDate.compare(date, startInclusive) >= 0 &&
           Temporal.PlainDate.compare(date, endExclusive) < 0
         ) {
           holidays.push({
-            date: holiday.Date,
-            title: holiday.Title,
+            date: holiday.date,
+            title: holiday.title,
           });
         }
       }
@@ -88,11 +101,25 @@ export class HolidayDto {
     throw new TypeError(`Invalid holiday data:\n${errors}`);
   }
 
-  readonly Date: string;
-  readonly Title: string;
+  readonly date: string;
+  readonly title: string;
 
   constructor(data: HolidayDto) {
-    this.Date = data.Date;
-    this.Title = data.Title;
+    this.date = data.date;
+    this.title = data.title;
+  }
+}
+
+class FsPromiseStub {
+  readonly #configurableResponses: ConfigurableResponses;
+
+  constructor(holidays?: unknown[][]) {
+    this.#configurableResponses = ConfigurableResponses.create(holidays);
+  }
+
+  async readFile() {
+    const response = this.#configurableResponses.next();
+    const s = syncStringify(response as unknown[], { header: true });
+    return Promise.resolve(s);
   }
 }

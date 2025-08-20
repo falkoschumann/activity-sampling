@@ -7,6 +7,8 @@ import { parse, stringify } from "csv";
 import { ConfigurableResponses } from "../common/configurable_responses";
 import { OutputTracker } from "../common/output_tracker";
 
+// TODO use upper case properties for CSV header
+
 const RECORDED_EVENT = "recorded";
 
 export class EventStore<T = unknown> extends EventTarget {
@@ -16,9 +18,7 @@ export class EventStore<T = unknown> extends EventTarget {
     return new EventStore<T>(fileName, fsPromise);
   }
 
-  static createNull<T>({
-    events,
-  }: { events?: T[][] | T[] } = {}): EventStore<T> {
+  static createNull<T>({ events }: { events?: T[][] } = {}): EventStore<T> {
     return new EventStore<T>(
       "null-file-csv",
       new FsPromiseStub(events) as unknown as typeof fsPromise,
@@ -96,7 +96,7 @@ export class EventStore<T = unknown> extends EventTarget {
 class FsPromiseStub {
   readonly #configurableResponses: ConfigurableResponses;
 
-  constructor(events?: unknown[][] | unknown[]) {
+  constructor(events?: unknown[][]) {
     this.#configurableResponses = ConfigurableResponses.create(events);
   }
 

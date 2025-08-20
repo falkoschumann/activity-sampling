@@ -49,4 +49,21 @@ describe("Holiday repository", () => {
 
     expect(holidays).toEqual([KARFREITAG, OSTERSONNTAG]);
   });
+
+  describe("Nulled holiday repository", () => {
+    it("Finds all by date", async () => {
+      const repository = HolidayRepository.createNull({
+        holidays: [[{ date: "2025-06-09", title: "Pfingstmontag" }]],
+      });
+
+      const holidays = await repository.findAllByDate(
+        "2025-01-01",
+        "2025-12-31",
+      );
+
+      expect(holidays).toEqual([
+        { date: "2025-06-09", title: "Pfingstmontag" },
+      ]);
+    });
+  });
 });
