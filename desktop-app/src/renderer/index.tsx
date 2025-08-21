@@ -1,13 +1,14 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
-import "./assets/main.css";
-
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import App from "./App";
+import "bootstrap";
+
+import DesktopApp from "./desktop_app";
+import "./assets/style.scss";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <App />
+    <DesktopApp />
   </StrictMode>,
 );

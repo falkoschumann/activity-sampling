@@ -1,8 +1,7 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
-import { resolve } from "path";
-import { defineConfig, externalizeDepsPlugin } from "electron-vite";
 import react from "@vitejs/plugin-react";
+import { defineConfig, externalizeDepsPlugin } from "electron-vite";
 
 export default defineConfig({
   main: {
@@ -12,9 +11,18 @@ export default defineConfig({
     plugins: [externalizeDepsPlugin()],
   },
   renderer: {
-    resolve: {
-      alias: {
-        "@renderer": resolve("src/renderer/src"),
+    css: {
+      preprocessorOptions: {
+        scss: {
+          // WORKAROUND: Silence deprecation warnings in Bootstrap 5.3
+          // See https://github.com/twbs/bootstrap/pull/41512
+          silenceDeprecations: [
+            "import",
+            "mixed-decls",
+            "color-functions",
+            "global-builtin",
+          ],
+        },
       },
     },
     plugins: [react()],
