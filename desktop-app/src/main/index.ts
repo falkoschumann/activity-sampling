@@ -45,6 +45,14 @@ function createWindow(): void {
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(() => {
+  if (!app.isPackaged) {
+    installExtension([REACT_DEVELOPER_TOOLS])
+      .then(([redux, react]) =>
+        console.log(`Added Extensions:  ${redux.name}, ${react.name}`),
+      )
+      .catch((err) => console.log("An error occurred: ", err));
+  }
+
   // IPC test
   ipcMain.on("ping", () => console.log("pong"));
 
@@ -55,14 +63,6 @@ app.whenReady().then(() => {
     // dock icon is clicked and there are no other windows open.
     if (BrowserWindow.getAllWindows().length === 0) createWindow();
   });
-
-  if (!app.isPackaged) {
-    installExtension([REACT_DEVELOPER_TOOLS])
-      .then(([redux, react]) =>
-        console.log(`Added Extensions:  ${redux.name}, ${react.name}`),
-      )
-      .catch((err) => console.log("An error occurred: ", err));
-  }
 });
 
 // Quit when all windows are closed, except on macOS. There, it's common
