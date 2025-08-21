@@ -1,34 +1,20 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
 import { contextBridge, ipcRenderer } from "electron";
+import type { RecentActivitiesQuery } from "../main/domain/activities";
 
-// Custom APIs for renderer
-const api = {};
+contextBridge.exposeInMainWorld("activitySampling", {
+  queryRecentActivities: (query: RecentActivitiesQuery) =>
+    ipcRenderer.invoke("queryRecentActivities", query),
+});
 
-// Use `contextBridge` APIs to expose Electron APIs to
-// renderer only if context isolation is enabled, otherwise
-// just add to the DOM global.
-if (process.contextIsolated) {
-  try {
-    contextBridge.exposeInMainWorld("electron", {
-      ping: () => ipcRenderer.send("ping"),
-      process: {
-        versions: {
-          electron: process.versions.electron,
-          chrome: process.versions.chrome,
-          node: process.versions.node,
-        },
-      },
-    });
-    contextBridge.exposeInMainWorld("api", api);
-  } catch (error) {
-    console.error(error);
-  }
-} else {
-  // @ts-expect-error define in dts
-  window.electron = {
-    ping: () => ipcRenderer.send("ping"),
-  };
-  // @ts-expect-error define in dts
-  window.api = api;
-}
+contextBridge.exposeInMainWorld("electron", {
+  ping: () => ipcRenderer.send("ping"),
+  process: {
+    versions: {
+      electron: process.versions.electron,
+      chrome: process.versions.chrome,
+      node: process.versions.node,
+    },
+  },
+});

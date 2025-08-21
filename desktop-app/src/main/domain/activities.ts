@@ -36,6 +36,19 @@ export interface RecentActivitiesQueryResult {
   readonly timeSummary: TimeSummary;
 }
 
+export function createRecentActivitiesQueryResult({
+  lastActivity,
+  workingDays = [],
+  timeSummary = {
+    hoursToday: "PT0S",
+    hoursYesterday: "PT0S",
+    hoursThisWeek: "PT0S",
+    hoursThisMonth: "PT0S",
+  },
+}: Partial<RecentActivitiesQueryResult> = {}): RecentActivitiesQueryResult {
+  return { lastActivity, workingDays, timeSummary };
+}
+
 export function createTestRecentActivitiesQueryResult({
   lastActivity = createTestActivity({ dateTime: "2025-08-14T13:00" }),
   workingDays = [
