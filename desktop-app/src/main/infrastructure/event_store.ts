@@ -2,7 +2,9 @@
 
 import fsPromise from "node:fs/promises";
 import path from "node:path";
+import stream from "node:stream";
 import { parse, stringify } from "csv";
+import { stringify as syncStringify } from "csv-stringify/sync";
 
 import { ConfigurableResponses } from "../common/configurable_responses";
 import { OutputTracker } from "../common/output_tracker";
@@ -69,6 +71,7 @@ export class EventStore<T = unknown> extends EventTarget {
       for await (const record of parser) {
         yield record;
       }
+      parser.end();
     } catch (error) {
       if ((error as NodeJS.ErrnoException).code === "ENOENT") {
         // No such file or directory, no events recorded yet
@@ -119,9 +122,14 @@ class FileHandleStub {
   }
 
   createReadStream() {
-    return {
-      pipe: () => this.#configurableResponses.next(),
-    };
+    const readable = new stream.PassThrough();
+    setTimeout(() => {
+      const events = this.#configurableResponses.next();
+      const record = syncStringify(events as unknown[], { header: true });
+      readable.emit("data", record);
+      readable.emit("end");
+    }, 0);
+    return readable;
   }
 
   createWriteStream() {
