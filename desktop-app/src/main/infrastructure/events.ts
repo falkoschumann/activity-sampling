@@ -17,6 +17,9 @@ const ACTIVITY_LOGGED_EVENT_SCHEMA = {
   additionalProperties: false,
 };
 
+const ajv = new Ajv();
+addFormats(ajv);
+
 export class ActivityLoggedEvent {
   static create({
     timestamp,
@@ -48,8 +51,6 @@ export class ActivityLoggedEvent {
   }
 
   static from(data: unknown): ActivityLoggedEvent {
-    const ajv = new Ajv();
-    addFormats(ajv);
     const valid = ajv.validate(ACTIVITY_LOGGED_EVENT_SCHEMA, data);
     if (valid) {
       return ActivityLoggedEvent.create(data as ActivityLoggedEvent);

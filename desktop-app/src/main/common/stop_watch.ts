@@ -20,7 +20,7 @@ export class StopWatch {
   #taskList?: TaskInfo[] = [];
   #totalTimeMillis = 0;
   #currentTaskName?: string;
-  #startTime = 0;
+  #startTimeMillis = 0;
   #lastTaskInfo?: TaskInfo;
 
   private constructor(id = "", dateClass: typeof Date) {
@@ -34,7 +34,7 @@ export class StopWatch {
     }
 
     this.#currentTaskName = taskName;
-    this.#startTime = this.#dateClass.now();
+    this.#startTimeMillis = this.#dateClass.now();
   }
 
   stop() {
@@ -42,7 +42,7 @@ export class StopWatch {
       throw new Error("Cannot stop StopWatch: it is not running.");
     }
 
-    const lastTime = this.#dateClass.now() - this.#startTime;
+    const lastTime = this.#dateClass.now() - this.#startTimeMillis;
     this.#totalTimeMillis += lastTime;
     this.#lastTaskInfo = {
       taskName: this.#currentTaskName!,
