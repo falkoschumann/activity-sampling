@@ -42,7 +42,7 @@ export class ActivitiesService {
       configuration,
       eventStore,
       holidayRepository,
-      Clock.systemUtc(),
+      Clock.systemDefaultZone(),
     );
   }
 
