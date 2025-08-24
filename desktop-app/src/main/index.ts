@@ -1,6 +1,6 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
-import { join } from "path";
+import path from "path";
 import { app, BrowserWindow, ipcMain, shell } from "electron";
 import {
   installExtension,
@@ -11,67 +11,27 @@ import icon from "../../resources/icon.png?asset";
 import { ActivitiesService } from "./application/activities_service";
 import type { RecentActivitiesQuery } from "./domain/activities";
 
-function createWindow(): void {
-  // Create the browser window.
-  const mainWindow = new BrowserWindow({
-    width: 900,
-    height: 670,
-    show: false,
-    autoHideMenuBar: true,
-    ...(process.platform === "linux" ? { icon } : {}),
-    webPreferences: {
-      preload: join(__dirname, "../preload/index.js"),
-      sandbox: false,
-    },
-  });
-
-  mainWindow.on("ready-to-show", () => {
-    mainWindow.show();
-  });
-
-  mainWindow.webContents.setWindowOpenHandler((details) => {
-    void shell.openExternal(details.url);
-    return { action: "deny" };
-  });
-
-  // HMR for renderer base on electron-vite cli.
-  // Load the remote URL for development or the local html file for production.
-  if (!app.isPackaged && process.env["ELECTRON_RENDERER_URL"]) {
-    void mainWindow.loadURL(process.env["ELECTRON_RENDERER_URL"]);
-  } else {
-    void mainWindow.loadFile(join(__dirname, "../renderer/index.html"));
-  }
-}
-
-// This method will be called when Electron has finished
-// initialization and is ready to create browser windows.
-// Some APIs can only be used after this event occurs.
 app.whenReady().then(() => {
-  if (!app.isPackaged) {
-    installExtension([REACT_DEVELOPER_TOOLS])
-      .then(([redux, react]) =>
-        console.log(`Added Extensions:  ${redux.name}, ${react.name}`),
-      )
-      .catch((err) => console.log("An error occurred: ", err));
-  }
-
-  const activitiesService = ActivitiesService.create();
-
-  ipcMain.handle(
-    "queryRecentActivities",
-    async (_event, query: RecentActivitiesQuery) =>
-      activitiesService.queryRecentActivities(query),
-  );
-
-  // IPC test
-  ipcMain.on("ping", () => console.log("pong"));
-
+  installDevTools();
+  createIpc();
   createWindow();
 
   app.on("activate", function () {
     // On macOS, it's common to re-create a window in the app when the
     // dock icon is clicked and there are no other windows open.
     if (BrowserWindow.getAllWindows().length === 0) createWindow();
+  });
+});
+
+app.on("web-contents-created", (_event, contents) => {
+  contents.setWindowOpenHandler((details) => {
+    if (isSafeForExternalOpen(details.url)) {
+      setTimeout(() => {
+        void shell.openExternal(details.url);
+      }, 0);
+    }
+
+    return { action: "deny" };
   });
 });
 
@@ -84,5 +44,52 @@ app.on("window-all-closed", () => {
   }
 });
 
-// In this file you can include the rest of your app's specific main process
-// code. You can also put them in separate files and require them here.
+function isProduction() {
+  return app.isPackaged;
+}
+
+function installDevTools() {
+  if (isProduction()) {
+    // No dev tools in production
+    return;
+  }
+
+  installExtension([REACT_DEVELOPER_TOOLS])
+    .then(([redux, react]) =>
+      console.log(`Added Extensions:  ${redux.name}, ${react.name}`),
+    )
+    .catch((err) => console.log("An error occurred: ", err));
+}
+
+function createIpc() {
+  const activitiesService = ActivitiesService.create();
+
+  ipcMain.handle(
+    "queryRecentActivities",
+    async (_event, query: RecentActivitiesQuery) =>
+      activitiesService.queryRecentActivities(query),
+  );
+}
+
+function createWindow(): void {
+  const mainWindow = new BrowserWindow({
+    width: 600,
+    height: 800,
+    ...(process.platform === "linux" ? { icon } : {}),
+    webPreferences: {
+      preload: path.join(__dirname, "../preload/index.js"),
+    },
+  });
+
+  // HMR for renderer base on electron-vite cli.
+  // Load the remote URL for development or the local HTML file for production.
+  if (!isProduction() && process.env["ELECTRON_RENDERER_URL"]) {
+    void mainWindow.loadURL(process.env["ELECTRON_RENDERER_URL"]);
+  } else {
+    void mainWindow.loadFile(path.join(__dirname, "../renderer/index.html"));
+  }
+}
+
+function isSafeForExternalOpen(url: string): boolean {
+  return url.startsWith("mailto:");
+}

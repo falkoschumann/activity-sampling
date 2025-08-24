@@ -14,16 +14,6 @@ export interface ActivitySampling {
 declare global {
   interface Window {
     activitySampling: ActivitySampling;
-    electron: {
-      ping: () => void;
-      process: {
-        versions: {
-          electron: string;
-          chrome: string;
-          node: string;
-        };
-      };
-    };
   }
 }
 
