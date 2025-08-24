@@ -6,6 +6,7 @@ import {
   createRecentActivitiesQueryResult,
   type RecentActivitiesQueryResult,
 } from "../../../main/domain/activities";
+import ScrollToTopButton from "../../components/scroll_to_top_button";
 import ActivityFormComponent from "./activity_form";
 import CountdownComponent from "./countdown";
 import WorkingDaysComponent from "./working_days";
@@ -29,49 +30,11 @@ export default function LogPage() {
     }
 
     void queryRecentActivities();
-    /*
-    setRecentActivities({
-      lastActivity: {
-        dateTime: "2025-08-21T09:20+02:00",
-        duration: "PT30M",
-        client: "Test client",
-        project: "Test project",
-        task: "Test task",
-      },
-      workingDays: [
-        {
-          date: "2025-08-21",
-          activities: [
-            {
-              dateTime: "2025-08-21T09:20+02:00",
-              duration: "PT30M",
-              client: "Test client",
-              project: "Test project",
-              task: "Test task",
-            },
-            {
-              dateTime: "2025-08-21T08:50+02:00",
-              duration: "PT30M",
-              client: "Test client",
-              project: "Test project",
-              task: "Test task",
-              notes: "Test notes",
-            },
-          ],
-        },
-      ],
-      timeSummary: {
-        hoursToday: "PT1H",
-        hoursYesterday: "PT0S",
-        hoursThisWeek: "PT1H",
-        hoursThisMonth: "PT1H",
-      },
-    });
-    */
   }, []);
 
   return (
     <>
+      <ScrollToTopButton />
       <aside className="container my-4">
         <ActivityFormComponent {...recentActivities.lastActivity} />
         <CountdownComponent {...countdown} />
