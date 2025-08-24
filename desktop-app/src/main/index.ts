@@ -8,6 +8,7 @@ import {
 } from "electron-devtools-installer";
 
 import icon from "../../resources/icon.png?asset";
+import { ActivitiesService } from "./application/activities_service";
 import type { RecentActivitiesQuery } from "./domain/activities";
 
 function createWindow(): void {
@@ -54,46 +55,12 @@ app.whenReady().then(() => {
       .catch((err) => console.log("An error occurred: ", err));
   }
 
+  const activitiesService = ActivitiesService.create();
+
   ipcMain.handle(
     "queryRecentActivities",
-    async (_event, _query: RecentActivitiesQuery) =>
-      Promise.resolve({
-        lastActivity: {
-          dateTime: "2025-08-21T09:20+02:00",
-          duration: "PT30M",
-          client: "Test client",
-          project: "Test project",
-          task: "Test task",
-        },
-        workingDays: [
-          {
-            date: "2025-08-21",
-            activities: [
-              {
-                dateTime: "2025-08-21T09:20+02:00",
-                duration: "PT30M",
-                client: "Test client",
-                project: "Test project",
-                task: "Test task",
-              },
-              {
-                dateTime: "2025-08-21T08:50+02:00",
-                duration: "PT30M",
-                client: "Test client",
-                project: "Test project",
-                task: "Test task",
-                notes: "Test notes",
-              },
-            ],
-          },
-        ],
-        timeSummary: {
-          hoursToday: "PT1H",
-          hoursYesterday: "PT0S",
-          hoursThisWeek: "PT1H",
-          hoursThisMonth: "PT1H",
-        },
-      }),
+    async (_event, query: RecentActivitiesQuery) =>
+      activitiesService.queryRecentActivities(query),
   );
 
   // IPC test
