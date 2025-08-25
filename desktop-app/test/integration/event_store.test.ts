@@ -1,6 +1,7 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
 import fsPromise from "node:fs/promises";
+
 import { describe, expect, it } from "vitest";
 
 import { EventStore } from "../../src/main/infrastructure/event_store";

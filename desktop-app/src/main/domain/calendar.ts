@@ -2,8 +2,6 @@
 
 import { Temporal } from "@js-temporal/polyfill";
 
-// TODO Always allow string, temporal or temporal-like
-
 export interface Holiday {
   date: string;
   title: string;
@@ -12,7 +10,9 @@ export interface Holiday {
 export class Calendar {
   static create({
     holidays = [],
-  }: { holidays?: (Temporal.PlainDateLike | string)[] } = {}): Calendar {
+  }: {
+    holidays?: (Temporal.PlainDate | Temporal.PlainDateLike | string)[];
+  } = {}): Calendar {
     return new Calendar(holidays.map((date) => date.toString()));
   }
 
@@ -25,7 +25,7 @@ export class Calendar {
     this.#holidays = holidays;
   }
 
-  isBusinessDay(date: Temporal.PlainDateLike | string) {
+  isBusinessDay(date: Temporal.PlainDate | Temporal.PlainDateLike | string) {
     const plainDate = Temporal.PlainDate.from(date);
     return this.#businessDays.includes(plainDate.dayOfWeek);
   }
@@ -36,8 +36,8 @@ export class Calendar {
   }
 
   countBusinessDays(
-    startInclusive: Temporal.PlainDateLike | string,
-    endExclusive: Temporal.PlainDateLike | string,
+    startInclusive: Temporal.PlainDate | Temporal.PlainDateLike | string,
+    endExclusive: Temporal.PlainDate | Temporal.PlainDateLike | string,
   ) {
     let date = Temporal.PlainDate.from(startInclusive);
     const end = Temporal.PlainDate.from(endExclusive);

@@ -1,6 +1,7 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
 import path from "node:path";
+
 import { describe, expect, it } from "vitest";
 
 import type { Holiday } from "../../src/main/domain/calendar";

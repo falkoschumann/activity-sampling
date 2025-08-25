@@ -66,7 +66,7 @@ export const FormatStyle = Object.freeze({
 export type FormatStyle = (typeof FormatStyle)[keyof typeof FormatStyle];
 
 export function formatDateTime(
-  dateTime: Temporal.PlainDateTime | string,
+  dateTime: Temporal.PlainDateTime | Temporal.PlainDateTimeLike | string,
   dateFormat: FormatStyle = FormatStyle.MEDIUM,
   timeFormat: FormatStyle = FormatStyle.MEDIUM,
 ): string {
@@ -78,7 +78,7 @@ export function formatDateTime(
 }
 
 export function formatDate(
-  date: Temporal.PlainDate | string,
+  date: Temporal.PlainDate | Temporal.PlainDateLike | string,
   format: FormatStyle = FormatStyle.MEDIUM,
 ): string {
   return Temporal.PlainDate.from(date).toLocaleString(undefined, {
@@ -87,7 +87,7 @@ export function formatDate(
 }
 
 export function formatTime(
-  time: Temporal.PlainTime | string,
+  time: Temporal.PlainTime | Temporal.PlainTimeLike | string,
   format: FormatStyle = FormatStyle.MEDIUM,
 ): string {
   return Temporal.PlainTime.from(time).toLocaleString(undefined, {

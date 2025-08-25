@@ -51,6 +51,8 @@ function ActivityComponent({
   task: string;
   notes?: string;
 }) {
+  // TODO do not break activity task
+
   return (
     <li className="list-group-item list-group-item-action py-1 d-flex justify-content-start align-items-start">
       <div style={{ width: "3em" }}>

@@ -1,6 +1,7 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
 import fsPromise from "node:fs/promises";
+
 import { Temporal } from "@js-temporal/polyfill";
 import Ajv from "ajv";
 import addFormats from "ajv-formats";
@@ -48,8 +49,8 @@ export class HolidayRepository extends EventTarget {
   }
 
   async findAllByDate(
-    startInclusive: Temporal.PlainDateLike | string,
-    endExclusive: Temporal.PlainDateLike | string,
+    startInclusive: Temporal.PlainDate | Temporal.PlainDateLike | string,
+    endExclusive: Temporal.PlainDate | Temporal.PlainDateLike | string,
   ): Promise<Holiday[]> {
     try {
       const fileContent = await this.#fs.readFile(this.#fileName);
