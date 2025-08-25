@@ -13,8 +13,6 @@ import WorkingDaysComponent from "./working_days";
 import TimeSummaryComponent from "./time_summary";
 
 export default function LogPage() {
-  // TODO add scroll to top button
-
   const [recentActivities, setRecentActivities] =
     useState<RecentActivitiesQueryResult>(createRecentActivitiesQueryResult());
 
