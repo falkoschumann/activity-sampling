@@ -68,7 +68,11 @@ function ActivityComponent({
             >
               <i className="bi bi-arrow-repeat"></i>
             </button>
-            <button className="btn btn-sm" title="Copy task name.">
+            <button
+              className="btn btn-sm"
+              title="Copy task name."
+              onClick={() => navigator.clipboard.writeText(task)}
+            >
               <i className="bi bi-copy"></i>
             </button>
           </div>

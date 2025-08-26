@@ -63,7 +63,9 @@ function installDevTools() {
 
 function createIpc() {
   const activitiesService = ActivitiesService.create();
-
+  ipcMain.handle("logActivity", async (_event, command) =>
+    activitiesService.logActivity(command),
+  );
   ipcMain.handle(
     "queryRecentActivities",
     async (_event, query: RecentActivitiesQuery) =>
