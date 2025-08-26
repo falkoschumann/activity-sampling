@@ -33,16 +33,18 @@ export class ActivitiesService {
     configuration = { capacity: Temporal.Duration.from("PT40H") },
     eventStore = EventStore.create(),
     holidayRepository = HolidayRepository.create(),
+    clock = Clock.systemDefaultZone(),
   }: {
     configuration?: ActivitiesConfiguration;
     eventStore?: EventStore;
     holidayRepository?: HolidayRepository;
+    clock?: Clock;
   } = {}): ActivitiesService {
     return new ActivitiesService(
       configuration,
       eventStore,
       holidayRepository,
-      Clock.systemDefaultZone(),
+      clock,
     );
   }
 
@@ -160,7 +162,7 @@ class RecentActivitiesProjection {
   async project(events: AsyncGenerator): Promise<RecentActivitiesQueryResult> {
     const from = this.#today
       .subtract({ days: 30 })
-      .toZonedDateTime({ plainTime: "00:00", timeZone: this.#timeZone })
+      .toZonedDateTime({ timeZone: this.#timeZone })
       .toPlainDate();
     const to = this.#today.with({ day: this.#today.daysInMonth }).add("P1D");
     const activities = project(events, this.#timeZone, from, to);
