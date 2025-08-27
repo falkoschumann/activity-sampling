@@ -4,7 +4,7 @@ ROOT_FILES = .github/ doc/ README.md
 PLANTUML_FILES = $(wildcard doc/*.puml)
 DIAGRAM_FILES = $(subst .puml,.png,$(PLANTUML_FILES))
 
-all: $(SUBDIRS) root
+all: $(SUBDIRS) root doc
 
 clean: $(SUBDIRS)
 clean: TARGET=clean

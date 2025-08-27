@@ -2,10 +2,12 @@
 
 title "Events for Activity Sampling System"
 
+class TimerStarted {
+  duration: Duration
+}
+
 class IntervalElapsed {
   timestamp: Timestamp
-  duration: Duration
-  activity?: Activity
 }
 
 class ActivityLogged {
