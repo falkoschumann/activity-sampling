@@ -3,6 +3,7 @@
 title "Events for Activity Sampling System"
 
 class TimerStarted {
+  timestamp: Timestamp
   duration: Duration
 }
 
