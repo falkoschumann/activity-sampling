@@ -7,11 +7,14 @@ analysis.
 
 ![Domain](domain.png)
 
-### Ask periodically
+### Start Timer
 
 - Start the timer with a given interval
-- Stop the timer
 - Start the timer with the default interval when the application starts
+
+### Stop Timer
+
+- Stop the timer
 
 ### Current Interval
 
@@ -52,10 +55,6 @@ analysis.
 - Compare with capacity
 - Take holidays into account
 - Take vacation into account
-
-## Events
-
-![Events](events.png)
 
 ## Architecture
 
