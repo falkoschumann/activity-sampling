@@ -22,10 +22,20 @@ export class Clock {
     return new Clock(Temporal.Instant.from(fixedInstant), zone);
   }
 
+  static offset(
+    baseClock: Clock,
+    offsetDuration: Temporal.Duration | Temporal.DurationLike | string,
+  ): Clock {
+    return new OffsetClock(baseClock, Temporal.Duration.from(offsetDuration));
+  }
+
   #instant: Temporal.Instant;
   #zone: Temporal.TimeZoneLike;
 
-  private constructor(instant: Temporal.Instant, zone: Temporal.TimeZoneLike) {
+  protected constructor(
+    instant: Temporal.Instant,
+    zone: Temporal.TimeZoneLike,
+  ) {
     this.#instant = instant;
     this.#zone = zone;
   }
@@ -39,7 +49,22 @@ export class Clock {
   }
 
   millis(): number {
-    return this.#instant.epochMilliseconds;
+    return this.instant().epochMilliseconds;
+  }
+}
+
+class OffsetClock extends Clock {
+  #baseClock: Clock;
+  #offsetDuration: Temporal.Duration;
+
+  constructor(baseClock: Clock, offsetDuration: Temporal.Duration) {
+    super(baseClock.instant().add(offsetDuration), baseClock.zone);
+    this.#baseClock = baseClock;
+    this.#offsetDuration = offsetDuration;
+  }
+
+  instant(): Temporal.Instant {
+    return this.#baseClock.instant().add(this.#offsetDuration);
   }
 }
 

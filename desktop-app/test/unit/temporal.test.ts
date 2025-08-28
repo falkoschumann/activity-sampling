@@ -36,6 +36,16 @@ describe("Temporal", () => {
       expect(now).toEqual(Temporal.Instant.from(fixed));
       expect(clock.zone).toEqual("Europe/Berlin");
     });
+
+    it("Adds duration", () => {
+      const clock = Clock.fixed("2025-08-28T15:55Z", "Europe/Berlin");
+
+      const offset = Clock.offset(clock, Temporal.Duration.from("PT5M"));
+
+      expect(offset.instant()).toEqual(
+        Temporal.Instant.from("2025-08-28T16:00Z"),
+      );
+    });
   });
 
   describe("Duration", () => {
