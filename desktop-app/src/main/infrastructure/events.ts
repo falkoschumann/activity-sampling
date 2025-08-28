@@ -6,7 +6,7 @@ import addFormats from "ajv-formats";
 const ACTIVITY_LOGGED_EVENT_SCHEMA = {
   type: "object",
   properties: {
-    timestamp: { type: "string", format: "date-time" },
+    timestamp: { type: "string", format: "iso-date-time" },
     duration: { type: "string", format: "duration" },
     client: { type: "string" },
     project: { type: "string" },

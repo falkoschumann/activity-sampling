@@ -8,7 +8,7 @@ import { EventStore } from "../../src/main/infrastructure/event_store";
 import { ActivityLoggedEvent } from "../../src/main/infrastructure/events";
 import { arrayFromAsync } from "../../src/main/common/polyfills";
 
-const TEST_FILE = "testdata/events.csv";
+const TEST_FILE = "testdata/event_store_test.csv";
 
 describe("Event store", () => {
   it("Records and replays events", async () => {

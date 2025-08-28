@@ -32,7 +32,7 @@ export class SystemUnderTest {
   #recentActivitiesQueryResult?: RecentActivitiesQueryResult;
 
   constructor({
-    fileName = "testdata/acceptance_test.events.csv",
+    fileName = "testdata/events.csv",
     fixedClock = "2025-08-26T14:00:00Z",
   } = {}) {
     this.#fileName = fileName;
