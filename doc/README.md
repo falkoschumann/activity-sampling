@@ -10,6 +10,7 @@ analysis.
 ### Ask periodically
 
 - Start the timer with a given interval
+- Stop the timer
 - Start the timer with the default interval when the application starts
 
 ### Current Interval

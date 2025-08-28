@@ -17,7 +17,7 @@
     <node id="n0">
       <data key="d6">
         <y:ShapeNode>
-          <y:Geometry height="60.0" width="100.0" x="490.0" y="570.0"/>
+          <y:Geometry height="60.0" width="100.0" x="620.0" y="570.0"/>
           <y:Fill color="#8FD04E" transparent="false"/>
           <y:BorderStyle hasColor="false" raised="false" type="line" width="1.0"/>
           <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="32.265625" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#FFFFFF" verticalTextPosition="bottom" visible="true" width="55.169921875" x="22.4150390625" xml:space="preserve" y="13.8671875">Recent
@@ -29,7 +29,7 @@ activities<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelModel><y
     <node id="n1">
       <data key="d6">
         <y:ShapeNode>
-          <y:Geometry height="60.0" width="100.0" x="295.0" y="480.0"/>
+          <y:Geometry height="60.0" width="100.0" x="425.0" y="480.0"/>
           <y:Fill color="#FFFFFF" transparent="false"/>
           <y:BorderStyle color="#000000" raised="false" type="line" width="2.0"/>
           <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="18.1328125" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="bottom" visible="true" width="25.251953125" x="37.3740234375" xml:space="preserve" y="20.93359375">Log<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelModel><y:ModelParameter><y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="0.0" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/></y:ModelParameter></y:NodeLabel>
@@ -40,7 +40,7 @@ activities<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelModel><y
     <node id="n2">
       <data key="d6">
         <y:ShapeNode>
-          <y:Geometry height="60.0" width="100.0" x="360.0" y="570.0"/>
+          <y:Geometry height="60.0" width="100.0" x="490.0" y="570.0"/>
           <y:Fill color="#2D9BF0" transparent="false"/>
           <y:BorderStyle hasColor="false" raised="false" type="line" width="1.0"/>
           <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="18.1328125" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#FFFFFF" verticalTextPosition="bottom" visible="true" width="70.216796875" x="14.8916015625" xml:space="preserve" y="20.93359375">Log activity<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelModel><y:ModelParameter><y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="0.0" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/></y:ModelParameter></y:NodeLabel>
@@ -51,10 +51,10 @@ activities<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelModel><y
     <node id="n3" yfiles.foldertype="group">
       <data key="d6">
         <y:TableNode configuration="YED_TABLE_NODE">
-          <y:Geometry height="202.0" width="815.0" x="59.0" y="658.0"/>
+          <y:Geometry height="202.0" width="942.0" x="59.0" y="658.0"/>
           <y:Fill color="#FFFDDA" color2="#FFFDDA" transparent="false"/>
           <y:BorderStyle color="#FFFFFF" type="line" width="4.0"/>
-          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="15" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="21.666015625" horizontalTextPosition="center" iconTextGap="4" modelName="internal" modelPosition="t" textColor="#000000" verticalTextPosition="bottom" visible="false" width="50.81640625" x="382.091796875" xml:space="preserve" y="4.0">Events</y:NodeLabel>
+          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="15" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="21.666015625" horizontalTextPosition="center" iconTextGap="4" modelName="internal" modelPosition="t" textColor="#000000" verticalTextPosition="bottom" visible="false" width="50.81640625" x="445.591796875" xml:space="preserve" y="4.0">Events</y:NodeLabel>
           <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="18.1328125" horizontalTextPosition="center" iconTextGap="4" modelName="custom" rotationAngle="270.0" textColor="#000000" verticalTextPosition="bottom" visible="true" width="56.822265625" x="3.0" xml:space="preserve" y="22.5888671875">Activities<y:LabelModel><y:RowNodeLabelModel offset="3.0"/></y:LabelModel><y:ModelParameter><y:RowNodeLabelModelParameter horizontalPosition="0.0" id="row_0" inside="true"/></y:ModelParameter></y:NodeLabel>
           <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="18.1328125" horizontalTextPosition="center" iconTextGap="4" modelName="custom" rotationAngle="270.0" textColor="#000000" verticalTextPosition="bottom" visible="true" width="37.85546875" x="3.0" xml:space="preserve" y="133.072265625">Timer<y:LabelModel><y:RowNodeLabelModel offset="3.0"/></y:LabelModel><y:ModelParameter><y:RowNodeLabelModelParameter horizontalPosition="0.0" id="row_1" inside="true"/></y:ModelParameter></y:NodeLabel>
           <y:StyleProperties>
@@ -68,13 +68,13 @@ activities<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelModel><y
           </y:StyleProperties>
           <y:State autoResize="true" closed="false" closedHeight="80.0" closedWidth="100.0"/>
           <y:Insets bottom="0" bottomF="0.0" left="0" leftF="0.0" right="0" rightF="0.0" top="0" topF="0.0"/>
-          <y:BorderInsets bottom="20" bottomF="20.0" left="17" leftF="17.0" right="349" rightF="349.0" top="22" topF="22.0"/>
+          <y:BorderInsets bottom="20" bottomF="20.0" left="17" leftF="17.0" right="346" rightF="346.0" top="22" topF="22.0"/>
           <y:Table autoResizeTable="true" defaultColumnWidth="120.0" defaultMinimumColumnWidth="80.0" defaultMinimumRowHeight="50.0" defaultRowHeight="100.0">
             <y:DefaultColumnInsets bottom="0.0" left="0.0" right="0.0" top="0.0"/>
             <y:DefaultRowInsets bottom="0.0" left="24.0" right="0.0" top="0.0"/>
             <y:Insets bottom="0.0" left="0.0" right="0.0" top="0.0"/>
             <y:Columns>
-              <y:Column id="column_0" minimumWidth="80.0" width="791.0">
+              <y:Column id="column_0" minimumWidth="80.0" width="918.0">
                 <y:Insets bottom="0.0" left="0.0" right="0.0" top="0.0"/>
               </y:Column>
             </y:Columns>
@@ -93,7 +93,7 @@ activities<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelModel><y
         <node id="n3::n0">
           <data key="d6">
             <y:ShapeNode>
-              <y:Geometry height="60.0" width="100.0" x="425.0" y="680.0"/>
+              <y:Geometry height="60.0" width="100.0" x="555.0" y="680.0"/>
               <y:Fill color="#FFA455" transparent="false"/>
               <y:BorderStyle hasColor="false" raised="false" type="line" width="1.0"/>
               <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="32.265625" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="bottom" visible="true" width="46.8203125" x="26.58984375" xml:space="preserve" y="13.8671875">Activity
@@ -105,7 +105,7 @@ logged<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelModel><y:Mod
         <node id="n3::n1">
           <data key="d6">
             <y:ShapeNode>
-              <y:Geometry height="60.0" width="100.0" x="230.0" y="780.0"/>
+              <y:Geometry height="60.0" width="100.0" x="360.0" y="780.0"/>
               <y:Fill color="#FFA455" transparent="false"/>
               <y:BorderStyle hasColor="false" raised="false" type="line" width="1.0"/>
               <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="32.265625" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="bottom" visible="true" width="48.689453125" x="25.6552734375" xml:space="preserve" y="13.8671875">Interval
@@ -125,12 +125,23 @@ elapsed<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelModel><y:Mo
             </y:ShapeNode>
           </data>
         </node>
+        <node id="n3::n3">
+          <data key="d6">
+            <y:ShapeNode>
+              <y:Geometry height="60.0" width="100.0" x="230.0" y="780.0"/>
+              <y:Fill color="#FFA455" transparent="false"/>
+              <y:BorderStyle hasColor="false" raised="false" type="line" width="1.0"/>
+              <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="18.1328125" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="bottom" visible="true" width="88.97265625" x="5.513671875" xml:space="preserve" y="20.93359375">Timer stopped<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelModel><y:ModelParameter><y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="0.0" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/></y:ModelParameter></y:NodeLabel>
+              <y:Shape type="rectangle"/>
+            </y:ShapeNode>
+          </data>
+        </node>
       </graph>
     </node>
     <node id="n4">
       <data key="d6">
         <y:ShapeNode>
-          <y:Geometry height="60.0" width="100.0" x="620.0" y="480.0"/>
+          <y:Geometry height="60.0" width="100.0" x="750.0" y="480.0"/>
           <y:Fill color="#FFFFFF" transparent="false"/>
           <y:BorderStyle color="#000000" raised="false" type="line" width="2.0"/>
           <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="18.1328125" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="bottom" visible="true" width="48.712890625" x="25.6435546875" xml:space="preserve" y="20.93359375">Reports<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelModel><y:ModelParameter><y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="0.0" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/></y:ModelParameter></y:NodeLabel>
@@ -141,7 +152,7 @@ elapsed<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelModel><y:Mo
     <node id="n5">
       <data key="d6">
         <y:ShapeNode>
-          <y:Geometry height="60.0" width="100.0" x="750.0" y="570.0"/>
+          <y:Geometry height="60.0" width="100.0" x="880.0" y="570.0"/>
           <y:Fill color="#8FD04E" transparent="false"/>
           <y:BorderStyle hasColor="false" raised="false" type="line" width="1.0"/>
           <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="18.1328125" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#FFFFFF" verticalTextPosition="bottom" visible="true" width="64.369140625" x="17.8154296875" xml:space="preserve" y="20.93359375">Timesheet<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelModel><y:ModelParameter><y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="0.0" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/></y:ModelParameter></y:NodeLabel>
@@ -152,7 +163,7 @@ elapsed<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelModel><y:Mo
     <node id="n6">
       <data key="d6">
         <y:ShapeNode>
-          <y:Geometry height="60.0" width="100.0" x="620.0" y="570.0"/>
+          <y:Geometry height="60.0" width="100.0" x="750.0" y="570.0"/>
           <y:Fill color="#8FD04E" transparent="false"/>
           <y:BorderStyle hasColor="false" raised="false" type="line" width="1.0"/>
           <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="18.1328125" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#FFFFFF" verticalTextPosition="bottom" visible="true" width="42.595703125" x="28.7021484375" xml:space="preserve" y="20.93359375">Report<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelModel><y:ModelParameter><y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="0.0" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/></y:ModelParameter></y:NodeLabel>
@@ -163,7 +174,7 @@ elapsed<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelModel><y:Mo
     <node id="n7">
       <data key="d6">
         <y:ShapeNode>
-          <y:Geometry height="60.0" width="100.0" x="100.0" y="570.0"/>
+          <y:Geometry height="60.0" width="100.0" x="160.0" y="570.0"/>
           <y:Fill color="#2D9BF0" transparent="false"/>
           <y:BorderStyle hasColor="false" raised="false" type="line" width="1.0"/>
           <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="32.265625" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#FFFFFF" verticalTextPosition="bottom" visible="true" width="70.990234375" x="14.5048828125" xml:space="preserve" y="13.8671875">Ask
@@ -175,7 +186,7 @@ periodically<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelModel>
     <node id="n8">
       <data key="d6">
         <y:ShapeNode>
-          <y:Geometry height="60.0" width="100.0" x="230.0" y="570.0"/>
+          <y:Geometry height="60.0" width="100.0" x="360.0" y="570.0"/>
           <y:Fill color="#8FD04E" transparent="false"/>
           <y:BorderStyle hasColor="false" raised="false" type="line" width="1.0"/>
           <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="32.265625" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#FFFFFF" verticalTextPosition="bottom" visible="true" width="48.19140625" x="25.904296875" xml:space="preserve" y="13.8671875">Current
@@ -187,7 +198,7 @@ interval<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelModel><y:M
     <node id="n9">
       <data key="d6">
         <y:ShapeNode>
-          <y:Geometry height="60.0" width="100.0" x="490.0" y="480.0"/>
+          <y:Geometry height="60.0" width="100.0" x="620.0" y="480.0"/>
           <y:Fill color="#FFFFFF" transparent="false"/>
           <y:BorderStyle color="#000000" raised="false" type="line" width="2.0"/>
           <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="18.1328125" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="bottom" visible="true" width="25.251953125" x="37.3740234375" xml:space="preserve" y="20.93359375">Log<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelModel><y:ModelParameter><y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="0.0" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/></y:ModelParameter></y:NodeLabel>
@@ -198,7 +209,7 @@ interval<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelModel><y:M
     <node id="n10">
       <data key="d6">
         <y:ShapeNode>
-          <y:Geometry height="60.0" width="100.0" x="100.0" y="482.0"/>
+          <y:Geometry height="60.0" width="100.0" x="160.0" y="482.0"/>
           <y:Fill color="#FFFFFF" transparent="false"/>
           <y:BorderStyle color="#000000" raised="false" type="line" width="2.0"/>
           <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="18.1328125" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="bottom" visible="true" width="25.251953125" x="37.3740234375" xml:space="preserve" y="20.93359375">Log<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelModel><y:ModelParameter><y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="0.0" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/></y:ModelParameter></y:NodeLabel>
@@ -209,7 +220,7 @@ interval<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelModel><y:M
     <node id="n11">
       <data key="d6">
         <y:ShapeNode>
-          <y:Geometry height="60.0" width="100.0" x="750.0" y="482.0"/>
+          <y:Geometry height="60.0" width="100.0" x="880.0" y="482.0"/>
           <y:Fill color="#FFFFFF" transparent="false"/>
           <y:BorderStyle color="#000000" raised="false" type="line" width="2.0"/>
           <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="18.1328125" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="bottom" visible="true" width="64.369140625" x="17.8154296875" xml:space="preserve" y="20.93359375">Timesheet<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelModel><y:ModelParameter><y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="0.0" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/></y:ModelParameter></y:NodeLabel>
@@ -317,6 +328,15 @@ interval<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelModel><y:M
       </data>
     </edge>
     <edge id="e11" source="n6" target="n4">
+      <data key="d10">
+        <y:SplineEdge>
+          <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
+          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:Arrows source="none" target="standard"/>
+        </y:SplineEdge>
+      </data>
+    </edge>
+    <edge id="e12" source="n7" target="n3::n3">
       <data key="d10">
         <y:SplineEdge>
           <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
