@@ -1,20 +1,43 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
 import { describe, it } from "vitest";
-import { SystemUnderTest } from "./system_under_test";
+import {
+  ActivitySamplingDsl,
+  createActivitySampling,
+} from "./activity_sampling";
 
 describe("Activity Sampling - Acceptance Tests", () => {
-  it("Should ask periodically", async () => {
-    const sut = new SystemUnderTest({ fixedClock: "2025-08-28T08:18:00Z" });
-    await sut.start();
+  it("Should start timer", () => {
+    const { log } = createActivitySampling();
 
-    await sut.askPeriodically();
+    log.startTimer();
 
-    sut.assertCommandWasSuccessful();
-    await sut.assertTimerStarted({ timestamp: "2025-08-28T08:18:00Z" });
+    log.assertCommandWasSuccessful();
+    log.assertTimerStarted();
   });
+
+  it("Should stop timer", () => {
+    const { log } = createActivitySampling();
+
+    log.passTime();
+    log.stopTimer();
+
+    log.assertCommandWasSuccessful();
+    log.assertTimerStopped();
+  });
+
+  it("Should query current interval", () => {
+    const { log } = createActivitySampling();
+    log.startTimer();
+    log.intervalElapsed();
+
+    log.queryCurrentInterval();
+
+    log.assertCurrentInterval();
+  });
+
   it("Should log activity", async () => {
-    const sut = new SystemUnderTest();
+    const sut = new ActivitySamplingDsl();
     await sut.start();
 
     await sut.logActivity({ timestamp: "2025-08-26T14:00:00Z" });
@@ -24,7 +47,7 @@ describe("Activity Sampling - Acceptance Tests", () => {
   });
 
   it("Should query recent activities", async () => {
-    const sut = new SystemUnderTest();
+    const sut = new ActivitySamplingDsl();
     await sut.start();
     await sut.activityLogged({ timestamp: "2025-08-26T13:30:00Z" });
     await sut.activityLogged({ timestamp: "2025-08-26T14:00:00Z" });
