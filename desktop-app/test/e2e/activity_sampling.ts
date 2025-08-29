@@ -1,7 +1,7 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
 import { Temporal } from "@js-temporal/polyfill";
-import fs from "node:fs/promises";
+import fs from "node:fs";
 import { expect } from "vitest";
 
 import { ActivitiesService } from "../../src/main/application/activities_service";
@@ -14,21 +14,30 @@ import { arrayFromAsync } from "../../src/main/common/polyfills";
 import { Clock } from "../../src/main/common/temporal";
 import {
   createTestActivity,
-  createTestLogActivityCommand,
+  type LogActivityCommand,
+  type RecentActivitiesQuery,
   type RecentActivitiesQueryResult,
 } from "../../src/main/domain/activities";
 import {
   type CurrentIntervalQuery,
   type CurrentIntervalQueryResult,
+  type StartTimerCommand,
+  type StopTimerCommand,
 } from "../../src/main/domain/timer";
 import { EventStore } from "../../src/main/infrastructure/event_store";
 import { ActivityLoggedEvent } from "../../src/main/infrastructure/events";
 
-export function createActivitySampling({ now = "2025-08-26T14:00:00Z" } = {}): {
+export function createActivitySampling({
+  now = "2025-08-26T14:00:00Z",
+  eventsFile = "testdata/events.csv",
+} = {}): {
   log: LogDsl;
 } {
   const clock = Clock.fixed(now, "Europe/Berlin");
-  const log = new LogDsl(new LogDriver(clock));
+  const log = new LogDsl(new LogDriver(eventsFile, clock));
+
+  fs.rmSync(eventsFile, { force: true });
+
   return { log };
 }
 
@@ -39,18 +48,44 @@ class LogDsl {
     this.#logDriver = driver;
   }
 
+  //
+  // Commands
+  //
+
   startTimer(args: { interval?: string } = {}) {
     const interval = Temporal.Duration.from(args.interval ?? "PT30M");
-    this.#logDriver.startTimer(interval);
+    this.#logDriver.startTimer({ interval });
   }
 
   stopTimer() {
-    this.#logDriver.stopTimer();
+    this.#logDriver.stopTimer({});
+  }
+
+  async logActivity({
+    timestamp = "2025-08-26T14:00:00Z",
+    duration = "PT30M",
+    client = "Test client",
+    project = "Test project",
+    task = "Test task",
+    notes,
+  }: Partial<LogActivityCommand> = {}) {
+    await this.#logDriver.logActivity({
+      timestamp,
+      duration,
+      client,
+      project,
+      task,
+      notes,
+    });
   }
 
   assertCommandWasSuccessful() {
     this.#logDriver.assertCommandWasSuccessful();
   }
+
+  //
+  // Queries
+  //
 
   queryCurrentInterval() {
     this.#logDriver.queryCurrentInterval({});
@@ -61,8 +96,41 @@ class LogDsl {
       args.timestamp ?? "2025-08-26T14:30:00Z",
     );
     const duration = Temporal.Duration.from(args.duration ?? "PT30M");
-    this.#logDriver.assertCurrentInterval(timestamp, duration);
+    this.#logDriver.assertCurrentInterval({ timestamp, duration });
   }
+
+  async queryRecentActivities() {
+    await this.#logDriver.queryRecentActivities({});
+  }
+
+  assertRecentActivities(args: {
+    lastActivity: string;
+    workingDays: { date: string; activities: string[] }[];
+    timeSummary: {
+      hoursToday: string;
+      hoursYesterday: string;
+      hoursThisWeek: string;
+      hoursThisMonth: string;
+    };
+  }) {
+    const lastActivity = createTestActivity({ dateTime: args.lastActivity });
+    const workingDays = args.workingDays.map((workingDay) => ({
+      date: workingDay.date,
+      activities: workingDay.activities.map((activity) =>
+        createTestActivity({ dateTime: activity }),
+      ),
+    }));
+    const timeSummary = args.timeSummary;
+    this.#logDriver.assertRecentActivities({
+      lastActivity,
+      workingDays,
+      timeSummary,
+    });
+  }
+
+  //
+  // Events
+  //
 
   assertTimerStarted(args: { timestamp?: string; interval?: string } = {}) {
     const timestamp = Temporal.Instant.from(
@@ -83,6 +151,20 @@ class LogDsl {
     this.#logDriver.intervalElapsed();
   }
 
+  async activityLogged({ timestamp }: { timestamp: string }) {
+    const event = ActivityLoggedEvent.createTestData({ timestamp });
+    await this.#logDriver.record(event);
+  }
+
+  async assertActivityLogged({ timestamp }: { timestamp: string }) {
+    const event = ActivityLoggedEvent.createTestData({ timestamp });
+    await this.#logDriver.assertActivityLogged(event);
+  }
+
+  //
+  // Common
+  //
+
   passTime(args: { duration?: string } = {}) {
     const duration = Temporal.Duration.from(args.duration ?? "PT1M");
     this.#logDriver.passTime(duration);
@@ -90,13 +172,22 @@ class LogDsl {
 }
 
 class LogDriver {
+  // TODO Split driver into activities and timer drivers
+
+  readonly #eventStore: EventStore;
+  readonly #activitiesService: ActivitiesService;
   readonly #timerService: TimerService;
 
   #commandStatus?: CommandStatus;
   #currentIntervalQueryResult?: CurrentIntervalQueryResult;
+  #recentActivitiesQueryResult?: RecentActivitiesQueryResult;
   readonly #timerEvents: Event[] = [];
 
-  constructor(clock: Clock) {
+  constructor(eventsFile: string, clock: Clock) {
+    const eventStore = (this.#eventStore = EventStore.create({
+      fileName: eventsFile,
+    }));
+    this.#activitiesService = ActivitiesService.create({ eventStore, clock });
     this.#timerService = TimerService.create({ clock });
 
     this.#timerService.addEventListener("timerStarted", (event) =>
@@ -107,28 +198,54 @@ class LogDriver {
     );
   }
 
-  startTimer(interval: Temporal.Duration) {
-    this.#commandStatus = this.#timerService.startTimer({ interval });
+  //
+  // Commands
+  //
+
+  startTimer(command: StartTimerCommand) {
+    this.#commandStatus = this.#timerService.startTimer(command);
   }
 
-  stopTimer() {
-    this.#commandStatus = this.#timerService.stopTimer({});
+  stopTimer(command: StopTimerCommand) {
+    this.#commandStatus = this.#timerService.stopTimer(command);
+  }
+
+  async logActivity(command: LogActivityCommand) {
+    this.#commandStatus = await this.#activitiesService.logActivity(command);
   }
 
   assertCommandWasSuccessful() {
     expect(this.#commandStatus).toEqual(createSuccess());
   }
 
+  //
+  // Queries
+  //
+
   queryCurrentInterval(query: CurrentIntervalQuery) {
     this.#currentIntervalQueryResult =
       this.#timerService.queryCurrentInterval(query);
   }
 
-  assertCurrentInterval(
-    timestamp: Temporal.Instant,
-    duration: Temporal.Duration,
-  ) {
-    expect(this.#currentIntervalQueryResult).toEqual({ timestamp, duration });
+  assertCurrentInterval(result: CurrentIntervalQueryResult) {
+    expect(this.#currentIntervalQueryResult).toEqual(result);
+  }
+
+  async queryRecentActivities(query: RecentActivitiesQuery) {
+    this.#recentActivitiesQueryResult =
+      await this.#activitiesService.queryRecentActivities(query);
+  }
+
+  assertRecentActivities(result: RecentActivitiesQueryResult) {
+    expect(this.#recentActivitiesQueryResult).toEqual(result);
+  }
+
+  //
+  // Events
+  //
+
+  async record(event: unknown) {
+    await this.#eventStore.record(event);
   }
 
   assertTimerStarted(timestamp: Temporal.Instant, interval: Temporal.Duration) {
@@ -154,83 +271,16 @@ class LogDriver {
     this.#timerService.simulateIntervalElapsed();
   }
 
+  async assertActivityLogged(event: ActivityLoggedEvent) {
+    const events = await arrayFromAsync(this.#eventStore.replay());
+    expect(events).toEqual([event]);
+  }
+
+  //
+  // Common
+  //
+
   passTime(duration: Temporal.Duration) {
     this.#timerService.clock = Clock.offset(this.#timerService.clock, duration);
-  }
-}
-
-export class ActivitySamplingDsl {
-  // TODO Move to LogDsl/LogDriver
-
-  readonly #fileName: string;
-  readonly #eventStore: EventStore;
-  readonly #activitiesService: ActivitiesService;
-
-  #commandStatus?: CommandStatus;
-  #recentActivitiesQueryResult?: RecentActivitiesQueryResult;
-
-  constructor({
-    fileName = "testdata/events.csv",
-    fixedClock = "2025-08-26T14:00:00Z",
-  } = {}) {
-    this.#fileName = fileName;
-    const clock = Clock.fixed(fixedClock, "Europe/Berlin");
-    const eventStore = (this.#eventStore = EventStore.create({ fileName }));
-    this.#activitiesService = ActivitiesService.create({ eventStore, clock });
-  }
-
-  async start() {
-    await fs.rm(this.#fileName, { force: true });
-  }
-
-  async logActivity({ timestamp }: { timestamp: string }) {
-    const command = createTestLogActivityCommand({ timestamp });
-    this.#commandStatus = await this.#activitiesService.logActivity(command);
-  }
-
-  assertCommandWasSuccessful() {
-    expect(this.#commandStatus).toEqual(createSuccess());
-  }
-
-  async queryRecentActivities() {
-    this.#recentActivitiesQueryResult =
-      await this.#activitiesService.queryRecentActivities({});
-  }
-
-  assertRecentActivities({
-    lastActivity,
-    workingDays,
-    timeSummary,
-  }: {
-    lastActivity: string;
-    workingDays: { date: string; activities: string[] }[];
-    timeSummary: {
-      hoursToday: string;
-      hoursYesterday: string;
-      hoursThisWeek: string;
-      hoursThisMonth: string;
-    };
-  }) {
-    expect(this.#recentActivitiesQueryResult).toEqual({
-      lastActivity: createTestActivity({ dateTime: lastActivity }),
-      workingDays: workingDays.map((workingDay) => ({
-        date: workingDay.date,
-        activities: workingDay.activities.map((activity) =>
-          createTestActivity({ dateTime: activity }),
-        ),
-      })),
-      timeSummary,
-    });
-  }
-
-  async activityLogged({ timestamp }: { timestamp: string }) {
-    await this.#eventStore.record(
-      ActivityLoggedEvent.createTestData({ timestamp }),
-    );
-  }
-
-  async assertActivityLogged({ timestamp }: { timestamp: string }) {
-    const events = await arrayFromAsync(this.#eventStore.replay());
-    expect(events).toEqual([ActivityLoggedEvent.createTestData({ timestamp })]);
   }
 }

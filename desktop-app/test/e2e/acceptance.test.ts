@@ -1,10 +1,7 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
 import { describe, it } from "vitest";
-import {
-  ActivitySamplingDsl,
-  createActivitySampling,
-} from "./activity_sampling";
+import { createActivitySampling } from "./activity_sampling";
 
 describe("Activity Sampling - Acceptance Tests", () => {
   it("Should start timer", () => {
@@ -37,24 +34,22 @@ describe("Activity Sampling - Acceptance Tests", () => {
   });
 
   it("Should log activity", async () => {
-    const sut = new ActivitySamplingDsl();
-    await sut.start();
+    const { log } = createActivitySampling();
 
-    await sut.logActivity({ timestamp: "2025-08-26T14:00:00Z" });
+    await log.logActivity({ timestamp: "2025-08-26T14:00:00Z" });
 
-    sut.assertCommandWasSuccessful();
-    await sut.assertActivityLogged({ timestamp: "2025-08-26T14:00:00Z" });
+    log.assertCommandWasSuccessful();
+    await log.assertActivityLogged({ timestamp: "2025-08-26T14:00:00Z" });
   });
 
   it("Should query recent activities", async () => {
-    const sut = new ActivitySamplingDsl();
-    await sut.start();
-    await sut.activityLogged({ timestamp: "2025-08-26T13:30:00Z" });
-    await sut.activityLogged({ timestamp: "2025-08-26T14:00:00Z" });
+    const { log } = createActivitySampling();
+    await log.activityLogged({ timestamp: "2025-08-26T13:30:00Z" });
+    await log.activityLogged({ timestamp: "2025-08-26T14:00:00Z" });
 
-    await sut.queryRecentActivities();
+    await log.queryRecentActivities();
 
-    sut.assertRecentActivities({
+    log.assertRecentActivities({
       lastActivity: "2025-08-26T16:00",
       workingDays: [
         {
