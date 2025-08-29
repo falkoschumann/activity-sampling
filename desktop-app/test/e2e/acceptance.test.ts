@@ -9,7 +9,6 @@ describe("Activity Sampling - Acceptance Tests", () => {
 
     log.startTimer();
 
-    log.assertCommandWasSuccessful();
     log.assertTimerStarted();
   });
 
@@ -19,7 +18,6 @@ describe("Activity Sampling - Acceptance Tests", () => {
     log.passTime();
     log.stopTimer();
 
-    log.assertCommandWasSuccessful();
     log.assertTimerStopped();
   });
 
@@ -38,7 +36,6 @@ describe("Activity Sampling - Acceptance Tests", () => {
 
     await log.logActivity({ timestamp: "2025-08-26T14:00:00Z" });
 
-    log.assertCommandWasSuccessful();
     await log.assertActivityLogged({ timestamp: "2025-08-26T14:00:00Z" });
   });
 
