@@ -62,14 +62,22 @@ class LogDsl {
     this.#timerDriver.stopTimer({});
   }
 
-  async logActivity({
-    timestamp = "2025-08-26T14:00:00Z",
-    duration = "PT30M",
-    client = "Test client",
-    project = "Test project",
-    task = "Test task",
-    notes,
-  }: Partial<LogActivityCommand> = {}) {
+  async logActivity(
+    args: {
+      timestamp?: string;
+      duration?: string;
+      client?: string;
+      project?: string;
+      task?: string;
+      notes?: string;
+    } = {},
+  ) {
+    const timestamp = args.timestamp ?? "2025-08-26T14:00:00Z";
+    const duration = args.duration ?? "PT30M";
+    const client = args.client ?? "Test client";
+    const project = args.project ?? "Test project";
+    const task = args.task ?? "Test task";
+    const notes = args.notes;
     await this.#activitiesDriver.logActivity({
       timestamp,
       duration,
@@ -101,8 +109,25 @@ class LogDsl {
   }
 
   assertRecentActivities(args: {
-    lastActivity: string;
-    workingDays: { date: string; activities: string[] }[];
+    lastActivity: {
+      dateTime?: string;
+      duration?: string;
+      client?: string;
+      project?: string;
+      task?: string;
+      notes?: string;
+    };
+    workingDays: {
+      date: string;
+      activities: {
+        dateTime?: string;
+        duration?: string;
+        client?: string;
+        project?: string;
+        task?: string;
+        notes?: string;
+      }[];
+    }[];
     timeSummary: {
       hoursToday: string;
       hoursYesterday: string;
@@ -110,11 +135,25 @@ class LogDsl {
       hoursThisMonth: string;
     };
   }) {
-    const lastActivity = createTestActivity({ dateTime: args.lastActivity });
+    const lastActivity = {
+      dateTime: args.lastActivity.dateTime ?? "2025-08-14T13:00",
+      duration: args.lastActivity.duration ?? "PT30M",
+      client: args.lastActivity.client ?? "Test client",
+      project: args.lastActivity.project ?? "Test project",
+      task: args.lastActivity.task ?? "Test task",
+      notes: args.lastActivity.notes,
+    };
     const workingDays = args.workingDays.map((workingDay) => ({
       date: workingDay.date,
       activities: workingDay.activities.map((activity) =>
-        createTestActivity({ dateTime: activity }),
+        createTestActivity({
+          dateTime: activity.dateTime ?? "2025-08-14T13:00",
+          duration: activity.duration ?? "PT30M",
+          client: activity.client ?? "Test client",
+          project: activity.project ?? "Test project",
+          task: activity.task ?? "Test task",
+          notes: activity.notes,
+        }),
       ),
     }));
     const timeSummary = args.timeSummary;
@@ -134,27 +173,48 @@ class LogDsl {
       args.timestamp ?? "2025-08-26T14:00:00Z",
     );
     const interval = Temporal.Duration.from(args.interval ?? "PT30M");
-    this.#timerDriver.assertTimerStarted(timestamp, interval);
+    this.#timerDriver.assertTimerStarted({ timestamp, interval });
   }
 
   assertTimerStopped(args: { timestamp?: string } = {}) {
     const timestamp = Temporal.Instant.from(
       args.timestamp ?? "2025-08-26T14:01:00Z",
     );
-    this.#timerDriver.assertTimerStopped(timestamp);
+    this.#timerDriver.assertTimerStopped({ timestamp });
   }
 
   intervalElapsed() {
     this.#timerDriver.intervalElapsed();
   }
 
-  async activityLogged({ timestamp }: { timestamp: string }) {
-    const event = ActivityLoggedEvent.createTestData({ timestamp });
-    await this.#activitiesDriver.record(event);
+  async activityLogged(args: {
+    timestamp?: string;
+    duration?: string;
+    client?: string;
+    project?: string;
+    task?: string;
+    notes?: string;
+  }) {
+    const timestamp = args.timestamp ?? "2025-08-14T11:00:00Z";
+    const duration = args.duration ?? "PT30M";
+    const client = args.client ?? "Test client";
+    const project = args.project ?? "Test project";
+    const task = args.task ?? "Test task";
+    const notes = args.notes;
+    await this.#activitiesDriver.record({
+      timestamp,
+      duration,
+      client,
+      project,
+      task,
+      notes,
+    });
   }
 
-  async assertActivityLogged({ timestamp }: { timestamp: string }) {
-    const event = ActivityLoggedEvent.createTestData({ timestamp });
+  async assertActivityLogged(args: { timestamp: string }) {
+    const event = ActivityLoggedEvent.createTestData({
+      timestamp: args.timestamp,
+    });
     await this.#activitiesDriver.assertActivityLogged(event);
   }
 
@@ -262,7 +322,13 @@ class TimerDriver {
   // Events
   //
 
-  assertTimerStarted(timestamp: Temporal.Instant, interval: Temporal.Duration) {
+  assertTimerStarted({
+    timestamp,
+    interval,
+  }: {
+    timestamp: Temporal.Instant;
+    interval: Temporal.Duration;
+  }) {
     expect(this.#timerEvents).toEqual([
       expect.objectContaining({
         type: "timerStarted",
@@ -272,7 +338,7 @@ class TimerDriver {
     ]);
   }
 
-  assertTimerStopped(timestamp: Temporal.Instant) {
+  assertTimerStopped({ timestamp }: { timestamp: Temporal.Instant }) {
     expect(this.#timerEvents).toEqual([
       expect.objectContaining({
         type: "timerStopped",

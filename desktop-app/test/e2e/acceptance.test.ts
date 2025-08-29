@@ -22,36 +22,42 @@ describe("Activity Sampling - Acceptance Tests", () => {
   });
 
   it("Should query current interval", () => {
-    const { log } = createActivitySampling();
-    log.startTimer();
+    const { log } = createActivitySampling({ now: "2025-08-29T08:19:00Z" });
+    log.startTimer({ interval: "PT20M" });
     log.intervalElapsed();
 
     log.queryCurrentInterval();
 
-    log.assertCurrentInterval();
+    log.assertCurrentInterval({
+      timestamp: "2025-08-29T08:39:00Z",
+      duration: "PT20M",
+    });
   });
 
   it("Should log activity", async () => {
-    const { log } = createActivitySampling();
+    const { log } = createActivitySampling({ now: "2025-08-29T09:42:00Z" });
 
-    await log.logActivity({ timestamp: "2025-08-26T14:00:00Z" });
+    await log.logActivity({ timestamp: "2025-08-29T08:47:00Z" });
 
-    await log.assertActivityLogged({ timestamp: "2025-08-26T14:00:00Z" });
+    await log.assertActivityLogged({ timestamp: "2025-08-29T08:47:00Z" });
   });
 
   it("Should query recent activities", async () => {
-    const { log } = createActivitySampling();
-    await log.activityLogged({ timestamp: "2025-08-26T13:30:00Z" });
-    await log.activityLogged({ timestamp: "2025-08-26T14:00:00Z" });
+    const { log } = createActivitySampling({ now: "2025-08-29T09:42:00Z" });
+    await log.activityLogged({ timestamp: "2025-08-29T08:47:00Z" });
+    await log.activityLogged({ timestamp: "2025-08-29T09:17:00Z" });
 
     await log.queryRecentActivities();
 
     log.assertRecentActivities({
-      lastActivity: "2025-08-26T16:00",
+      lastActivity: { dateTime: "2025-08-29T11:17" },
       workingDays: [
         {
-          date: "2025-08-26",
-          activities: ["2025-08-26T16:00", "2025-08-26T15:30"],
+          date: "2025-08-29",
+          activities: [
+            { dateTime: "2025-08-29T11:17" },
+            { dateTime: "2025-08-29T10:47" },
+          ],
         },
       ],
       timeSummary: {
