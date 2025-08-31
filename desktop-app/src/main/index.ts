@@ -68,8 +68,11 @@ function createIpc() {
   );
   ipcMain.handle(
     "queryRecentActivities",
-    async (_event, query: RecentActivitiesQuery) =>
-      activitiesService.queryRecentActivities(query),
+    async (_event, query: RecentActivitiesQuery) => {
+      const result = await activitiesService.queryRecentActivities(query);
+      console.log("main", JSON.stringify(result));
+      return result;
+    },
   );
 }
 

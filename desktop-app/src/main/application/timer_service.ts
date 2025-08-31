@@ -2,11 +2,11 @@
 
 import { Temporal } from "@js-temporal/polyfill";
 
-import { type CommandStatus, createSuccess } from "../common/messages";
+import { CommandStatus } from "../common/messages";
 import { Clock } from "../common/temporal";
 import {
   type CurrentIntervalQuery,
-  type CurrentIntervalQueryResult,
+  CurrentIntervalQueryResult,
   IntervalElapsedEvent,
   type StartTimerCommand,
   type StopTimerCommand,
@@ -40,10 +40,6 @@ export class TimerService extends EventTarget {
     this.#timer = timer;
   }
 
-  simulateTimePassing(duration: Temporal.DurationLike | string) {
-    this.clock = Clock.offset(this.clock, duration);
-  }
-
   startTimer(command: StartTimerCommand): CommandStatus {
     this.#start = this.clock.instant();
     this.#interval = Temporal.Duration.from(command.interval);
@@ -54,7 +50,26 @@ export class TimerService extends EventTarget {
     this.dispatchEvent(
       new TimerStartedEvent(this.clock.instant(), command.interval),
     );
-    return createSuccess();
+    return CommandStatus.success();
+  }
+
+  stopTimer(_command: StopTimerCommand): CommandStatus {
+    this.#timer.clearTimeout(this.#timeout);
+    this.dispatchEvent(new TimerStoppedEvent(this.clock.instant()));
+    return CommandStatus.success();
+  }
+
+  queryCurrentInterval(
+    _query: CurrentIntervalQuery,
+  ): CurrentIntervalQueryResult {
+    return new CurrentIntervalQueryResult(
+      this.clock.instant(),
+      this.#currentInterval ?? Temporal.Duration.from("PT30M"),
+    );
+  }
+
+  simulateTimePassing(duration: Temporal.DurationLike | string) {
+    this.clock = Clock.offset(this.clock, duration);
   }
 
   simulateIntervalElapsed() {
@@ -65,21 +80,6 @@ export class TimerService extends EventTarget {
     const end = this.#start.add(this.#interval);
     this.clock = Clock.fixed(end, this.clock.zone);
     this.#handleIntervalElapsed();
-  }
-
-  stopTimer(_command: StopTimerCommand): CommandStatus {
-    this.#timer.clearTimeout(this.#timeout);
-    this.dispatchEvent(new TimerStoppedEvent(this.clock.instant()));
-    return createSuccess();
-  }
-
-  queryCurrentInterval(
-    _query: CurrentIntervalQuery,
-  ): CurrentIntervalQueryResult {
-    return {
-      timestamp: this.clock.instant(),
-      duration: this.#currentInterval ?? Temporal.Duration.from("PT30M"),
-    };
   }
 
   #handleIntervalElapsed() {

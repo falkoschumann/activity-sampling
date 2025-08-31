@@ -6,15 +6,15 @@ import type { CommandStatus } from "../main/common/messages";
 import type {
   LogActivityCommand,
   RecentActivitiesQuery,
-  RecentActivitiesQueryResult,
 } from "../main/domain/activities";
 
 contextBridge.exposeInMainWorld("activitySampling", {
   logActivity: (command: LogActivityCommand): Promise<CommandStatus> =>
     ipcRenderer.invoke("logActivity", command),
 
-  queryRecentActivities: (
-    query: RecentActivitiesQuery,
-  ): Promise<RecentActivitiesQueryResult> =>
-    ipcRenderer.invoke("queryRecentActivities", query),
+  queryRecentActivities: async (query: RecentActivitiesQuery) => {
+    const result = await ipcRenderer.invoke("queryRecentActivities", query);
+    console.log("preload", JSON.stringify(result));
+    return result;
+  },
 });

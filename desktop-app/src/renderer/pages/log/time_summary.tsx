@@ -1,5 +1,6 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
+import { Temporal } from "@js-temporal/polyfill";
 import { formatDuration } from "../../../main/common/temporal";
 
 export default function TimeSummaryComponent({
@@ -8,10 +9,10 @@ export default function TimeSummaryComponent({
   hoursThisWeek,
   hoursThisMonth,
 }: {
-  hoursToday: string;
-  hoursYesterday: string;
-  hoursThisWeek: string;
-  hoursThisMonth: string;
+  hoursToday: Temporal.DurationLike | string;
+  hoursYesterday: Temporal.DurationLike | string;
+  hoursThisWeek: Temporal.DurationLike | string;
+  hoursThisMonth: Temporal.DurationLike | string;
 }) {
   return (
     <div className="py-2 d-flex justify-content-center flex-wrap text-center">

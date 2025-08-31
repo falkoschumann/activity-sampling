@@ -2,15 +2,14 @@
 
 import { Temporal } from "@js-temporal/polyfill";
 
-import { type CommandStatus, createSuccess } from "../common/messages";
+import { CommandStatus } from "../common/messages";
 import { Clock, normalizeDuration } from "../common/temporal";
 import {
-  type Activity,
-  createActivity,
+  Activity,
   type LogActivityCommand,
   type RecentActivitiesQuery,
   type RecentActivitiesQueryResult,
-  type ReportEntry,
+  ReportEntry,
   type ReportQuery,
   type ReportQueryResult,
   Scope,
@@ -87,9 +86,13 @@ export class ActivitiesService {
   }
 
   async logActivity(command: LogActivityCommand): Promise<CommandStatus> {
-    const event = ActivityLoggedEvent.create(command);
+    const event = ActivityLoggedEvent.create({
+      ...command,
+      timestamp: command.timestamp.toString(),
+      duration: command.duration.toString(),
+    });
     await this.#eventStore.record(event);
-    return createSuccess();
+    return CommandStatus.success();
   }
 
   async queryRecentActivities(
@@ -183,10 +186,10 @@ class RecentActivitiesProjection {
       lastActivity: this.#lastActivity,
       workingDays: this.#workingDays,
       timeSummary: {
-        hoursToday: normalizeDuration(this.#hoursToday).toString(),
-        hoursYesterday: normalizeDuration(this.#hoursYesterday).toString(),
-        hoursThisWeek: normalizeDuration(this.#hoursThisWeek).toString(),
-        hoursThisMonth: normalizeDuration(this.#hoursThisMonth).toString(),
+        hoursToday: normalizeDuration(this.#hoursToday),
+        hoursYesterday: normalizeDuration(this.#hoursYesterday),
+        hoursThisWeek: normalizeDuration(this.#hoursThisWeek),
+        hoursThisMonth: normalizeDuration(this.#hoursThisMonth),
       },
     };
   }
@@ -224,7 +227,7 @@ class RecentActivitiesProjection {
         Temporal.PlainDateTime.from(a1.dateTime),
       ),
     );
-    const day = { date: this.#date.toString(), activities: this.#activities };
+    const day = { date: this.#date, activities: this.#activities };
     this.#workingDays.push(day);
   }
 
@@ -283,7 +286,7 @@ class ReportProjection {
     this.#entries = this.#entries.sort((e1, e2) =>
       e1.name.localeCompare(e2.name),
     );
-    return { entries: this.#entries, totalHours: this.#totalHours.toString() };
+    return { entries: this.#entries, totalHours: this.#totalHours };
   }
 
   #updateEntries(activity: Activity) {
@@ -306,10 +309,10 @@ class ReportProjection {
     }
   }
 
-  #updateEntry(name: string, duration: string) {
+  #updateEntry(name: string, duration: Temporal.DurationLike) {
     const index = this.#entries.findIndex((entry) => entry.name === name);
     if (index == -1) {
-      this.#entries.push({ name, hours: duration });
+      this.#entries.push(new ReportEntry(name, duration));
     } else {
       const existingEntry = this.#entries[index];
       const accumulatedHours = Temporal.Duration.from(existingEntry.hours).add(
@@ -317,15 +320,19 @@ class ReportProjection {
       );
       this.#entries[index] = {
         ...existingEntry,
-        hours: accumulatedHours.toString(),
+        hours: accumulatedHours,
       };
     }
   }
 
-  #updateProjects(project: string, client: string, duration: string) {
+  #updateProjects(
+    project: string,
+    client: string,
+    duration: Temporal.DurationLike,
+  ) {
     const index = this.#entries.findIndex((entry) => entry.name === project);
     if (index == -1) {
-      this.#entries.push({ name: project, client, hours: duration });
+      this.#entries.push(new ReportEntry(project, duration, client));
     } else {
       const existingEntry = this.#entries[index];
       let existingClient = existingEntry.client;
@@ -340,7 +347,7 @@ class ReportProjection {
       this.#entries[index] = {
         ...existingEntry,
         client: existingClient,
-        hours: accumulatedHours.toString(),
+        hours: accumulatedHours,
       };
     }
   }
@@ -396,8 +403,8 @@ class TimesheetProjection {
     const offset = this.#determineOffset();
     this.#entries = this.#entries.sort((entry1, entry2) => {
       const dateComparison = Temporal.PlainDate.compare(
-        Temporal.PlainDate.from(entry1.date),
-        Temporal.PlainDate.from(entry2.date),
+        entry1.date,
+        entry2.date,
       );
       if (dateComparison !== 0) {
         return dateComparison;
@@ -414,9 +421,9 @@ class TimesheetProjection {
     return {
       entries: this.#entries,
       workingHoursSummary: {
-        totalHours: normalizeDuration(this.#totalHours).toString(),
-        capacity: capacity.toString(),
-        offset: offset.toString(),
+        totalHours: normalizeDuration(this.#totalHours),
+        capacity,
+        offset,
       },
     };
   }
@@ -425,14 +432,14 @@ class TimesheetProjection {
     const date = Temporal.PlainDate.from(activity.dateTime);
     const index = this.#entries.findIndex(
       (entry) =>
-        entry.date === date.toString() &&
+        Temporal.PlainDate.compare(entry.date, date.toString()) === 0 &&
         entry.client === activity.client &&
         entry.project === activity.project &&
         entry.task === activity.task,
     );
     if (index === -1) {
       const newEntry: TimesheetEntry = {
-        date: date.toString(),
+        date,
         client: activity.client,
         project: activity.project,
         task: activity.task,
@@ -446,7 +453,7 @@ class TimesheetProjection {
       );
       this.#entries[index] = {
         ...existingEntry,
-        hours: normalizeDuration(accumulatedHours).toString(),
+        hours: normalizeDuration(accumulatedHours),
       };
     }
   }
@@ -507,13 +514,18 @@ async function* project(
       continue;
     }
 
-    const activity = createActivity({
-      ...event,
-      dateTime: Temporal.Instant.from(event.timestamp)
-        .toZonedDateTimeISO(timeZone)
-        .toPlainDateTime()
-        .toString({ smallestUnit: "minutes" }),
-    });
+    const dateTime = Temporal.Instant.from(event.timestamp)
+      .toZonedDateTimeISO(timeZone)
+      .toPlainDateTime();
+    const duration = Temporal.Duration.from(event.duration);
+    const activity = new Activity(
+      dateTime,
+      duration,
+      event.client,
+      event.project,
+      event.task,
+      event.notes,
+    );
     yield activity;
   }
 }

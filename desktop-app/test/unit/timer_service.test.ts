@@ -5,6 +5,11 @@ import { describe, expect, it } from "vitest";
 
 import { TimerService } from "../../src/main/application/timer_service";
 import { Clock } from "../../src/main/common/temporal";
+import {
+  CurrentIntervalQuery,
+  StartTimerCommand,
+  StopTimerCommand,
+} from "../../src/main/domain/timer";
 
 describe("Timer service", () => {
   describe("Start timer", () => {
@@ -15,7 +20,7 @@ describe("Timer service", () => {
       const events: Event[] = [];
       service.addEventListener("timerStarted", (event) => events.push(event));
 
-      service.startTimer({ interval: "PT30M" });
+      service.startTimer(new StartTimerCommand("PT30M"));
 
       expect(events).toEqual([
         expect.objectContaining({
@@ -38,10 +43,10 @@ describe("Timer service", () => {
       });
       const events: Event[] = [];
       service.addEventListener("timerStopped", (event) => events.push(event));
-      service.startTimer({ interval: "PT30M" });
+      service.startTimer(new StartTimerCommand("PT30M"));
 
       service.simulateTimePassing("PT2M");
-      service.stopTimer({});
+      service.stopTimer(new StopTimerCommand());
 
       expect(events).toEqual([
         expect.objectContaining({
@@ -61,10 +66,10 @@ describe("Timer service", () => {
       service.addEventListener("intervalElapsed", (event) =>
         events.push(event),
       );
-      service.startTimer({ interval: "PT30M" });
+      service.startTimer(new StartTimerCommand("PT30M"));
 
       service.simulateIntervalElapsed();
-      const result = service.queryCurrentInterval({});
+      const result = service.queryCurrentInterval(new CurrentIntervalQuery());
 
       expect(result).toEqual({
         timestamp: Temporal.Instant.from("2025-08-28T20:11:00Z"),

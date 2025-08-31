@@ -11,7 +11,10 @@ export default function WorkingDaysComponent({
   workingDays: WorkingDay[];
 }) {
   return workingDays.map((workingDay) => (
-    <WorkingDayComponent key={workingDay.date} {...workingDay} />
+    <WorkingDayComponent
+      key={Temporal.PlainDate.from(workingDay.date).toString()}
+      {...workingDay}
+    />
   ));
 }
 
@@ -19,7 +22,7 @@ function WorkingDayComponent({
   date,
   activities,
 }: {
-  date: string;
+  date: Temporal.PlainDateLike;
   activities: Activity[];
 }) {
   return (
@@ -31,7 +34,10 @@ function WorkingDayComponent({
       </h6>
       <ul className="list-group list-group-flush">
         {activities.map((activity) => (
-          <ActivityComponent key={activity.dateTime} {...activity} />
+          <ActivityComponent
+            key={Temporal.PlainDateTime.from(activity.dateTime).toString()}
+            {...activity}
+          />
         ))}
       </ul>
     </div>
@@ -45,7 +51,7 @@ function ActivityComponent({
   task,
   notes,
 }: {
-  dateTime: string;
+  dateTime: Temporal.PlainDateTimeLike | string;
   client: string;
   project: string;
   task: string;

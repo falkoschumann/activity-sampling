@@ -3,10 +3,7 @@
 import { Temporal } from "@js-temporal/polyfill";
 import { useEffect, useState } from "react";
 
-import {
-  createRecentActivitiesQueryResult,
-  type RecentActivitiesQueryResult,
-} from "../../../main/domain/activities";
+import { RecentActivitiesQueryResult } from "../../../main/domain/activities";
 import ScrollToTopButton from "../../components/scroll_to_top_button";
 import ActivityFormComponent, { type ActivityFormData } from "./activity_form";
 import CountdownComponent from "./countdown";
@@ -15,7 +12,7 @@ import TimeSummaryComponent from "./time_summary";
 
 export default function LogPage() {
   const [recentActivities, setRecentActivities] =
-    useState<RecentActivitiesQueryResult>(createRecentActivitiesQueryResult());
+    useState<RecentActivitiesQueryResult>(RecentActivitiesQueryResult.empty());
 
   const countdown = {
     remaining: "PT18M36S",
@@ -25,8 +22,8 @@ export default function LogPage() {
   async function handleSubmitActivity(formData: ActivityFormData) {
     console.log("Submitted activity:", formData);
     await window.activitySampling.logActivity({
-      timestamp: Temporal.Now.instant().toString(),
-      duration: "PT30M",
+      timestamp: Temporal.Now.instant(),
+      duration: Temporal.Duration.from("PT30M"),
       ...formData,
     });
     void queryRecentActivities();
@@ -34,6 +31,7 @@ export default function LogPage() {
 
   async function queryRecentActivities() {
     const result = await window.activitySampling.queryRecentActivities({});
+    console.log(JSON.stringify(result));
     setRecentActivities(result);
   }
 

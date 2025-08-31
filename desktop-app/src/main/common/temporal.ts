@@ -69,9 +69,9 @@ class OffsetClock extends Clock {
 }
 
 export function normalizeDuration(
-  duration: Temporal.Duration,
+  duration: Temporal.Duration | Temporal.DurationLike | string,
 ): Temporal.Duration {
-  return duration.round({
+  return Temporal.Duration.from(duration).round({
     largestUnit: "hours",
     smallestUnit: "nanoseconds",
   });
@@ -122,7 +122,7 @@ export function formatTime(
 }
 
 export function formatDuration(
-  duration: Temporal.Duration | string,
+  duration: Temporal.Duration | Temporal.DurationLike | string,
   format: FormatStyle = FormatStyle.MEDIUM,
 ): string {
   const s = Temporal.Duration.from(duration).toLocaleString(undefined, {

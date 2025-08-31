@@ -2,22 +2,34 @@
 
 import { Temporal } from "@js-temporal/polyfill";
 
-export interface StartTimerCommand {
-  readonly interval: Temporal.DurationLike | string;
+export class StartTimerCommand {
+  readonly interval: Temporal.Duration;
+
+  constructor(interval: Temporal.DurationLike | string) {
+    this.interval = Temporal.Duration.from(interval);
+  }
 }
 
-export type StopTimerCommand = object;
+export class StopTimerCommand {}
 
-export type CurrentIntervalQuery = object;
+export class CurrentIntervalQuery {}
 
-export interface CurrentIntervalQueryResult {
+export class CurrentIntervalQueryResult {
   readonly timestamp: Temporal.Instant;
-  readonly duration: Temporal.DurationLike;
+  readonly duration: Temporal.Duration;
+
+  constructor(
+    timestamp: Temporal.Instant | string,
+    duration: Temporal.DurationLike | string,
+  ) {
+    this.timestamp = Temporal.Instant.from(timestamp);
+    this.duration = Temporal.Duration.from(duration);
+  }
 }
 
 export class TimerStartedEvent extends Event {
   readonly timestamp: Temporal.Instant;
-  readonly interval: Temporal.DurationLike;
+  readonly interval: Temporal.Duration;
 
   constructor(
     timestamp: Temporal.Instant | string,
@@ -40,7 +52,7 @@ export class TimerStoppedEvent extends Event {
 
 export class IntervalElapsedEvent extends Event {
   readonly timestamp: Temporal.Instant;
-  readonly interval: Temporal.DurationLike;
+  readonly interval: Temporal.Duration;
 
   constructor(
     timestamp: Temporal.Instant | string,

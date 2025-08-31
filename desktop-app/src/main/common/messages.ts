@@ -1,20 +1,19 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
-export type CommandStatus = Success | Failure;
+export class CommandStatus {
+  static success(): CommandStatus {
+    return new CommandStatus(true);
+  }
 
-export interface Success {
-  readonly success: true;
-}
+  static failure(errorMessage: string): CommandStatus {
+    return new CommandStatus(false, errorMessage);
+  }
 
-export function createSuccess(): Success {
-  return { success: true };
-}
+  readonly success: boolean;
+  readonly errorMessage?: string;
 
-export interface Failure {
-  readonly success: false;
-  readonly errorMessage: string;
-}
-
-export function createFailure(errorMessage: string): Failure {
-  return { success: false, errorMessage };
+  constructor(success: boolean, errorMessage?: string) {
+    this.success = success;
+    this.errorMessage = errorMessage;
+  }
 }

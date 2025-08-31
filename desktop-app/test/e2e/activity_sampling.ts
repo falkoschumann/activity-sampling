@@ -9,7 +9,6 @@ import { TimerService } from "../../src/main/application/timer_service";
 import { arrayFromAsync } from "../../src/main/common/polyfills";
 import { Clock } from "../../src/main/common/temporal";
 import {
-  createTestActivity,
   type LogActivityCommand,
   type RecentActivitiesQuery,
   type RecentActivitiesQueryResult,
@@ -18,7 +17,7 @@ import {
   type CurrentIntervalQuery,
   type CurrentIntervalQueryResult,
   type StartTimerCommand,
-  type StopTimerCommand,
+  StopTimerCommand,
 } from "../../src/main/domain/timer";
 import { EventStore } from "../../src/main/infrastructure/event_store";
 import { ActivityLoggedEvent } from "../../src/main/infrastructure/events";
@@ -59,7 +58,7 @@ class LogDsl {
   }
 
   stopTimer() {
-    this.#timerDriver.stopTimer({});
+    this.#timerDriver.stopTimer(new StopTimerCommand());
   }
 
   async logActivity(
@@ -72,8 +71,10 @@ class LogDsl {
       notes?: string;
     } = {},
   ) {
-    const timestamp = args.timestamp ?? "2025-08-26T14:00:00Z";
-    const duration = args.duration ?? "PT30M";
+    const timestamp = Temporal.Instant.from(
+      args.timestamp ?? "2025-08-26T14:00:00Z",
+    );
+    const duration = Temporal.Duration.from(args.duration ?? "PT30M");
     const client = args.client ?? "Test client";
     const project = args.project ?? "Test project";
     const task = args.task ?? "Test task";
@@ -129,34 +130,47 @@ class LogDsl {
       }[];
     }[];
     timeSummary: {
-      hoursToday: string;
-      hoursYesterday: string;
-      hoursThisWeek: string;
-      hoursThisMonth: string;
+      hoursToday?: string;
+      hoursYesterday?: string;
+      hoursThisWeek?: string;
+      hoursThisMonth?: string;
     };
   }) {
     const lastActivity = {
-      dateTime: args.lastActivity.dateTime ?? "2025-08-14T13:00",
-      duration: args.lastActivity.duration ?? "PT30M",
+      dateTime: Temporal.PlainDateTime.from(
+        args.lastActivity.dateTime ?? "2025-08-14T13:00",
+      ),
+      duration: Temporal.Duration.from(args.lastActivity.duration ?? "PT30M"),
       client: args.lastActivity.client ?? "Test client",
       project: args.lastActivity.project ?? "Test project",
       task: args.lastActivity.task ?? "Test task",
       notes: args.lastActivity.notes,
     };
     const workingDays = args.workingDays.map((workingDay) => ({
-      date: workingDay.date,
-      activities: workingDay.activities.map((activity) =>
-        createTestActivity({
-          dateTime: activity.dateTime ?? "2025-08-14T13:00",
-          duration: activity.duration ?? "PT30M",
-          client: activity.client ?? "Test client",
-          project: activity.project ?? "Test project",
-          task: activity.task ?? "Test task",
-          notes: activity.notes,
-        }),
-      ),
+      date: Temporal.PlainDate.from(workingDay.date),
+      activities: workingDay.activities.map((activity) => ({
+        dateTime: Temporal.PlainDateTime.from(
+          activity.dateTime ?? "2025-08-14T13:00",
+        ),
+        duration: Temporal.Duration.from(activity.duration ?? "PT30M"),
+        client: activity.client ?? "Test client",
+        project: activity.project ?? "Test project",
+        task: activity.task ?? "Test task",
+        notes: activity.notes,
+      })),
     }));
-    const timeSummary = args.timeSummary;
+    const timeSummary = {
+      hoursToday: Temporal.Duration.from(args.timeSummary.hoursToday ?? "PT0S"),
+      hoursYesterday: Temporal.Duration.from(
+        args.timeSummary.hoursYesterday ?? "PT0S",
+      ),
+      hoursThisWeek: Temporal.Duration.from(
+        args.timeSummary.hoursThisWeek ?? "PT0S",
+      ),
+      hoursThisMonth: Temporal.Duration.from(
+        args.timeSummary.hoursThisMonth ?? "PT0S",
+      ),
+    };
     this.#activitiesDriver.assertRecentActivities({
       lastActivity,
       workingDays,
@@ -211,11 +225,29 @@ class LogDsl {
     });
   }
 
-  async assertActivityLogged(args: { timestamp: string }) {
-    const event = ActivityLoggedEvent.createTestData({
-      timestamp: args.timestamp,
+  async assertActivityLogged(args: {
+    timestamp?: string;
+    duration?: string;
+    client?: string;
+    project?: string;
+    task?: string;
+    notes?: string;
+  }) {
+    const timestamp = args.timestamp ?? "2025-08-14T11:00:00Z";
+    const duration = args.duration ?? "PT30M";
+    const client = args.client ?? "Test client";
+    const project = args.project ?? "Test project";
+    const task = args.task ?? "Test task";
+    const notes = args.notes;
+
+    await this.#activitiesDriver.assertActivityLogged({
+      timestamp,
+      duration,
+      client,
+      project,
+      task,
+      notes,
     });
-    await this.#activitiesDriver.assertActivityLogged(event);
   }
 
   //

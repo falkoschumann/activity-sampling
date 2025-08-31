@@ -1,34 +1,25 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
+import { Temporal } from "@js-temporal/polyfill";
 import { describe, expect, it } from "vitest";
 
 import { ActivitiesService } from "../../src/main/application/activities_service";
-import { EventStore } from "../../src/main/infrastructure/event_store";
-import { ActivityLoggedEvent } from "../../src/main/infrastructure/events";
+import { CommandStatus } from "../../src/main/common/messages";
 import {
-  createTestActivity,
-  createTestLogActivityCommand,
-  createTestReportEntry,
-  createTestReportQuery,
-  createTestTimesheetEntry,
-  createTestTimesheetQuery,
+  Activity,
+  ReportEntry,
+  TimesheetEntry,
+  TimesheetQuery,
+  LogActivityCommand,
+  RecentActivitiesQuery,
+  ReportQuery,
   Scope,
 } from "../../src/main/domain/activities";
-import { createSuccess } from "../../src/main/common/messages";
+import { EventStore } from "../../src/main/infrastructure/event_store";
+import { ActivityLoggedEvent } from "../../src/main/infrastructure/events";
 import { HolidayRepository } from "../../src/main/infrastructure/holiday_repository";
 
 describe("Activities service", () => {
-  describe("Ask periodically", () => {
-    it.todo("Start the countdown with a given interval");
-    it.todo(
-      "Start countdown with the default interval when the application starts",
-    );
-  });
-
-  describe("Current Interval", () => {
-    it.todo("Notify the user when an interval is elapsed");
-  });
-
   describe("Log activity", () => {
     describe("Log the activity with a client, a project, a task and an optional notes", () => {
       it("Logs without an optional notes", async () => {
@@ -37,10 +28,10 @@ describe("Activities service", () => {
         const recordEvents = eventStore.trackRecorded();
 
         const status = await service.logActivity(
-          createTestLogActivityCommand(),
+          LogActivityCommand.createTestInstance(),
         );
 
-        expect(status).toEqual(createSuccess());
+        expect(status).toEqual(CommandStatus.success());
         expect(recordEvents.data).toEqual([
           ActivityLoggedEvent.createTestData(),
         ]);
@@ -52,10 +43,10 @@ describe("Activities service", () => {
         const recordEvents = eventStore.trackRecorded();
 
         const status = await service.logActivity(
-          createTestLogActivityCommand({ notes: "Lorem ipsum" }),
+          LogActivityCommand.createTestInstance({ notes: "Lorem ipsum" }),
         );
 
-        expect(status).toEqual(createSuccess());
+        expect(status).toEqual(CommandStatus.success());
         expect(recordEvents.data).toEqual([
           ActivityLoggedEvent.createTestData({ notes: "Lorem ipsum" }),
         ]);
@@ -73,16 +64,18 @@ describe("Activities service", () => {
       });
       const service = ActivitiesService.createNull({ eventStore });
 
-      const result = await service.queryRecentActivities({});
+      const result = await service.queryRecentActivities(
+        new RecentActivitiesQuery(),
+      );
 
       expect(result).toEqual({
         lastActivity: undefined,
         workingDays: [],
         timeSummary: {
-          hoursToday: "PT0S",
-          hoursYesterday: "PT0S",
-          hoursThisWeek: "PT0S",
-          hoursThisMonth: "PT0S",
+          hoursToday: Temporal.Duration.from("PT0S"),
+          hoursYesterday: Temporal.Duration.from("PT0S"),
+          hoursThisWeek: Temporal.Duration.from("PT0S"),
+          hoursThisMonth: Temporal.Duration.from("PT0S"),
         },
       });
     });
@@ -96,9 +89,11 @@ describe("Activities service", () => {
         fixedInstant: "2025-08-20T09:03:00Z",
       });
 
-      const result = await service.queryRecentActivities({});
+      const result = await service.queryRecentActivities(
+        new RecentActivitiesQuery(),
+      );
 
-      expect(result.lastActivity).toEqual(createTestActivity());
+      expect(result.lastActivity).toEqual(Activity.createTestInstance());
     });
 
     it("Groups activities by working days for the last 30 days", async () => {
@@ -121,23 +116,37 @@ describe("Activities service", () => {
         fixedInstant: "2025-06-05T10:00:00Z",
       });
 
-      const result = await service.queryRecentActivities({});
+      const result = await service.queryRecentActivities(
+        new RecentActivitiesQuery(),
+      );
 
       expect(result.workingDays).toEqual([
         {
-          date: "2025-06-05",
+          date: Temporal.PlainDate.from("2025-06-05"),
           activities: [
-            createTestActivity({ dateTime: "2025-06-05T11:00" }),
-            createTestActivity({ dateTime: "2025-06-05T10:30" }),
+            Activity.createTestInstance({
+              dateTime: Temporal.PlainDateTime.from("2025-06-05T11:00"),
+            }),
+            Activity.createTestInstance({
+              dateTime: Temporal.PlainDateTime.from("2025-06-05T10:30"),
+            }),
           ],
         },
         {
-          date: "2025-06-04",
-          activities: [createTestActivity({ dateTime: "2025-06-04T16:00" })],
+          date: Temporal.PlainDate.from("2025-06-04"),
+          activities: [
+            Activity.createTestInstance({
+              dateTime: Temporal.PlainDateTime.from("2025-06-04T16:00"),
+            }),
+          ],
         },
         {
-          date: "2025-05-06",
-          activities: [createTestActivity({ dateTime: "2025-05-06T16:00" })],
+          date: Temporal.PlainDate.from("2025-05-06"),
+          activities: [
+            Activity.createTestInstance({
+              dateTime: Temporal.PlainDateTime.from("2025-05-06T16:00"),
+            }),
+          ],
         },
       ]);
     });
@@ -180,13 +189,15 @@ describe("Activities service", () => {
         fixedInstant: "2025-06-05T10:00:00Z",
       });
 
-      const result = await service.queryRecentActivities({});
+      const result = await service.queryRecentActivities(
+        new RecentActivitiesQuery(),
+      );
 
       expect(result.timeSummary).toEqual({
-        hoursToday: "PT1H",
-        hoursYesterday: "PT1H30M",
-        hoursThisWeek: "PT4H",
-        hoursThisMonth: "PT5H30M",
+        hoursToday: Temporal.Duration.from("PT1H"),
+        hoursYesterday: Temporal.Duration.from("PT1H30M"),
+        hoursThisWeek: Temporal.Duration.from("PT4H"),
+        hoursThisMonth: Temporal.Duration.from("PT5H30M"),
       });
     });
   });
@@ -197,12 +208,15 @@ describe("Activities service", () => {
       const service = ActivitiesService.createNull({ eventStore });
 
       const result = await service.queryReport(
-        createTestReportQuery({
+        ReportQuery.createTestInstance({
           scope: Scope.TASKS,
         }),
       );
 
-      expect(result).toEqual({ entries: [], totalHours: "PT0S" });
+      expect(result).toEqual({
+        entries: [],
+        totalHours: Temporal.Duration.from("PT0S"),
+      });
     });
 
     it("Summarizes hours worked for clients", async () => {
@@ -230,14 +244,20 @@ describe("Activities service", () => {
       const service = ActivitiesService.createNull({ eventStore });
 
       const result = await service.queryReport(
-        createTestReportQuery({
+        ReportQuery.createTestInstance({
           scope: Scope.CLIENTS,
         }),
       );
 
       expect(result.entries).toEqual([
-        createTestReportEntry({ name: "Client 1", hours: "PT8H" }),
-        createTestReportEntry({ name: "Client 2", hours: "PT7H" }),
+        ReportEntry.createTestInstance({
+          name: "Client 1",
+          hours: Temporal.Duration.from("PT8H"),
+        }),
+        ReportEntry.createTestInstance({
+          name: "Client 2",
+          hours: Temporal.Duration.from("PT7H"),
+        }),
       ]);
     });
 
@@ -280,18 +300,20 @@ describe("Activities service", () => {
       });
       const service = ActivitiesService.createNull({ eventStore });
 
-      const result = await service.queryReport(createTestReportQuery({}));
+      const result = await service.queryReport(
+        ReportQuery.createTestInstance({}),
+      );
 
       expect(result.entries).toEqual([
-        createTestReportEntry({
+        ReportEntry.createTestInstance({
           name: "Project A",
           client: "Client 1",
-          hours: "PT18H",
+          hours: Temporal.Duration.from("PT18H"),
         }),
-        createTestReportEntry({
+        ReportEntry.createTestInstance({
           name: "Project B",
           client: "Client 2",
-          hours: "PT24H",
+          hours: Temporal.Duration.from("PT24H"),
         }),
       ]);
     });
@@ -325,14 +347,20 @@ describe("Activities service", () => {
       const service = ActivitiesService.createNull({ eventStore });
 
       const result = await service.queryReport(
-        createTestReportQuery({
+        ReportQuery.createTestInstance({
           scope: Scope.TASKS,
         }),
       );
 
       expect(result.entries).toEqual([
-        createTestReportEntry({ name: "Task 1", hours: "PT8H" }),
-        createTestReportEntry({ name: "Task 2", hours: "PT7H" }),
+        ReportEntry.createTestInstance({
+          name: "Task 1",
+          hours: Temporal.Duration.from("PT8H"),
+        }),
+        ReportEntry.createTestInstance({
+          name: "Task 2",
+          hours: Temporal.Duration.from("PT7H"),
+        }),
       ]);
     });
 
@@ -372,9 +400,11 @@ describe("Activities service", () => {
       });
       const service = ActivitiesService.createNull({ eventStore });
 
-      const result = await service.queryReport(createTestReportQuery({}));
+      const result = await service.queryReport(
+        ReportQuery.createTestInstance({}),
+      );
 
-      expect(result.totalHours).toEqual("PT42H");
+      expect(result.totalHours).toEqual(Temporal.Duration.from("PT42H"));
     });
   });
 
@@ -383,14 +413,16 @@ describe("Activities service", () => {
       const eventStore = EventStore.createNull({ events: [[]] });
       const service = ActivitiesService.createNull({ eventStore });
 
-      const result = await service.queryTimesheet(createTestTimesheetQuery());
+      const result = await service.queryTimesheet(
+        TimesheetQuery.createTestInstance(),
+      );
 
       expect(result).toEqual({
         entries: [],
         workingHoursSummary: {
-          totalHours: "PT0S",
-          capacity: "PT40H",
-          offset: "PT0S",
+          totalHours: Temporal.Duration.from("PT0S"),
+          capacity: Temporal.Duration.from("PT40H"),
+          offset: Temporal.Duration.from("PT0S"),
         },
       });
     });
@@ -435,28 +467,42 @@ describe("Activities service", () => {
       });
       const service = ActivitiesService.createNull({ eventStore });
 
-      const result = await service.queryTimesheet(createTestTimesheetQuery({}));
+      const result = await service.queryTimesheet(
+        TimesheetQuery.createTestInstance({}),
+      );
 
       expect(result.entries).toEqual([
-        createTestTimesheetEntry({ date: "2025-06-02", hours: "PT1H" }),
-        createTestTimesheetEntry({
-          date: "2025-06-03",
+        TimesheetEntry.createTestInstance({
+          date: Temporal.PlainDate.from("2025-06-02"),
+          hours: Temporal.Duration.from("PT1H"),
+        }),
+        TimesheetEntry.createTestInstance({
+          date: Temporal.PlainDate.from("2025-06-03"),
           task: "Other task",
-          hours: "PT30M",
+          hours: Temporal.Duration.from("PT30M"),
         }),
-        createTestTimesheetEntry({ date: "2025-06-03", hours: "PT30M" }),
-        createTestTimesheetEntry({
-          date: "2025-06-04",
+        TimesheetEntry.createTestInstance({
+          date: Temporal.PlainDate.from("2025-06-03"),
+          hours: Temporal.Duration.from("PT30M"),
+        }),
+        TimesheetEntry.createTestInstance({
+          date: Temporal.PlainDate.from("2025-06-04"),
           project: "Other project",
-          hours: "PT30M",
+          hours: Temporal.Duration.from("PT30M"),
         }),
-        createTestTimesheetEntry({ date: "2025-06-04", hours: "PT30M" }),
-        createTestTimesheetEntry({
-          date: "2025-06-05",
+        TimesheetEntry.createTestInstance({
+          date: Temporal.PlainDate.from("2025-06-04"),
+          hours: Temporal.Duration.from("PT30M"),
+        }),
+        TimesheetEntry.createTestInstance({
+          date: Temporal.PlainDate.from("2025-06-05"),
           client: "Other client",
-          hours: "PT30M",
+          hours: Temporal.Duration.from("PT30M"),
         }),
-        createTestTimesheetEntry({ date: "2025-06-05", hours: "PT30M" }),
+        TimesheetEntry.createTestInstance({
+          date: Temporal.PlainDate.from("2025-06-05"),
+          hours: Temporal.Duration.from("PT30M"),
+        }),
       ]);
     });
 
@@ -479,9 +525,13 @@ describe("Activities service", () => {
       });
       const service = ActivitiesService.createNull({ eventStore });
 
-      const result = await service.queryTimesheet(createTestTimesheetQuery({}));
+      const result = await service.queryTimesheet(
+        TimesheetQuery.createTestInstance({}),
+      );
 
-      expect(result.workingHoursSummary.totalHours).toEqual("PT1H30M");
+      expect(result.workingHoursSummary.totalHours).toEqual(
+        Temporal.Duration.from("PT1H30M"),
+      );
     });
 
     it("Compares with capacity", async () => {
@@ -509,13 +559,16 @@ describe("Activities service", () => {
       });
 
       const result = await service.queryTimesheet(
-        createTestTimesheetQuery({ from: "2025-06-09", to: "2025-06-15" }),
+        TimesheetQuery.createTestInstance({
+          from: Temporal.PlainDate.from("2025-06-09"),
+          to: Temporal.PlainDate.from("2025-06-15"),
+        }),
       );
 
       expect(result.workingHoursSummary).toEqual({
-        totalHours: "PT24H",
-        capacity: "PT40H",
-        offset: "PT0S",
+        totalHours: Temporal.Duration.from("PT24H"),
+        capacity: Temporal.Duration.from("PT40H"),
+        offset: Temporal.Duration.from("PT0S"),
       });
     });
 
@@ -549,13 +602,16 @@ describe("Activities service", () => {
         });
 
         const result = await service.queryTimesheet(
-          createTestTimesheetQuery({ from: "2025-06-09", to: "2025-06-15" }),
+          TimesheetQuery.createTestInstance({
+            from: Temporal.PlainDate.from("2025-06-09"),
+            to: Temporal.PlainDate.from("2025-06-15"),
+          }),
         );
 
         expect(result.workingHoursSummary).toEqual({
-          totalHours: "PT24H",
-          capacity: "PT32H",
-          offset: "PT0S",
+          totalHours: Temporal.Duration.from("PT24H"),
+          capacity: Temporal.Duration.from("PT32H"),
+          offset: Temporal.Duration.from("PT0S"),
         });
       });
 
@@ -581,7 +637,6 @@ describe("Activities service", () => {
         const holidayRepository = HolidayRepository.createNull({
           holidays: [[{ date: "2025-06-09", title: "Pfingstmontag" }]],
         });
-
         const service = ActivitiesService.createNull({
           eventStore,
           holidayRepository,
@@ -589,13 +644,16 @@ describe("Activities service", () => {
         });
 
         const result = await service.queryTimesheet(
-          createTestTimesheetQuery({ from: "2025-06-09", to: "2025-06-15" }),
+          TimesheetQuery.createTestInstance({
+            from: Temporal.PlainDate.from("2025-06-09"),
+            to: Temporal.PlainDate.from("2025-06-15"),
+          }),
         );
 
         expect(result.workingHoursSummary).toEqual({
-          totalHours: "PT18H",
-          capacity: "PT32H",
-          offset: "-PT6H",
+          totalHours: Temporal.Duration.from("PT18H"),
+          capacity: Temporal.Duration.from("PT32H"),
+          offset: Temporal.Duration.from("-PT6H"),
         });
       });
 
@@ -628,13 +686,16 @@ describe("Activities service", () => {
         });
 
         const result = await service.queryTimesheet(
-          createTestTimesheetQuery({ from: "2025-06-09", to: "2025-06-15" }),
+          TimesheetQuery.createTestInstance({
+            from: Temporal.PlainDate.from("2025-06-09"),
+            to: Temporal.PlainDate.from("2025-06-15"),
+          }),
         );
 
         expect(result.workingHoursSummary).toEqual({
-          totalHours: "PT30H",
-          capacity: "PT32H",
-          offset: "PT6H",
+          totalHours: Temporal.Duration.from("PT30H"),
+          capacity: Temporal.Duration.from("PT32H"),
+          offset: Temporal.Duration.from("PT6H"),
         });
       });
     });
