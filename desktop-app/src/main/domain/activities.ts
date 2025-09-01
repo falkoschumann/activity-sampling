@@ -270,7 +270,7 @@ export class Activity {
   readonly notes?: string;
 
   constructor(
-    dateTime: Temporal.PlainDateLike | string,
+    dateTime: Temporal.PlainDateTimeLike | string,
     duration: Temporal.DurationLike | string,
     client: string,
     project: string,

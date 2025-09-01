@@ -9,7 +9,12 @@ import {
 
 import icon from "../../resources/icon.png?asset";
 import { ActivitiesService } from "./application/activities_service";
-import type { RecentActivitiesQuery } from "./domain/activities";
+import {
+  CommandStatusDto,
+  LogActivityCommandDto,
+  RecentActivitiesQueryDto,
+  RecentActivitiesQueryResultDto,
+} from "./application/activities_messages";
 
 app.whenReady().then(() => {
   installDevTools();
@@ -62,18 +67,18 @@ function installDevTools() {
 }
 
 function createIpc() {
+  // TODO configure data folder
   const activitiesService = ActivitiesService.create();
-  ipcMain.handle("logActivity", async (_event, command) =>
-    activitiesService.logActivity(command),
-  );
-  ipcMain.handle(
-    "queryRecentActivities",
-    async (_event, query: RecentActivitiesQuery) => {
-      const result = await activitiesService.queryRecentActivities(query);
-      console.log("main", JSON.stringify(result));
-      return result;
-    },
-  );
+  ipcMain.handle("logActivity", async (_event, commandDto) => {
+    const command = LogActivityCommandDto.create(commandDto).validate();
+    const status = await activitiesService.logActivity(command);
+    return CommandStatusDto.from(status);
+  });
+  ipcMain.handle("queryRecentActivities", async (_event, queryDto) => {
+    const query = RecentActivitiesQueryDto.create(queryDto).validate();
+    const result = await activitiesService.queryRecentActivities(query);
+    return RecentActivitiesQueryResultDto.from(result);
+  });
 }
 
 function createWindow(): void {
