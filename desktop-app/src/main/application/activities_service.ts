@@ -20,7 +20,7 @@ import {
 } from "../domain/activities";
 import { Calendar, type Holiday } from "../domain/calendar";
 import { EventStore } from "../infrastructure/event_store";
-import { ActivityLoggedEvent } from "../infrastructure/events";
+import { ActivityLoggedEventDto } from "../infrastructure/events";
 import { HolidayRepository } from "../infrastructure/holiday_repository";
 
 export interface ActivitiesConfiguration {
@@ -86,7 +86,7 @@ export class ActivitiesService {
   }
 
   async logActivity(command: LogActivityCommand): Promise<CommandStatus> {
-    const event = ActivityLoggedEvent.create({
+    const event = ActivityLoggedEventDto.create({
       ...command,
       timestamp: command.timestamp.toString(),
       duration: command.duration.toString(),
@@ -503,10 +503,8 @@ async function* project(
 ): AsyncGenerator<Activity> {
   for await (const e of events) {
     // TODO handle type error
-    const event = ActivityLoggedEvent.from(e);
-    const date = Temporal.Instant.from(event.timestamp)
-      .toZonedDateTimeISO(timeZone)
-      .toPlainDate();
+    const event = ActivityLoggedEventDto.fromJson(e).validate();
+    const date = event.timestamp.toZonedDateTimeISO(timeZone).toPlainDate();
     if (
       Temporal.PlainDate.compare(date, startInclusive) < 0 ||
       Temporal.PlainDate.compare(date, endExclusive) >= 0
@@ -514,13 +512,12 @@ async function* project(
       continue;
     }
 
-    const dateTime = Temporal.Instant.from(event.timestamp)
+    const dateTime = event.timestamp
       .toZonedDateTimeISO(timeZone)
       .toPlainDateTime();
-    const duration = Temporal.Duration.from(event.duration);
     const activity = new Activity(
       dateTime,
-      duration,
+      event.duration,
       event.client,
       event.project,
       event.task,

@@ -16,7 +16,7 @@ import {
   Scope,
 } from "../../src/main/domain/activities";
 import { EventStore } from "../../src/main/infrastructure/event_store";
-import { ActivityLoggedEvent } from "../../src/main/infrastructure/events";
+import { ActivityLoggedEventDto } from "../../src/main/infrastructure/events";
 import { HolidayRepository } from "../../src/main/infrastructure/holiday_repository";
 
 describe("Activities service", () => {
@@ -33,7 +33,7 @@ describe("Activities service", () => {
 
         expect(status).toEqual(CommandStatus.success());
         expect(recordEvents.data).toEqual([
-          ActivityLoggedEvent.createTestData(),
+          ActivityLoggedEventDto.createTestData(),
         ]);
       });
 
@@ -48,7 +48,7 @@ describe("Activities service", () => {
 
         expect(status).toEqual(CommandStatus.success());
         expect(recordEvents.data).toEqual([
-          ActivityLoggedEvent.createTestData({ notes: "Lorem ipsum" }),
+          ActivityLoggedEventDto.createTestData({ notes: "Lorem ipsum" }),
         ]);
       });
 
@@ -82,7 +82,7 @@ describe("Activities service", () => {
 
     it("Returns last activity", async () => {
       const eventStore = EventStore.createNull({
-        events: [[ActivityLoggedEvent.createTestData()]],
+        events: [[ActivityLoggedEventDto.createTestData()]],
       });
       const service = ActivitiesService.createNull({
         eventStore,
@@ -107,7 +107,7 @@ describe("Activities service", () => {
       const eventStore = EventStore.createNull({
         events: [
           timestamps.map((timestamp) =>
-            ActivityLoggedEvent.createTestData({ timestamp }),
+            ActivityLoggedEventDto.createTestData({ timestamp }),
           ),
         ],
       });
@@ -180,7 +180,7 @@ describe("Activities service", () => {
       const eventStore = EventStore.createNull({
         events: [
           timestamps.map((timestamp) =>
-            ActivityLoggedEvent.createTestData({ timestamp }),
+            ActivityLoggedEventDto.createTestData({ timestamp }),
           ),
         ],
       });
@@ -223,17 +223,17 @@ describe("Activities service", () => {
       const eventStore = EventStore.createNull({
         events: [
           [
-            ActivityLoggedEvent.createTestData({
+            ActivityLoggedEventDto.createTestData({
               timestamp: "2025-06-25T15:00:00Z",
               client: "Client 2",
               duration: "PT7H",
             }),
-            ActivityLoggedEvent.createTestData({
+            ActivityLoggedEventDto.createTestData({
               timestamp: "2025-06-26T15:00:00Z",
               client: "Client 1",
               duration: "PT5H",
             }),
-            ActivityLoggedEvent.createTestData({
+            ActivityLoggedEventDto.createTestData({
               timestamp: "2025-06-27T15:00:00Z",
               client: "Client 1",
               duration: "PT3H",
@@ -265,31 +265,31 @@ describe("Activities service", () => {
       const eventStore = EventStore.createNull({
         events: [
           [
-            ActivityLoggedEvent.createTestData({
+            ActivityLoggedEventDto.createTestData({
               timestamp: "2025-06-02T15:00:00Z",
               client: "Client 2",
               project: "Project B",
               duration: "PT8H",
             }),
-            ActivityLoggedEvent.createTestData({
+            ActivityLoggedEventDto.createTestData({
               timestamp: "2025-06-03T15:00:00Z",
               client: "Client 1",
               project: "Project A",
               duration: "PT9H",
             }),
-            ActivityLoggedEvent.createTestData({
+            ActivityLoggedEventDto.createTestData({
               timestamp: "2025-06-04T15:00:00Z",
               client: "Client 2",
               project: "Project B",
               duration: "PT8H",
             }),
-            ActivityLoggedEvent.createTestData({
+            ActivityLoggedEventDto.createTestData({
               timestamp: "2025-06-05T15:00:00Z",
               client: "Client 1",
               project: "Project A",
               duration: "PT9H",
             }),
-            ActivityLoggedEvent.createTestData({
+            ActivityLoggedEventDto.createTestData({
               timestamp: "2025-06-06T15:00:00Z",
               client: "Client 2",
               project: "Project B",
@@ -326,17 +326,17 @@ describe("Activities service", () => {
       const eventStore = EventStore.createNull({
         events: [
           [
-            ActivityLoggedEvent.createTestData({
+            ActivityLoggedEventDto.createTestData({
               timestamp: "2025-06-25T15:00:00Z",
               task: "Task 2",
               duration: "PT7H",
             }),
-            ActivityLoggedEvent.createTestData({
+            ActivityLoggedEventDto.createTestData({
               timestamp: "2025-06-26T15:00:00Z",
               task: "Task 1",
               duration: "PT5H",
             }),
-            ActivityLoggedEvent.createTestData({
+            ActivityLoggedEventDto.createTestData({
               timestamp: "2025-06-27T15:00:00Z",
               task: "Task 1",
               duration: "PT3H",
@@ -375,23 +375,23 @@ describe("Activities service", () => {
       const eventStore = EventStore.createNull({
         events: [
           [
-            ActivityLoggedEvent.createTestData({
+            ActivityLoggedEventDto.createTestData({
               timestamp: "2025-06-02T15:00:00Z",
               duration: "PT8H",
             }),
-            ActivityLoggedEvent.createTestData({
+            ActivityLoggedEventDto.createTestData({
               timestamp: "2025-06-03T15:00:00Z",
               duration: "PT9H",
             }),
-            ActivityLoggedEvent.createTestData({
+            ActivityLoggedEventDto.createTestData({
               timestamp: "2025-06-04T15:00:00Z",
               duration: "PT8H",
             }),
-            ActivityLoggedEvent.createTestData({
+            ActivityLoggedEventDto.createTestData({
               timestamp: "2025-06-05T15:00:00Z",
               duration: "PT9H",
             }),
-            ActivityLoggedEvent.createTestData({
+            ActivityLoggedEventDto.createTestData({
               timestamp: "2025-06-06T15:00:00Z",
               duration: "PT8H",
             }),
@@ -432,33 +432,33 @@ describe("Activities service", () => {
         events: [
           [
             // monday, only same tasks
-            ActivityLoggedEvent.createTestData({
+            ActivityLoggedEventDto.createTestData({
               timestamp: "2025-06-02T10:00:00Z",
             }),
-            ActivityLoggedEvent.createTestData({
+            ActivityLoggedEventDto.createTestData({
               timestamp: "2025-06-02T10:30:00Z",
             }),
             // tuesday, different tasks
-            ActivityLoggedEvent.createTestData({
+            ActivityLoggedEventDto.createTestData({
               timestamp: "2025-06-03T10:00:00Z",
             }),
-            ActivityLoggedEvent.createTestData({
+            ActivityLoggedEventDto.createTestData({
               timestamp: "2025-06-03T10:30:00Z",
               task: "Other task",
             }),
             // wednesday, different projects
-            ActivityLoggedEvent.createTestData({
+            ActivityLoggedEventDto.createTestData({
               timestamp: "2025-06-04T10:00:00Z",
             }),
-            ActivityLoggedEvent.createTestData({
+            ActivityLoggedEventDto.createTestData({
               timestamp: "2025-06-04T10:30:00Z",
               project: "Other project",
             }),
             // thursday, different clients
-            ActivityLoggedEvent.createTestData({
+            ActivityLoggedEventDto.createTestData({
               timestamp: "2025-06-05T10:00:00Z",
             }),
-            ActivityLoggedEvent.createTestData({
+            ActivityLoggedEventDto.createTestData({
               timestamp: "2025-06-05T10:30:00Z",
               client: "Other client",
             }),
@@ -519,7 +519,7 @@ describe("Activities service", () => {
       const eventStore = EventStore.createNull({
         events: [
           timestamps.map((timestamp) =>
-            ActivityLoggedEvent.createTestData({ timestamp }),
+            ActivityLoggedEventDto.createTestData({ timestamp }),
           ),
         ],
       });
@@ -538,15 +538,15 @@ describe("Activities service", () => {
       const eventStore = EventStore.createNull({
         events: [
           [
-            ActivityLoggedEvent.createTestData({
+            ActivityLoggedEventDto.createTestData({
               timestamp: "2025-06-09T14:00:00Z",
               duration: "PT8H",
             }),
-            ActivityLoggedEvent.createTestData({
+            ActivityLoggedEventDto.createTestData({
               timestamp: "2025-06-10T14:00:00Z",
               duration: "PT8H",
             }),
-            ActivityLoggedEvent.createTestData({
+            ActivityLoggedEventDto.createTestData({
               timestamp: "2025-06-11T14:00:00Z",
               duration: "PT8H",
             }),
@@ -577,15 +577,15 @@ describe("Activities service", () => {
         const eventStore = EventStore.createNull({
           events: [
             [
-              ActivityLoggedEvent.createTestData({
+              ActivityLoggedEventDto.createTestData({
                 timestamp: "2025-06-10T14:00:00Z",
                 duration: "PT8H",
               }),
-              ActivityLoggedEvent.createTestData({
+              ActivityLoggedEventDto.createTestData({
                 timestamp: "2025-06-11T14:00:00Z",
                 duration: "PT8H",
               }),
-              ActivityLoggedEvent.createTestData({
+              ActivityLoggedEventDto.createTestData({
                 timestamp: "2025-06-12T14:00:00Z",
                 duration: "PT8H",
               }),
@@ -619,15 +619,15 @@ describe("Activities service", () => {
         const eventStore = EventStore.createNull({
           events: [
             [
-              ActivityLoggedEvent.createTestData({
+              ActivityLoggedEventDto.createTestData({
                 timestamp: "2025-06-10T14:00:00Z",
                 duration: "PT6H",
               }),
-              ActivityLoggedEvent.createTestData({
+              ActivityLoggedEventDto.createTestData({
                 timestamp: "2025-06-11T14:00:00Z",
                 duration: "PT6H",
               }),
-              ActivityLoggedEvent.createTestData({
+              ActivityLoggedEventDto.createTestData({
                 timestamp: "2025-06-12T14:00:00Z",
                 duration: "PT6H",
               }),
@@ -661,15 +661,15 @@ describe("Activities service", () => {
         const eventStore = EventStore.createNull({
           events: [
             [
-              ActivityLoggedEvent.createTestData({
+              ActivityLoggedEventDto.createTestData({
                 timestamp: "2025-06-10T14:00:00Z",
                 duration: "PT10H",
               }),
-              ActivityLoggedEvent.createTestData({
+              ActivityLoggedEventDto.createTestData({
                 timestamp: "2025-06-11T14:00:00Z",
                 duration: "PT10H",
               }),
-              ActivityLoggedEvent.createTestData({
+              ActivityLoggedEventDto.createTestData({
                 timestamp: "2025-06-12T14:00:00Z",
                 duration: "PT10H",
               }),

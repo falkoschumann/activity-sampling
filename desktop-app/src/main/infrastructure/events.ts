@@ -3,6 +3,8 @@
 import Ajv from "ajv";
 import addFormats from "ajv-formats";
 
+import { ActivityLoggedEvent } from "../domain/activities";
+
 const ACTIVITY_LOGGED_EVENT_SCHEMA = {
   type: "object",
   properties: {
@@ -20,7 +22,7 @@ const ACTIVITY_LOGGED_EVENT_SCHEMA = {
 const ajv = new Ajv();
 addFormats(ajv);
 
-export class ActivityLoggedEvent {
+export class ActivityLoggedEventDto {
   static create({
     timestamp,
     duration,
@@ -28,15 +30,22 @@ export class ActivityLoggedEvent {
     project,
     task,
     notes,
-  }: ActivityLoggedEvent): ActivityLoggedEvent {
-    return new ActivityLoggedEvent({
+  }: {
+    timestamp: string;
+    duration: string;
+    client: string;
+    project: string;
+    task: string;
+    notes?: string;
+  }): ActivityLoggedEventDto {
+    return new ActivityLoggedEventDto(
       timestamp,
       duration,
       client,
       project,
       task,
       notes,
-    });
+    );
   }
 
   static createTestData({
@@ -46,14 +55,21 @@ export class ActivityLoggedEvent {
     project = "Test project",
     task = "Test task",
     notes,
-  }: Partial<ActivityLoggedEvent> = {}): ActivityLoggedEvent {
-    return { timestamp, duration, client, project, task, notes };
+  }: Partial<ActivityLoggedEventDto> = {}): ActivityLoggedEventDto {
+    return new ActivityLoggedEventDto(
+      timestamp,
+      duration,
+      client,
+      project,
+      task,
+      notes,
+    );
   }
 
-  static from(data: unknown): ActivityLoggedEvent {
+  static fromJson(data: unknown): ActivityLoggedEventDto {
     const valid = ajv.validate(ACTIVITY_LOGGED_EVENT_SCHEMA, data);
     if (valid) {
-      return ActivityLoggedEvent.create(data as ActivityLoggedEvent);
+      return ActivityLoggedEventDto.create(data as ActivityLoggedEventDto);
     }
 
     const errors = JSON.stringify(ajv.errors, null, 2);
@@ -67,12 +83,30 @@ export class ActivityLoggedEvent {
   readonly task: string;
   readonly notes?: string;
 
-  constructor(data: ActivityLoggedEvent) {
-    this.timestamp = data.timestamp;
-    this.duration = data.duration;
-    this.client = data.client;
-    this.project = data.project;
-    this.task = data.task;
-    this.notes = data.notes;
+  constructor(
+    timestamp: string,
+    duration: string,
+    client: string,
+    project: string,
+    task: string,
+    notes?: string,
+  ) {
+    this.timestamp = timestamp;
+    this.duration = duration;
+    this.client = client;
+    this.project = project;
+    this.task = task;
+    this.notes = notes;
+  }
+
+  validate(): ActivityLoggedEvent {
+    return new ActivityLoggedEvent(
+      this.timestamp,
+      this.duration,
+      this.client,
+      this.project,
+      this.task,
+      this.notes,
+    );
   }
 }

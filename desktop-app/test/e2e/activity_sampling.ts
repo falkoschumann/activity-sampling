@@ -20,7 +20,7 @@ import {
   StopTimerCommand,
 } from "../../src/main/domain/timer";
 import { EventStore } from "../../src/main/infrastructure/event_store";
-import { ActivityLoggedEvent } from "../../src/main/infrastructure/events";
+import { ActivityLoggedEventDto } from "../../src/main/infrastructure/events";
 
 export function createActivitySampling({
   now = "2025-08-26T14:00:00Z",
@@ -240,14 +240,16 @@ class LogDsl {
     const task = args.task ?? "Test task";
     const notes = args.notes;
 
-    await this.#activitiesDriver.assertActivityLogged({
-      timestamp,
-      duration,
-      client,
-      project,
-      task,
-      notes,
-    });
+    await this.#activitiesDriver.assertActivityLogged(
+      ActivityLoggedEventDto.create({
+        timestamp,
+        duration,
+        client,
+        project,
+        task,
+        notes,
+      }),
+    );
   }
 
   //
@@ -302,7 +304,7 @@ class ActivitiesDriver {
     await this.#eventStore.record(event);
   }
 
-  async assertActivityLogged(event: ActivityLoggedEvent) {
+  async assertActivityLogged(event: ActivityLoggedEventDto) {
     const events = await arrayFromAsync(this.#eventStore.replay());
     expect(events).toEqual([event]);
   }
