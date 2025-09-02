@@ -26,6 +26,9 @@ export default function LogPage() {
 
   async function handleSubmitActivity(formData: ActivityFormData) {
     console.log("Submitted activity:", formData);
+    // TODO get current timestamp from countdown
+    // TODO get duration from countdown
+    // TODO check status
     await window.activitySampling.logActivity(
       LogActivityCommandDto.from({
         timestamp: Temporal.Now.instant(),

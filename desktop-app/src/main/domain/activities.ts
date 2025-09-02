@@ -2,6 +2,8 @@
 
 import { Temporal } from "@js-temporal/polyfill";
 
+// TODO think about using createTestInstance with logically dependency
+
 export class LogActivityCommand {
   static createTestInstance({
     timestamp = "2025-08-14T11:00:00Z",

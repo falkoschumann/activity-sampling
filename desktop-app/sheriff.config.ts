@@ -18,6 +18,7 @@ export const config: SheriffConfig = {
     "src/main/domain": ["layer:domain"],
     "src/main/infrastructure": ["layer:infrastructure"],
     "src/preload": ["layer:ui"],
+    // TODO render should be humble-view
     "src/renderer": ["layer:ui"], //TODO should
   },
   depRules: {
