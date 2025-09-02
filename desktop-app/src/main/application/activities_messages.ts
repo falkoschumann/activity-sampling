@@ -13,39 +13,25 @@ import {
 } from "../domain/activities";
 
 export class LogActivityCommandDto {
-  static create({
-    timestamp,
-    duration,
-    client,
-    project,
-    task,
-    notes,
-  }: {
-    timestamp: string;
-    duration: string;
-    client: string;
-    project: string;
-    task: string;
-    notes?: string;
-  }): LogActivityCommandDto {
+  static create(dto: LogActivityCommandDto): LogActivityCommandDto {
     return new LogActivityCommandDto(
-      timestamp,
-      duration,
-      client,
-      project,
-      task,
-      notes,
+      dto.timestamp,
+      dto.duration,
+      dto.client,
+      dto.project,
+      dto.task,
+      dto.notes,
     );
   }
 
-  static from(command: LogActivityCommand): LogActivityCommandDto {
+  static from(model: LogActivityCommand): LogActivityCommandDto {
     return new LogActivityCommandDto(
-      command.timestamp.toString(),
-      command.duration.toString(),
-      command.client,
-      command.project,
-      command.task,
-      command.notes,
+      model.timestamp.toString(),
+      model.duration.toString(),
+      model.client,
+      model.project,
+      model.task,
+      model.notes,
     );
   }
 
@@ -85,18 +71,12 @@ export class LogActivityCommandDto {
 }
 
 export class CommandStatusDto {
-  static create({
-    success,
-    errorMessage,
-  }: {
-    success: boolean;
-    errorMessage?: string;
-  }): CommandStatusDto {
-    return new CommandStatusDto(success, errorMessage);
+  static create(dto: CommandStatusDto): CommandStatusDto {
+    return new CommandStatusDto(dto.success, dto.errorMessage);
   }
 
-  static from(status: CommandStatus): CommandStatusDto {
-    return new CommandStatusDto(status.success, status.errorMessage);
+  static from(model: CommandStatus): CommandStatusDto {
+    return new CommandStatusDto(model.success, model.errorMessage);
   }
 
   readonly success: boolean;
@@ -113,14 +93,12 @@ export class CommandStatusDto {
 }
 
 export class RecentActivitiesQueryDto {
-  static create({
-    timeZone,
-  }: { timeZone?: string } = {}): RecentActivitiesQueryDto {
-    return new RecentActivitiesQueryDto(timeZone);
+  static create(dto: RecentActivitiesQueryDto): RecentActivitiesQueryDto {
+    return new RecentActivitiesQueryDto(dto.timeZone);
   }
 
-  static from(query: RecentActivitiesQuery): RecentActivitiesQueryDto {
-    return new RecentActivitiesQueryDto(query.timeZone?.toString());
+  static from(model: RecentActivitiesQuery): RecentActivitiesQueryDto {
+    return new RecentActivitiesQueryDto(model.timeZone?.toString());
   }
 
   readonly timeZone?: string;
@@ -135,59 +113,23 @@ export class RecentActivitiesQueryDto {
 }
 
 export class RecentActivitiesQueryResultDto {
-  static create({
-    workingDays,
-    timeSummary,
-    lastActivity,
-  }: {
-    workingDays: WorkingDayDto[];
-    timeSummary: TimeSummaryDto;
-    lastActivity?: ActivityDto;
-  }): RecentActivitiesQueryResultDto {
+  static create(
+    dto: RecentActivitiesQueryResultDto,
+  ): RecentActivitiesQueryResultDto {
     return new RecentActivitiesQueryResultDto(
-      workingDays,
-      timeSummary,
-      lastActivity,
+      dto.workingDays,
+      dto.timeSummary,
+      dto.lastActivity,
     );
   }
 
   static from(
-    result: RecentActivitiesQueryResult,
+    model: RecentActivitiesQueryResult,
   ): RecentActivitiesQueryResultDto {
     return new RecentActivitiesQueryResultDto(
-      result.workingDays.map(
-        (workingDay) =>
-          new WorkingDayDto(
-            workingDay.date.toString(),
-            workingDay.activities.map(
-              (activity) =>
-                new ActivityDto(
-                  activity.dateTime.toString(),
-                  activity.duration.toString(),
-                  activity.client,
-                  activity.project,
-                  activity.task,
-                  activity.notes,
-                ),
-            ),
-          ),
-      ),
-      new TimeSummaryDto(
-        result.timeSummary.hoursToday.toString(),
-        result.timeSummary.hoursYesterday.toString(),
-        result.timeSummary.hoursThisWeek.toString(),
-        result.timeSummary.hoursThisMonth.toString(),
-      ),
-      result.lastActivity
-        ? new ActivityDto(
-            result.lastActivity.dateTime.toString(),
-            result.lastActivity.duration.toString(),
-            result.lastActivity.client,
-            result.lastActivity.project,
-            result.lastActivity.task,
-            result.lastActivity.notes,
-          )
-        : undefined,
+      model.workingDays.map((workingDay) => WorkingDayDto.from(workingDay)),
+      TimeSummaryDto.from(model.timeSummary),
+      ActivityDto.from(model.lastActivity),
     );
   }
 
@@ -207,14 +149,27 @@ export class RecentActivitiesQueryResultDto {
 
   validate() {
     return new RecentActivitiesQueryResult(
-      this.workingDays.map((workingDay) => workingDay.validate()),
-      this.timeSummary.validate(),
-      this.lastActivity?.validate(),
+      this.workingDays.map((workingDay) =>
+        WorkingDayDto.create(workingDay).validate(),
+      ),
+      TimeSummaryDto.create(this.timeSummary).validate(),
+      ActivityDto.create(this.lastActivity)?.validate(),
     );
   }
 }
 
 export class WorkingDayDto {
+  static create(workingDay: WorkingDayDto): WorkingDayDto {
+    return new WorkingDayDto(workingDay.date, workingDay.activities);
+  }
+
+  static from(model: WorkingDay): WorkingDayDto {
+    return new WorkingDayDto(
+      model.date.toString(),
+      model.activities.map((activity) => ActivityDto.from(activity)!),
+    );
+  }
+
   readonly date: string;
   readonly activities: ActivityDto[];
 
@@ -226,12 +181,30 @@ export class WorkingDayDto {
   validate(): WorkingDay {
     return new WorkingDay(
       Temporal.PlainDate.from(this.date),
-      this.activities.map((activity) => activity.validate()),
+      this.activities.map((dto) => ActivityDto.create(dto)!.validate()),
     );
   }
 }
 
 export class TimeSummaryDto {
+  static create(dto: TimeSummaryDto): TimeSummaryDto {
+    return new TimeSummaryDto(
+      dto.hoursToday,
+      dto.hoursYesterday,
+      dto.hoursThisWeek,
+      dto.hoursThisMonth,
+    );
+  }
+
+  static from(model: TimeSummary): TimeSummaryDto {
+    return new TimeSummaryDto(
+      model.hoursToday.toString(),
+      model.hoursYesterday.toString(),
+      model.hoursThisWeek.toString(),
+      model.hoursThisMonth.toString(),
+    );
+  }
+
   readonly hoursToday: string;
   readonly hoursYesterday: string;
   readonly hoursThisWeek: string;
@@ -260,22 +233,34 @@ export class TimeSummaryDto {
 }
 
 export class ActivityDto {
-  static create({
-    dateTime,
-    duration,
-    client,
-    project,
-    task,
-    notes,
-  }: {
-    dateTime: string;
-    duration: string;
-    client: string;
-    project: string;
-    task: string;
-    notes?: string;
-  }): ActivityDto {
-    return new ActivityDto(dateTime, duration, client, project, task, notes);
+  static create(dto?: ActivityDto): ActivityDto | undefined {
+    if (dto == null) {
+      return;
+    }
+
+    return new ActivityDto(
+      dto.dateTime,
+      dto.duration,
+      dto.client,
+      dto.project,
+      dto.task,
+      dto.notes,
+    );
+  }
+
+  static from(model?: Activity): ActivityDto | undefined {
+    if (!model) {
+      return;
+    }
+
+    return new ActivityDto(
+      model.dateTime.toString(),
+      model.duration.toString(),
+      model.client,
+      model.project,
+      model.task,
+      model.notes,
+    );
   }
 
   readonly dateTime: string;

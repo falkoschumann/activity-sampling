@@ -1,18 +1,18 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
-import type { CommandStatus } from "../main/common/messages";
-import type {
-  LogActivityCommand,
-  RecentActivitiesQuery,
-  RecentActivitiesQueryResult,
-} from "../main/domain/activities";
+import {
+  type CommandStatusDto,
+  LogActivityCommandDto,
+  RecentActivitiesQueryDto,
+  RecentActivitiesQueryResultDto,
+} from "../main/application/activities_messages";
 
 export interface ActivitySampling {
-  logActivity(command: LogActivityCommand): Promise<CommandStatus>;
+  logActivity(command: LogActivityCommandDto): Promise<CommandStatusDto>;
 
   queryRecentActivities(
-    query: RecentActivitiesQuery,
-  ): Promise<RecentActivitiesQueryResult>;
+    query: RecentActivitiesQueryDto,
+  ): Promise<RecentActivitiesQueryResultDto>;
 }
 
 declare global {

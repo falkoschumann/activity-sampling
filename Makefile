@@ -62,7 +62,7 @@ $(SUBDIRS): force
 	@$(MAKE) -C $@ $(TARGET)
 
 $(DIAGRAM_FILES): %.png: %.puml
-	plantuml $^ || echo "Error: PlantUML generation failed"
+	plantuml $^
 
 force: ;
 

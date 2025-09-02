@@ -2,6 +2,11 @@
 
 import { Temporal } from "@js-temporal/polyfill";
 import { useEffect, useState } from "react";
+import {
+  LogActivityCommandDto,
+  RecentActivitiesQueryDto,
+  RecentActivitiesQueryResultDto,
+} from "../../../main/application/activities_messages";
 
 import { RecentActivitiesQueryResult } from "../../../main/domain/activities";
 import ScrollToTopButton from "../../components/scroll_to_top_button";
@@ -21,17 +26,21 @@ export default function LogPage() {
 
   async function handleSubmitActivity(formData: ActivityFormData) {
     console.log("Submitted activity:", formData);
-    await window.activitySampling.logActivity({
-      timestamp: Temporal.Now.instant(),
-      duration: Temporal.Duration.from("PT30M"),
-      ...formData,
-    });
+    await window.activitySampling.logActivity(
+      LogActivityCommandDto.from({
+        timestamp: Temporal.Now.instant(),
+        duration: Temporal.Duration.from("PT30M"),
+        ...formData,
+      }),
+    );
     void queryRecentActivities();
   }
 
   async function queryRecentActivities() {
-    const result = await window.activitySampling.queryRecentActivities({});
-    console.log(JSON.stringify(result));
+    const dto = await window.activitySampling.queryRecentActivities(
+      new RecentActivitiesQueryDto(),
+    );
+    const result = RecentActivitiesQueryResultDto.create(dto).validate();
     setRecentActivities(result);
   }
 

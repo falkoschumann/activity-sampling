@@ -11,10 +11,7 @@ export default function WorkingDaysComponent({
   workingDays: WorkingDay[];
 }) {
   return workingDays.map((workingDay) => (
-    <WorkingDayComponent
-      key={Temporal.PlainDate.from(workingDay.date).toString()}
-      {...workingDay}
-    />
+    <WorkingDayComponent key={workingDay.date.toString()} {...workingDay} />
   ));
 }
 
@@ -22,22 +19,19 @@ function WorkingDayComponent({
   date,
   activities,
 }: {
-  date: Temporal.PlainDateLike;
+  date: Temporal.PlainDate;
   activities: Activity[];
 }) {
   return (
     <div className="mt-4">
       <h6 className="m-0 p-2 sticky-top bg-body-tertiary">
-        {Temporal.PlainDate.from(date).toLocaleString(undefined, {
+        {date.toLocaleString(undefined, {
           dateStyle: "full",
         })}
       </h6>
       <ul className="list-group list-group-flush">
         {activities.map((activity) => (
-          <ActivityComponent
-            key={Temporal.PlainDateTime.from(activity.dateTime).toString()}
-            {...activity}
-          />
+          <ActivityComponent key={activity.dateTime.toString()} {...activity} />
         ))}
       </ul>
     </div>
@@ -51,7 +45,7 @@ function ActivityComponent({
   task,
   notes,
 }: {
-  dateTime: Temporal.PlainDateTimeLike | string;
+  dateTime: Temporal.PlainDateTime;
   client: string;
   project: string;
   task: string;

@@ -18,7 +18,7 @@ export const config: SheriffConfig = {
     "src/main/domain": ["layer:domain"],
     "src/main/infrastructure": ["layer:infrastructure"],
     "src/preload": ["layer:ui"],
-    "src/renderer": ["layer:humble-view"],
+    "src/renderer": ["layer:ui"], //TODO should
   },
   depRules: {
     // root is a virtual module, which contains all files not being part

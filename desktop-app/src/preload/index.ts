@@ -1,12 +1,6 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
 import { contextBridge, ipcRenderer } from "electron";
-import type { CommandStatus } from "../main/common/messages";
-
-import {
-  type LogActivityCommand,
-  type RecentActivitiesQuery,
-} from "../main/domain/activities";
 import {
   CommandStatusDto,
   LogActivityCommandDto,
@@ -15,18 +9,15 @@ import {
 } from "../main/application/activities_messages";
 
 contextBridge.exposeInMainWorld("activitySampling", {
-  logActivity: async (command: LogActivityCommand): Promise<CommandStatus> => {
-    const commandDto = LogActivityCommandDto.from(command);
-    const statusDto = await ipcRenderer.invoke("logActivity", commandDto);
-    return CommandStatusDto.create(statusDto).validate();
+  logActivity: async (
+    command: LogActivityCommandDto,
+  ): Promise<CommandStatusDto> => {
+    return ipcRenderer.invoke("logActivity", command);
   },
 
-  queryRecentActivities: async (query: RecentActivitiesQuery) => {
-    const queryDto = RecentActivitiesQueryDto.from(query);
-    const resultDto = await ipcRenderer.invoke(
-      "queryRecentActivities",
-      queryDto,
-    );
-    return RecentActivitiesQueryResultDto.create(resultDto).validate();
+  queryRecentActivities: async (
+    query: RecentActivitiesQueryDto,
+  ): Promise<RecentActivitiesQueryResultDto> => {
+    return ipcRenderer.invoke("queryRecentActivities", query);
   },
 });
