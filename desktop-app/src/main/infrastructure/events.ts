@@ -3,7 +3,7 @@
 import Ajv from "ajv";
 import addFormats from "ajv-formats";
 
-import { ActivityLoggedEvent } from "../domain/activities";
+import { ActivityLoggedEvent } from "../../shared/domain/activities";
 
 const ACTIVITY_LOGGED_EVENT_SCHEMA = {
   type: "object",

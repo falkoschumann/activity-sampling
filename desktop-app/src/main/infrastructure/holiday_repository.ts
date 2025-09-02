@@ -7,7 +7,7 @@ import Ajv from "ajv";
 import addFormats from "ajv-formats";
 import { parse } from "csv";
 import { stringify as syncStringify } from "csv-stringify/sync";
-import { ConfigurableResponses } from "../common/configurable_responses";
+import { ConfigurableResponses } from "../../shared/common/configurable_responses";
 
 import type { Holiday } from "../domain/calendar";
 

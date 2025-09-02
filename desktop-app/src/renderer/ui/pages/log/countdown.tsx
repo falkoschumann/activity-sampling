@@ -1,6 +1,9 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
-import { formatDuration, FormatStyle } from "../../../main/common/temporal";
+import {
+  formatDuration,
+  FormatStyle,
+} from "../../../../shared/common/temporal";
 
 export default function CountdownComponent({
   remaining,

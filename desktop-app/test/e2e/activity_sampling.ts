@@ -6,13 +6,13 @@ import { expect } from "vitest";
 
 import { ActivitiesService } from "../../src/main/application/activities_service";
 import { TimerService } from "../../src/main/application/timer_service";
-import { arrayFromAsync } from "../../src/main/common/polyfills";
-import { Clock } from "../../src/main/common/temporal";
+import { arrayFromAsync } from "../../src/shared/common/polyfills";
+import { Clock } from "../../src/shared/common/temporal";
 import {
   type LogActivityCommand,
   type RecentActivitiesQuery,
   type RecentActivitiesQueryResult,
-} from "../../src/main/domain/activities";
+} from "../../src/shared/domain/activities";
 import {
   type CurrentIntervalQuery,
   type CurrentIntervalQueryResult,

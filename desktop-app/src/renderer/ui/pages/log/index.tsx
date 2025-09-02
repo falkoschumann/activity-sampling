@@ -1,23 +1,21 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
 import { Temporal } from "@js-temporal/polyfill";
-import { useEffect, useState } from "react";
-import {
-  LogActivityCommandDto,
-  RecentActivitiesQueryDto,
-  RecentActivitiesQueryResultDto,
-} from "../../../main/application/activities_messages";
 
-import { RecentActivitiesQueryResult } from "../../../main/domain/activities";
+import { LogActivityCommand } from "../../../../shared/domain/activities";
+import {
+  useLogActivity,
+  useRecentActivities,
+} from "../../../application/activities_service";
 import ScrollToTopButton from "../../components/scroll_to_top_button";
 import ActivityFormComponent, { type ActivityFormData } from "./activity_form";
 import CountdownComponent from "./countdown";
-import WorkingDaysComponent from "./working_days";
 import TimeSummaryComponent from "./time_summary";
+import WorkingDaysComponent from "./working_days";
 
 export default function LogPage() {
-  const [recentActivities, setRecentActivities] =
-    useState<RecentActivitiesQueryResult>(RecentActivitiesQueryResult.empty());
+  const [logActivity] = useLogActivity();
+  const [recentActivities, queryRecentActivities] = useRecentActivities();
 
   const countdown = {
     remaining: "PT18M36S",
@@ -29,27 +27,19 @@ export default function LogPage() {
     // TODO get current timestamp from countdown
     // TODO get duration from countdown
     // TODO check status
-    await window.activitySampling.logActivity(
-      LogActivityCommandDto.from({
-        timestamp: Temporal.Now.instant(),
-        duration: Temporal.Duration.from("PT30M"),
-        ...formData,
-      }),
+    logActivity(
+      new LogActivityCommand(
+        Temporal.Now.instant(),
+        Temporal.Duration.from("PT30M"),
+        formData.client,
+        formData.project,
+        formData.task,
+        formData.notes,
+      ),
     );
-    void queryRecentActivities();
-  }
 
-  async function queryRecentActivities() {
-    const dto = await window.activitySampling.queryRecentActivities(
-      new RecentActivitiesQueryDto(),
-    );
-    const result = RecentActivitiesQueryResultDto.create(dto).validate();
-    setRecentActivities(result);
+    queryRecentActivities({});
   }
-
-  useEffect(() => {
-    void queryRecentActivities();
-  }, []);
 
   return (
     <>
@@ -67,7 +57,7 @@ export default function LogPage() {
           <button
             className="btn"
             title="Refresh logged activities."
-            onClick={queryRecentActivities}
+            onClick={() => queryRecentActivities({})}
           >
             <i className="bi bi-arrow-clockwise"></i>
           </button>

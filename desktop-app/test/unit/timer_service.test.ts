@@ -4,7 +4,7 @@ import { Temporal } from "@js-temporal/polyfill";
 import { describe, expect, it } from "vitest";
 
 import { TimerService } from "../../src/main/application/timer_service";
-import { Clock } from "../../src/main/common/temporal";
+import { Clock } from "../../src/shared/common/temporal";
 import {
   CurrentIntervalQuery,
   StartTimerCommand,

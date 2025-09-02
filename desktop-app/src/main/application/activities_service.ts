@@ -2,8 +2,8 @@
 
 import { Temporal } from "@js-temporal/polyfill";
 
-import { CommandStatus } from "../common/messages";
-import { Clock, normalizeDuration } from "../common/temporal";
+import { CommandStatus } from "../../shared/common/messages";
+import { Clock, normalizeDuration } from "../../shared/common/temporal";
 import {
   Activity,
   type LogActivityCommand,
@@ -17,7 +17,7 @@ import {
   type TimesheetQuery,
   type TimesheetQueryResult,
   type WorkingDay,
-} from "../domain/activities";
+} from "../../shared/domain/activities";
 import { Calendar, type Holiday } from "../domain/calendar";
 import { EventStore } from "../infrastructure/event_store";
 import { ActivityLoggedEventDto } from "../infrastructure/events";

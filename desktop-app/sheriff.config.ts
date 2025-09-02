@@ -14,12 +14,18 @@ export const config: SheriffConfig = {
   modules: {
     "src/main": ["layer:entry"],
     "src/main/application": ["layer:application"],
-    "src/main/common": ["layer:common"],
     "src/main/domain": ["layer:domain"],
     "src/main/infrastructure": ["layer:infrastructure"],
-    "src/preload": ["layer:ui"],
-    // TODO render should be humble-view
-    "src/renderer": ["layer:ui"], //TODO should
+
+    "src/preload": ["layer:application"],
+
+    "src/renderer": ["layer:entry"],
+    "src/renderer/application": ["layer:application"],
+    "src/renderer/ui": ["layer:ui"],
+
+    "src/shared/common": ["layer:common"],
+    "src/shared/domain": ["layer:domain"],
+    "src/shared/infrastructure": ["layer:infrastructure"],
   },
   depRules: {
     // root is a virtual module, which contains all files not being part
@@ -30,7 +36,6 @@ export const config: SheriffConfig = {
     // add your dependency rules here
     "layer:entry": ["layer:*"],
     "layer:ui": ["layer:application", "layer:domain"],
-    "layer:humble-view": ["layer:domain"],
     "layer:application": ["layer:domain", "layer:infrastructure"],
     "layer:infrastructure": ["layer:domain"],
     "layer:*": ["layer:common"],

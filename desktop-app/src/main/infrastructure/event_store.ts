@@ -7,8 +7,8 @@ import stream from "node:stream";
 import { parse, stringify } from "csv";
 import { stringify as syncStringify } from "csv-stringify/sync";
 
-import { ConfigurableResponses } from "../common/configurable_responses";
-import { OutputTracker } from "../common/output_tracker";
+import { ConfigurableResponses } from "../../shared/common/configurable_responses";
+import { OutputTracker } from "../../shared/common/output_tracker";
 
 // TODO use upper case properties for CSV header
 

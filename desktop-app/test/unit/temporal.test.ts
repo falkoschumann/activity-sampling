@@ -2,7 +2,7 @@
 
 import { describe, expect, it } from "vitest";
 
-import { Clock, normalizeDuration } from "../../src/main/common/temporal";
+import { Clock, normalizeDuration } from "../../src/shared/common/temporal";
 import { Temporal } from "@js-temporal/polyfill";
 
 describe("Temporal", () => {

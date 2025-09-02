@@ -6,7 +6,7 @@ import { describe, expect, it } from "vitest";
 
 import { EventStore } from "../../src/main/infrastructure/event_store";
 import { ActivityLoggedEventDto } from "../../src/main/infrastructure/events";
-import { arrayFromAsync } from "../../src/main/common/polyfills";
+import { arrayFromAsync } from "../../src/shared/common/polyfills";
 
 const TEST_FILE = "testdata/event_store_test.csv";
 

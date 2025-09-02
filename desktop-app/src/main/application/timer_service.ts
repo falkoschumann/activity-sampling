@@ -2,8 +2,8 @@
 
 import { Temporal } from "@js-temporal/polyfill";
 
-import { CommandStatus } from "../common/messages";
-import { Clock } from "../common/temporal";
+import { CommandStatus } from "../../shared/common/messages";
+import { Clock } from "../../shared/common/temporal";
 import {
   type CurrentIntervalQuery,
   CurrentIntervalQueryResult,

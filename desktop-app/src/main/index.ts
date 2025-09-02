@@ -14,7 +14,7 @@ import {
   LogActivityCommandDto,
   RecentActivitiesQueryDto,
   RecentActivitiesQueryResultDto,
-} from "./application/activities_messages";
+} from "../shared/infrastructure/activities_messages";
 
 app.whenReady().then(() => {
   installDevTools();

@@ -6,7 +6,7 @@ import {
   LogActivityCommandDto,
   RecentActivitiesQueryDto,
   RecentActivitiesQueryResultDto,
-} from "../main/application/activities_messages";
+} from "../shared/infrastructure/activities_messages";
 
 contextBridge.exposeInMainWorld("activitySampling", {
   logActivity: async (

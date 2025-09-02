@@ -2,7 +2,7 @@
 
 import { describe, it } from "vitest";
 
-import { arrayFromAsync } from "../../src/main/common/polyfills";
+import { arrayFromAsync } from "../../src/shared/common/polyfills";
 import { ActivitiesService } from "../../src/main/application/activities_service";
 import { EventStore } from "../../src/main/infrastructure/event_store";
 

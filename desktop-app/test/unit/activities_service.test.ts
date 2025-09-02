@@ -4,7 +4,7 @@ import { Temporal } from "@js-temporal/polyfill";
 import { describe, expect, it } from "vitest";
 
 import { ActivitiesService } from "../../src/main/application/activities_service";
-import { CommandStatus } from "../../src/main/common/messages";
+import { CommandStatus } from "../../src/shared/common/messages";
 import {
   Activity,
   ReportEntry,
@@ -14,7 +14,7 @@ import {
   RecentActivitiesQuery,
   ReportQuery,
   Scope,
-} from "../../src/main/domain/activities";
+} from "../../src/shared/domain/activities";
 import { EventStore } from "../../src/main/infrastructure/event_store";
 import { ActivityLoggedEventDto } from "../../src/main/infrastructure/events";
 import { HolidayRepository } from "../../src/main/infrastructure/holiday_repository";

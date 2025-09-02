@@ -2,7 +2,7 @@
 
 import { describe, expect, it } from "vitest";
 
-import { StopWatch } from "../../src/main/common/stop_watch";
+import { StopWatch } from "../../src/shared/common/stop_watch";
 
 describe("Stop watch", () => {
   it("Measure an unnamed task", () => {

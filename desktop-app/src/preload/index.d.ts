@@ -5,7 +5,7 @@ import {
   LogActivityCommandDto,
   RecentActivitiesQueryDto,
   RecentActivitiesQueryResultDto,
-} from "../main/application/activities_messages";
+} from "../shared/infrastructure/activities_messages";
 
 export interface ActivitySampling {
   logActivity(command: LogActivityCommandDto): Promise<CommandStatusDto>;

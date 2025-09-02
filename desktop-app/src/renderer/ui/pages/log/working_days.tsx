@@ -2,8 +2,11 @@
 
 import { Temporal } from "@js-temporal/polyfill";
 
-import { FormatStyle, formatTime } from "../../../main/common/temporal";
-import type { Activity, WorkingDay } from "../../../main/domain/activities";
+import { FormatStyle, formatTime } from "../../../../shared/common/temporal";
+import type {
+  Activity,
+  WorkingDay,
+} from "../../../../shared/domain/activities";
 
 export default function WorkingDaysComponent({
   workingDays,
