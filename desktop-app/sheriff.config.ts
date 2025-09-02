@@ -12,20 +12,20 @@ export const config: SheriffConfig = {
   enableBarrelLess: true,
   excludeRoot: true,
   modules: {
-    "src/main": ["layer:entry"],
-    "src/main/application": ["layer:application"],
-    "src/main/domain": ["layer:domain"],
-    "src/main/infrastructure": ["layer:infrastructure"],
+    "src/main": ["component:main", "layer:entry"],
+    "src/main/application": ["component:main", "layer:application"],
+    "src/main/domain": ["component:main", "layer:domain"],
+    "src/main/infrastructure": ["component:main", "layer:infrastructure"],
 
-    "src/preload": ["layer:application"],
+    "src/preload": ["component:preload", "layer:application"],
 
-    "src/renderer": ["layer:entry"],
-    "src/renderer/application": ["layer:application"],
-    "src/renderer/ui": ["layer:ui"],
+    "src/renderer": ["component:renderer", "layer:entry"],
+    "src/renderer/application": ["component:renderer", "layer:application"],
+    "src/renderer/ui": ["component:renderer", "layer:ui"],
 
-    "src/shared/common": ["layer:common"],
-    "src/shared/domain": ["layer:domain"],
-    "src/shared/infrastructure": ["layer:infrastructure"],
+    "src/shared/common": ["component:shared", "layer:common"],
+    "src/shared/domain": ["component:shared", "layer:domain"],
+    "src/shared/infrastructure": ["component:shared", "layer:infrastructure"],
   },
   depRules: {
     // root is a virtual module, which contains all files not being part
@@ -34,6 +34,7 @@ export const config: SheriffConfig = {
     noTag: "noTag",
 
     // add your dependency rules here
+    "component:*": ["component:shared", "layer:*"],
     "layer:entry": ["layer:*"],
     "layer:ui": ["layer:application", "layer:domain"],
     "layer:application": ["layer:domain", "layer:infrastructure"],
