@@ -200,6 +200,37 @@ describe("Activities service", () => {
         hoursThisMonth: Temporal.Duration.from("PT5H30M"),
       });
     });
+
+    it.todo("What to do when event can not be deserialized?", async () => {
+      const eventStore = EventStore.createNull({
+        events: [
+          [
+            {
+              timestamp: "2025-13-14T11:00:00Z",
+              duration: "PT30M",
+              client: "Test client",
+              project: "Test project",
+              task: "Test task",
+            },
+          ],
+        ],
+      });
+      const service = ActivitiesService.createNull({ eventStore });
+
+      const result = service.queryRecentActivities(new RecentActivitiesQuery());
+
+      expect(result).rejects.throw(TypeError);
+      //expect(result).toEqual({
+      //  lastActivity: undefined,
+      //  workingDays: [],
+      //  timeSummary: {
+      //    hoursToday: Temporal.Duration.from("PT0S"),
+      //    hoursYesterday: Temporal.Duration.from("PT0S"),
+      //    hoursThisWeek: Temporal.Duration.from("PT0S"),
+      //    hoursThisMonth: Temporal.Duration.from("PT0S"),
+      //  },
+      //});
+    });
   });
 
   describe("Reports", () => {
