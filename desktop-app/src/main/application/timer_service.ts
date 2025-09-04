@@ -12,7 +12,7 @@ import {
   type StopTimerCommand,
   TimerStartedEvent,
   TimerStoppedEvent,
-} from "../domain/timer";
+} from "../../shared/domain/timer";
 
 export class TimerService extends EventTarget {
   static create({ clock = Clock.systemDefaultZone() } = {}): TimerService {
@@ -41,6 +41,8 @@ export class TimerService extends EventTarget {
   }
 
   startTimer(command: StartTimerCommand): CommandStatus {
+    this.#timer.clearTimeout(this.#timeout);
+
     this.#start = this.clock.instant();
     this.#interval = Temporal.Duration.from(command.interval);
     this.#timeout = this.#timer.setTimeout(

@@ -1,8 +1,8 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
 import { useEffect, useState } from "react";
-import { CommandStatus } from "../../shared/common/messages";
 
+import { CommandStatus } from "../../shared/common/messages";
 import {
   LogActivityCommand,
   RecentActivitiesQuery,
@@ -13,7 +13,7 @@ import {
   LogActivityCommandDto,
   RecentActivitiesQueryDto,
   RecentActivitiesQueryResultDto,
-} from "../../shared/infrastructure/activities_messages";
+} from "../../shared/infrastructure/activities";
 
 export function useLogActivity(): [
   (command: LogActivityCommand) => void,

@@ -9,7 +9,7 @@ import {
   CurrentIntervalQuery,
   StartTimerCommand,
   StopTimerCommand,
-} from "../../src/main/domain/timer";
+} from "../../src/shared/domain/timer";
 
 describe("Timer service", () => {
   describe("Start timer", () => {

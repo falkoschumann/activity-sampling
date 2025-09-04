@@ -1,5 +1,7 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
+import { Temporal } from "@js-temporal/polyfill";
+
 import {
   formatDuration,
   FormatStyle,
@@ -9,7 +11,7 @@ export default function CountdownComponent({
   remaining,
   percentage,
 }: {
-  remaining: string;
+  remaining: Temporal.Duration | string;
   percentage: number;
 }) {
   return (

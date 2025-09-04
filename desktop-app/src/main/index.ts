@@ -1,7 +1,14 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
-import path from "path";
-import { app, BrowserWindow, ipcMain, shell } from "electron";
+import path from "node:path";
+import { shell } from "electron/common";
+import {
+  app,
+  BrowserWindow,
+  ipcMain,
+  Menu,
+  type MenuItemConstructorOptions,
+} from "electron/main";
 import {
   installExtension,
   REACT_DEVELOPER_TOOLS,
@@ -14,7 +21,18 @@ import {
   LogActivityCommandDto,
   RecentActivitiesQueryDto,
   RecentActivitiesQueryResultDto,
-} from "../shared/infrastructure/activities_messages";
+} from "../shared/infrastructure/activities";
+import { TimerService } from "./application/timer_service";
+import {
+  IntervalElapsedEvent,
+  StartTimerCommand,
+  StopTimerCommand,
+  TimerStartedEvent,
+  TimerStoppedEvent,
+} from "../shared/domain/timer";
+
+const activitiesService = ActivitiesService.create();
+const timerService = TimerService.create();
 
 app.whenReady().then(() => {
   installDevTools();
@@ -68,7 +86,6 @@ function installDevTools() {
 
 function createIpc() {
   // TODO configure data folder
-  const activitiesService = ActivitiesService.create();
   ipcMain.handle("logActivity", async (_event, commandDto) => {
     const command = LogActivityCommandDto.create(commandDto).validate();
     const status = await activitiesService.logActivity(command);
@@ -87,8 +104,29 @@ function createWindow(): void {
     height: 800,
     ...(process.platform === "linux" ? { icon } : {}),
     webPreferences: {
-      preload: path.join(__dirname, "../preload/index.js"),
+      preload: path.join(import.meta.dirname, "../preload/index.js"),
     },
+  });
+
+  timerService.addEventListener(TimerStartedEvent.TYPE, (event) => {
+    const timerStartedEvent = event as TimerStartedEvent;
+    mainWindow.webContents.send(TimerStartedEvent.TYPE, {
+      timestamp: timerStartedEvent.timestamp.toString(),
+      interval: timerStartedEvent.interval.toString(),
+    });
+  });
+  timerService.addEventListener(TimerStoppedEvent.TYPE, (event) => {
+    const timerStoppedEvent = event as TimerStoppedEvent;
+    mainWindow.webContents.send(TimerStoppedEvent.TYPE, {
+      timestamp: timerStoppedEvent.timestamp.toString(),
+    });
+  });
+  timerService.addEventListener(IntervalElapsedEvent.TYPE, (event) => {
+    const intervalElapsedEvent = event as IntervalElapsedEvent;
+    mainWindow.webContents.send(IntervalElapsedEvent.TYPE, {
+      timestamp: intervalElapsedEvent.timestamp.toString(),
+      interval: intervalElapsedEvent.interval.toString(),
+    });
   });
 
   // HMR for renderer base on electron-vite cli.
@@ -96,10 +134,187 @@ function createWindow(): void {
   if (!isProduction() && process.env["ELECTRON_RENDERER_URL"]) {
     void mainWindow.loadURL(process.env["ELECTRON_RENDERER_URL"]);
   } else {
-    void mainWindow.loadFile(path.join(__dirname, "../renderer/index.html"));
+    void mainWindow.loadFile(
+      path.join(import.meta.dirname, "../renderer/index.html"),
+    );
+  }
+
+  if (!isProduction()) {
+    mainWindow.setSize(1800, 1000);
+    mainWindow.webContents.openDevTools();
   }
 }
 
 function isSafeForExternalOpen(url: string): boolean {
   return url.startsWith("mailto:");
 }
+
+const isMac = process.platform === "darwin";
+
+const template: MenuItemConstructorOptions[] = [
+  // { role: 'appMenu' }
+  ...((isMac
+    ? [
+        {
+          label: app.name,
+          submenu: [
+            { role: "about" },
+            { type: "separator" },
+            { role: "services" },
+            { type: "separator" },
+            { role: "hide" },
+            { role: "hideOthers" },
+            { role: "unhide" },
+            { type: "separator" },
+            { role: "quit" },
+          ],
+        },
+      ]
+    : []) as MenuItemConstructorOptions[]),
+  // { role: 'fileMenu' }
+  {
+    label: "File",
+    submenu: [isMac ? { role: "close" } : { role: "quit" }],
+  },
+  // { role: 'editMenu' }
+  {
+    label: "Edit",
+    submenu: [
+      { role: "undo" },
+      { role: "redo" },
+      { type: "separator" },
+      { role: "cut" },
+      { role: "copy" },
+      { role: "paste" },
+      ...((isMac
+        ? [
+            { role: "pasteAndMatchStyle" },
+            { role: "delete" },
+            { role: "selectAll" },
+            { type: "separator" },
+            {
+              label: "Speech",
+              submenu: [{ role: "startSpeaking" }, { role: "stopSpeaking" }],
+            },
+          ]
+        : [
+            { role: "delete" },
+            { type: "separator" },
+            { role: "selectAll" },
+          ]) as MenuItemConstructorOptions[]),
+    ],
+  },
+  // Notifications
+  {
+    label: "Notifications",
+    submenu: [
+      {
+        label: "Start",
+        submenu: [
+          {
+            label: "5 min",
+            click: () => {
+              console.log("Start 5 min notification");
+              timerService.startTimer(new StartTimerCommand("PT5M"));
+            },
+          },
+          {
+            label: "10 min",
+            click: () => {
+              console.log("Start 10 min notification");
+              timerService.startTimer(new StartTimerCommand("PT10M"));
+            },
+          },
+          {
+            label: "15 min",
+            click: () => {
+              console.log("Start 15 min notification");
+              timerService.startTimer(new StartTimerCommand("PT15M"));
+            },
+          },
+          {
+            label: "20 min",
+            click: () => {
+              console.log("Start 20 min notification");
+              timerService.startTimer(new StartTimerCommand("PT20M"));
+            },
+          },
+          {
+            label: "30 min",
+            click: () => {
+              console.log("Start 30 min notification");
+              timerService.startTimer(new StartTimerCommand("PT30M"));
+            },
+          },
+          {
+            label: "60 min",
+            click: () => {
+              console.log("Start 60 min notification");
+              timerService.startTimer(new StartTimerCommand("PT1H"));
+            },
+          },
+          {
+            label: "1 min",
+            click: () => {
+              console.log("Start 1 min notification");
+              timerService.startTimer(new StartTimerCommand("PT1M"));
+            },
+          },
+        ],
+      },
+      {
+        label: "Stop",
+        click: () => {
+          console.log("Stop notification");
+          timerService.stopTimer(new StopTimerCommand());
+        },
+      },
+    ],
+  },
+  // { role: 'viewMenu' }
+  {
+    label: "View",
+    submenu: [
+      { role: "reload" },
+      { role: "forceReload" },
+      { role: "toggleDevTools" },
+      { type: "separator" },
+      { role: "resetZoom" },
+      { role: "zoomIn" },
+      { role: "zoomOut" },
+      { type: "separator" },
+      { role: "togglefullscreen" },
+    ],
+  },
+  // { role: 'windowMenu' }
+  {
+    label: "Window",
+    submenu: [
+      { role: "minimize" },
+      { role: "zoom" },
+      ...((isMac
+        ? [
+            { type: "separator" },
+            { role: "front" },
+            { type: "separator" },
+            { role: "window" },
+          ]
+        : [{ role: "close" }]) as MenuItemConstructorOptions[]),
+    ],
+  },
+  {
+    role: "help",
+    submenu: [
+      {
+        label: "Learn More",
+        click: async () => {
+          const { shell } = await import("electron/common");
+          await shell.openExternal("https://electronjs.org");
+        },
+      },
+    ],
+  },
+];
+
+const menu = Menu.buildFromTemplate(template);
+Menu.setApplicationMenu(menu);

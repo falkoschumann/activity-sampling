@@ -7,6 +7,7 @@ import {
   useLogActivity,
   useRecentActivities,
 } from "../../../application/activities_service";
+import { useTimer } from "../../../application/timer_service";
 import ScrollToTopButton from "../../components/scroll_to_top_button";
 import ActivityFormComponent, { type ActivityFormData } from "./activity_form";
 import CountdownComponent from "./countdown";
@@ -17,10 +18,7 @@ export default function LogPage() {
   const [logActivity] = useLogActivity();
   const [recentActivities, queryRecentActivities] = useRecentActivities();
 
-  const countdown = {
-    remaining: "PT18M36S",
-    percentage: 38,
-  };
+  const countdown = useTimer();
 
   async function handleSubmitActivity(formData: ActivityFormData) {
     console.log("Submitted activity:", formData);

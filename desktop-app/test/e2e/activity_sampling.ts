@@ -18,7 +18,7 @@ import {
   type CurrentIntervalQueryResult,
   type StartTimerCommand,
   StopTimerCommand,
-} from "../../src/main/domain/timer";
+} from "../../src/shared/domain/timer";
 import { EventStore } from "../../src/main/infrastructure/event_store";
 import { ActivityLoggedEventDto } from "../../src/main/infrastructure/events";
 
