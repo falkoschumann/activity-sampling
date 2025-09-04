@@ -19,7 +19,7 @@ jobs:
           distribution: temurin
           java-version: "21"
       - name: Use Node.js LTS
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           # Use Node.js LTS
           node-version: "22.x"
@@ -36,7 +36,7 @@ jobs:
       - name: Checkout source code
         uses: actions/checkout@v5
       - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: ${{ matrix.node-version }}
       - name: Build
@@ -52,7 +52,7 @@ jobs:
       - name: Checkout source code
         uses: actions/checkout@v5
       - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: ${{ matrix.node-version }}
       - name: Build
