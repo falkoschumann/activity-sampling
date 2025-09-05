@@ -32,13 +32,36 @@ contextBridge.exposeInMainWorld("activitySampling", {
     return ipcRenderer.invoke("queryCurrentInterval", query);
   },
 
-  onTimerStartedEvent: (callback: (event: TimerStartedEventDto) => void) =>
-    ipcRenderer.on("timerStarted", (_event, args) => callback(args)),
+  onTimerStartedEvent: (
+    eventHandler: (event: TimerStartedEventDto) => void,
+  ) => {
+    function listener(_event: unknown, args: TimerStartedEventDto) {
+      eventHandler(args);
+    }
 
-  onTimerStoppedEvent: (callback: (event: TimerStoppedEventDto) => void) =>
-    ipcRenderer.on("timerStopped", (_event, args) => callback(args)),
+    ipcRenderer.on("timerStarted", listener);
+    return () => ipcRenderer.off("timerStarted", listener);
+  },
+
+  onTimerStoppedEvent: (
+    eventHandler: (event: TimerStoppedEventDto) => void,
+  ) => {
+    function listener(_event: unknown, args: TimerStoppedEventDto) {
+      eventHandler(args);
+    }
+
+    ipcRenderer.on("timerStopped", listener);
+    return () => ipcRenderer.off("timerStopped", listener);
+  },
 
   onIntervalElapsedEvent: (
-    callback: (event: IntervalElapsedEventDto) => void,
-  ) => ipcRenderer.on("intervalElapsed", (_event, args) => callback(args)),
+    eventListener: (event: IntervalElapsedEventDto) => void,
+  ) => {
+    function listener(_event: unknown, args: IntervalElapsedEventDto) {
+      eventListener(args);
+    }
+
+    ipcRenderer.on("intervalElapsed", listener);
+    return () => ipcRenderer.off("intervalElapsed", listener);
+  },
 });

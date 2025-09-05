@@ -13,6 +13,8 @@ import {
   TimerStoppedEventDto,
 } from "../shared/infrastructure/timer";
 
+export type Unsubscriber = () => void;
+
 export interface ActivitySampling {
   logActivity(command: LogActivityCommandDto): Promise<CommandStatusDto>;
 
@@ -26,15 +28,15 @@ export interface ActivitySampling {
 
   onTimerStartedEvent: (
     callback: (event: TimerStartedEventDto) => void,
-  ) => void;
+  ) => Unsubscriber;
 
   onTimerStoppedEvent: (
     callback: (event: TimerStoppedEventDto) => void,
-  ) => void;
+  ) => Unsubscriber;
 
   onIntervalElapsedEvent: (
     callback: (event: IntervalElapsedEventDto) => void,
-  ) => void;
+  ) => Unsubscriber;
 }
 
 declare global {
