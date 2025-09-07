@@ -78,8 +78,10 @@ function installDevTools() {
   }
 
   installExtension([REACT_DEVELOPER_TOOLS])
-    .then(([redux, react]) =>
-      console.log(`Added Extensions:  ${redux.name}, ${react.name}`),
+    .then((extensions) =>
+      console.log(
+        `Added Extensions:  ${extensions.map((e) => e.name).join(", ")}`,
+      ),
     )
     .catch((err) => console.log("An error occurred: ", err));
 }
