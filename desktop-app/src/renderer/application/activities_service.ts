@@ -19,8 +19,8 @@ export function useLogActivity(): [
   (command: LogActivityCommand) => void,
   CommandStatus | undefined,
 ] {
-  const [status, setStatus] = useState<CommandStatus>();
   const [command, setCommand] = useState<LogActivityCommand>();
+  const [status, setStatus] = useState<CommandStatus>();
 
   useEffect(() => {
     async function logActivity() {
@@ -41,8 +41,8 @@ export function useLogActivity(): [
 }
 
 export function useRecentActivities(): [
-  RecentActivitiesQueryResult,
   (query: RecentActivitiesQuery) => void,
+  RecentActivitiesQueryResult,
 ] {
   const [query, setQuery] = useState<RecentActivitiesQuery>({});
   const [result, setResult] = useState<RecentActivitiesQueryResult>(
@@ -51,15 +51,14 @@ export function useRecentActivities(): [
 
   useEffect(() => {
     async function queryRecentActivities() {
-      const dto = await window.activitySampling.queryRecentActivities(
+      const resultDto = await window.activitySampling.queryRecentActivities(
         RecentActivitiesQueryDto.from(query),
       );
-      const result = RecentActivitiesQueryResultDto.create(dto).validate();
-      setResult(result);
+      setResult(RecentActivitiesQueryResultDto.create(resultDto).validate());
     }
 
     void queryRecentActivities();
   }, [query]);
 
-  return [result, setQuery];
+  return [setQuery, result];
 }

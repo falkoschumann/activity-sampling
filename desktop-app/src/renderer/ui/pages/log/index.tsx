@@ -16,7 +16,7 @@ import WorkingDaysComponent from "./working_days";
 
 export default function LogPage() {
   const [logActivity] = useLogActivity();
-  const [recentActivities, queryRecentActivities] = useRecentActivities();
+  const [queryRecentActivities, recentActivities] = useRecentActivities();
 
   const countdown = useTimer();
 
