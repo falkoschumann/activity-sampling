@@ -1,8 +1,5 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
-import { useEffect, useState } from "react";
-
-import { CommandStatus } from "../../shared/common/messages";
 import {
   LogActivityCommand,
   RecentActivitiesQuery,
@@ -14,51 +11,32 @@ import {
   RecentActivitiesQueryDto,
   RecentActivitiesQueryResultDto,
 } from "../../shared/infrastructure/activities";
+import { useCommandHandler, useQueryHandler } from "../common/messages_hooks";
 
-export function useLogActivity(): [
-  (command: LogActivityCommand) => void,
-  CommandStatus | undefined,
-] {
-  const [command, setCommand] = useState<LogActivityCommand>();
-  const [status, setStatus] = useState<CommandStatus>();
-
-  useEffect(() => {
-    async function logActivity() {
-      if (command == null) {
-        return;
-      }
-
-      const statusDto = await window.activitySampling.logActivity(
-        LogActivityCommandDto.from(command),
-      );
-      setStatus(CommandStatusDto.create(statusDto).validate());
-    }
-
-    void logActivity();
-  }, [command]);
-
-  return [setCommand, status];
+export function useLogActivity() {
+  return useCommandHandler<LogActivityCommand>({
+    handler: handleLogActivityCommand,
+  });
 }
 
-export function useRecentActivities(): [
-  (query: RecentActivitiesQuery) => void,
-  RecentActivitiesQueryResult,
-] {
-  const [query, setQuery] = useState<RecentActivitiesQuery>({});
-  const [result, setResult] = useState<RecentActivitiesQueryResult>(
-    RecentActivitiesQueryResult.empty(),
+async function handleLogActivityCommand(command: LogActivityCommand) {
+  const statusDto = await window.activitySampling.logActivity(
+    LogActivityCommandDto.from(command),
   );
+  return CommandStatusDto.create(statusDto).validate();
+}
 
-  useEffect(() => {
-    async function queryRecentActivities() {
-      const resultDto = await window.activitySampling.queryRecentActivities(
-        RecentActivitiesQueryDto.from(query),
-      );
-      setResult(RecentActivitiesQueryResultDto.create(resultDto).validate());
-    }
+export function useRecentActivities() {
+  return useQueryHandler<RecentActivitiesQuery, RecentActivitiesQueryResult>({
+    handler: handleRecentActivitiesQuery,
+    initialQuery: {},
+    initialResult: RecentActivitiesQueryResult.empty(),
+  });
+}
 
-    void queryRecentActivities();
-  }, [query]);
-
-  return [setQuery, result];
+async function handleRecentActivitiesQuery(query: RecentActivitiesQuery) {
+  const resultDto = await window.activitySampling.queryRecentActivities(
+    RecentActivitiesQueryDto.from(query),
+  );
+  return RecentActivitiesQueryResultDto.create(resultDto).validate();
 }

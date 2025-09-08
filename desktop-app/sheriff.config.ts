@@ -14,6 +14,7 @@ export const config: SheriffConfig = {
   modules: {
     "src/main": ["component:main", "layer:entry"],
     "src/main/application": ["component:main", "layer:application"],
+    "src/main/common": ["component:main", "layer:common"],
     "src/main/domain": ["component:main", "layer:domain"],
     "src/main/infrastructure": ["component:main", "layer:infrastructure"],
 
@@ -21,6 +22,8 @@ export const config: SheriffConfig = {
 
     "src/renderer": ["component:renderer", "layer:entry"],
     "src/renderer/application": ["component:renderer", "layer:application"],
+    "src/renderer/common": ["component:renderer", "layer:common"],
+    "src/renderer/domain": ["component:renderer", "layer:domain"],
     "src/renderer/ui": ["component:renderer", "layer:ui"],
 
     "src/shared/common": ["component:shared", "layer:common"],
