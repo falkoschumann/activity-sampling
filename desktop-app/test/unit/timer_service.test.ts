@@ -13,7 +13,7 @@ import {
 
 describe("Timer service", () => {
   describe("Start timer", () => {
-    it("Starts the timer with a given interval", () => {
+    it("should start the timer with a given interval", () => {
       const service = TimerService.createNull({
         clock: Clock.fixed("2025-08-28T19:41:00Z", "Europe/Berlin"),
       });
@@ -32,12 +32,12 @@ describe("Timer service", () => {
     });
 
     it.todo(
-      "Starts the timer with the default interval when the application starts",
+      "should start the timer with the default interval when the application starts",
     );
   });
 
   describe("Stop timer", () => {
-    it("Stops the timer", () => {
+    it("should stop the timer", () => {
       const service = TimerService.createNull({
         clock: Clock.fixed("2025-08-28T19:41:00Z", "Europe/Berlin"),
       });
@@ -57,8 +57,8 @@ describe("Timer service", () => {
     });
   });
 
-  describe("Current interval", () => {
-    it("Queries current interval", () => {
+  describe("Query current interval", () => {
+    it("should notify the user when an interval is elapsed", () => {
       const service = TimerService.createNull({
         clock: Clock.fixed("2025-08-28T19:41:00Z", "Europe/Berlin"),
       });
@@ -71,10 +71,6 @@ describe("Timer service", () => {
       service.simulateIntervalElapsed();
       const result = service.queryCurrentInterval(new CurrentIntervalQuery());
 
-      expect(result).toEqual({
-        timestamp: Temporal.Instant.from("2025-08-28T20:11:00Z"),
-        duration: Temporal.Duration.from("PT30M"),
-      });
       expect(events).toEqual([
         expect.objectContaining({
           type: "intervalElapsed",
@@ -82,14 +78,20 @@ describe("Timer service", () => {
           interval: Temporal.Duration.from("PT30M"),
         }),
       ]);
+      expect(result).toEqual({
+        timestamp: Temporal.Instant.from("2025-08-28T20:11:00Z"),
+        duration: Temporal.Duration.from("PT30M"),
+      });
     });
-  });
 
-  it("Throws error when simulating interval elapsed without starting timer", () => {
-    const service = TimerService.createNull();
+    describe("Simulate interval elapsed", () => {
+      it("should throw an error when simulating interval elapsed without starting timer", () => {
+        const service = TimerService.createNull();
 
-    expect(() => service.simulateIntervalElapsed()).toThrowError(
-      "Timer has not been started",
-    );
+        expect(() => service.simulateIntervalElapsed()).toThrowError(
+          "Timer has not been started",
+        );
+      });
+    });
   });
 });

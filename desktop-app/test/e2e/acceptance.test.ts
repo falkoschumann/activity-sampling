@@ -3,8 +3,8 @@
 import { describe, it } from "vitest";
 import { createActivitySampling } from "./activity_sampling";
 
-describe("Activity Sampling - Acceptance Tests", () => {
-  it("Should start timer", () => {
+describe("Activity Sampling", () => {
+  it("should start timer", () => {
     const { log } = createActivitySampling();
 
     log.startTimer();
@@ -12,7 +12,7 @@ describe("Activity Sampling - Acceptance Tests", () => {
     log.assertTimerStarted();
   });
 
-  it("Should stop timer", () => {
+  it("should stop timer", () => {
     const { log } = createActivitySampling();
 
     log.passTime();
@@ -21,7 +21,7 @@ describe("Activity Sampling - Acceptance Tests", () => {
     log.assertTimerStopped();
   });
 
-  it("Should query current interval", () => {
+  it("should query current interval", () => {
     const { log } = createActivitySampling({ now: "2025-08-29T08:19:00Z" });
     log.startTimer({ interval: "PT20M" });
     log.intervalElapsed();
@@ -34,7 +34,7 @@ describe("Activity Sampling - Acceptance Tests", () => {
     });
   });
 
-  it("Should log activity", async () => {
+  it("should log activity", async () => {
     const { log } = createActivitySampling({ now: "2025-08-29T09:42:00Z" });
 
     await log.logActivity({ timestamp: "2025-08-29T08:47:00Z" });
@@ -42,7 +42,7 @@ describe("Activity Sampling - Acceptance Tests", () => {
     await log.assertActivityLogged({ timestamp: "2025-08-29T08:47:00Z" });
   });
 
-  it("Should query recent activities", async () => {
+  it("should query recent activities", async () => {
     const { log } = createActivitySampling({ now: "2025-08-29T09:42:00Z" });
     await log.activityLogged({ timestamp: "2025-08-29T08:47:00Z" });
     await log.activityLogged({ timestamp: "2025-08-29T09:17:00Z" });
@@ -68,4 +68,8 @@ describe("Activity Sampling - Acceptance Tests", () => {
       },
     });
   });
+
+  it.todo("should query report");
+
+  it.todo("should query timesheet");
 });
