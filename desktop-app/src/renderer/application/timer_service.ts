@@ -1,18 +1,23 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
-import { Temporal } from "@js-temporal/polyfill";
-import { useEffect, useState } from "react";
+import { useEffect, useReducer, useState } from "react";
 
 import {
   IntervalElapsedEventDto,
   type TimerStartedEventDto,
   TimerStoppedEventDto,
 } from "../../shared/infrastructure/timer";
+import {
+  initialState,
+  intervalElapsed,
+  reducer,
+  timerStarted,
+  timerStopped,
+  timerTicked,
+} from "../domain/timer";
 
 export function useTimer() {
-  // TODO Replace with reducer and write tests
-  const [remaining, setRemaining] = useState(Temporal.Duration.from("PT30M"));
-  const [percentage, setPercentage] = useState(0);
+  const [state, dispatch] = useReducer(reducer, initialState);
   const [timeoutId, setTimeoutId] =
     useState<ReturnType<typeof globalThis.setInterval>>();
 
@@ -20,37 +25,41 @@ export function useTimer() {
     const offTimerStartedEvent = window.activitySampling.onTimerStartedEvent(
       (event: TimerStartedEventDto) => {
         console.info(`Timer started: ${event.interval}`);
+
         clearInterval(timeoutId);
-
-        const interval = Temporal.Duration.from(event.interval);
-        setRemaining(interval);
-        setPercentage(0);
-
-        const id = setInterval(() => {
-          setRemaining((prevRemaining) => {
-            const newRemaining = prevRemaining.subtract("PT1S");
-            const elapsed = interval.subtract(newRemaining);
-            const newPercentage =
-              (elapsed.total("seconds") / interval.total("seconds")) * 100;
-            setPercentage(newPercentage > 100 ? 100 : newPercentage);
-            return newRemaining;
-          });
-        }, 1000);
+        const id = setInterval(
+          () => dispatch(timerTicked({ duration: "PT1S" })),
+          1000,
+        );
         setTimeoutId(id);
+
+        dispatch(timerStarted({ interval: event.interval }));
       },
     );
 
     const offTimerStoppedEvent = window.activitySampling.onTimerStoppedEvent(
       (_event: TimerStoppedEventDto) => {
         console.info("Timer stopped event.");
+
         clearInterval(timeoutId);
+
+        dispatch(timerStopped());
       },
     );
 
     const offIntervalElapsedEvent =
       window.activitySampling.onIntervalElapsedEvent(
         (event: IntervalElapsedEventDto) => {
-          console.info(`Interval elapsed event: ${event.interval}`);
+          console.info(
+            `Interval elapsed event: ${event.timestamp} ${event.interval}`,
+          );
+
+          dispatch(
+            intervalElapsed({
+              timestamp: event.timestamp,
+              interval: event.interval,
+            }),
+          );
         },
       );
 
@@ -59,7 +68,7 @@ export function useTimer() {
       offTimerStoppedEvent();
       offIntervalElapsedEvent();
     };
-  }, [percentage, remaining, timeoutId]);
+  }, [timeoutId]);
 
-  return { remaining, percentage };
+  return { remaining: state.remaining, percentage: state.percentage };
 }
