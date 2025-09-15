@@ -1,8 +1,3 @@
-export NPM_CONFIG_YES=true
-
-# Needed for compatibility with Node.js 18
-export NODE_OPTIONS=--experimental-global-webcrypto
-
 all: dist check
 
 clean:
@@ -20,12 +15,12 @@ start:
 
 check: test
 	npx eslint .
-	npx prettier . --check
+	npx prettier --check .
 	npx sheriff verify
 
 format:
 	npx eslint --fix .
-	npx prettier . --write
+	npx prettier --write .
 
 dev: prepare
 	npm run dev
