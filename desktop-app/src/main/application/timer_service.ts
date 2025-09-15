@@ -1,8 +1,8 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
 import { Temporal } from "@js-temporal/polyfill";
+import { type CommandStatus, Success } from "@muspellheim/shared";
 
-import { CommandStatus } from "../../shared/common/messages";
 import { Clock } from "../../shared/common/temporal";
 import {
   type CurrentIntervalQuery,
@@ -52,13 +52,13 @@ export class TimerService extends EventTarget {
     this.dispatchEvent(
       new TimerStartedEvent(this.clock.instant(), command.interval),
     );
-    return CommandStatus.success();
+    return new Success();
   }
 
   stopTimer(_command: StopTimerCommand): CommandStatus {
     this.#timer.clearTimeout(this.#timeout);
     this.dispatchEvent(new TimerStoppedEvent(this.clock.instant()));
-    return CommandStatus.success();
+    return new Success();
   }
 
   queryCurrentInterval(

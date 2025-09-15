@@ -1,19 +1,19 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
 import { Temporal } from "@js-temporal/polyfill";
+import { Success } from "@muspellheim/shared";
 import { describe, expect, it } from "vitest";
 
 import { ActivitiesService } from "../../src/main/application/activities_service";
-import { CommandStatus } from "../../src/shared/common/messages";
 import {
   Activity,
-  ReportEntry,
-  TimesheetEntry,
-  TimesheetQuery,
   LogActivityCommand,
   RecentActivitiesQuery,
+  ReportEntry,
   ReportQuery,
   Scope,
+  TimesheetEntry,
+  TimesheetQuery,
 } from "../../src/shared/domain/activities";
 import { EventStore } from "../../src/main/infrastructure/event_store";
 import { ActivityLoggedEventDto } from "../../src/main/infrastructure/events";
@@ -30,7 +30,7 @@ describe("Log activity", () => {
         LogActivityCommand.createTestInstance(),
       );
 
-      expect(status).toEqual(CommandStatus.success());
+      expect(status).toEqual(new Success());
       expect(recordEvents.data).toEqual([
         ActivityLoggedEventDto.createTestData(),
       ]);
@@ -45,7 +45,7 @@ describe("Log activity", () => {
         LogActivityCommand.createTestInstance({ notes: "Lorem ipsum" }),
       );
 
-      expect(status).toEqual(CommandStatus.success());
+      expect(status).toEqual(new Success());
       expect(recordEvents.data).toEqual([
         ActivityLoggedEventDto.createTestData({ notes: "Lorem ipsum" }),
       ]);

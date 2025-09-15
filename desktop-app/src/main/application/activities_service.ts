@@ -1,8 +1,8 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
 import { Temporal } from "@js-temporal/polyfill";
+import { type CommandStatus, Success } from "@muspellheim/shared";
 
-import { CommandStatus } from "../../shared/common/messages";
 import { Clock, normalizeDuration } from "../../shared/common/temporal";
 import {
   Activity,
@@ -92,7 +92,7 @@ export class ActivitiesService {
       duration: command.duration.toString(),
     });
     await this.#eventStore.record(event);
-    return CommandStatus.success();
+    return new Success();
   }
 
   async queryRecentActivities(

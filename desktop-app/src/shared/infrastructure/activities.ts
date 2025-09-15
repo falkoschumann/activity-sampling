@@ -1,8 +1,8 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
 import { Temporal } from "@js-temporal/polyfill";
+import { type CommandStatus, Failure, Success } from "@muspellheim/shared";
 
-import { CommandStatus } from "../common/messages";
 import {
   Activity,
   LogActivityCommand,
@@ -72,23 +72,27 @@ export class LogActivityCommandDto {
 
 export class CommandStatusDto {
   static create(dto: CommandStatusDto): CommandStatusDto {
-    return new CommandStatusDto(dto.success, dto.errorMessage);
+    return new CommandStatusDto(dto.isSuccess, dto.errorMessage);
   }
 
   static from(model: CommandStatus): CommandStatusDto {
-    return new CommandStatusDto(model.success, model.errorMessage);
+    if (model.isSuccess) {
+      return new CommandStatusDto(true);
+    }
+
+    return new CommandStatusDto(model.isSuccess, model.errorMessage);
   }
 
-  readonly success: boolean;
+  readonly isSuccess: boolean;
   readonly errorMessage?: string;
 
-  constructor(success: boolean, errorMessage?: string) {
-    this.success = success;
+  constructor(isSuccess: boolean, errorMessage?: string) {
+    this.isSuccess = isSuccess;
     this.errorMessage = errorMessage;
   }
 
   validate(): CommandStatus {
-    return new CommandStatus(this.success, this.errorMessage);
+    return this.isSuccess ? new Success() : new Failure(this.errorMessage!);
   }
 }
 

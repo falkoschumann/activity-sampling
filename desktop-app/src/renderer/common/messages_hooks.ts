@@ -1,7 +1,7 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
+import { type CommandStatus, Success } from "@muspellheim/shared";
 import { useEffect, useState } from "react";
-import { CommandStatus } from "../../shared/common/messages";
 
 export function useCommandHandler<Command>({
   handler,
@@ -9,7 +9,7 @@ export function useCommandHandler<Command>({
   handler: (command: Command) => Promise<CommandStatus>;
 }): [(command: Command) => void, CommandStatus, boolean] {
   const [command, setCommand] = useState<Command>();
-  const [status, setStatus] = useState(CommandStatus.success());
+  const [status, setStatus] = useState<CommandStatus>(new Success());
   const [isPending, setPending] = useState(false);
 
   useEffect(() => {
