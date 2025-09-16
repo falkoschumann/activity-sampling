@@ -30,7 +30,7 @@ export class TimerService extends EventTarget {
 
   #start?: Temporal.Instant;
   #interval?: Temporal.DurationLike;
-  #timeout?: ReturnType<typeof globalThis.setTimeout>;
+  #intervalId?: ReturnType<typeof globalThis.setInterval>;
 
   #currentInterval?: Temporal.DurationLike;
 
@@ -41,11 +41,11 @@ export class TimerService extends EventTarget {
   }
 
   startTimer(command: StartTimerCommand): CommandStatus {
-    this.#timer.clearTimeout(this.#timeout);
+    this.#timer.clearInterval(this.#intervalId);
 
     this.#start = this.clock.instant();
     this.#interval = Temporal.Duration.from(command.interval);
-    this.#timeout = this.#timer.setTimeout(
+    this.#intervalId = this.#timer.setInterval(
       () => this.#handleIntervalElapsed(),
       Temporal.Duration.from(command.interval).total("milliseconds"),
     );
@@ -56,7 +56,7 @@ export class TimerService extends EventTarget {
   }
 
   stopTimer(_command: StopTimerCommand): CommandStatus {
-    this.#timer.clearTimeout(this.#timeout);
+    this.#timer.clearInterval(this.#intervalId);
     this.dispatchEvent(new TimerStoppedEvent(this.clock.instant()));
     return new Success();
   }
@@ -93,6 +93,6 @@ export class TimerService extends EventTarget {
 }
 
 const timerStub = {
-  setTimeout: () => 0,
-  clearTimeout: () => {},
+  setInterval: () => 0,
+  clearInterval: () => {},
 };

@@ -96,7 +96,8 @@ export function reducer(state: State, action: Action): State {
         (elapsed.total("seconds") / interval.total("seconds")) * 100;
       return {
         ...state,
-        remaining: newRemaining.toString(),
+        remaining:
+          newRemaining.total("seconds") < 0 ? "PT0S" : newRemaining.toString(),
         percentage: newPercentage > 100 ? 100 : newPercentage,
       };
     }

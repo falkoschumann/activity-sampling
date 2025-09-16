@@ -1,6 +1,7 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
 import path from "node:path";
+
 import { shell } from "electron/common";
 import {
   app,
@@ -14,14 +15,7 @@ import {
   REACT_DEVELOPER_TOOLS,
 } from "electron-devtools-installer";
 
-import icon from "../../resources/icon.png?asset";
 import { ActivitiesService } from "./application/activities_service";
-import {
-  CommandStatusDto,
-  LogActivityCommandDto,
-  RecentActivitiesQueryDto,
-  RecentActivitiesQueryResultDto,
-} from "../shared/infrastructure/activities";
 import { TimerService } from "./application/timer_service";
 import {
   IntervalElapsedEvent,
@@ -30,6 +24,13 @@ import {
   TimerStartedEvent,
   TimerStoppedEvent,
 } from "../shared/domain/timer";
+import {
+  CommandStatusDto,
+  LogActivityCommandDto,
+  RecentActivitiesQueryDto,
+  RecentActivitiesQueryResultDto,
+} from "../shared/infrastructure/activities";
+import icon from "../../resources/icon.png?asset";
 
 const activitiesService = ActivitiesService.create();
 const timerService = TimerService.create();
@@ -79,11 +80,11 @@ function installDevTools() {
 
   installExtension([REACT_DEVELOPER_TOOLS])
     .then((extensions) =>
-      console.log(
+      console.info(
         `Added Extensions:  ${extensions.map((e) => e.name).join(", ")}`,
       ),
     )
-    .catch((err) => console.log("An error occurred: ", err));
+    .catch((err) => console.error("An error occurred: ", err));
 }
 
 function createIpc() {
@@ -142,7 +143,7 @@ function createWindow(): void {
   }
 
   if (!isProduction()) {
-    mainWindow.setSize(1800, 1000);
+    mainWindow.setSize(1600, 1000);
     mainWindow.webContents.openDevTools();
   }
 }
@@ -215,61 +216,41 @@ const template: MenuItemConstructorOptions[] = [
         submenu: [
           {
             label: "5 min",
-            click: () => {
-              console.log("Start 5 min notification");
-              timerService.startTimer(new StartTimerCommand("PT5M"));
-            },
+            click: () => timerService.startTimer(new StartTimerCommand("PT5M")),
           },
           {
             label: "10 min",
-            click: () => {
-              console.log("Start 10 min notification");
-              timerService.startTimer(new StartTimerCommand("PT10M"));
-            },
+            click: () =>
+              timerService.startTimer(new StartTimerCommand("PT10M")),
           },
           {
             label: "15 min",
-            click: () => {
-              console.log("Start 15 min notification");
-              timerService.startTimer(new StartTimerCommand("PT15M"));
-            },
+            click: () =>
+              timerService.startTimer(new StartTimerCommand("PT15M")),
           },
           {
             label: "20 min",
-            click: () => {
-              console.log("Start 20 min notification");
-              timerService.startTimer(new StartTimerCommand("PT20M"));
-            },
+            click: () =>
+              timerService.startTimer(new StartTimerCommand("PT20M")),
           },
           {
             label: "30 min",
-            click: () => {
-              console.log("Start 30 min notification");
-              timerService.startTimer(new StartTimerCommand("PT30M"));
-            },
+            click: () =>
+              timerService.startTimer(new StartTimerCommand("PT30M")),
           },
           {
             label: "60 min",
-            click: () => {
-              console.log("Start 60 min notification");
-              timerService.startTimer(new StartTimerCommand("PT1H"));
-            },
+            click: () => timerService.startTimer(new StartTimerCommand("PT1H")),
           },
           {
             label: "1 min",
-            click: () => {
-              console.log("Start 1 min notification");
-              timerService.startTimer(new StartTimerCommand("PT1M"));
-            },
+            click: () => timerService.startTimer(new StartTimerCommand("PT1M")),
           },
         ],
       },
       {
         label: "Stop",
-        click: () => {
-          console.log("Stop notification");
-          timerService.stopTimer(new StopTimerCommand());
-        },
+        click: () => timerService.stopTimer(new StopTimerCommand()),
       },
     ],
   },

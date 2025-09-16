@@ -10,12 +10,14 @@ export interface ActivityFormData {
 }
 
 export default function ActivityFormComponent({
+  isDisabled = false,
   client,
   project,
   task,
   notes,
   onSubmit,
 }: {
+  isDisabled?: boolean;
   client?: string;
   project?: string;
   task?: string;
@@ -39,16 +41,33 @@ export default function ActivityFormComponent({
         title="Client"
         value={client}
         isRequired
+        isDisabled={isDisabled}
       />
       <FormInputComponent
         name="project"
         title="Project"
         value={project}
         isRequired
+        isDisabled={isDisabled}
       />
-      <FormInputComponent name="task" title="Task" value={task} isRequired />
-      <FormInputComponent name="notes" title="Notes" value={notes} />
-      <button type="submit" className="btn btn-primary btn-sm w-100">
+      <FormInputComponent
+        name="task"
+        title="Task"
+        value={task}
+        isRequired
+        isDisabled={isDisabled}
+      />
+      <FormInputComponent
+        name="notes"
+        title="Notes"
+        value={notes}
+        isDisabled={isDisabled}
+      />
+      <button
+        type="submit"
+        disabled={isDisabled}
+        className="btn btn-primary btn-sm w-100"
+      >
         Log
       </button>
     </form>
@@ -60,11 +79,13 @@ function FormInputComponent({
   title,
   value,
   isRequired,
+  isDisabled = false,
 }: {
   name: string;
   title: string;
   value?: string;
   isRequired?: boolean;
+  isDisabled?: boolean;
 }) {
   return (
     <div className="row mb-1">
@@ -78,6 +99,7 @@ function FormInputComponent({
           name={name}
           defaultValue={value}
           required={isRequired}
+          disabled={isDisabled}
           className="form-control form-control-sm"
         />
       </div>

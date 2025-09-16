@@ -2,12 +2,13 @@
 
 import { Temporal } from "@js-temporal/polyfill";
 
-import { LogActivityCommand } from "../../../../shared/domain/activities";
 import {
+  useCurrentInterval,
   useLogActivity,
   useRecentActivities,
 } from "../../../application/activities_service";
-import { useTimer } from "../../../application/timer_service";
+import { useCountdown } from "../../../application/timer_service";
+import { LogActivityCommand } from "../../../../shared/domain/activities";
 import ScrollToTopButton from "../../components/scroll_to_top_button";
 import ActivityFormComponent, { type ActivityFormData } from "./activity_form";
 import CountdownComponent from "./countdown";
@@ -15,26 +16,23 @@ import TimeSummaryComponent from "./time_summary";
 import WorkingDaysComponent from "./working_days";
 
 export default function LogPage() {
+  const [isFormDisabled, setFormDisabled] = useCurrentInterval();
   const [logActivity] = useLogActivity();
   const [queryRecentActivities, recentActivities] = useRecentActivities();
-
-  const countdown = useTimer();
+  const countdown = useCountdown();
 
   async function handleSubmitActivity(formData: ActivityFormData) {
-    console.log("Submitted activity:", formData);
-    // TODO get current timestamp from countdown
-    // TODO get duration from countdown
-    // TODO check status
     logActivity(
       new LogActivityCommand(
         Temporal.Now.instant(),
-        Temporal.Duration.from("PT30M"),
+        Temporal.Duration.from(countdown.interval),
         formData.client,
         formData.project,
         formData.task,
         formData.notes,
       ),
     );
+    setFormDisabled(true);
 
     queryRecentActivities({});
   }
@@ -44,6 +42,7 @@ export default function LogPage() {
       <ScrollToTopButton />
       <aside className="container my-4">
         <ActivityFormComponent
+          isDisabled={isFormDisabled}
           {...recentActivities.lastActivity}
           onSubmit={handleSubmitActivity}
         />

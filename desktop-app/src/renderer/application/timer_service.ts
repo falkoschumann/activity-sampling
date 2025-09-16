@@ -16,7 +16,7 @@ import {
   timerTicked,
 } from "../domain/timer";
 
-export function useTimer() {
+export function useCountdown() {
   const [state, dispatch] = useReducer(reducer, initialState);
   const [timeoutId, setTimeoutId] =
     useState<ReturnType<typeof globalThis.setInterval>>();
@@ -24,25 +24,19 @@ export function useTimer() {
   useEffect(() => {
     const offTimerStartedEvent = window.activitySampling.onTimerStartedEvent(
       (event: TimerStartedEventDto) => {
-        console.info(`Timer started: ${event.interval}`);
-
         clearInterval(timeoutId);
         const id = setInterval(
           () => dispatch(timerTicked({ duration: "PT1S" })),
           1000,
         );
         setTimeoutId(id);
-
         dispatch(timerStarted({ interval: event.interval }));
       },
     );
 
     const offTimerStoppedEvent = window.activitySampling.onTimerStoppedEvent(
       (_event: TimerStoppedEventDto) => {
-        console.info("Timer stopped event.");
-
         clearInterval(timeoutId);
-
         dispatch(timerStopped());
       },
     );
@@ -50,10 +44,6 @@ export function useTimer() {
     const offIntervalElapsedEvent =
       window.activitySampling.onIntervalElapsedEvent(
         (event: IntervalElapsedEventDto) => {
-          console.info(
-            `Interval elapsed event: ${event.timestamp} ${event.interval}`,
-          );
-
           dispatch(
             intervalElapsed({
               timestamp: event.timestamp,
@@ -70,5 +60,5 @@ export function useTimer() {
     };
   }, [timeoutId]);
 
-  return { remaining: state.remaining, percentage: state.percentage };
+  return state;
 }
