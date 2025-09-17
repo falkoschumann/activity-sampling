@@ -8,22 +8,37 @@ import type {
   WorkingDay,
 } from "../../../../shared/domain/activities";
 
+export interface ActivityTemplate {
+  client: string;
+  project: string;
+  task: string;
+  notes?: string;
+}
+
 export default function WorkingDaysComponent({
   workingDays,
+  onSelect,
 }: {
   workingDays: WorkingDay[];
+  onSelect: (activity: ActivityTemplate) => void;
 }) {
   return workingDays.map((workingDay) => (
-    <WorkingDayComponent key={workingDay.date.toString()} {...workingDay} />
+    <WorkingDayComponent
+      key={workingDay.date.toString()}
+      {...workingDay}
+      onSelect={onSelect}
+    />
   ));
 }
 
 function WorkingDayComponent({
   date,
   activities,
+  onSelect,
 }: {
   date: Temporal.PlainDate;
   activities: Activity[];
+  onSelect: (activity: ActivityTemplate) => void;
 }) {
   return (
     <div className="mt-4">
@@ -34,7 +49,11 @@ function WorkingDayComponent({
       </h6>
       <ul className="list-group list-group-flush">
         {activities.map((activity) => (
-          <ActivityComponent key={activity.dateTime.toString()} {...activity} />
+          <ActivityComponent
+            key={activity.dateTime.toString()}
+            {...activity}
+            onSelect={onSelect}
+          />
         ))}
       </ul>
     </div>
@@ -47,15 +66,15 @@ function ActivityComponent({
   project,
   task,
   notes,
+  onSelect,
 }: {
   dateTime: Temporal.PlainDateTime;
   client: string;
   project: string;
   task: string;
   notes?: string;
+  onSelect: (activity: ActivityTemplate) => void;
 }) {
-  // TODO do not break activity task
-
   return (
     <li className="list-group-item list-group-item-action py-1 d-flex justify-content-start align-items-start">
       <div style={{ width: "3em" }}>
@@ -68,6 +87,7 @@ function ActivityComponent({
             <button
               className="btn btn-sm"
               title="Use this activity as current activity."
+              onClick={() => onSelect({ client, project, task, notes })}
             >
               <i className="bi bi-arrow-repeat"></i>
             </button>

@@ -13,13 +13,15 @@ import ScrollToTopButton from "../../components/scroll_to_top_button";
 import ActivityFormComponent, { type ActivityFormData } from "./activity_form";
 import CountdownComponent from "./countdown";
 import TimeSummaryComponent from "./time_summary";
-import WorkingDaysComponent from "./working_days";
+import WorkingDaysComponent, { type ActivityTemplate } from "./working_days";
+import { useEffect, useState } from "react";
 
 export default function LogPage() {
   const [isFormDisabled, setFormDisabled] = useCurrentInterval();
   const [logActivity] = useLogActivity();
   const [queryRecentActivities, recentActivities] = useRecentActivities();
   const countdown = useCountdown();
+  const [formData, setFormData] = useState<ActivityFormData>();
 
   async function handleSubmitActivity(formData: ActivityFormData) {
     logActivity(
@@ -37,13 +39,22 @@ export default function LogPage() {
     queryRecentActivities({});
   }
 
+  function handleActivitySelected(activity: ActivityTemplate) {
+    setFormData(activity);
+  }
+
+  useEffect(
+    () => setFormData(recentActivities.lastActivity),
+    [recentActivities.lastActivity],
+  );
+
   return (
     <>
       <ScrollToTopButton />
       <aside className="container my-4">
         <ActivityFormComponent
           isDisabled={isFormDisabled}
-          {...recentActivities.lastActivity}
+          {...formData}
           onSubmit={handleSubmitActivity}
         />
         <CountdownComponent {...countdown} />
@@ -59,7 +70,10 @@ export default function LogPage() {
             <i className="bi bi-arrow-clockwise"></i>
           </button>
         </h5>
-        <WorkingDaysComponent workingDays={recentActivities.workingDays} />
+        <WorkingDaysComponent
+          workingDays={recentActivities.workingDays}
+          onSelect={handleActivitySelected}
+        />
       </main>
       <footer className="fixed-bottom bg-body-secondary">
         <div className="container">
