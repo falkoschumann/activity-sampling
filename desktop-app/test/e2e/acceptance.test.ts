@@ -13,12 +13,13 @@ describe("Activity Sampling", () => {
   });
 
   it("should stop timer", () => {
-    const { log } = createActivitySampling();
+    const { log } = createActivitySampling({ now: "2025-09-17T17:51:00Z" });
+    log.startTimer();
 
-    log.passTime();
+    log.passTime({ duration: "PT8M" });
     log.stopTimer();
 
-    log.assertTimerStopped();
+    log.assertTimerStopped({ timestamp: "2025-09-17T17:59:00Z" });
   });
 
   it("should query current interval", () => {

@@ -11,7 +11,7 @@ import {
   StopTimerCommand,
 } from "../../src/shared/domain/timer";
 
-describe("Timer service", () => {
+describe("Activity Sampling", () => {
   describe("Start timer", () => {
     it("should start the timer with a given interval", () => {
       const service = TimerService.createNull({

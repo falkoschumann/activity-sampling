@@ -306,7 +306,7 @@ class ActivitiesDriver {
 
   async assertActivityLogged(event: ActivityLoggedEventDto) {
     const events = await arrayFromAsync(this.#eventStore.replay());
-    expect(events).toEqual([event]);
+    expect(events.at(-1)).toEqual(event);
   }
 }
 
@@ -363,22 +363,22 @@ class TimerDriver {
     timestamp: Temporal.Instant;
     interval: Temporal.Duration;
   }) {
-    expect(this.#timerEvents).toEqual([
+    expect(this.#timerEvents.at(-1)).toEqual(
       expect.objectContaining({
         type: "timerStarted",
         timestamp,
         interval,
       }),
-    ]);
+    );
   }
 
   assertTimerStopped({ timestamp }: { timestamp: Temporal.Instant }) {
-    expect(this.#timerEvents).toEqual([
+    expect(this.#timerEvents.at(-1)).toEqual(
       expect.objectContaining({
         type: "timerStopped",
         timestamp,
       }),
-    ]);
+    );
   }
 
   intervalElapsed() {
