@@ -88,7 +88,7 @@ export class ActivitiesService {
   async logActivity(command: LogActivityCommand): Promise<CommandStatus> {
     const event = ActivityLoggedEventDto.create({
       ...command,
-      timestamp: command.timestamp.toString(),
+      timestamp: command.timestamp.toString({ smallestUnit: "seconds" }),
       duration: command.duration.toString(),
     });
     await this.#eventStore.record(event);
