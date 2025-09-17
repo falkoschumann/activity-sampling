@@ -12,8 +12,6 @@ import { ConfigurableResponses } from "@muspellheim/shared";
 
 import type { Holiday } from "../domain/calendar";
 
-// TODO use upper case properties for CSV header
-
 const schema = {
   type: "object",
   properties: {
@@ -58,7 +56,17 @@ export class HolidayRepository extends EventTarget {
       const records = parse(fileContent, {
         cast: (value, context) =>
           value == "" && !context.quoting ? undefined : value,
-        columns: true,
+        columns: (header) =>
+          header.map((column) => {
+            switch (column) {
+              case "Date":
+                return "date";
+              case "Title":
+                return "title";
+              default:
+                return column;
+            }
+          }),
       });
       const holidays: Holiday[] = [];
       for await (const record of records) {

@@ -9,8 +9,6 @@ import { ConfigurableResponses, OutputTracker } from "@muspellheim/shared";
 import { parse, stringify } from "csv";
 import { stringify as syncStringify } from "csv-stringify/sync";
 
-// TODO use upper case properties for CSV header
-
 const RECORDED_EVENT = "recorded";
 
 export class EventStore<T = unknown> extends EventTarget {
@@ -44,6 +42,14 @@ export class EventStore<T = unknown> extends EventTarget {
     const stringifier = stringify({
       header: !existsFile,
       record_delimiter: "\r\n",
+      columns: [
+        { key: "timestamp", header: "Timestamp" },
+        { key: "duration", header: "Duration" },
+        { key: "client", header: "Client" },
+        { key: "project", header: "Project" },
+        { key: "task", header: "Task" },
+        { key: "notes", header: "Notes" },
+      ],
     });
     const file = await this.#fs.open(this.#fileName, "a");
     const stream = file.createWriteStream();
@@ -65,7 +71,25 @@ export class EventStore<T = unknown> extends EventTarget {
         parse({
           cast: (value, context) =>
             value == "" && !context.quoting ? undefined : value,
-          columns: true,
+          columns: (header) =>
+            header.map((column) => {
+              switch (column) {
+                case "Timestamp":
+                  return "timestamp";
+                case "Duration":
+                  return "duration";
+                case "Client":
+                  return "client";
+                case "Project":
+                  return "project";
+                case "Task":
+                  return "task";
+                case "Notes":
+                  return "notes";
+                default:
+                  return column;
+              }
+            }),
         }),
       );
       for await (const record of parser) {
