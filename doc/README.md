@@ -9,8 +9,8 @@ analysis.
 
 ### Start Timer
 
-- Start the timer with a given interval
 - Start the timer with the default interval when the application starts
+- Start the timer with a given interval
 
 ### Stop Timer
 
@@ -37,20 +37,13 @@ analysis.
 - Summarize hours worked for clients
 - Summarize hours worked on projects
 - Summarize hours worked on tasks
-- Summarize hours worked per day
-- Summarize hours worked per week
-- Summarize hours worked per month
-- Summarize hours worked per year
-- Summarize hours worked all the time
-- Summarize hours worked in a custom period
+- Summarize hours worked in a period
 - Summarize the total hours worked
 
 ### Timesheet
 
 - Summarize hours worked on tasks
-- Summarize hours worked per day
-- Summarize hours worked per week
-- Summarize hours worked per month
+- Summarize hours worked in a period
 - Summarize the total hours worked
 - Compare with capacity
 - Take holidays into account
