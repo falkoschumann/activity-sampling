@@ -1,12 +1,7 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
-import { useEffect, useReducer, useState } from "react";
+import { useEffect, useReducer, useRef } from "react";
 
-import {
-  IntervalElapsedEventDto,
-  type TimerStartedEventDto,
-  TimerStoppedEventDto,
-} from "../../shared/infrastructure/timer";
 import {
   initialState,
   intervalElapsed,
@@ -15,28 +10,32 @@ import {
   timerStopped,
   timerTicked,
 } from "../domain/timer";
+import {
+  IntervalElapsedEventDto,
+  type TimerStartedEventDto,
+  TimerStoppedEventDto,
+} from "../../shared/infrastructure/timer";
 
 export function useCountdown() {
   const [state, dispatch] = useReducer(reducer, initialState);
-  const [timeoutId, setTimeoutId] =
-    useState<ReturnType<typeof globalThis.setInterval>>();
+  const timeoutId =
+    useRef<ReturnType<typeof globalThis.setInterval>>(undefined);
 
   useEffect(() => {
     const offTimerStartedEvent = window.activitySampling.onTimerStartedEvent(
       (event: TimerStartedEventDto) => {
-        clearInterval(timeoutId);
-        const id = setInterval(
+        clearInterval(timeoutId.current);
+        timeoutId.current = setInterval(
           () => dispatch(timerTicked({ duration: "PT1S" })),
           1000,
         );
-        setTimeoutId(id);
         dispatch(timerStarted({ interval: event.interval }));
       },
     );
 
     const offTimerStoppedEvent = window.activitySampling.onTimerStoppedEvent(
       (_event: TimerStoppedEventDto) => {
-        clearInterval(timeoutId);
+        clearInterval(timeoutId.current);
         dispatch(timerStopped());
       },
     );

@@ -5,6 +5,7 @@
 //
 
 import { Temporal } from "@js-temporal/polyfill";
+
 import type { FluxStandardAction } from "../common/reducer";
 
 const TIMER_STARTED_ACTION = "timerStarted";
@@ -109,9 +110,12 @@ export function reducer(state: State, action: Action): State {
         remaining: state.interval,
         percentage: 0,
       };
-    default:
-      throw new Error(
-        `Unhandled action in timer reducer: ${JSON.stringify(action)}.`,
-      );
   }
+
+  assertUnreachable(action);
+}
+
+function assertUnreachable(action: never): never {
+  // @ts-expect-error: code is unreachable if all action types are handled above
+  throw new Error(`Unknown action in timer reducer: ${action.type}.`);
 }

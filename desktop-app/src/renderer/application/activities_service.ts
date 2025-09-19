@@ -3,15 +3,15 @@
 import { useEffect, useState } from "react";
 
 import {
-  IntervalElapsedEventDto,
-  type TimerStartedEventDto,
-  TimerStoppedEventDto,
-} from "../../shared/infrastructure/timer";
-import {
   LogActivityCommand,
   RecentActivitiesQuery,
   RecentActivitiesQueryResult,
 } from "../../shared/domain/activities";
+import {
+  IntervalElapsedEventDto,
+  type TimerStartedEventDto,
+  TimerStoppedEventDto,
+} from "../../shared/infrastructure/timer";
 import {
   CommandStatusDto,
   LogActivityCommandDto,

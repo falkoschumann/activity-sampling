@@ -1,6 +1,7 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
 import { Temporal } from "@js-temporal/polyfill";
+import { useEffect, useState } from "react";
 
 import {
   useCurrentInterval,
@@ -14,7 +15,6 @@ import ActivityFormComponent, { type ActivityFormData } from "./activity_form";
 import CountdownComponent from "./countdown";
 import TimeSummaryComponent from "./time_summary";
 import WorkingDaysComponent, { type ActivityTemplate } from "./working_days";
-import { useEffect, useState } from "react";
 
 export default function LogPage() {
   const [isFormDisabled, setFormDisabled] = useCurrentInterval();
