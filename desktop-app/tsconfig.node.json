@@ -34,9 +34,11 @@
     "skipLibCheck": true
   },
   "include": [
-    "electron.vite.config.*",
     "src/main/**/*",
     "src/preload/**/*",
-    "test/**/*"
+    "test/**/*",
+    "electron.vite.config.*",
+    "sheriff.config.ts",
+    "vitest.config.ts"
   ]
 }
