@@ -44,8 +44,8 @@ export default function LogPage() {
   }
 
   useEffect(
-    () => setFormData(recentActivities.lastActivity),
-    [recentActivities.lastActivity],
+    () => setFormData(recentActivities.workingDays[0]?.activities[0]),
+    [recentActivities.workingDays],
   );
 
   return (

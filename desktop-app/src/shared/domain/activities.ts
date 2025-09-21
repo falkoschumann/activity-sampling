@@ -4,6 +4,10 @@ import { Temporal } from "@js-temporal/polyfill";
 
 // TODO think about using createTestInstance with logically dependency
 
+//
+// Commands
+//
+
 export class LogActivityCommand {
   static createTestInstance({
     timestamp = "2025-08-14T11:00:00Z",
@@ -54,6 +58,10 @@ export class LogActivityCommand {
   }
 }
 
+//
+// Queries
+//
+
 export class RecentActivitiesQuery {
   readonly timeZone?: Temporal.TimeZoneLike;
 
@@ -74,16 +82,10 @@ export class RecentActivitiesQueryResult {
 
   readonly workingDays: WorkingDay[];
   readonly timeSummary: TimeSummary;
-  readonly lastActivity?: Activity;
 
-  constructor(
-    workingDays: WorkingDay[],
-    timeSummary: TimeSummary,
-    lastActivity?: Activity,
-  ) {
+  constructor(workingDays: WorkingDay[], timeSummary: TimeSummary) {
     this.workingDays = workingDays;
     this.timeSummary = timeSummary;
-    this.lastActivity = lastActivity;
   }
 }
 
@@ -98,19 +100,19 @@ export class ReportQuery {
   }
 
   readonly scope: Scope;
-  readonly from: Temporal.PlainDate;
-  readonly to: Temporal.PlainDate;
+  readonly from?: Temporal.PlainDate;
+  readonly to?: Temporal.PlainDate;
   readonly timeZone?: Temporal.TimeZoneLike;
 
   constructor(
     scope: Scope,
-    from: Temporal.PlainDateLike | string,
-    to: Temporal.PlainDateLike | string,
+    from?: Temporal.PlainDateLike | string,
+    to?: Temporal.PlainDateLike | string,
     timeZone?: Temporal.TimeZoneLike,
   ) {
     this.scope = scope;
-    this.from = Temporal.PlainDate.from(from);
-    this.to = Temporal.PlainDate.from(to);
+    this.from = from ? Temporal.PlainDate.from(from) : undefined;
+    this.to = to ? Temporal.PlainDate.from(to) : undefined;
     this.timeZone = timeZone;
   }
 }
@@ -186,14 +188,17 @@ export class TimesheetQuery {
 
 export class TimesheetQueryResult {
   readonly entries: TimesheetEntry[];
-  readonly workingHoursSummary: WorkingHoursSummary;
+  readonly totalHours: Temporal.Duration;
+  readonly capacity: Capacity;
 
   constructor(
     entries: TimesheetEntry[],
-    workingHoursSummary: WorkingHoursSummary,
+    totalHours: Temporal.DurationLike | string,
+    capacity: Capacity,
   ) {
     this.entries = entries;
-    this.workingHoursSummary = workingHoursSummary;
+    this.totalHours = Temporal.Duration.from(totalHours);
+    this.capacity = capacity;
   }
 }
 
@@ -229,18 +234,15 @@ export class TimesheetEntry {
   }
 }
 
-export class WorkingHoursSummary {
-  readonly totalHours: Temporal.Duration;
-  readonly capacity: Temporal.Duration;
+export class Capacity {
+  readonly hours: Temporal.Duration;
   readonly offset: Temporal.Duration;
 
   constructor(
-    totalHours: Temporal.DurationLike | string,
-    capacity: Temporal.DurationLike | string,
+    hours: Temporal.DurationLike | string,
     offset: Temporal.DurationLike | string,
   ) {
-    this.totalHours = Temporal.Duration.from(totalHours);
-    this.capacity = Temporal.Duration.from(capacity);
+    this.hours = Temporal.Duration.from(hours);
     this.offset = Temporal.Duration.from(offset);
   }
 }
@@ -317,8 +319,12 @@ export class TimeSummary {
   }
 }
 
+//
+// Events
+//
+
 export class ActivityLoggedEvent {
-  static createTestData({
+  static createTestInstance({
     timestamp = "2025-08-14T11:00:00Z",
     duration = "PT30M",
     client = "Test client",

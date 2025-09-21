@@ -14,7 +14,7 @@ describe.runIf(isPerformance)("Performance", () => {
 
     const events = await arrayFromAsync(eventStore.replay());
 
-    console.info("Replayed events, number of events", events.length);
+    console.info("Replayed events, number of events:", events.length);
   }, 60_000_000);
 
   it("Queries recent activities", async () => {
@@ -24,9 +24,7 @@ describe.runIf(isPerformance)("Performance", () => {
     const result = await service.queryRecentActivities({});
 
     console.info(
-      "Recent activities queried, last activity",
-      result.lastActivity,
-      "time summary",
+      "Recent activities queried, time summary:",
       result.timeSummary,
     );
   }, 60_000_000);

@@ -11,7 +11,7 @@ import {
   StopTimerCommand,
 } from "../../src/shared/domain/timer";
 
-describe("Activity Sampling", () => {
+describe("Timer service", () => {
   describe("Start timer", () => {
     it("should start the timer with a given interval", () => {
       const service = TimerService.createNull({
@@ -58,7 +58,7 @@ describe("Activity Sampling", () => {
   });
 
   describe("Query current interval", () => {
-    it("should notify the user when an interval is elapsed", () => {
+    it("should notify the user when an interval is elapsed", async () => {
       const service = TimerService.createNull({
         clock: Clock.fixed("2025-08-28T19:41:00Z", "Europe/Berlin"),
       });
@@ -66,10 +66,12 @@ describe("Activity Sampling", () => {
       service.addEventListener("intervalElapsed", (event) =>
         events.push(event),
       );
-      service.startTimer(new StartTimerCommand("PT30M"));
+      await service.startTimer(new StartTimerCommand("PT30M"));
 
-      service.simulateIntervalElapsed();
-      const result = service.queryCurrentInterval(new CurrentIntervalQuery());
+      await service.simulateIntervalElapsed();
+      const result = await service.queryCurrentInterval(
+        new CurrentIntervalQuery(),
+      );
 
       expect(events).toEqual([
         expect.objectContaining({
@@ -88,9 +90,9 @@ describe("Activity Sampling", () => {
       it("should throw an error when simulating interval elapsed without starting timer", () => {
         const service = TimerService.createNull();
 
-        expect(() => service.simulateIntervalElapsed()).toThrowError(
-          "Timer has not been started",
-        );
+        const result = service.simulateIntervalElapsed();
+
+        expect(result).rejects.toThrowError("Timer has not been started");
       });
     });
   });

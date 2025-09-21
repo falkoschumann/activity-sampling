@@ -25,7 +25,7 @@ export class TimerService extends EventTarget {
     return new TimerService(clock, timerStub as unknown as typeof globalThis);
   }
 
-  clock: Clock;
+  #clock: Clock;
   #timer: typeof globalThis;
 
   #start?: Temporal.Instant;
@@ -36,58 +36,58 @@ export class TimerService extends EventTarget {
 
   constructor(clock: Clock, timer: typeof globalThis) {
     super();
-    this.clock = clock;
+    this.#clock = clock;
     this.#timer = timer;
   }
 
-  startTimer(command: StartTimerCommand): CommandStatus {
+  async startTimer(command: StartTimerCommand): Promise<CommandStatus> {
     this.#timer.clearInterval(this.#intervalId);
 
-    this.#start = this.clock.instant();
+    this.#start = this.#clock.instant();
     this.#interval = Temporal.Duration.from(command.interval);
     this.#intervalId = this.#timer.setInterval(
       () => this.#handleIntervalElapsed(),
       Temporal.Duration.from(command.interval).total("milliseconds"),
     );
     this.dispatchEvent(
-      new TimerStartedEvent(this.clock.instant(), command.interval),
+      new TimerStartedEvent(this.#clock.instant(), command.interval),
     );
     return new Success();
   }
 
-  stopTimer(_command: StopTimerCommand): CommandStatus {
+  async stopTimer(_command: StopTimerCommand): Promise<CommandStatus> {
     this.#timer.clearInterval(this.#intervalId);
-    this.dispatchEvent(new TimerStoppedEvent(this.clock.instant()));
+    this.dispatchEvent(new TimerStoppedEvent(this.#clock.instant()));
     return new Success();
   }
 
-  queryCurrentInterval(
+  async queryCurrentInterval(
     _query: CurrentIntervalQuery,
-  ): CurrentIntervalQueryResult {
+  ): Promise<CurrentIntervalQueryResult> {
     return new CurrentIntervalQueryResult(
-      this.clock.instant(),
+      this.#clock.instant(),
       this.#currentInterval ?? Temporal.Duration.from("PT30M"),
     );
   }
 
-  simulateTimePassing(duration: Temporal.DurationLike | string) {
-    this.clock = Clock.offset(this.clock, duration);
+  async simulateTimePassing(duration: Temporal.DurationLike | string) {
+    this.#clock = Clock.offset(this.#clock, duration);
   }
 
-  simulateIntervalElapsed() {
+  async simulateIntervalElapsed() {
     if (!this.#start || !this.#interval) {
       throw new Error("Timer has not been started");
     }
 
     const end = this.#start.add(this.#interval);
-    this.clock = Clock.fixed(end, this.clock.zone);
+    this.#clock = Clock.fixed(end, this.#clock.zone);
     this.#handleIntervalElapsed();
   }
 
   #handleIntervalElapsed() {
     this.#currentInterval = this.#interval!;
     this.dispatchEvent(
-      new IntervalElapsedEvent(this.clock.instant(), this.#currentInterval),
+      new IntervalElapsedEvent(this.#clock.instant(), this.#currentInterval),
     );
   }
 }

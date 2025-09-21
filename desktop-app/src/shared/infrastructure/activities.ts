@@ -120,11 +120,7 @@ export class RecentActivitiesQueryResultDto {
   static create(
     dto: RecentActivitiesQueryResultDto,
   ): RecentActivitiesQueryResultDto {
-    return new RecentActivitiesQueryResultDto(
-      dto.workingDays,
-      dto.timeSummary,
-      dto.lastActivity,
-    );
+    return new RecentActivitiesQueryResultDto(dto.workingDays, dto.timeSummary);
   }
 
   static from(
@@ -133,22 +129,15 @@ export class RecentActivitiesQueryResultDto {
     return new RecentActivitiesQueryResultDto(
       model.workingDays.map((workingDay) => WorkingDayDto.from(workingDay)),
       TimeSummaryDto.from(model.timeSummary),
-      ActivityDto.from(model.lastActivity),
     );
   }
 
   readonly workingDays: WorkingDayDto[];
   readonly timeSummary: TimeSummaryDto;
-  readonly lastActivity?: ActivityDto;
 
-  constructor(
-    workingDays: WorkingDayDto[],
-    timeSummary: TimeSummaryDto,
-    lastActivity?: ActivityDto,
-  ) {
+  constructor(workingDays: WorkingDayDto[], timeSummary: TimeSummaryDto) {
     this.workingDays = workingDays;
     this.timeSummary = timeSummary;
-    this.lastActivity = lastActivity;
   }
 
   validate() {
@@ -157,7 +146,6 @@ export class RecentActivitiesQueryResultDto {
         WorkingDayDto.create(workingDay).validate(),
       ),
       TimeSummaryDto.create(this.timeSummary).validate(),
-      ActivityDto.create(this.lastActivity)?.validate(),
     );
   }
 }

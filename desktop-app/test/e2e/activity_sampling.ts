@@ -1,7 +1,8 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
+import fs from "node:fs/promises";
+
 import { Temporal } from "@js-temporal/polyfill";
-import fs from "node:fs";
 import { expect } from "vitest";
 
 import { ActivitiesService } from "../../src/main/application/activities_service";
@@ -12,6 +13,10 @@ import {
   type LogActivityCommand,
   type RecentActivitiesQuery,
   type RecentActivitiesQueryResult,
+  ReportQuery,
+  ReportQueryResult,
+  TimesheetQuery,
+  TimesheetQueryResult,
 } from "../../src/shared/domain/activities";
 import {
   type CurrentIntervalQuery,
@@ -21,22 +26,29 @@ import {
 } from "../../src/shared/domain/timer";
 import { EventStore } from "../../src/main/infrastructure/event_store";
 import { ActivityLoggedEventDto } from "../../src/main/infrastructure/events";
+import { HolidayRepository } from "../../src/main/infrastructure/holiday_repository";
 
-export function createActivitySampling({
+export async function startActivitySampling({
   now = "2025-08-26T14:00:00Z",
   eventsFile = "testdata/events.csv",
-} = {}): {
-  log: LogDsl;
-} {
+  holidayFile = "test/data/holidays.csv",
+} = {}): Promise<Ui> {
+  await fs.rm(eventsFile, { force: true });
+
   const clock = Clock.fixed(now, "Europe/Berlin");
-  const log = new LogDsl(
-    new ActivitiesDriver(eventsFile, clock),
-    new TimerDriver(clock),
-  );
+  const activitiesDriver = new ActivitiesDriver(eventsFile, holidayFile, clock);
+  const timerDriver = new TimerDriver(clock);
+  const log = new LogDsl(activitiesDriver, timerDriver);
+  const reports = new ReportsDsl(activitiesDriver);
+  const timesheet = new TimesheetDsl(activitiesDriver);
 
-  fs.rmSync(eventsFile, { force: true });
+  return { log, reports, timesheet };
+}
 
-  return { log };
+export interface Ui {
+  log: LogDsl;
+  reports: ReportsDsl;
+  timesheet: TimesheetDsl;
 }
 
 class LogDsl {
@@ -52,13 +64,13 @@ class LogDsl {
   // Commands
   //
 
-  startTimer(args: { interval?: string } = {}) {
+  async startTimer(args: { interval?: string } = {}) {
     const interval = Temporal.Duration.from(args.interval ?? "PT30M");
-    this.#timerDriver.startTimer({ interval });
+    await this.#timerDriver.startTimer({ interval });
   }
 
-  stopTimer() {
-    this.#timerDriver.stopTimer(new StopTimerCommand());
+  async stopTimer() {
+    await this.#timerDriver.stopTimer(new StopTimerCommand());
   }
 
   async logActivity(
@@ -93,8 +105,8 @@ class LogDsl {
   // Queries
   //
 
-  queryCurrentInterval() {
-    this.#timerDriver.queryCurrentInterval({});
+  async queryCurrentInterval() {
+    await this.#timerDriver.queryCurrentInterval({});
   }
 
   assertCurrentInterval(args: { timestamp?: string; duration?: string } = {}) {
@@ -110,15 +122,7 @@ class LogDsl {
   }
 
   assertRecentActivities(args: {
-    lastActivity: {
-      dateTime?: string;
-      duration?: string;
-      client?: string;
-      project?: string;
-      task?: string;
-      notes?: string;
-    };
-    workingDays: {
+    workingDays?: {
       date: string;
       activities: {
         dateTime?: string;
@@ -129,24 +133,14 @@ class LogDsl {
         notes?: string;
       }[];
     }[];
-    timeSummary: {
+    timeSummary?: {
       hoursToday?: string;
       hoursYesterday?: string;
       hoursThisWeek?: string;
       hoursThisMonth?: string;
     };
   }) {
-    const lastActivity = {
-      dateTime: Temporal.PlainDateTime.from(
-        args.lastActivity.dateTime ?? "2025-08-14T13:00",
-      ),
-      duration: Temporal.Duration.from(args.lastActivity.duration ?? "PT30M"),
-      client: args.lastActivity.client ?? "Test client",
-      project: args.lastActivity.project ?? "Test project",
-      task: args.lastActivity.task ?? "Test task",
-      notes: args.lastActivity.notes,
-    };
-    const workingDays = args.workingDays.map((workingDay) => ({
+    const workingDays = args.workingDays?.map((workingDay) => ({
       date: Temporal.PlainDate.from(workingDay.date),
       activities: workingDay.activities.map((activity) => ({
         dateTime: Temporal.PlainDateTime.from(
@@ -159,7 +153,7 @@ class LogDsl {
         notes: activity.notes,
       })),
     }));
-    const timeSummary = {
+    const timeSummary = args.timeSummary && {
       hoursToday: Temporal.Duration.from(args.timeSummary.hoursToday ?? "PT0S"),
       hoursYesterday: Temporal.Duration.from(
         args.timeSummary.hoursYesterday ?? "PT0S",
@@ -171,11 +165,7 @@ class LogDsl {
         args.timeSummary.hoursThisMonth ?? "PT0S",
       ),
     };
-    this.#activitiesDriver.assertRecentActivities({
-      lastActivity,
-      workingDays,
-      timeSummary,
-    });
+    this.#activitiesDriver.assertRecentActivities({ workingDays, timeSummary });
   }
 
   //
@@ -197,8 +187,8 @@ class LogDsl {
     this.#timerDriver.assertTimerStopped({ timestamp });
   }
 
-  intervalElapsed() {
-    this.#timerDriver.intervalElapsed();
+  async intervalElapsed() {
+    await this.#timerDriver.intervalElapsed();
   }
 
   async activityLogged(args: {
@@ -253,12 +243,170 @@ class LogDsl {
   }
 
   //
-  // Common
+  // Other
   //
 
-  passTime(args: { duration?: string } = {}) {
+  async passTime(args: { duration?: string } = {}) {
     const duration = Temporal.Duration.from(args.duration ?? "PT1M");
-    this.#timerDriver.passTime(duration);
+    await this.#timerDriver.passTime(duration);
+  }
+}
+
+class ReportsDsl {
+  readonly #activitiesDriver: ActivitiesDriver;
+
+  constructor(activitiesDriver: ActivitiesDriver) {
+    this.#activitiesDriver = activitiesDriver;
+  }
+
+  //
+  // Queries
+  //
+
+  async queryReport(
+    args: {
+      scope?: "Clients" | "Projects" | "Tasks";
+      from?: string;
+      to?: string;
+    } = {},
+  ) {
+    const scope = args.scope ?? "Clients";
+    const from = args.from ? Temporal.PlainDate.from(args.from) : undefined;
+    const to = args.to ? Temporal.PlainDate.from(args.to) : undefined;
+    await this.#activitiesDriver.queryReport({ scope, from, to });
+  }
+
+  assertReport(args: {
+    entries?: {
+      name?: string;
+      hours?: string;
+      client?: string;
+    }[];
+    totalHours?: string;
+  }) {
+    const entries = args.entries?.map((entry) => ({
+      name: entry.name ?? "Test client",
+      hours: Temporal.Duration.from(entry.hours ?? "PT30M"),
+      client: entry.client,
+    }));
+    const totalHours = args.totalHours
+      ? Temporal.Duration.from(args.totalHours ?? "PT0S")
+      : undefined;
+    this.#activitiesDriver.assertReport({ entries, totalHours });
+  }
+
+  //
+  // Events
+  //
+
+  async activityLogged(args: {
+    timestamp?: string;
+    duration?: string;
+    client?: string;
+    project?: string;
+    task?: string;
+    notes?: string;
+  }) {
+    const timestamp = args.timestamp ?? "2025-08-14T11:00:00Z";
+    const duration = args.duration ?? "PT30M";
+    const client = args.client ?? "Test client";
+    const project = args.project ?? "Test project";
+    const task = args.task ?? "Test task";
+    const notes = args.notes;
+    await this.#activitiesDriver.record({
+      timestamp,
+      duration,
+      client,
+      project,
+      task,
+      notes,
+    });
+  }
+}
+
+class TimesheetDsl {
+  readonly #activitiesDriver: ActivitiesDriver;
+
+  constructor(activitiesDriver: ActivitiesDriver) {
+    this.#activitiesDriver = activitiesDriver;
+  }
+
+  //
+  // Queries
+  //
+
+  async queryTimesheet(
+    args: {
+      from?: string;
+      to?: string;
+    } = {},
+  ) {
+    const from = Temporal.PlainDate.from(args.from ?? "2025-08-26");
+    const to = Temporal.PlainDate.from(args.to ?? "2025-08-26");
+    await this.#activitiesDriver.queryTimesheet({ from, to });
+  }
+
+  assertTimesheet(args: {
+    entries?: {
+      date?: string;
+      client?: string;
+      project?: string;
+      task?: string;
+      hours?: string;
+    }[];
+    totalHours?: string;
+    capacity?: {
+      hours?: string;
+      offset?: string;
+    };
+  }) {
+    const entries = args.entries?.map((entry) => ({
+      date: Temporal.PlainDate.from(entry.date ?? "2025-08-26"),
+      client: entry.client ?? "Test client",
+      project: entry.project ?? "Test project",
+      task: entry.task ?? "Test task",
+      hours: Temporal.Duration.from(entry.hours ?? "PT30M"),
+    }));
+    const totalHours = args.totalHours
+      ? Temporal.Duration.from(args.totalHours)
+      : undefined;
+    const capacity = args.capacity && {
+      hours: Temporal.Duration.from(args.capacity.hours ?? "PT8H"),
+      offset: Temporal.Duration.from(args.capacity.offset ?? "PT7H30M"),
+    };
+    this.#activitiesDriver.assertTimesheet({
+      entries,
+      totalHours,
+      capacity,
+    });
+  }
+
+  //
+  // Events
+  //
+
+  async activityLogged(args: {
+    timestamp?: string;
+    duration?: string;
+    client?: string;
+    project?: string;
+    task?: string;
+    notes?: string;
+  }) {
+    const timestamp = args.timestamp ?? "2025-08-14T11:00:00Z";
+    const duration = args.duration ?? "PT30M";
+    const client = args.client ?? "Test client";
+    const project = args.project ?? "Test project";
+    const task = args.task ?? "Test task";
+    const notes = args.notes;
+    await this.#activitiesDriver.record({
+      timestamp,
+      duration,
+      client,
+      project,
+      task,
+      notes,
+    });
   }
 }
 
@@ -267,12 +415,21 @@ class ActivitiesDriver {
   readonly #activitiesService: ActivitiesService;
 
   #recentActivitiesQueryResult?: RecentActivitiesQueryResult;
+  #reportQueryResult?: ReportQueryResult;
+  #timesheetQueryResult?: TimesheetQueryResult;
 
-  constructor(eventsFile: string, clock: Clock) {
+  constructor(eventsFile: string, holidayFile: string, clock: Clock) {
     const eventStore = (this.#eventStore = EventStore.create({
       fileName: eventsFile,
     }));
-    this.#activitiesService = ActivitiesService.create({ eventStore, clock });
+    const holidayRepository = HolidayRepository.create({
+      fileName: holidayFile,
+    });
+    this.#activitiesService = ActivitiesService.create({
+      eventStore,
+      holidayRepository,
+      clock,
+    });
   }
 
   //
@@ -292,8 +449,47 @@ class ActivitiesDriver {
       await this.#activitiesService.queryRecentActivities(query);
   }
 
-  assertRecentActivities(result: RecentActivitiesQueryResult) {
-    expect(this.#recentActivitiesQueryResult).toEqual(result);
+  assertRecentActivities(result: Partial<RecentActivitiesQueryResult>) {
+    if (result.workingDays) {
+      expect(this.#recentActivitiesQueryResult?.workingDays).toEqual(
+        result.workingDays,
+      );
+    }
+    if (result.timeSummary) {
+      expect(this.#recentActivitiesQueryResult?.timeSummary).toEqual(
+        result.timeSummary,
+      );
+    }
+  }
+
+  async queryReport(query: ReportQuery) {
+    this.#reportQueryResult = await this.#activitiesService.queryReport(query);
+  }
+
+  assertReport(result: Partial<ReportQueryResult>) {
+    if (result.entries) {
+      expect(this.#reportQueryResult?.entries).toEqual(result.entries);
+    }
+    if (result.totalHours) {
+      expect(this.#reportQueryResult?.totalHours).toEqual(result.totalHours);
+    }
+  }
+
+  async queryTimesheet(query: TimesheetQuery) {
+    this.#timesheetQueryResult =
+      await this.#activitiesService.queryTimesheet(query);
+  }
+
+  assertTimesheet(result: Partial<TimesheetQueryResult>) {
+    if (result.entries) {
+      expect(this.#timesheetQueryResult?.entries).toEqual(result.entries);
+    }
+    if (result.totalHours) {
+      expect(this.#timesheetQueryResult?.totalHours).toEqual(result.totalHours);
+    }
+    if (result.capacity) {
+      expect(this.#timesheetQueryResult?.capacity).toEqual(result.capacity);
+    }
   }
 
   //
@@ -331,21 +527,21 @@ class TimerDriver {
   // Commands
   //
 
-  startTimer(command: StartTimerCommand) {
-    this.#timerService.startTimer(command);
+  async startTimer(command: StartTimerCommand) {
+    await this.#timerService.startTimer(command);
   }
 
-  stopTimer(command: StopTimerCommand) {
-    this.#timerService.stopTimer(command);
+  async stopTimer(command: StopTimerCommand) {
+    await this.#timerService.stopTimer(command);
   }
 
   //
   // Queries
   //
 
-  queryCurrentInterval(query: CurrentIntervalQuery) {
+  async queryCurrentInterval(query: CurrentIntervalQuery) {
     this.#currentIntervalQueryResult =
-      this.#timerService.queryCurrentInterval(query);
+      await this.#timerService.queryCurrentInterval(query);
   }
 
   assertCurrentInterval(result: CurrentIntervalQueryResult) {
@@ -381,15 +577,15 @@ class TimerDriver {
     );
   }
 
-  intervalElapsed() {
-    this.#timerService.simulateIntervalElapsed();
+  async intervalElapsed() {
+    await this.#timerService.simulateIntervalElapsed();
   }
 
   //
   // Common
   //
 
-  passTime(duration: Temporal.Duration) {
-    this.#timerService.clock = Clock.offset(this.#timerService.clock, duration);
+  async passTime(duration: Temporal.Duration) {
+    await this.#timerService.simulateTimePassing(duration);
   }
 }

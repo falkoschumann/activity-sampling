@@ -19,7 +19,7 @@ import { EventStore } from "../../src/main/infrastructure/event_store";
 import { ActivityLoggedEventDto } from "../../src/main/infrastructure/events";
 import { HolidayRepository } from "../../src/main/infrastructure/holiday_repository";
 
-describe("Activity Sampling", () => {
+describe("Activities service", () => {
   describe("Log activity", () => {
     describe("Log the activity with a client, a project, a task and optional notes", () => {
       it("should log without an optional notes", async () => {
@@ -59,22 +59,6 @@ describe("Activity Sampling", () => {
   });
 
   describe("Query recent activities", () => {
-    it("should return last activity", async () => {
-      const eventStore = EventStore.createNull({
-        events: [[ActivityLoggedEventDto.createTestData()]],
-      });
-      const service = ActivitiesService.createNull({
-        eventStore,
-        fixedInstant: "2025-08-20T09:03:00Z",
-      });
-
-      const result = await service.queryRecentActivities(
-        new RecentActivitiesQuery(),
-      );
-
-      expect(result.lastActivity).toEqual(Activity.createTestInstance());
-    });
-
     it("should group activities by working days for the last 30 days", async () => {
       const timestamps = [
         "2025-05-05T14:00:00Z",
@@ -545,9 +529,7 @@ describe("Activity Sampling", () => {
         TimesheetQuery.createTestInstance({}),
       );
 
-      expect(result.workingHoursSummary.totalHours).toEqual(
-        Temporal.Duration.from("PT1H30M"),
-      );
+      expect(result.totalHours).toEqual(Temporal.Duration.from("PT1H30M"));
     });
 
     it("should compare with capacity", async () => {
@@ -581,10 +563,9 @@ describe("Activity Sampling", () => {
         }),
       );
 
-      expect(result.workingHoursSummary).toEqual({
-        totalHours: Temporal.Duration.from("PT24H"),
-        capacity: Temporal.Duration.from("PT40H"),
-        offset: Temporal.Duration.from("PT0S"),
+      expect(result.capacity).toEqual({
+        hours: Temporal.Duration.from("PT40H"),
+        offset: Temporal.Duration.from("PT0H"),
       });
     });
 
@@ -624,9 +605,8 @@ describe("Activity Sampling", () => {
           }),
         );
 
-        expect(result.workingHoursSummary).toEqual({
-          totalHours: Temporal.Duration.from("PT24H"),
-          capacity: Temporal.Duration.from("PT32H"),
+        expect(result.capacity).toEqual({
+          hours: Temporal.Duration.from("PT32H"),
           offset: Temporal.Duration.from("PT0S"),
         });
       });
@@ -666,9 +646,8 @@ describe("Activity Sampling", () => {
           }),
         );
 
-        expect(result.workingHoursSummary).toEqual({
-          totalHours: Temporal.Duration.from("PT18H"),
-          capacity: Temporal.Duration.from("PT32H"),
+        expect(result.capacity).toEqual({
+          hours: Temporal.Duration.from("PT32H"),
           offset: Temporal.Duration.from("-PT6H"),
         });
       });
@@ -708,9 +687,8 @@ describe("Activity Sampling", () => {
           }),
         );
 
-        expect(result.workingHoursSummary).toEqual({
-          totalHours: Temporal.Duration.from("PT30H"),
-          capacity: Temporal.Duration.from("PT32H"),
+        expect(result.capacity).toEqual({
+          hours: Temporal.Duration.from("PT32H"),
           offset: Temporal.Duration.from("PT6H"),
         });
       });
@@ -728,9 +706,9 @@ describe("Activity Sampling", () => {
 
       expect(result).toEqual({
         entries: [],
-        workingHoursSummary: {
-          totalHours: Temporal.Duration.from("PT0S"),
-          capacity: Temporal.Duration.from("PT40H"),
+        totalHours: Temporal.Duration.from("PT0S"),
+        capacity: {
+          hours: Temporal.Duration.from("PT40H"),
           offset: Temporal.Duration.from("PT0S"),
         },
       });

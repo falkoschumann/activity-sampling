@@ -23,12 +23,9 @@ analysis.
 ### Log Activity
 
 - Log the activity with a client, a project, a task and optional notes
-- Select an activity from recent activities
-- Select the last activity when the application starts
 
 ### Recent Activities
 
-- Return last activity
 - Group activities by working days for the last 30 days
 - Summarize hours worked today, yesterday, this week and this month
 
@@ -37,14 +34,14 @@ analysis.
 - Summarize hours worked for clients
 - Summarize hours worked on projects
 - Summarize hours worked on tasks
-- Summarize hours worked in a period
 - Summarize the total hours worked
+- Summarize in a period
 
 ### Timesheet
 
 - Summarize hours worked on tasks
-- Summarize hours worked in a period
 - Summarize the total hours worked
+- Summarize in a period
 - Compare with capacity
 - Take holidays into account
 - Take vacation into account

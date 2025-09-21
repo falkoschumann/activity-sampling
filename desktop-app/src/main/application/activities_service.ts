@@ -134,8 +134,6 @@ class RecentActivitiesProjection {
   readonly #thisMonthStart: Temporal.PlainDate;
   readonly #nextMonthStart: Temporal.PlainDate;
 
-  #lastActivity?: Activity;
-
   // working days
   #workingDays: WorkingDay[] = [];
   #date?: Temporal.PlainDate;
@@ -170,7 +168,6 @@ class RecentActivitiesProjection {
     const to = this.#today.with({ day: this.#today.daysInMonth }).add("P1D");
     const activities = project(events, this.#timeZone, from, to);
     for await (const activity of activities) {
-      this.#updateLastActivity(activity);
       this.#updateWorkingDays(activity);
       this.#updateTimeSummary(activity);
     }
@@ -183,7 +180,6 @@ class RecentActivitiesProjection {
       ),
     );
     return {
-      lastActivity: this.#lastActivity,
       workingDays: this.#workingDays,
       timeSummary: {
         hoursToday: normalizeDuration(this.#hoursToday),
@@ -192,18 +188,6 @@ class RecentActivitiesProjection {
         hoursThisMonth: normalizeDuration(this.#hoursThisMonth),
       },
     };
-  }
-
-  #updateLastActivity(activity: Activity) {
-    if (
-      !this.#lastActivity ||
-      Temporal.PlainDateTime.compare(
-        Temporal.PlainDateTime.from(activity.dateTime),
-        Temporal.PlainDateTime.from(this.#lastActivity.dateTime),
-      ) > 0
-    ) {
-      this.#lastActivity = activity;
-    }
   }
 
   #updateWorkingDays(activity: Activity) {
@@ -256,8 +240,8 @@ class RecentActivitiesProjection {
 }
 
 class ReportProjection {
-  readonly #startInclusive: Temporal.PlainDate;
-  readonly #endExclusive: Temporal.PlainDate;
+  readonly #startInclusive?: Temporal.PlainDate;
+  readonly #endExclusive?: Temporal.PlainDate;
   readonly #scope: Scope;
   readonly #timeZone: Temporal.TimeZoneLike;
 
@@ -265,8 +249,8 @@ class ReportProjection {
   #totalHours = Temporal.Duration.from("PT0S");
 
   constructor(query: ReportQuery, clock: Clock) {
-    this.#startInclusive = Temporal.PlainDate.from(query.from);
-    this.#endExclusive = Temporal.PlainDate.from(query.to);
+    this.#startInclusive = query.from;
+    this.#endExclusive = query.to ? query.to.add("P1D") : undefined;
     this.#scope = query.scope;
     this.#timeZone = query.timeZone ?? clock.zone;
   }
@@ -286,7 +270,10 @@ class ReportProjection {
     this.#entries = this.#entries.sort((e1, e2) =>
       e1.name.localeCompare(e2.name),
     );
-    return { entries: this.#entries, totalHours: this.#totalHours };
+    return {
+      entries: this.#entries,
+      totalHours: this.#totalHours,
+    };
   }
 
   #updateEntries(activity: Activity) {
@@ -320,7 +307,7 @@ class ReportProjection {
       );
       this.#entries[index] = {
         ...existingEntry,
-        hours: accumulatedHours,
+        hours: normalizeDuration(accumulatedHours),
       };
     }
   }
@@ -347,14 +334,14 @@ class ReportProjection {
       this.#entries[index] = {
         ...existingEntry,
         client: existingClient,
-        hours: accumulatedHours,
+        hours: normalizeDuration(accumulatedHours),
       };
     }
   }
 
   #updateTotalHours(activity: Activity) {
     const duration = Temporal.Duration.from(activity.duration);
-    this.#totalHours = this.#totalHours.add(duration);
+    this.#totalHours = normalizeDuration(this.#totalHours.add(duration));
   }
 }
 
@@ -420,9 +407,9 @@ class TimesheetProjection {
 
     return {
       entries: this.#entries,
-      workingHoursSummary: {
-        totalHours: normalizeDuration(this.#totalHours),
-        capacity,
+      totalHours: normalizeDuration(this.#totalHours),
+      capacity: {
+        hours: normalizeDuration(capacity),
         offset,
       },
     };
@@ -498,17 +485,20 @@ class TimesheetProjection {
 async function* project(
   events: AsyncGenerator,
   timeZone: Temporal.TimeZoneLike,
-  startInclusive: Temporal.PlainDate | Temporal.PlainDateLike | string,
-  endExclusive: Temporal.PlainDate | Temporal.PlainDateLike | string,
+  startInclusive?: Temporal.PlainDate | Temporal.PlainDateLike | string,
+  endExclusive?: Temporal.PlainDate | Temporal.PlainDateLike | string,
 ): AsyncGenerator<Activity> {
   for await (const e of events) {
     // TODO handle type error
     const event = ActivityLoggedEventDto.fromJson(e).validate();
     const date = event.timestamp.toZonedDateTimeISO(timeZone).toPlainDate();
     if (
-      Temporal.PlainDate.compare(date, startInclusive) < 0 ||
-      Temporal.PlainDate.compare(date, endExclusive) >= 0
+      startInclusive &&
+      Temporal.PlainDate.compare(date, startInclusive) < 0
     ) {
+      continue;
+    }
+    if (endExclusive && Temporal.PlainDate.compare(date, endExclusive) >= 0) {
       continue;
     }
 
