@@ -3,14 +3,13 @@
 import fsPromise from "node:fs/promises";
 
 import { Temporal } from "@js-temporal/polyfill";
+import { ConfigurableResponses } from "@muspellheim/shared";
 import Ajv from "ajv";
 import addFormats from "ajv-formats";
 import { parse } from "csv";
 import { stringify as syncStringify } from "csv-stringify/sync";
 
-import { ConfigurableResponses } from "@muspellheim/shared";
-
-import type { Holiday } from "../domain/calendar";
+import { Holiday } from "../domain/calendar";
 
 const schema = {
   type: "object",
@@ -31,7 +30,9 @@ export class HolidayRepository extends EventTarget {
 
   static createNull({
     holidays,
-  }: { holidays?: Holiday[][] } = {}): HolidayRepository {
+  }: {
+    holidays?: { date: string; title: string }[][];
+  } = {}): HolidayRepository {
     return new HolidayRepository(
       "null-file-csv",
       new FsPromiseStub(holidays) as unknown as typeof fsPromise,
@@ -48,8 +49,8 @@ export class HolidayRepository extends EventTarget {
   }
 
   async findAllByDate(
-    startInclusive: Temporal.PlainDate | Temporal.PlainDateLike | string,
-    endExclusive: Temporal.PlainDate | Temporal.PlainDateLike | string,
+    startInclusive: Temporal.PlainDateLike | string,
+    endExclusive: Temporal.PlainDateLike | string,
   ): Promise<Holiday[]> {
     try {
       const fileContent = await this.#fs.readFile(this.#fileName);
@@ -70,16 +71,12 @@ export class HolidayRepository extends EventTarget {
       });
       const holidays: Holiday[] = [];
       for await (const record of records) {
-        const holiday = HolidayDto.from(record);
-        const date = Temporal.PlainDate.from(holiday.date);
+        const holiday = HolidayDto.from(record).validate();
         if (
-          Temporal.PlainDate.compare(date, startInclusive) >= 0 &&
-          Temporal.PlainDate.compare(date, endExclusive) < 0
+          Temporal.PlainDate.compare(holiday.date, startInclusive) >= 0 &&
+          Temporal.PlainDate.compare(holiday.date, endExclusive) < 0
         ) {
-          holidays.push({
-            date: holiday.date,
-            title: holiday.title,
-          });
+          holidays.push(holiday);
         }
       }
       return holidays;
@@ -117,6 +114,10 @@ export class HolidayDto {
   constructor(data: HolidayDto) {
     this.date = data.date;
     this.title = data.title;
+  }
+
+  validate(): Holiday {
+    return new Holiday(this.date, this.title);
   }
 }
 

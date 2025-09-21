@@ -2,9 +2,14 @@
 
 import { Temporal } from "@js-temporal/polyfill";
 
-export interface Holiday {
-  date: string;
+export class Holiday {
+  date: Temporal.PlainDate;
   title: string;
+
+  constructor(date: Temporal.PlainDateLike | string, title: string) {
+    this.date = Temporal.PlainDate.from(date);
+    this.title = title;
+  }
 }
 
 export class Calendar {

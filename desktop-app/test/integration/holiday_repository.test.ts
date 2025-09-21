@@ -2,6 +2,7 @@
 
 import path from "node:path";
 
+import { Temporal } from "@js-temporal/polyfill";
 import { describe, expect, it } from "vitest";
 
 import type { Holiday } from "../../src/main/domain/calendar";
@@ -12,9 +13,18 @@ const NON_EXISTING_FILE = path.resolve(
   "../test/data/holidays.csv",
 );
 const TESTDATA_FILE = path.resolve(import.meta.dirname, "../data/holidays.csv");
-const KARFREITAG: Holiday = { date: "2025-04-18", title: "Karfreitag" };
-const OSTERSONNTAG: Holiday = { date: "2025-04-20", title: "Ostersonntag" };
-const OSTERMONTAG: Holiday = { date: "2025-04-21", title: "Ostermontag" };
+const KARFREITAG: Holiday = {
+  date: Temporal.PlainDate.from("2025-04-18"),
+  title: "Karfreitag",
+};
+const OSTERSONNTAG: Holiday = {
+  date: Temporal.PlainDate.from("2025-04-20"),
+  title: "Ostersonntag",
+};
+const OSTERMONTAG: Holiday = {
+  date: Temporal.PlainDate.from("2025-04-21"),
+  title: "Ostermontag",
+};
 
 describe("Holiday repository", () => {
   it("Finds nothing when file does not exists", async () => {
@@ -54,7 +64,14 @@ describe("Holiday repository", () => {
   describe("Nulled holiday repository", () => {
     it("Finds all by date", async () => {
       const repository = HolidayRepository.createNull({
-        holidays: [[{ date: "2025-06-09", title: "Pfingstmontag" }]],
+        holidays: [
+          [
+            {
+              date: "2025-06-09",
+              title: "Pfingstmontag",
+            },
+          ],
+        ],
       });
 
       const holidays = await repository.findAllByDate(
@@ -63,7 +80,7 @@ describe("Holiday repository", () => {
       );
 
       expect(holidays).toEqual([
-        { date: "2025-06-09", title: "Pfingstmontag" },
+        { date: Temporal.PlainDate.from("2025-06-09"), title: "Pfingstmontag" },
       ]);
     });
   });

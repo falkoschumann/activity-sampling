@@ -15,10 +15,10 @@ describe("Event store", () => {
     await fsPromise.rm(TEST_FILE, { force: true });
     const store = EventStore.create({ fileName: TEST_FILE });
 
-    await store.record(ActivityLoggedEventDto.createTestData());
+    await store.record(ActivityLoggedEventDto.createTestInstance());
     const events = await arrayFromAsync(store.replay());
 
-    expect(events).toEqual([ActivityLoggedEventDto.createTestData()]);
+    expect(events).toEqual([ActivityLoggedEventDto.createTestInstance()]);
   });
 
   describe("Nulled event store", () => {
@@ -26,21 +26,21 @@ describe("Event store", () => {
       const store = EventStore.createNull();
       const recordEvents = store.trackRecorded();
 
-      await store.record(ActivityLoggedEventDto.createTestData());
+      await store.record(ActivityLoggedEventDto.createTestInstance());
 
       expect(recordEvents.data).toEqual([
-        ActivityLoggedEventDto.createTestData(),
+        ActivityLoggedEventDto.createTestInstance(),
       ]);
     });
 
     it("Replays events", async () => {
       const store = EventStore.createNull({
-        events: [[ActivityLoggedEventDto.createTestData()]],
+        events: [[ActivityLoggedEventDto.createTestInstance()]],
       });
 
       const events = await arrayFromAsync(store.replay());
 
-      expect(events).toEqual([ActivityLoggedEventDto.createTestData()]);
+      expect(events).toEqual([ActivityLoggedEventDto.createTestInstance()]);
     });
   });
 });

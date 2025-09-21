@@ -48,7 +48,7 @@ export class ActivityLoggedEventDto {
     );
   }
 
-  static createTestData({
+  static createTestInstance({
     timestamp = "2025-08-14T11:00:00Z",
     duration = "PT30M",
     client = "Test client",
