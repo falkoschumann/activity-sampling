@@ -17,7 +17,7 @@ jobs:
         with:
           # Use Java LTS
           distribution: temurin
-          java-version: "21"
+          java-version: "25"
       - name: Use Node.js LTS
         uses: actions/setup-node@v5
         with:
@@ -64,8 +64,8 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        # Build with Java LTS and current version
-        java-version: ["21", "24"]
+        # Build with Java LTS and the current version
+        java-version: ["21", "25"]
     steps:
       - name: Checkout source code
         uses: actions/checkout@v5
