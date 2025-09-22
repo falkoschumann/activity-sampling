@@ -10,7 +10,7 @@ plugins {
   pmd
   id("com.diffplug.spotless") version "7.2.1"
   id("io.spring.dependency-management") version "1.1.7"
-  id("org.springframework.boot") version "3.5.5"
+  id("org.springframework.boot") version "3.5.6"
 }
 
 configurations {
@@ -42,7 +42,7 @@ dependencies {
   implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
   implementation("org.thymeleaf.extras:thymeleaf-extras-springsecurity6")
   compileOnly("org.projectlombok:lombok")
-  compileOnly("com.github.spotbugs:spotbugs-annotations:4.9.5")
+  compileOnly("com.github.spotbugs:spotbugs-annotations:4.9.6")
   developmentOnly("org.springframework.boot:spring-boot-devtools")
   annotationProcessor("org.projectlombok:lombok")
   annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
