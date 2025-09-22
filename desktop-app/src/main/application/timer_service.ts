@@ -20,9 +20,12 @@ export class TimerService extends EventTarget {
   }
 
   static createNull({
-    clock = Clock.fixed("2025-08-28T15:52:00Z", "Europe/Berlin"),
+    fixedInstant = "2025-08-28T15:52:00Z",
   } = {}): TimerService {
-    return new TimerService(clock, timerStub as unknown as typeof globalThis);
+    return new TimerService(
+      Clock.fixed(fixedInstant, "Europe/Berlin"),
+      timerStub as unknown as typeof globalThis,
+    );
   }
 
   #clock: Clock;

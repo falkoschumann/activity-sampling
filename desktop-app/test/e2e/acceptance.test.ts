@@ -91,6 +91,7 @@ describe("Activity Sampling", () => {
         const { log } = await startActivitySampling({
           now: "2025-08-29T09:42:00Z",
         });
+        await log.activityLogged({ timestamp: "2025-07-29T11:37:00Z" });
         await log.activityLogged({ timestamp: "2025-07-30T11:37:00Z" });
         await log.activityLogged({ timestamp: "2025-08-29T09:17:00Z" });
         await log.activityLogged({ timestamp: "2025-08-29T08:47:00Z" });
@@ -110,6 +111,7 @@ describe("Activity Sampling", () => {
               date: "2025-07-30",
               activities: [{ dateTime: "2025-07-30T13:37" }],
             },
+            // event from 2025-07-29 is not included because it's older than 30 days
           ],
         });
       });
@@ -270,10 +272,13 @@ describe("Activity Sampling", () => {
 
       it("should return summary for a custom period", async () => {
         const { reports } = await startActivitySampling();
+        // event before the period
         await reports.activityLogged({ timestamp: "2025-09-07T09:00:00Z" });
+        // events within the period
         await reports.activityLogged({ timestamp: "2025-09-08T09:00:00Z" });
         await reports.activityLogged({ timestamp: "2025-09-12T09:00:00Z" });
         await reports.activityLogged({ timestamp: "2025-09-14T09:00:00Z" });
+        // event after the period
         await reports.activityLogged({ timestamp: "2025-09-15T09:00:00Z" });
 
         await reports.queryReport({

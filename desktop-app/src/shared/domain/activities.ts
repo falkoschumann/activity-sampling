@@ -2,8 +2,6 @@
 
 import { Temporal } from "@js-temporal/polyfill";
 
-// TODO think about using createTestInstance with logically dependency
-
 //
 // Commands
 //

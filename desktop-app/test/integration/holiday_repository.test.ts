@@ -27,7 +27,7 @@ const OSTERMONTAG: Holiday = {
 };
 
 describe("Holiday repository", () => {
-  it("Finds nothing when file does not exists", async () => {
+  it("should find nothing when file does not exist", async () => {
     const repository = HolidayRepository.create({
       fileName: NON_EXISTING_FILE,
     });
@@ -37,7 +37,7 @@ describe("Holiday repository", () => {
     expect(holidays).toEqual([]);
   });
 
-  it("Finds all saved holidays", async () => {
+  it("should find all saved holidays", async () => {
     const repository = HolidayRepository.create({ fileName: TESTDATA_FILE });
 
     const holidays = await repository.findAllByDate("2025-01-01", "2025-12-31");
@@ -45,7 +45,7 @@ describe("Holiday repository", () => {
     expect(holidays).toEqual([KARFREITAG, OSTERSONNTAG, OSTERMONTAG]);
   });
 
-  it("finds all by date with lower limit", async () => {
+  it("should find all by date with lower limit", async () => {
     const repository = HolidayRepository.create({ fileName: TESTDATA_FILE });
 
     const holidays = await repository.findAllByDate("2025-04-21", "2025-04-28");
@@ -53,7 +53,7 @@ describe("Holiday repository", () => {
     expect(holidays).toEqual([OSTERMONTAG]);
   });
 
-  it("finds all by date with upper limit", async () => {
+  it("should find all by date with upper limit", async () => {
     const repository = HolidayRepository.create({ fileName: TESTDATA_FILE });
 
     const holidays = await repository.findAllByDate("2025-04-14", "2025-04-21");
@@ -62,16 +62,9 @@ describe("Holiday repository", () => {
   });
 
   describe("Nulled holiday repository", () => {
-    it("Finds all by date", async () => {
+    it("should find all by date", async () => {
       const repository = HolidayRepository.createNull({
-        holidays: [
-          [
-            {
-              date: "2025-06-09",
-              title: "Pfingstmontag",
-            },
-          ],
-        ],
+        holidays: [{ date: "2025-06-09", title: "Pfingstmontag" }],
       });
 
       const holidays = await repository.findAllByDate(

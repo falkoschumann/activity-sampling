@@ -16,12 +16,7 @@ export default defineConfig({
         scss: {
           // WORKAROUND: Silence deprecation warnings in Bootstrap 5.3
           // See https://github.com/twbs/bootstrap/pull/41512
-          silenceDeprecations: [
-            "import",
-            "mixed-decls",
-            "color-functions",
-            "global-builtin",
-          ],
+          silenceDeprecations: ["import", "color-functions", "global-builtin"],
         },
       },
     },

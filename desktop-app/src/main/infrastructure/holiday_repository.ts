@@ -10,6 +10,7 @@ import { parse } from "csv";
 import { stringify as syncStringify } from "csv-stringify/sync";
 
 import { Holiday } from "../domain/calendar";
+import { HolidayConfiguration } from "./configuration_gateway";
 
 const schema = {
   type: "object",
@@ -22,29 +23,27 @@ const schema = {
 };
 
 export class HolidayRepository extends EventTarget {
-  static create({
-    fileName = "data/holidays.csv",
-  }: { fileName?: string } = {}) {
-    return new HolidayRepository(fileName, fsPromise);
+  static create(configuration = HolidayConfiguration.createDefault()) {
+    return new HolidayRepository(configuration, fsPromise);
   }
 
   static createNull({
     holidays,
   }: {
-    holidays?: { date: string; title: string }[][];
+    holidays?: HolidayDto[];
   } = {}): HolidayRepository {
     return new HolidayRepository(
-      "null-file-csv",
+      new HolidayConfiguration("null-file-csv"),
       new FsPromiseStub(holidays) as unknown as typeof fsPromise,
     );
   }
 
-  readonly #fileName: string;
+  readonly #configuration: HolidayConfiguration;
   readonly #fs: typeof fsPromise;
 
-  constructor(fileName: string, fs: typeof fsPromise) {
+  constructor(configuration: HolidayConfiguration, fs: typeof fsPromise) {
     super();
-    this.#fileName = fileName;
+    this.#configuration = configuration;
     this.#fs = fs;
   }
 
@@ -53,7 +52,7 @@ export class HolidayRepository extends EventTarget {
     endExclusive: Temporal.PlainDateLike | string,
   ): Promise<Holiday[]> {
     try {
-      const fileContent = await this.#fs.readFile(this.#fileName);
+      const fileContent = await this.#fs.readFile(this.#configuration.fileName);
       const records = parse(fileContent, {
         cast: (value, context) =>
           value == "" && !context.quoting ? undefined : value,
@@ -71,7 +70,8 @@ export class HolidayRepository extends EventTarget {
       });
       const holidays: Holiday[] = [];
       for await (const record of records) {
-        const holiday = HolidayDto.from(record).validate();
+        const dto = HolidayDto.from(record);
+        const holiday = validateHoliday(dto);
         if (
           Temporal.PlainDate.compare(holiday.date, startInclusive) >= 0 &&
           Temporal.PlainDate.compare(holiday.date, endExclusive) < 0
@@ -115,17 +115,20 @@ export class HolidayDto {
     this.date = data.date;
     this.title = data.title;
   }
+}
 
-  validate(): Holiday {
-    return new Holiday(this.date, this.title);
-  }
+function validateHoliday(dto: HolidayDto): Holiday {
+  return new Holiday(dto.date, dto.title);
 }
 
 class FsPromiseStub {
   readonly #configurableResponses: ConfigurableResponses;
 
-  constructor(holidays?: unknown[][]) {
-    this.#configurableResponses = ConfigurableResponses.create(holidays);
+  constructor(holidays?: unknown[]) {
+    this.#configurableResponses = ConfigurableResponses.create(
+      holidays ? [holidays] : undefined,
+      "filesystem stub",
+    );
   }
 
   async readFile() {

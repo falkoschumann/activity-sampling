@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import { Calendar } from "../../src/main/domain/calendar";
 
 describe("Calendar", () => {
-  it("Determines business days", () => {
+  it("should count business days", () => {
     const calendar = Calendar.create();
 
     const businessDays = calendar.countBusinessDays("2025-06-01", "2025-07-01");
@@ -12,7 +12,7 @@ describe("Calendar", () => {
     expect(businessDays).toEqual(21);
   });
 
-  it("Determines business days with holidays", () => {
+  it("should count business days with holidays", () => {
     const calendar = Calendar.create({ holidays: ["2025-06-09"] });
 
     const businessDays = calendar.countBusinessDays("2025-06-01", "2025-07-01");

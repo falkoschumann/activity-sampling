@@ -31,8 +31,18 @@ import {
   RecentActivitiesQueryResultDto,
 } from "../shared/infrastructure/activities";
 import icon from "../../resources/icon.png?asset";
+import { Configuration } from "./infrastructure/configuration_gateway";
+import { EventStore } from "./infrastructure/event_store";
+import { HolidayRepository } from "./infrastructure/holiday_repository";
 
-const activitiesService = ActivitiesService.create();
+const configuration = Configuration.createDefault();
+const eventStore = EventStore.create(configuration.eventStore);
+const holidayRepository = HolidayRepository.create(configuration.holidays);
+const activitiesService = new ActivitiesService(
+  configuration.activities,
+  eventStore,
+  holidayRepository,
+);
 const timerService = TimerService.create();
 
 app.whenReady().then(() => {
@@ -88,7 +98,6 @@ function installDevTools() {
 }
 
 function createIpc() {
-  // TODO configure data folder
   ipcMain.handle("logActivity", async (_event, commandDto) => {
     const command = LogActivityCommandDto.create(commandDto).validate();
     const status = await activitiesService.logActivity(command);

@@ -1,6 +1,5 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
-import { Temporal } from "@js-temporal/polyfill";
 import { type CommandStatus, Success } from "@muspellheim/shared";
 
 import { Clock } from "../../shared/common/temporal";
@@ -18,55 +17,12 @@ import {
   projectReport,
   projectTimesheet,
 } from "../domain/activities";
+import { ActivitiesConfiguration } from "../infrastructure/configuration_gateway";
 import { EventStore } from "../infrastructure/event_store";
 import { ActivityLoggedEventDto } from "../infrastructure/events";
 import { HolidayRepository } from "../infrastructure/holiday_repository";
 
-export interface ActivitiesConfiguration {
-  readonly capacity: Temporal.Duration;
-}
-
 export class ActivitiesService {
-  static create({
-    configuration = { capacity: Temporal.Duration.from("PT40H") },
-    eventStore = EventStore.create(),
-    holidayRepository = HolidayRepository.create(),
-    clock = Clock.systemDefaultZone(),
-  }: {
-    configuration?: ActivitiesConfiguration;
-    eventStore?: EventStore;
-    holidayRepository?: HolidayRepository;
-    clock?: Clock;
-  } = {}): ActivitiesService {
-    return new ActivitiesService(
-      configuration,
-      eventStore,
-      holidayRepository,
-      clock,
-    );
-  }
-
-  static createNull({
-    configuration = { capacity: Temporal.Duration.from("PT40H") },
-    eventStore = EventStore.createNull(),
-    holidayRepository = HolidayRepository.createNull({ holidays: [[]] }),
-    fixedInstant = "1970-01-01T00:00:00Z",
-    zone = "Europe/Berlin",
-  }: {
-    configuration?: ActivitiesConfiguration;
-    eventStore?: EventStore;
-    holidayRepository?: HolidayRepository;
-    fixedInstant?: Temporal.Instant | string;
-    zone?: Temporal.TimeZoneLike;
-  } = {}): ActivitiesService {
-    return new ActivitiesService(
-      configuration,
-      eventStore,
-      holidayRepository,
-      Clock.fixed(fixedInstant, zone),
-    );
-  }
-
   readonly #configuration: ActivitiesConfiguration;
   readonly #eventStore: EventStore;
   readonly #holidayRepository: HolidayRepository;
@@ -76,7 +32,7 @@ export class ActivitiesService {
     configuration: ActivitiesConfiguration,
     eventStore: EventStore,
     holidayRepository: HolidayRepository,
-    clock: Clock,
+    clock = Clock.systemDefaultZone(),
   ) {
     this.#configuration = configuration;
     this.#eventStore = eventStore;

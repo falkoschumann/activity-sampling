@@ -5,10 +5,10 @@ import fs from "node:fs/promises";
 import { Temporal } from "@js-temporal/polyfill";
 import { expect } from "vitest";
 
-import { ActivitiesService } from "../../src/main/application/activities_service";
-import { TimerService } from "../../src/main/application/timer_service";
 import { arrayFromAsync } from "../../src/shared/common/polyfills";
 import { Clock } from "../../src/shared/common/temporal";
+import { ActivitiesService } from "../../src/main/application/activities_service";
+import { TimerService } from "../../src/main/application/timer_service";
 import {
   type LogActivityCommand,
   type RecentActivitiesQuery,
@@ -24,6 +24,7 @@ import {
   type StartTimerCommand,
   StopTimerCommand,
 } from "../../src/shared/domain/timer";
+import { ActivitiesConfiguration } from "../../src/main/infrastructure/configuration_gateway";
 import { EventStore } from "../../src/main/infrastructure/event_store";
 import { ActivityLoggedEventDto } from "../../src/main/infrastructure/events";
 import { HolidayRepository } from "../../src/main/infrastructure/holiday_repository";
@@ -425,11 +426,12 @@ class ActivitiesDriver {
     const holidayRepository = HolidayRepository.create({
       fileName: holidayFile,
     });
-    this.#activitiesService = ActivitiesService.create({
+    this.#activitiesService = new ActivitiesService(
+      ActivitiesConfiguration.createDefault(),
       eventStore,
       holidayRepository,
       clock,
-    });
+    );
   }
 
   //

@@ -7,37 +7,38 @@ import stream from "node:stream";
 import { ConfigurableResponses, OutputTracker } from "@muspellheim/shared";
 import { parse, stringify } from "csv";
 import { stringify as syncStringify } from "csv-stringify/sync";
+import { EventStoreConfiguration } from "./configuration_gateway";
 
 const RECORDED_EVENT = "recorded";
 
 export class EventStore<T = unknown> extends EventTarget {
-  static create<T>({
-    fileName = "data/events.csv",
-  }: { fileName?: string } = {}): EventStore<T> {
-    return new EventStore<T>(fileName, fsPromise);
+  static create<T>(
+    configuration = EventStoreConfiguration.createDefault(),
+  ): EventStore<T> {
+    return new EventStore<T>(configuration, fsPromise);
   }
 
-  static createNull<T>({ events }: { events?: T[][] } = {}): EventStore<T> {
+  static createNull<T>({ events }: { events?: T[] } = {}): EventStore<T> {
     return new EventStore<T>(
-      "null-file-csv",
+      { fileName: "null-file-csv" },
       new FsPromiseStub(events) as unknown as typeof fsPromise,
     );
   }
 
-  readonly #fileName: string;
+  readonly #configuration: EventStoreConfiguration;
   readonly #fs: typeof fsPromise;
 
-  constructor(fileName: string, fs: typeof fsPromise) {
+  constructor(configuration: EventStoreConfiguration, fs: typeof fsPromise) {
     super();
-    this.#fileName = fileName;
+    this.#configuration = configuration;
     this.#fs = fs;
   }
 
   async record(event: T) {
-    const dirName = path.resolve(path.dirname(this.#fileName));
+    const dirName = path.resolve(path.dirname(this.#configuration.fileName));
     await this.#fs.mkdir(dirName, { recursive: true });
 
-    const existsFile = await this.#existsFile(this.#fileName);
+    const existsFile = await this.#existsFile(this.#configuration.fileName);
     const stringifier = stringify({
       header: !existsFile,
       record_delimiter: "\r\n",
@@ -50,7 +51,7 @@ export class EventStore<T = unknown> extends EventTarget {
         { key: "notes", header: "Notes" },
       ],
     });
-    const file = await this.#fs.open(this.#fileName, "a");
+    const file = await this.#fs.open(this.#configuration.fileName, "a");
     const stream = file.createWriteStream();
     stringifier.pipe(stream);
     stringifier.write(event);
@@ -65,7 +66,7 @@ export class EventStore<T = unknown> extends EventTarget {
 
   async *replay(): AsyncGenerator<T> {
     try {
-      const file = await this.#fs.open(this.#fileName, "r");
+      const file = await this.#fs.open(this.#configuration.fileName, "r");
       const parser = file.createReadStream().pipe(
         parse({
           cast: (value, context) =>
@@ -122,8 +123,11 @@ export class EventStore<T = unknown> extends EventTarget {
 class FsPromiseStub {
   readonly #configurableResponses: ConfigurableResponses;
 
-  constructor(events?: unknown[][]) {
-    this.#configurableResponses = ConfigurableResponses.create(events);
+  constructor(events?: unknown[]) {
+    this.#configurableResponses = ConfigurableResponses.create(
+      events ? [events] : undefined,
+      "filesystem stub",
+    );
   }
 
   async lstat() {}

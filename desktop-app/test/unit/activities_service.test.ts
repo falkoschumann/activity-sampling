@@ -4,6 +4,7 @@ import { Temporal } from "@js-temporal/polyfill";
 import { Success } from "@muspellheim/shared";
 import { describe, expect, it } from "vitest";
 
+import { Clock } from "../../src/shared/common/temporal";
 import { ActivitiesService } from "../../src/main/application/activities_service";
 import {
   Activity,
@@ -12,14 +13,18 @@ import {
   Scope,
   TimesheetEntry,
 } from "../../src/shared/domain/activities";
+import { ActivitiesConfiguration } from "../../src/main/infrastructure/configuration_gateway";
 import { EventStore } from "../../src/main/infrastructure/event_store";
 import { ActivityLoggedEventDto } from "../../src/main/infrastructure/events";
+import {
+  HolidayDto,
+  HolidayRepository,
+} from "../../src/main/infrastructure/holiday_repository";
 
 describe("Activities service", () => {
   describe("Log activity", () => {
     it("should log without an optional notes", async () => {
-      const eventStore = EventStore.createNull();
-      const service = ActivitiesService.createNull({ eventStore });
+      const { service, eventStore } = configure();
       const recordEvents = eventStore.trackRecorded();
 
       const status = await service.logActivity(
@@ -33,8 +38,7 @@ describe("Activities service", () => {
     });
 
     it("should log with an optional notes", async () => {
-      const eventStore = EventStore.createNull();
-      const service = ActivitiesService.createNull({ eventStore });
+      const { service, eventStore } = configure();
       const recordEvents = eventStore.trackRecorded();
 
       const status = await service.logActivity(
@@ -50,20 +54,12 @@ describe("Activities service", () => {
 
   describe("Query recent activities", () => {
     it("should return recent activities", async () => {
-      const timestamps = [
-        "2025-06-04T14:00:00Z",
-        "2025-06-05T08:30:00Z",
-        "2025-06-05T09:00:00Z",
-      ];
-      const eventStore = EventStore.createNull({
-        events: [
-          timestamps.map((timestamp) =>
-            ActivityLoggedEventDto.createTestInstance({ timestamp }),
-          ),
-        ],
-      });
-      const service = ActivitiesService.createNull({
-        eventStore,
+      const { service } = configure({
+        events: mapTimestampsToEvents([
+          "2025-06-04T14:00:00Z",
+          "2025-06-05T08:30:00Z",
+          "2025-06-05T09:00:00Z",
+        ]),
         fixedInstant: "2025-06-05T10:00:00Z",
       });
 
@@ -103,28 +99,25 @@ describe("Activities service", () => {
 
   describe("Query report", () => {
     it("should return report", async () => {
-      const eventStore = EventStore.createNull({
+      const { service } = configure({
         events: [
-          [
-            ActivityLoggedEventDto.createTestInstance({
-              timestamp: "2025-06-25T15:00:00Z",
-              client: "Client 2",
-              duration: "PT7H",
-            }),
-            ActivityLoggedEventDto.createTestInstance({
-              timestamp: "2025-06-26T15:00:00Z",
-              client: "Client 1",
-              duration: "PT5H",
-            }),
-            ActivityLoggedEventDto.createTestInstance({
-              timestamp: "2025-06-27T15:00:00Z",
-              client: "Client 1",
-              duration: "PT3H",
-            }),
-          ],
+          ActivityLoggedEventDto.createTestInstance({
+            timestamp: "2025-06-25T15:00:00Z",
+            client: "Client 2",
+            duration: "PT7H",
+          }),
+          ActivityLoggedEventDto.createTestInstance({
+            timestamp: "2025-06-26T15:00:00Z",
+            client: "Client 1",
+            duration: "PT5H",
+          }),
+          ActivityLoggedEventDto.createTestInstance({
+            timestamp: "2025-06-27T15:00:00Z",
+            client: "Client 1",
+            duration: "PT3H",
+          }),
         ],
       });
-      const service = ActivitiesService.createNull({ eventStore });
 
       const result = await service.queryReport({ scope: Scope.CLIENTS });
 
@@ -146,38 +139,76 @@ describe("Activities service", () => {
 
   describe("Query timesheet", () => {
     it("should return timesheet", async () => {
-      const eventStore = EventStore.createNull({
+      const { service } = configure({
         events: [
-          [
-            ActivityLoggedEventDto.createTestInstance({
-              timestamp: "2025-06-02T10:00:00Z",
-            }),
-            ActivityLoggedEventDto.createTestInstance({
-              timestamp: "2025-06-02T10:30:00Z",
-            }),
-            ActivityLoggedEventDto.createTestInstance({
-              timestamp: "2025-06-03T10:00:00Z",
-            }),
-          ],
+          ActivityLoggedEventDto.createTestInstance({
+            timestamp: "2025-06-10T15:00:00Z",
+            duration: "PT8H",
+          }),
+          ActivityLoggedEventDto.createTestInstance({
+            timestamp: "2025-06-11T15:00:00Z",
+            duration: "PT8H",
+          }),
         ],
+        holidays: [{ date: "2025-06-10", title: "Pfingstmontag" }],
+        fixedInstant: "2025-06-11T15:00:00Z",
       });
-      const service = ActivitiesService.createNull({ eventStore });
 
       const result = await service.queryTimesheet({
-        from: Temporal.PlainDate.from("2025-06-02"),
-        to: Temporal.PlainDate.from("2025-06-08"),
+        from: Temporal.PlainDate.from("2025-06-09"),
+        to: Temporal.PlainDate.from("2025-06-15"),
       });
 
-      expect(result.entries).toEqual([
-        TimesheetEntry.createTestInstance({
-          date: Temporal.PlainDate.from("2025-06-02"),
-          hours: Temporal.Duration.from("PT1H"),
-        }),
-        TimesheetEntry.createTestInstance({
-          date: Temporal.PlainDate.from("2025-06-03"),
-          hours: Temporal.Duration.from("PT30M"),
-        }),
-      ]);
+      expect(result).toEqual({
+        entries: [
+          TimesheetEntry.createTestInstance({
+            date: Temporal.PlainDate.from("2025-06-10"),
+            hours: Temporal.Duration.from("PT8H"),
+          }),
+          TimesheetEntry.createTestInstance({
+            date: Temporal.PlainDate.from("2025-06-11"),
+            hours: Temporal.Duration.from("PT8H"),
+          }),
+        ],
+        totalHours: Temporal.Duration.from("PT16H"),
+        capacity: {
+          hours: Temporal.Duration.from("PT32H"),
+          offset: Temporal.Duration.from("PT0H"),
+        },
+      });
     });
   });
 });
+
+function configure({
+  events,
+  holidays,
+  fixedInstant,
+}: {
+  events?: unknown[];
+  holidays?: HolidayDto[];
+  fixedInstant?: string;
+} = {}) {
+  const configuration = ActivitiesConfiguration.createDefault();
+  const eventStore = EventStore.createNull({ events });
+  const holidayRepository = HolidayRepository.createNull({
+    holidays,
+  });
+  const clock = Clock.fixed(
+    fixedInstant ?? "1970-01-01T00:00:00Z",
+    "Europe/Berlin",
+  );
+  const service = new ActivitiesService(
+    configuration,
+    eventStore,
+    holidayRepository,
+    clock,
+  );
+  return { service, eventStore, holidayRepository, clock };
+}
+
+function mapTimestampsToEvents(timestamps: string[]) {
+  return timestamps.map((timestamp) =>
+    ActivityLoggedEventDto.createTestInstance({ timestamp }),
+  );
+}
