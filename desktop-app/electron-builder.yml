@@ -1,5 +1,5 @@
-appId: com.electron.app
-productName: desktop-app
+appId: de.muspellheim.activitysampling
+productName: Activity Sampling
 directories:
   buildResources: build
 files:
@@ -12,7 +12,7 @@ files:
 asarUnpack:
   - resources/**
 win:
-  executableName: desktop-app
+  executableName: activity-sampling
 nsis:
   artifactName: ${name}-${version}-setup.${ext}
   shortcutName: ${productName}
@@ -37,7 +37,7 @@ linux:
     - AppImage
     - snap
     - deb
-  maintainer: electronjs.org
+  maintainer: Falko Schumann
   category: Utility
 appImage:
   artifactName: ${name}-${version}.${ext}

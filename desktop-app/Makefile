@@ -1,14 +1,14 @@
 all: dist check
 
 clean:
-	rm -rf coverage
-	rm -rf out
+	rm -rf coverage out testdata
 
 distclean: clean
 	rm -rf dist
 	rm -rf node_modules
 
 dist: build
+#	npm run build:electron
 
 start:
 	npm start

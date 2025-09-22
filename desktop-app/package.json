@@ -1,16 +1,17 @@
 {
-  "name": "desktop-app",
+  "name": "activity-sampling",
   "version": "1.0.0",
-  "description": "An Electron application with React and TypeScript",
+  "description": "Periodically asks the user about their current activity and logs it for analysis.",
   "main": "./out/main/index.js",
-  "author": "example.com",
-  "homepage": "https://electron-vite.org",
+  "author": "Falko Schumann",
+  "homepage": "https://muspellheim.de",
   "scripts": {
     "start": "electron-vite preview",
     "dev": "electron-vite dev --watch",
     "build": "tsc --build && electron-vite build",
     "postinstall": "electron-builder install-app-deps",
     "build:unpack": "npm run build && electron-builder --dir",
+    "build:electron": "npm run build && electron-builder build",
     "build:win": "npm run build && electron-builder --win",
     "build:mac": "npm run build && electron-builder --mac",
     "build:linux": "npm run build && electron-builder --linux"
