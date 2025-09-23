@@ -1,14 +1,15 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
 import fs from "node:fs/promises";
+import path from "node:path";
 
 import { Temporal } from "@js-temporal/polyfill";
 import { expect } from "vitest";
 
-import { arrayFromAsync } from "../../src/shared/common/polyfills";
-import { Clock } from "../../src/shared/common/temporal";
-import { ActivitiesService } from "../../src/main/application/activities_service";
-import { TimerService } from "../../src/main/application/timer_service";
+import { arrayFromAsync } from "../../../src/shared/common/polyfills";
+import { Clock } from "../../../src/shared/common/temporal";
+import { ActivitiesService } from "../../../src/main/application/activities_service";
+import { TimerService } from "../../../src/main/application/timer_service";
 import {
   type LogActivityCommand,
   type RecentActivitiesQuery,
@@ -17,22 +18,28 @@ import {
   ReportQueryResult,
   TimesheetQuery,
   TimesheetQueryResult,
-} from "../../src/shared/domain/activities";
+} from "../../../src/shared/domain/activities";
 import {
   type CurrentIntervalQuery,
   type CurrentIntervalQueryResult,
   type StartTimerCommand,
   StopTimerCommand,
-} from "../../src/shared/domain/timer";
-import { ActivitiesConfiguration } from "../../src/main/infrastructure/configuration_gateway";
-import { EventStore } from "../../src/main/infrastructure/event_store";
-import { ActivityLoggedEventDto } from "../../src/main/infrastructure/events";
-import { HolidayRepository } from "../../src/main/infrastructure/holiday_repository";
+} from "../../../src/shared/domain/timer";
+import { ActivitiesConfiguration } from "../../../src/main/infrastructure/configuration_gateway";
+import { EventStore } from "../../../src/main/infrastructure/event_store";
+import { ActivityLoggedEventDto } from "../../../src/main/infrastructure/events";
+import { HolidayRepository } from "../../../src/main/infrastructure/holiday_repository";
 
 export async function startActivitySampling({
   now = "2025-08-26T14:00:00Z",
-  eventsFile = "testdata/events.csv",
-  holidayFile = "test/data/holidays.csv",
+  eventsFile = path.resolve(
+    import.meta.dirname,
+    "../../../testdata/events.csv",
+  ),
+  holidayFile = path.resolve(
+    import.meta.dirname,
+    "../../../test/main/data/holidays/example.csv",
+  ),
 } = {}): Promise<Ui> {
   await fs.rm(eventsFile, { force: true });
 

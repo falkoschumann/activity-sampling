@@ -3,7 +3,7 @@
 import { Temporal } from "@js-temporal/polyfill";
 import { describe, expect, it } from "vitest";
 
-import { Clock, normalizeDuration } from "../../src/shared/common/temporal";
+import { Clock, normalizeDuration } from "../../../src/shared/common/temporal";
 
 describe("Clock", () => {
   it("should return current timestamp with system UTC", () => {

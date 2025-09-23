@@ -3,7 +3,7 @@
 import { Temporal } from "@js-temporal/polyfill";
 import { describe, expect, it } from "vitest";
 
-import { Clock } from "../../src/shared/common/temporal";
+import { Clock } from "../../../src/shared/common/temporal";
 import {
   Activity,
   ActivityLoggedEvent,
@@ -11,12 +11,12 @@ import {
   ReportEntry,
   Scope,
   TimesheetEntry,
-} from "../../src/shared/domain/activities";
+} from "../../../src/shared/domain/activities";
 import {
   projectRecentActivities,
   projectReport,
   projectTimesheet,
-} from "../../src/main/domain/activities";
+} from "../../../src/main/domain/activities";
 
 describe("Activities", () => {
   describe("Project recent activities", () => {

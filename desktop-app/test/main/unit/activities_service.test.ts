@@ -4,22 +4,22 @@ import { Temporal } from "@js-temporal/polyfill";
 import { Success } from "@muspellheim/shared";
 import { describe, expect, it } from "vitest";
 
-import { Clock } from "../../src/shared/common/temporal";
-import { ActivitiesService } from "../../src/main/application/activities_service";
+import { Clock } from "../../../src/shared/common/temporal";
+import { ActivitiesService } from "../../../src/main/application/activities_service";
 import {
   Activity,
   LogActivityCommand,
   ReportEntry,
   Scope,
   TimesheetEntry,
-} from "../../src/shared/domain/activities";
-import { ActivitiesConfiguration } from "../../src/main/infrastructure/configuration_gateway";
-import { EventStore } from "../../src/main/infrastructure/event_store";
-import { ActivityLoggedEventDto } from "../../src/main/infrastructure/events";
+} from "../../../src/shared/domain/activities";
+import { ActivitiesConfiguration } from "../../../src/main/infrastructure/configuration_gateway";
+import { EventStore } from "../../../src/main/infrastructure/event_store";
+import { ActivityLoggedEventDto } from "../../../src/main/infrastructure/events";
 import {
   HolidayDto,
   HolidayRepository,
-} from "../../src/main/infrastructure/holiday_repository";
+} from "../../../src/main/infrastructure/holiday_repository";
 
 describe("Activities service", () => {
   describe("Log activity", () => {

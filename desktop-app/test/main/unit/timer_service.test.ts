@@ -2,12 +2,13 @@
 
 import { Temporal } from "@js-temporal/polyfill";
 import { describe, expect, it } from "vitest";
-import { TimerService } from "../../src/main/application/timer_service";
+
+import { TimerService } from "../../../src/main/application/timer_service";
 import {
   CurrentIntervalQuery,
   StartTimerCommand,
   StopTimerCommand,
-} from "../../src/shared/domain/timer";
+} from "../../../src/shared/domain/timer";
 
 describe("Timer service", () => {
   describe("Start timer", () => {

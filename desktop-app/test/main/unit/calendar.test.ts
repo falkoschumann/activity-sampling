@@ -1,7 +1,8 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
 import { describe, expect, it } from "vitest";
-import { Calendar } from "../../src/main/domain/calendar";
+
+import { Calendar } from "../../../src/main/domain/calendar";
 
 describe("Calendar", () => {
   it("should count business days", () => {

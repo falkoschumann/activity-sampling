@@ -10,7 +10,7 @@ import {
   timerStarted,
   timerStopped,
   timerTicked,
-} from "../../src/renderer/domain/timer";
+} from "../../../src/renderer/domain/timer";
 
 describe("Timer UI", () => {
   it("should handle timer started", () => {

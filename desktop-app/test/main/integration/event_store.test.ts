@@ -5,16 +5,19 @@ import fsPromise from "node:fs/promises";
 
 import { describe, expect, it } from "vitest";
 
-import { arrayFromAsync } from "../../src/shared/common/polyfills";
-import { EventStore } from "../../src/main/infrastructure/event_store";
-import { ActivityLoggedEventDto } from "../../src/main/infrastructure/events";
+import { arrayFromAsync } from "../../../src/shared/common/polyfills";
+import { EventStore } from "../../../src/main/infrastructure/event_store";
+import { ActivityLoggedEventDto } from "../../../src/main/infrastructure/events";
 
 const TEST_FILE = path.resolve(
-  __dirname,
-  "../../testdata/event_store_test.csv",
+  import.meta.dirname,
+  "../../../testdata/event_store_test.csv",
 );
 
-const NON_EXISTING_FILE = path.resolve(__dirname, "../data/non_existing.csv");
+const NON_EXISTING_FILE = path.resolve(
+  import.meta.dirname,
+  "../data/non_existing.csv",
+);
 
 describe("Event store", () => {
   it("should replay nothing when file does not exist", async () => {
