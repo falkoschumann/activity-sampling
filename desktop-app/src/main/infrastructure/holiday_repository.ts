@@ -28,13 +28,13 @@ export class HolidayRepository extends EventTarget {
   }
 
   static createNull({
-    holidays,
+    readFileResponses = [],
   }: {
-    holidays?: HolidayDto[];
+    readFileResponses?: (HolidayDto[] | null | Error)[];
   } = {}): HolidayRepository {
     return new HolidayRepository(
       new HolidayConfiguration("null-file-csv"),
-      new FsPromiseStub(holidays) as unknown as typeof fsPromise,
+      new FsPromiseStub(readFileResponses) as unknown as typeof fsPromise,
     );
   }
 
@@ -122,18 +122,27 @@ function validateHoliday(dto: HolidayDto): Holiday {
 }
 
 class FsPromiseStub {
-  readonly #configurableResponses: ConfigurableResponses;
+  readonly #readFileResponses: ConfigurableResponses<
+    HolidayDto[] | null | Error
+  >;
 
-  constructor(holidays?: unknown[]) {
-    this.#configurableResponses = ConfigurableResponses.create(
-      holidays ? [holidays] : undefined,
-      "filesystem stub",
+  constructor(readFileResponses: (HolidayDto[] | null | Error)[]) {
+    this.#readFileResponses = ConfigurableResponses.create(
+      readFileResponses,
+      "read file",
     );
   }
 
   async readFile() {
-    const response = this.#configurableResponses.next();
-    const s = syncStringify(response as unknown[], { header: true });
+    const response = this.#readFileResponses.next();
+    if (response === null) {
+      throw { code: "ENOENT" };
+    }
+    if (response instanceof Error) {
+      throw response;
+    }
+
+    const s = syncStringify(response, { header: true });
     return Promise.resolve(s);
   }
 }

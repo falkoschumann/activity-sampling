@@ -121,11 +121,11 @@ export class EventStore<T = unknown> extends EventTarget {
 }
 
 class FsPromiseStub {
-  readonly #configurableResponses: ConfigurableResponses;
+  readonly createReadStreamResponses: ConfigurableResponses;
 
-  constructor(events?: unknown[]) {
-    this.#configurableResponses = ConfigurableResponses.create(
-      events ? [events] : undefined,
+  constructor(createReadStreamResponses?: unknown[]) {
+    this.createReadStreamResponses = ConfigurableResponses.create(
+      createReadStreamResponses ? [createReadStreamResponses] : undefined,
       "filesystem stub",
     );
   }
@@ -135,23 +135,23 @@ class FsPromiseStub {
   async mkdir() {}
 
   async open() {
-    return Promise.resolve(new FileHandleStub(this.#configurableResponses));
+    return Promise.resolve(new FileHandleStub(this.createReadStreamResponses));
   }
 
   async writeFile() {}
 }
 
 class FileHandleStub {
-  #configurableResponses: ConfigurableResponses;
+  #createReadStreamResponses: ConfigurableResponses;
 
-  constructor(configurableResponses: ConfigurableResponses) {
-    this.#configurableResponses = configurableResponses;
+  constructor(createReadStreamResponses: ConfigurableResponses) {
+    this.#createReadStreamResponses = createReadStreamResponses;
   }
 
   createReadStream() {
     const readable = new stream.PassThrough();
     setTimeout(() => {
-      const events = this.#configurableResponses.next();
+      const events = this.#createReadStreamResponses.next();
       const record = syncStringify(events as unknown[], { header: true });
       readable.emit("data", record);
       readable.emit("end");

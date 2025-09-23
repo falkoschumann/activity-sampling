@@ -6,7 +6,10 @@ import { Temporal } from "@js-temporal/polyfill";
 import { describe, expect, it } from "vitest";
 
 import type { Holiday } from "../../../src/main/domain/calendar";
-import { HolidayRepository } from "../../../src/main/infrastructure/holiday_repository";
+import {
+  HolidayDto,
+  HolidayRepository,
+} from "../../../src/main/infrastructure/holiday_repository";
 
 const NON_EXISTING_FILE = path.resolve(
   import.meta.dirname,
@@ -68,20 +71,61 @@ describe("Holiday repository", () => {
     expect(holidays).toEqual([KARFREITAG, OSTERSONNTAG]);
   });
 
-  describe("Nulled holiday repository", () => {
-    it("should find all by date", async () => {
-      const repository = HolidayRepository.createNull({
-        holidays: [{ date: "2025-06-09", title: "Pfingstmontag" }],
+  describe("Nullable", () => {
+    describe("Find all by date", () => {
+      it("should return nothing when configurable response is null", async () => {
+        const repository = HolidayRepository.createNull({
+          readFileResponses: [null],
+        });
+
+        const holidays = await repository.findAllByDate(
+          "2025-01-01",
+          "2025-12-31",
+        );
+
+        expect(holidays).toEqual([]);
       });
 
-      const holidays = await repository.findAllByDate(
-        "2025-01-01",
-        "2025-12-31",
-      );
+      it("should return configurable responses", async () => {
+        const repository = HolidayRepository.createNull({
+          readFileResponses: [[{ date: "2025-06-09", title: "Pfingstmontag" }]],
+        });
 
-      expect(holidays).toEqual([
-        { date: Temporal.PlainDate.from("2025-06-09"), title: "Pfingstmontag" },
-      ]);
+        const holidays = await repository.findAllByDate(
+          "2025-01-01",
+          "2025-12-31",
+        );
+
+        expect(holidays).toEqual([
+          {
+            date: Temporal.PlainDate.from("2025-06-09"),
+            title: "Pfingstmontag",
+          },
+        ]);
+      });
+
+      it("should throw an error when configurable response is an error", async () => {
+        const repository = HolidayRepository.createNull({
+          readFileResponses: [new Error("Test error")],
+        });
+
+        const holidays = repository.findAllByDate("2025-01-01", "2025-12-31");
+
+        await expect(holidays).rejects.toThrow("Test error");
+      });
+    });
+  });
+});
+
+describe("Holiday DTO", () => {
+  describe("Validate", () => {
+    it("should throw a type error when DTO is not valid", () => {
+      const dto = {
+        date: "2025-13-01",
+        title: "Test",
+      };
+
+      expect(() => HolidayDto.from(dto)).toThrow(TypeError);
     });
   });
 });

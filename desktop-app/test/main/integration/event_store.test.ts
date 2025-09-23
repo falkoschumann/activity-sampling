@@ -38,7 +38,7 @@ describe("Event store", () => {
     expect(events).toEqual([ActivityLoggedEventDto.createTestInstance()]);
   });
 
-  describe("Nulled event store", () => {
+  describe("Nullable", () => {
     it("should record a event", async () => {
       const store = EventStore.createNull();
       const recordEvents = store.trackRecorded();

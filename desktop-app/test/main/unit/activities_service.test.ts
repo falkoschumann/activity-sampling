@@ -192,7 +192,7 @@ function configure({
   const configuration = ActivitiesConfiguration.createDefault();
   const eventStore = EventStore.createNull({ events });
   const holidayRepository = HolidayRepository.createNull({
-    holidays,
+    readFileResponses: holidays ? [holidays] : undefined,
   });
   const clock = Clock.fixed(
     fixedInstant ?? "1970-01-01T00:00:00Z",
