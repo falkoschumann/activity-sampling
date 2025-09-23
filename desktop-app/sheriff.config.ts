@@ -12,23 +12,18 @@ export const config: SheriffConfig = {
     renderer: "src/renderer/index.tsx",
   },
   modules: {
-    "src/main": ["component:main", "layer:entry"],
-    "src/main/application": ["component:main", "layer:application"],
-    "src/main/common": ["component:main", "layer:common"],
-    "src/main/domain": ["component:main", "layer:domain"],
-    "src/main/infrastructure": ["component:main", "layer:infrastructure"],
-
-    "src/preload": ["component:preload", "layer:application"],
-
-    "src/renderer": ["component:renderer", "layer:entry"],
-    "src/renderer/application": ["component:renderer", "layer:application"],
-    "src/renderer/common": ["component:renderer", "layer:common"],
-    "src/renderer/domain": ["component:renderer", "layer:domain"],
-    "src/renderer/ui": ["component:renderer", "layer:ui"],
-
-    "src/shared/common": ["component:shared", "layer:common"],
-    "src/shared/domain": ["component:shared", "layer:domain"],
-    "src/shared/infrastructure": ["component:shared", "layer:infrastructure"],
+    "src/<component>": ["component:<component>", "layer:entry"],
+    "src/<component>/application": [
+      "component:<component>",
+      "layer:application",
+    ],
+    "src/<component>/common": ["component:<component>", "layer:common"],
+    "src/<component>/domain": ["component:<component>", "layer:domain"],
+    "src/<component>/infrastructure": [
+      "component:<component>",
+      "layer:infrastructure",
+    ],
+    "src/<component>/ui": ["component:<component>", "layer:ui"],
   },
   depRules: {
     "component:*": [sameTag, "component:shared"],
