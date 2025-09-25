@@ -12,7 +12,7 @@ import {
   timerTicked,
 } from "../../../src/renderer/domain/timer";
 
-describe("Timer UI", () => {
+describe("Timer", () => {
   it("should handle timer started", () => {
     let state: State = initialState;
 

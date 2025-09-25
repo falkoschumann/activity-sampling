@@ -1,6 +1,6 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
-import { useEffect, useReducer, useRef } from "react";
+import { useEffect, useReducer, useRef, useState } from "react";
 
 import {
   initialState,
@@ -15,6 +15,36 @@ import {
   type TimerStartedEventDto,
   TimerStoppedEventDto,
 } from "../../shared/infrastructure/timer";
+
+export function useCurrentInterval(): [
+  boolean,
+  (isFormDisabled: boolean) => void,
+] {
+  const [isFormDisabled, setFormDisabled] = useState(false);
+
+  useEffect(() => {
+    const offTimerStartedEvent = window.activitySampling.onTimerStartedEvent(
+      (_event: TimerStartedEventDto) => setFormDisabled(true),
+    );
+
+    const offTimerStoppedEvent = window.activitySampling.onTimerStoppedEvent(
+      (_event: TimerStoppedEventDto) => setFormDisabled(false),
+    );
+
+    const offIntervalElapsedEvent =
+      window.activitySampling.onIntervalElapsedEvent(
+        (_event: IntervalElapsedEventDto) => setFormDisabled(false),
+      );
+
+    return () => {
+      offTimerStartedEvent();
+      offTimerStoppedEvent();
+      offIntervalElapsedEvent();
+    };
+  }, []);
+
+  return [isFormDisabled, setFormDisabled];
+}
 
 export function useCountdown() {
   const [state, dispatch] = useReducer(reducer, initialState);

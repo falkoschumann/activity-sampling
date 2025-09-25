@@ -4,11 +4,13 @@ import { Temporal } from "@js-temporal/polyfill";
 import { useEffect, useState } from "react";
 
 import {
-  useCurrentInterval,
   useLogActivity,
   useRecentActivities,
 } from "../../../application/activities_service";
-import { useCountdown } from "../../../application/timer_service";
+import {
+  useCountdown,
+  useCurrentInterval,
+} from "../../../application/timer_service";
 import { LogActivityCommand } from "../../../../shared/domain/activities";
 import ScrollToTopButton from "../../components/scroll_to_top_button";
 import ActivityFormComponent, { type ActivityFormData } from "./activity_form";
@@ -18,9 +20,9 @@ import WorkingDaysComponent, { type ActivityTemplate } from "./working_days";
 
 export default function LogPage() {
   const [isFormDisabled, setFormDisabled] = useCurrentInterval();
+  const countdown = useCountdown();
   const [logActivity] = useLogActivity();
   const [queryRecentActivities, recentActivities] = useRecentActivities();
-  const countdown = useCountdown();
   const [formData, setFormData] = useState<ActivityFormData>();
 
   async function handleSubmitActivity(formData: ActivityFormData) {

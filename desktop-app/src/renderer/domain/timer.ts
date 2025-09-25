@@ -112,10 +112,6 @@ export function reducer(state: State, action: Action): State {
       };
   }
 
-  assertUnreachable(action);
-}
-
-function assertUnreachable(action: never): never {
-  // @ts-expect-error: code is unreachable if all action types are handled above
+  // @ts-expect-error: code is unreachable if all action types are handled
   throw new Error(`Unknown action in timer reducer: ${action.type}.`);
 }
