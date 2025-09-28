@@ -2,7 +2,7 @@
 
 import type { FormEvent } from "react";
 
-import type { ActivityTemplate } from "../../../domain/activities";
+import type { ActivityTemplate } from "../../../domain/log";
 
 export default function ActivityFormComponent({
   isDisabled = false,

@@ -80,7 +80,6 @@ export class ActivitiesService {
 
 async function* replayTyped(events: AsyncGenerator) {
   for await (const e of events) {
-    // TODO handle type error
     const event = ActivityLoggedEventDto.fromJson(e).validate();
     yield event;
   }

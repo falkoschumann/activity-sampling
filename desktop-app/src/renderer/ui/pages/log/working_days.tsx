@@ -7,7 +7,7 @@ import type {
   Activity,
   WorkingDay,
 } from "../../../../shared/domain/activities";
-import type { ActivityTemplate } from "../../../domain/activities";
+import type { ActivityTemplate } from "../../../domain/log";
 
 export default function WorkingDaysComponent({
   workingDays,

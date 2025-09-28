@@ -3,9 +3,6 @@
 import { describe, it } from "vitest";
 import { startActivitySampling } from "./activity_sampling";
 
-// TODO write acceptance tests with acceptance criteria
-// TODO write sociable tests
-
 describe("Activity Sampling", () => {
   describe("Start Timer", () => {
     describe("Start the timer with the default interval when the application starts", () => {
@@ -29,7 +26,6 @@ describe("Activity Sampling", () => {
         const { log } = await startActivitySampling({
           now: "2025-09-17T17:51:00Z",
         });
-        // TODO use timerStarted() ?!
         await log.startTimer();
 
         await log.passTime({ duration: "PT8M" });

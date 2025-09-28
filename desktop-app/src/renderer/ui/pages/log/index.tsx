@@ -1,20 +1,25 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
 import { Temporal } from "@js-temporal/polyfill";
-import { useEffect } from "react";
+import { useEffect, useReducer, useState } from "react";
 
 import {
-  useLogActivity,
-  useRecentActivities,
+  logActivity,
+  queryRecentActivities,
 } from "../../../application/activities_service";
 import { useCurrentInterval } from "../../../application/timer_service";
-import { LogActivityCommand } from "../../../../shared/domain/activities";
-import type { ActivityTemplate } from "../../../domain/activities";
+import {
+  LogActivityCommand,
+  RecentActivitiesQueryResult,
+} from "../../../../shared/domain/activities";
 import {
   activityLogged,
   activitySelected,
+  type ActivityTemplate,
   changeText,
-} from "../../../domain/timer";
+  initialState,
+  reducer,
+} from "../../../domain/log";
 import ScrollToTopButton from "../../components/scroll_to_top_button";
 import ActivityFormComponent from "./activity_form";
 import CountdownComponent from "./countdown";
@@ -22,12 +27,26 @@ import TimeSummaryComponent from "./time_summary";
 import WorkingDaysComponent from "./working_days";
 
 export default function LogPage() {
-  const [state, dispatch] = useCurrentInterval();
-  const [logActivity] = useLogActivity();
-  const [queryRecentActivities, recentActivities] = useRecentActivities();
+  const [state, dispatch] = useReducer(reducer, initialState);
+  const [recentActivities, setRecentActivities] = useState(
+    RecentActivitiesQueryResult.empty,
+  );
+
+  useCurrentInterval(dispatch);
+
+  useEffect(() => {
+    const activity = recentActivities.workingDays[0]?.activities[0];
+    if (activity) {
+      dispatch(activitySelected(activity));
+    }
+  }, [recentActivities.workingDays]);
+
+  useEffect(() => {
+    void handleQueryRecentActivities();
+  }, []);
 
   async function handleSubmitActivity() {
-    logActivity(
+    await logActivity(
       new LogActivityCommand(
         Temporal.Now.instant(),
         Temporal.Duration.from(state.countdown.interval),
@@ -38,7 +57,12 @@ export default function LogPage() {
       ),
     );
     dispatch(activityLogged());
-    queryRecentActivities({});
+    await handleQueryRecentActivities();
+  }
+
+  async function handleQueryRecentActivities() {
+    const result = await queryRecentActivities({});
+    setRecentActivities(result);
   }
 
   function handleTextChange(name: keyof ActivityTemplate, text: string) {
@@ -48,13 +72,6 @@ export default function LogPage() {
   function handleActivitySelected(activity: ActivityTemplate) {
     dispatch(activitySelected(activity));
   }
-
-  useEffect(() => {
-    const activity = recentActivities.workingDays[0]?.activities[0];
-    if (activity) {
-      dispatch(activitySelected(activity));
-    }
-  }, [dispatch, recentActivities.workingDays]);
 
   return (
     <>

@@ -13,7 +13,7 @@ import {
   timerStarted,
   timerStopped,
   timerTicked,
-} from "../../../src/renderer/domain/timer";
+} from "../../../src/renderer/domain/log";
 
 describe("Timer", () => {
   describe("Change text", () => {

@@ -1,25 +1,21 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
-import { type Dispatch, useEffect, useReducer, useRef } from "react";
+import { type Dispatch, useEffect, useRef } from "react";
 
 import {
   type Action,
-  initialState,
   intervalElapsed,
-  reducer,
-  type State,
   timerStarted,
   timerStopped,
   timerTicked,
-} from "../domain/timer";
+} from "../domain/log";
 import {
   IntervalElapsedEventDto,
   type TimerStartedEventDto,
   TimerStoppedEventDto,
 } from "../../shared/infrastructure/timer";
 
-export function useCurrentInterval(): [State, Dispatch<Action>] {
-  const [state, dispatch] = useReducer(reducer, initialState);
+export function useCurrentInterval(dispatch: Dispatch<Action>) {
   const timeoutId =
     useRef<ReturnType<typeof globalThis.setInterval>>(undefined);
 
@@ -53,7 +49,5 @@ export function useCurrentInterval(): [State, Dispatch<Action>] {
       offTimerStoppedEvent();
       offIntervalElapsedEvent();
     };
-  }, [timeoutId]);
-
-  return [state, dispatch];
+  }, [dispatch, timeoutId]);
 }
