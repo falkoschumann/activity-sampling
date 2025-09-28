@@ -83,6 +83,9 @@ function ActivityComponent({
               title="Use this activity as current activity."
               onClick={() => onSelect({ client, project, task, notes })}
             >
+              <span className="visually-hidden">
+                Use this activity as current activity.
+              </span>
               <i className="bi bi-arrow-repeat"></i>
             </button>
             <button
@@ -90,6 +93,7 @@ function ActivityComponent({
               title="Copy task name."
               onClick={() => navigator.clipboard.writeText(task)}
             >
+              <span className="visually-hidden">Copy task name.</span>
               <i className="bi bi-copy"></i>
             </button>
           </div>

@@ -26,7 +26,7 @@ export default function CountdownComponent({
       >
         <div className="progress-bar" style={{ width: `${percentage}%` }}></div>
       </div>
-      <div className="text-center">
+      <div className="text-center" aria-label="Remaining time">
         {formatDuration(remaining, FormatStyle.FULL)}
       </div>
     </div>
