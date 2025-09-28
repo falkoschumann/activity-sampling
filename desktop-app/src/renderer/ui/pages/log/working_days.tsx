@@ -7,13 +7,7 @@ import type {
   Activity,
   WorkingDay,
 } from "../../../../shared/domain/activities";
-
-export interface ActivityTemplate {
-  client: string;
-  project: string;
-  task: string;
-  notes?: string;
-}
+import type { ActivityTemplate } from "../../../domain/activities";
 
 export default function WorkingDaysComponent({
   workingDays,

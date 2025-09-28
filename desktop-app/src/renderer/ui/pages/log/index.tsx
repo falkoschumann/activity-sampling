@@ -1,65 +1,71 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
 import { Temporal } from "@js-temporal/polyfill";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 import {
   useLogActivity,
   useRecentActivities,
 } from "../../../application/activities_service";
-import {
-  useCountdown,
-  useCurrentInterval,
-} from "../../../application/timer_service";
+import { useCurrentInterval } from "../../../application/timer_service";
 import { LogActivityCommand } from "../../../../shared/domain/activities";
+import type { ActivityTemplate } from "../../../domain/activities";
+import {
+  activityLogged,
+  activitySelected,
+  changeText,
+} from "../../../domain/timer";
 import ScrollToTopButton from "../../components/scroll_to_top_button";
-import ActivityFormComponent, { type ActivityFormData } from "./activity_form";
+import ActivityFormComponent from "./activity_form";
 import CountdownComponent from "./countdown";
 import TimeSummaryComponent from "./time_summary";
-import WorkingDaysComponent, { type ActivityTemplate } from "./working_days";
+import WorkingDaysComponent from "./working_days";
 
 export default function LogPage() {
-  const [isFormDisabled, setFormDisabled] = useCurrentInterval();
-  const countdown = useCountdown();
+  const [state, dispatch] = useCurrentInterval();
   const [logActivity] = useLogActivity();
   const [queryRecentActivities, recentActivities] = useRecentActivities();
-  const [formData, setFormData] = useState<ActivityFormData>();
 
-  async function handleSubmitActivity(formData: ActivityFormData) {
+  async function handleSubmitActivity() {
     logActivity(
       new LogActivityCommand(
         Temporal.Now.instant(),
-        Temporal.Duration.from(countdown.interval),
-        formData.client,
-        formData.project,
-        formData.task,
-        formData.notes,
+        Temporal.Duration.from(state.countdown.interval),
+        state.form.client,
+        state.form.project,
+        state.form.task,
+        state.form.notes,
       ),
     );
-    setFormDisabled(true);
-
+    dispatch(activityLogged());
     queryRecentActivities({});
   }
 
-  function handleActivitySelected(activity: ActivityTemplate) {
-    setFormData(activity);
+  function handleTextChange(name: keyof ActivityTemplate, text: string) {
+    dispatch(changeText({ name, text }));
   }
 
-  useEffect(
-    () => setFormData(recentActivities.workingDays[0]?.activities[0]),
-    [recentActivities.workingDays],
-  );
+  function handleActivitySelected(activity: ActivityTemplate) {
+    dispatch(activitySelected(activity));
+  }
+
+  useEffect(() => {
+    const activity = recentActivities.workingDays[0]?.activities[0];
+    if (activity) {
+      dispatch(activitySelected(activity));
+    }
+  }, [dispatch, recentActivities.workingDays]);
 
   return (
     <>
       <ScrollToTopButton />
       <aside className="container my-4">
         <ActivityFormComponent
-          isDisabled={isFormDisabled}
-          {...formData}
+          {...state.form}
+          onTextChange={handleTextChange}
           onSubmit={handleSubmitActivity}
         />
-        <CountdownComponent {...countdown} />
+        <CountdownComponent {...state.countdown} />
       </aside>
       <main className="container my-4">
         <h5>
