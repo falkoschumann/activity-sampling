@@ -26,7 +26,7 @@ describe("Activity Sampling", () => {
         const { log } = await startActivitySampling({
           now: "2025-09-17T17:51:00Z",
         });
-        await log.startTimer();
+        await log.timerStarted();
 
         await log.passTime({ duration: "PT8M" });
         await log.stopTimer();
@@ -42,7 +42,7 @@ describe("Activity Sampling", () => {
         const { log } = await startActivitySampling({
           now: "2025-08-29T08:19:00Z",
         });
-        await log.startTimer({ interval: "PT20M" });
+        await log.timerStarted({ interval: "PT20M" });
         await log.intervalElapsed();
 
         await log.queryCurrentInterval();

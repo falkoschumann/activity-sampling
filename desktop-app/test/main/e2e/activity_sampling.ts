@@ -180,6 +180,10 @@ class LogDsl {
   // Events
   //
 
+  async timerStarted(args: { interval?: string } = {}) {
+    await this.startTimer(args);
+  }
+
   assertTimerStarted(args: { timestamp?: string; interval?: string } = {}) {
     const timestamp = Temporal.Instant.from(
       args.timestamp ?? "2025-08-26T14:00:00Z",
