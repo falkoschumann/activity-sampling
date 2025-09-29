@@ -11,6 +11,15 @@ export default defineConfig({
     plugins: [externalizeDepsPlugin()],
   },
   renderer: {
+    build: {
+      rollupOptions: {
+        input: {
+          main: "src/renderer/log.html",
+          reports: "src/renderer/reports.html",
+          timesheet: "src/renderer/timesheet.html",
+        },
+      },
+    },
     css: {
       preprocessorOptions: {
         scss: {

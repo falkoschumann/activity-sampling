@@ -9,7 +9,9 @@ export const config: SheriffConfig = {
   entryPoints: {
     main: "src/main/index.ts",
     preload: "src/preload/index.ts",
-    renderer: "src/renderer/index.tsx",
+    log: "src/renderer/log.tsx",
+    reports: "src/renderer/reports.tsx",
+    timesheet: "src/renderer/timesheet.tsx",
   },
   modules: {
     "src/<component>": ["component:<component>", "layer:entry"],

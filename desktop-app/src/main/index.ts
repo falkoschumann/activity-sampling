@@ -112,8 +112,8 @@ function createIpc() {
 
 function createWindow(): void {
   const mainWindow = new BrowserWindow({
-    width: 600,
-    height: 800,
+    width: 580,
+    height: 900,
     ...(process.platform === "linux" ? { icon } : {}),
     webPreferences: {
       preload: path.join(import.meta.dirname, "../preload/index.js"),
@@ -144,16 +144,11 @@ function createWindow(): void {
   // HMR for renderer base on electron-vite cli.
   // Load the remote URL for development or the local HTML file for production.
   if (!isProduction() && process.env["ELECTRON_RENDERER_URL"]) {
-    void mainWindow.loadURL(process.env["ELECTRON_RENDERER_URL"]);
+    void mainWindow.loadURL(`${process.env["ELECTRON_RENDERER_URL"]}/log.html`);
   } else {
     void mainWindow.loadFile(
-      path.join(import.meta.dirname, "../renderer/index.html"),
+      path.join(import.meta.dirname, "../renderer/log.html"),
     );
-  }
-
-  if (!isProduction()) {
-    mainWindow.setSize(1600, 1000);
-    mainWindow.webContents.openDevTools();
   }
 }
 
@@ -260,6 +255,56 @@ const template: MenuItemConstructorOptions[] = [
       {
         label: "Stop",
         click: () => timerService.stopTimer(new StopTimerCommand()),
+      },
+    ],
+  },
+  // Reports
+  {
+    label: "Reports",
+    submenu: [
+      {
+        label: "Reports",
+        click: () => {
+          const reportWindow = new BrowserWindow({
+            width: 1000,
+            height: 800,
+            ...(process.platform === "linux" ? { icon } : {}),
+            webPreferences: {
+              preload: path.join(import.meta.dirname, "../preload/index.js"),
+            },
+          });
+          if (!isProduction() && process.env["ELECTRON_RENDERER_URL"]) {
+            void reportWindow.loadURL(
+              `${process.env["ELECTRON_RENDERER_URL"]}/reports.html`,
+            );
+          } else {
+            void reportWindow.loadFile(
+              path.join(import.meta.dirname, "../renderer/reports.html"),
+            );
+          }
+        },
+      },
+      {
+        label: "Timesheet",
+        click: () => {
+          const reportWindow = new BrowserWindow({
+            width: 1000,
+            height: 800,
+            ...(process.platform === "linux" ? { icon } : {}),
+            webPreferences: {
+              preload: path.join(import.meta.dirname, "../preload/index.js"),
+            },
+          });
+          if (!isProduction() && process.env["ELECTRON_RENDERER_URL"]) {
+            void reportWindow.loadURL(
+              `${process.env["ELECTRON_RENDERER_URL"]}/timesheet.html`,
+            );
+          } else {
+            void reportWindow.loadFile(
+              path.join(import.meta.dirname, "../renderer/timesheet.html"),
+            );
+          }
+        },
       },
     ],
   },
