@@ -1,5 +1,9 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
+import { Temporal } from "@js-temporal/polyfill";
+
+import type { FluxStandardAction } from "../common/reducer";
+
 export interface ActivityTemplate {
   client: string;
   project: string;
@@ -10,10 +14,6 @@ export interface ActivityTemplate {
 //
 // Actions and Action Creators
 //
-
-import { Temporal } from "@js-temporal/polyfill";
-
-import type { FluxStandardAction } from "../common/reducer";
 
 const CHANGE_TEXT_ACTION = "changeText";
 
@@ -95,6 +95,15 @@ export function intervalElapsed(
   return { type: INTERVAL_ELAPSED_ACTION, payload };
 }
 
+export type Action =
+  | ReturnType<typeof changeText>
+  | ReturnType<typeof activityLogged>
+  | ReturnType<typeof activitySelected>
+  | ReturnType<typeof timerStarted>
+  | ReturnType<typeof timerTicked>
+  | ReturnType<typeof timerStopped>
+  | ReturnType<typeof intervalElapsed>;
+
 //
 // State and Reducer
 //
@@ -134,15 +143,6 @@ export const initialState: State = {
   },
   currentInterval: "PT30M",
 };
-
-export type Action =
-  | ReturnType<typeof changeText>
-  | ReturnType<typeof activityLogged>
-  | ReturnType<typeof activitySelected>
-  | ReturnType<typeof timerStarted>
-  | ReturnType<typeof timerTicked>
-  | ReturnType<typeof timerStopped>
-  | ReturnType<typeof intervalElapsed>;
 
 export function reducer(state: State, action: Action): State {
   switch (action.type) {
