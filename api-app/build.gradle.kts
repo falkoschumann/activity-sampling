@@ -8,22 +8,17 @@ plugins {
   jacoco
   java
   pmd
-  id("com.diffplug.spotless") version "7.2.1"
+  id("com.diffplug.spotless") version "8.0.0"
   id("io.spring.dependency-management") version "1.1.7"
   id("org.springframework.boot") version "3.5.6"
 }
 
-configurations {
-  compileOnly {
-    extendsFrom(configurations.annotationProcessor.get())
-  }
-}
+configurations { compileOnly { extendsFrom(configurations.annotationProcessor.get()) } }
 
-repositories {
-  mavenCentral()
-}
+repositories { mavenCentral() }
 
 dependencyManagement {
+  imports { mavenBom("com.azure.spring:spring-cloud-azure-dependencies:5.23.0") }
   imports {
     mavenBom("com.azure.spring:spring-cloud-azure-dependencies:6.0.0")
   }
@@ -71,9 +66,7 @@ tasks.withType<Test> {
   finalizedBy(tasks.jacocoTestReport)
 }
 
-tasks.jacocoTestReport {
-  dependsOn(tasks.test)
-}
+tasks.jacocoTestReport { dependsOn(tasks.test) }
 
 tasks.register<Copy>("processFrontendResources") {
   group = "Frontend"
@@ -83,9 +76,7 @@ tasks.register<Copy>("processFrontendResources") {
   into(project.layout.buildDirectory.dir("resources/main/static"))
 }
 
-tasks.named("processResources") {
-  dependsOn("processFrontendResources")
-}
+tasks.named("processResources") { dependsOn("processFrontendResources") }
 
 distributions {
   main {
@@ -106,12 +97,10 @@ checkstyle {
   maxWarnings = 0
   maxErrors = 0
   val archive =
-    configurations.checkstyle.get().resolve().filter {
-      it.name.startsWith("checkstyle")
-    }
+      configurations.checkstyle.get().resolve().filter { it.name.startsWith("checkstyle") }
   config = resources.text.fromArchiveEntry(archive, "google_checks.xml")
   configProperties["org.checkstyle.google.suppressionfilter.config"] =
-    "$projectDir/config/checkstyle/suppressions.xml"
+      "$projectDir/config/checkstyle/suppressions.xml"
 }
 
 pmd {
@@ -124,15 +113,15 @@ spotless {
   java {
     googleJavaFormat("1.27.0")
     licenseHeader(
-      "// Copyright (c) \$YEAR Falko Schumann. All rights reserved. MIT license.\n\n",
+        "// Copyright (c) \$YEAR Falko Schumann. All rights reserved. MIT license.\n\n",
     )
   }
   kotlinGradle {
     target("*.gradle.kts")
-    ktlint()
+    ktfmt("0.54")
     licenseHeader(
-      "// Copyright (c) \$YEAR Falko Schumann. All rights reserved. MIT license.\n\n",
-      "^(import|plugins|rootProject).*",
+        "// Copyright (c) \$YEAR Falko Schumann. All rights reserved. MIT license.\n\n",
+        "^(import|plugins|rootProject).*",
     )
   }
 }
