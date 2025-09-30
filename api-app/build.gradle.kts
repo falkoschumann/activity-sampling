@@ -111,7 +111,7 @@ pmd {
 
 spotless {
   java {
-    googleJavaFormat("1.27.0")
+    googleJavaFormat("1.28.0")
     licenseHeader(
         "// Copyright (c) \$YEAR Falko Schumann. All rights reserved. MIT license.\n\n",
     )
