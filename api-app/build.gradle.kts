@@ -29,6 +29,8 @@ dependencies {
   implementation("com.azure.spring:spring-cloud-azure-starter-active-directory")
   implementation("com.azure.spring:spring-cloud-azure-starter-actuator")
   implementation("org.mnode.ical4j:ical4j:4.1.1")
+  // WORKAROUND CVE-2025-48924 commons-lang3 used by ical4j
+  implementation("org.apache.commons:commons-lang3:3.19.0")
   implementation("org.springframework.boot:spring-boot-starter-actuator")
   implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
   implementation("org.springframework.boot:spring-boot-starter-security")
