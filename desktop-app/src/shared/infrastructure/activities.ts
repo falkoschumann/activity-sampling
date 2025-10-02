@@ -5,12 +5,20 @@ import { type CommandStatus, Failure, Success } from "@muspellheim/shared";
 
 import {
   Activity,
+  Capacity,
   LogActivityCommand,
   RecentActivitiesQuery,
   RecentActivitiesQueryResult,
+  TimesheetEntry,
+  TimesheetQuery,
+  TimesheetQueryResult,
   TimeSummary,
   WorkingDay,
 } from "../domain/activities";
+
+//
+// Commands
+//
 
 export class LogActivityCommandDto {
   static create(dto: LogActivityCommandDto): LogActivityCommandDto {
@@ -96,6 +104,10 @@ export class CommandStatusDto {
   }
 }
 
+//
+// Queries
+//
+
 export class RecentActivitiesQueryDto {
   static create(dto: RecentActivitiesQueryDto): RecentActivitiesQueryDto {
     return new RecentActivitiesQueryDto(dto.timeZone);
@@ -178,52 +190,6 @@ export class WorkingDayDto {
   }
 }
 
-export class TimeSummaryDto {
-  static create(dto: TimeSummaryDto): TimeSummaryDto {
-    return new TimeSummaryDto(
-      dto.hoursToday,
-      dto.hoursYesterday,
-      dto.hoursThisWeek,
-      dto.hoursThisMonth,
-    );
-  }
-
-  static from(model: TimeSummary): TimeSummaryDto {
-    return new TimeSummaryDto(
-      model.hoursToday.toString(),
-      model.hoursYesterday.toString(),
-      model.hoursThisWeek.toString(),
-      model.hoursThisMonth.toString(),
-    );
-  }
-
-  readonly hoursToday: string;
-  readonly hoursYesterday: string;
-  readonly hoursThisWeek: string;
-  readonly hoursThisMonth: string;
-
-  constructor(
-    hoursToday: string,
-    hoursYesterday: string,
-    hoursThisWeek: string,
-    hoursThisMonth: string,
-  ) {
-    this.hoursToday = hoursToday;
-    this.hoursYesterday = hoursYesterday;
-    this.hoursThisWeek = hoursThisWeek;
-    this.hoursThisMonth = hoursThisMonth;
-  }
-
-  validate(): TimeSummary {
-    return new TimeSummary(
-      Temporal.Duration.from(this.hoursToday),
-      Temporal.Duration.from(this.hoursYesterday),
-      Temporal.Duration.from(this.hoursThisWeek),
-      Temporal.Duration.from(this.hoursThisMonth),
-    );
-  }
-}
-
 export class ActivityDto {
   static create(dto?: ActivityDto): ActivityDto | undefined {
     if (dto == null) {
@@ -287,5 +253,193 @@ export class ActivityDto {
       this.task,
       this.notes,
     );
+  }
+}
+
+export class TimeSummaryDto {
+  static create(dto: TimeSummaryDto): TimeSummaryDto {
+    return new TimeSummaryDto(
+      dto.hoursToday,
+      dto.hoursYesterday,
+      dto.hoursThisWeek,
+      dto.hoursThisMonth,
+    );
+  }
+
+  static from(model: TimeSummary): TimeSummaryDto {
+    return new TimeSummaryDto(
+      model.hoursToday.toString(),
+      model.hoursYesterday.toString(),
+      model.hoursThisWeek.toString(),
+      model.hoursThisMonth.toString(),
+    );
+  }
+
+  readonly hoursToday: string;
+  readonly hoursYesterday: string;
+  readonly hoursThisWeek: string;
+  readonly hoursThisMonth: string;
+
+  constructor(
+    hoursToday: string,
+    hoursYesterday: string,
+    hoursThisWeek: string,
+    hoursThisMonth: string,
+  ) {
+    this.hoursToday = hoursToday;
+    this.hoursYesterday = hoursYesterday;
+    this.hoursThisWeek = hoursThisWeek;
+    this.hoursThisMonth = hoursThisMonth;
+  }
+
+  validate(): TimeSummary {
+    return new TimeSummary(
+      Temporal.Duration.from(this.hoursToday),
+      Temporal.Duration.from(this.hoursYesterday),
+      Temporal.Duration.from(this.hoursThisWeek),
+      Temporal.Duration.from(this.hoursThisMonth),
+    );
+  }
+}
+
+export class TimesheetQueryDto {
+  static create(dto: TimesheetQueryDto): TimesheetQueryDto {
+    return new TimesheetQueryDto(dto.from, dto.to, dto.timeZone);
+  }
+
+  static from(model: TimesheetQuery): TimesheetQueryDto {
+    return new TimesheetQueryDto(
+      model.from.toString(),
+      model.to.toString(),
+      model.timeZone?.toString(),
+    );
+  }
+
+  readonly from: string;
+  readonly to: string;
+  readonly timeZone?: string;
+
+  constructor(from: string, to: string, timeZone?: string) {
+    this.from = from;
+    this.to = to;
+    this.timeZone = timeZone;
+  }
+
+  validate(): TimesheetQuery {
+    return new TimesheetQuery(this.from, this.to, this.timeZone);
+  }
+}
+
+export class TimesheetQueryResultDto {
+  static create(dto: TimesheetQueryResultDto) {
+    return new TimesheetQueryResultDto(
+      dto.entries,
+      dto.totalHours,
+      dto.capacity,
+    );
+  }
+
+  static from(model: TimesheetQueryResult): TimesheetQueryResultDto {
+    return new TimesheetQueryResultDto(
+      model.entries.map((entry) => TimesheetEntryDto.from(entry)),
+      model.totalHours.toString(),
+      CapacityDto.from(model.capacity),
+    );
+  }
+
+  readonly entries: TimesheetEntryDto[];
+  readonly totalHours: string;
+  readonly capacity: CapacityDto;
+
+  constructor(
+    entries: TimesheetEntryDto[],
+    totalHours: string,
+    capacity: CapacityDto,
+  ) {
+    this.entries = entries;
+    this.totalHours = totalHours;
+    this.capacity = capacity;
+  }
+
+  validate(): TimesheetQueryResult {
+    return new TimesheetQueryResult(
+      this.entries.map((entry) => TimesheetEntryDto.create(entry).validate()),
+      Temporal.Duration.from(this.totalHours),
+      CapacityDto.create(this.capacity).validate(),
+    );
+  }
+}
+
+export class TimesheetEntryDto {
+  static create(dto: TimesheetEntryDto): TimesheetEntryDto {
+    return new TimesheetEntryDto(
+      dto.date,
+      dto.client,
+      dto.project,
+      dto.task,
+      dto.hours,
+    );
+  }
+
+  static from(model: TimesheetEntry): TimesheetEntryDto {
+    return new TimesheetEntryDto(
+      model.date.toString(),
+      model.client,
+      model.project,
+      model.task,
+      model.hours.toString(),
+    );
+  }
+
+  readonly date: string;
+  readonly client: string;
+  readonly project: string;
+  readonly task: string;
+  readonly hours: string;
+
+  constructor(
+    date: string,
+    client: string,
+    project: string,
+    task: string,
+    hours: string,
+  ) {
+    this.date = date;
+    this.client = client;
+    this.project = project;
+    this.task = task;
+    this.hours = hours;
+  }
+
+  validate(): TimesheetEntry {
+    return new TimesheetEntry(
+      this.date,
+      this.client,
+      this.project,
+      this.task,
+      this.hours,
+    );
+  }
+}
+
+export class CapacityDto {
+  static create(dto: CapacityDto): CapacityDto {
+    return new CapacityDto(dto.hours, dto.offset);
+  }
+
+  static from(model: Capacity): CapacityDto {
+    return new CapacityDto(model.hours.toString(), model.offset.toString());
+  }
+
+  readonly hours: string;
+  readonly offset: string;
+
+  constructor(hours: string, offset: string) {
+    this.hours = hours;
+    this.offset = offset;
+  }
+
+  validate(): Capacity {
+    return new Capacity(this.hours, this.offset);
   }
 }

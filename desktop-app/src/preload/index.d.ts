@@ -5,6 +5,8 @@ import {
   LogActivityCommandDto,
   RecentActivitiesQueryDto,
   RecentActivitiesQueryResultDto,
+  TimesheetQueryDto,
+  TimesheetQueryResultDto,
 } from "../shared/infrastructure/activities";
 import {
   CurrentIntervalQueryDto,
@@ -25,6 +27,8 @@ export interface ActivitySampling {
   queryCurrentIntervalQuery(
     query: CurrentIntervalQueryDto,
   ): CurrentIntervalQueryDto;
+
+  queryTimesheet(query: TimesheetQueryDto): Promise<TimesheetQueryResultDto>;
 
   onTimerStartedEvent: (
     callback: (event: TimerStartedEventDto) => void,

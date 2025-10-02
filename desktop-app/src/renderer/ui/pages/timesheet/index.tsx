@@ -1,30 +1,69 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
-import { PeriodUnit } from "../../../domain/period";
+import { Temporal } from "@js-temporal/polyfill";
+import { useEffect, useReducer, useState } from "react";
+
+import { queryTimesheet } from "../../../application/activities_service";
+import { TimesheetQueryResult } from "../../../../shared/domain/activities";
+import {
+  changePeriod,
+  goToNextPeriod,
+  goToPreviousPeriod,
+  init,
+  PeriodUnit,
+  reducer,
+} from "../../../domain/period";
 import { PeriodComponent } from "../../components/period_component";
+import CapacityComponent from "./capacity";
+import TimesheetComponent from "./timesheet";
 
 export default function TimesheetPage() {
-  const from = "2025-09-29";
-  const to = "2025-10-05";
-  const unit = PeriodUnit.WEEK;
-  const isCurrent = true;
-  const units = [PeriodUnit.DAY, PeriodUnit.WEEK, PeriodUnit.MONTH];
-  const onPreviousPeriod = () => {};
-  const onNextPeriod = () => {};
-  const onChangePeriod = () => {};
+  const [state, dispatch] = useReducer(
+    reducer,
+    { unit: PeriodUnit.WEEK },
+    init,
+  );
+  const [timesheet, setTimesheet] = useState(TimesheetQueryResult.empty());
+
+  useEffect(() => {
+    (async function () {
+      const result = await queryTimesheet({
+        from: Temporal.PlainDate.from(state.from),
+        to: Temporal.PlainDate.from(state.to),
+      });
+      setTimesheet(result);
+    })();
+  }, [state.from, state.to]);
 
   return (
-    <aside className="fixed-top bg-body-secondary">
-      <PeriodComponent
-        from={from}
-        to={to}
-        unit={unit}
-        isCurrent={isCurrent}
-        units={units}
-        onPreviousPeriod={onPreviousPeriod}
-        onNextPeriod={onNextPeriod}
-        onChangePeriod={onChangePeriod}
-      />
-    </aside>
+    <>
+      <aside className="fixed-top bg-body-secondary">
+        <PeriodComponent
+          from={state.from}
+          to={state.to}
+          unit={state.unit}
+          isCurrent={state.isCurrent}
+          units={[PeriodUnit.DAY, PeriodUnit.WEEK, PeriodUnit.MONTH]}
+          onPreviousPeriod={() => dispatch(goToPreviousPeriod({}))}
+          onNextPeriod={() => dispatch(goToNextPeriod({}))}
+          onChangePeriod={(unit) => dispatch(changePeriod({ unit }))}
+        />
+      </aside>
+      <main
+        className="container my-4"
+        style={{ paddingTop: "3rem", paddingBottom: "3rem" }}
+      >
+        <TimesheetComponent entries={timesheet.entries} />
+      </main>
+      <footer className="fixed-bottom bg-body">
+        <div className="container py-2">
+          <CapacityComponent
+            totalHours={timesheet.totalHours}
+            capacity={timesheet.capacity.hours}
+            offset={timesheet.capacity.offset}
+          />
+        </div>
+      </footer>
+    </>
   );
 }

@@ -7,6 +7,8 @@ import {
   LogActivityCommandDto,
   RecentActivitiesQueryDto,
   RecentActivitiesQueryResultDto,
+  TimesheetQueryDto,
+  TimesheetQueryResultDto,
 } from "../shared/infrastructure/activities";
 import {
   type CurrentIntervalQueryDto,
@@ -30,6 +32,12 @@ contextBridge.exposeInMainWorld("activitySampling", {
 
   queryCurrentIntervalQuery: (query: CurrentIntervalQueryDto) => {
     return ipcRenderer.invoke("queryCurrentInterval", query);
+  },
+
+  queryTimesheet: async (
+    query: TimesheetQueryDto,
+  ): Promise<TimesheetQueryResultDto> => {
+    return ipcRenderer.invoke("queryTimesheet", query);
   },
 
   onTimerStartedEvent: (

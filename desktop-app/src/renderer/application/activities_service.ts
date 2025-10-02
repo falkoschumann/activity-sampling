@@ -3,12 +3,15 @@
 import {
   LogActivityCommand,
   RecentActivitiesQuery,
+  TimesheetQuery,
 } from "../../shared/domain/activities";
 import {
   CommandStatusDto,
   LogActivityCommandDto,
   RecentActivitiesQueryDto,
   RecentActivitiesQueryResultDto,
+  TimesheetQueryDto,
+  TimesheetQueryResultDto,
 } from "../../shared/infrastructure/activities";
 
 export async function logActivity(command: LogActivityCommand) {
@@ -23,4 +26,11 @@ export async function queryRecentActivities(query: RecentActivitiesQuery) {
     RecentActivitiesQueryDto.from(query),
   );
   return RecentActivitiesQueryResultDto.create(resultDto).validate();
+}
+
+export async function queryTimesheet(query: TimesheetQuery) {
+  const resultDto = await window.activitySampling.queryTimesheet(
+    TimesheetQueryDto.from(query),
+  );
+  return TimesheetQueryResultDto.create(resultDto).validate();
 }

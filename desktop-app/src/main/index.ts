@@ -29,6 +29,8 @@ import {
   LogActivityCommandDto,
   RecentActivitiesQueryDto,
   RecentActivitiesQueryResultDto,
+  TimesheetQueryDto,
+  TimesheetQueryResultDto,
 } from "../shared/infrastructure/activities";
 import icon from "../../resources/icon.png?asset";
 import { Configuration } from "./infrastructure/configuration_gateway";
@@ -107,6 +109,11 @@ function createIpc() {
     const query = RecentActivitiesQueryDto.create(queryDto).validate();
     const result = await activitiesService.queryRecentActivities(query);
     return RecentActivitiesQueryResultDto.from(result);
+  });
+  ipcMain.handle("queryTimesheet", async (_event, queryDto) => {
+    const query = TimesheetQueryDto.create(queryDto).validate();
+    const result = await activitiesService.queryTimesheet(query);
+    return TimesheetQueryResultDto.from(result);
   });
 }
 

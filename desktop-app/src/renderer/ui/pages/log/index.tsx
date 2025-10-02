@@ -29,7 +29,7 @@ import WorkingDaysComponent from "./working_days";
 export default function LogPage() {
   const [state, dispatch] = useReducer(reducer, initialState);
   const [recentActivities, setRecentActivities] = useState(
-    RecentActivitiesQueryResult.empty,
+    RecentActivitiesQueryResult.empty(),
   );
 
   useCurrentInterval(dispatch);

@@ -87,6 +87,78 @@ export class RecentActivitiesQueryResult {
   }
 }
 
+export class WorkingDay {
+  readonly date: Temporal.PlainDate;
+  readonly activities: Activity[];
+
+  constructor(date: Temporal.PlainDateLike | string, activities: Activity[]) {
+    this.date = Temporal.PlainDate.from(date);
+    this.activities = activities;
+  }
+}
+
+export class Activity {
+  static createTestInstance({
+    dateTime = "2025-08-14T13:00",
+    duration = "PT30M",
+    client = "Test client",
+    project = "Test project",
+    task = "Test task",
+    notes,
+  }: {
+    dateTime?: Temporal.PlainDateLike | string;
+    duration?: Temporal.DurationLike | string;
+    client?: string;
+    project?: string;
+    task?: string;
+    notes?: string;
+  } = {}): Activity {
+    return new Activity(dateTime, duration, client, project, task, notes);
+  }
+
+  readonly dateTime: Temporal.PlainDateTime;
+  readonly duration: Temporal.Duration;
+  readonly client: string;
+  readonly project: string;
+  readonly task: string;
+  readonly notes?: string;
+
+  constructor(
+    dateTime: Temporal.PlainDateTimeLike | string,
+    duration: Temporal.DurationLike | string,
+    client: string,
+    project: string,
+    task: string,
+    notes?: string,
+  ) {
+    this.dateTime = Temporal.PlainDateTime.from(dateTime);
+    this.duration = Temporal.Duration.from(duration);
+    this.client = client;
+    this.project = project;
+    this.task = task;
+    this.notes = notes;
+  }
+}
+
+export class TimeSummary {
+  readonly hoursToday: Temporal.Duration;
+  readonly hoursYesterday: Temporal.Duration;
+  readonly hoursThisWeek: Temporal.Duration;
+  readonly hoursThisMonth: Temporal.Duration;
+
+  constructor(
+    hoursToday: Temporal.DurationLike | string,
+    hoursYesterday: Temporal.DurationLike | string,
+    hoursThisWeek: Temporal.DurationLike | string,
+    hoursThisMonth: Temporal.DurationLike | string,
+  ) {
+    this.hoursToday = Temporal.Duration.from(hoursToday);
+    this.hoursYesterday = Temporal.Duration.from(hoursYesterday);
+    this.hoursThisWeek = Temporal.Duration.from(hoursThisWeek);
+    this.hoursThisMonth = Temporal.Duration.from(hoursThisMonth);
+  }
+}
+
 export class ReportQuery {
   static createTestInstance({
     scope = Scope.PROJECTS,
@@ -185,6 +257,14 @@ export class TimesheetQuery {
 }
 
 export class TimesheetQueryResult {
+  static empty(): TimesheetQueryResult {
+    return new TimesheetQueryResult(
+      [],
+      Temporal.Duration.from("PT0S"),
+      Capacity.empty(),
+    );
+  }
+
   readonly entries: TimesheetEntry[];
   readonly totalHours: Temporal.Duration;
   readonly capacity: Capacity;
@@ -233,6 +313,13 @@ export class TimesheetEntry {
 }
 
 export class Capacity {
+  static empty(): Capacity {
+    return new Capacity(
+      Temporal.Duration.from("PT40M"),
+      Temporal.Duration.from("-PT40M"),
+    );
+  }
+
   readonly hours: Temporal.Duration;
   readonly offset: Temporal.Duration;
 
@@ -242,78 +329,6 @@ export class Capacity {
   ) {
     this.hours = Temporal.Duration.from(hours);
     this.offset = Temporal.Duration.from(offset);
-  }
-}
-
-export class Activity {
-  static createTestInstance({
-    dateTime = "2025-08-14T13:00",
-    duration = "PT30M",
-    client = "Test client",
-    project = "Test project",
-    task = "Test task",
-    notes,
-  }: {
-    dateTime?: Temporal.PlainDateLike | string;
-    duration?: Temporal.DurationLike | string;
-    client?: string;
-    project?: string;
-    task?: string;
-    notes?: string;
-  } = {}): Activity {
-    return new Activity(dateTime, duration, client, project, task, notes);
-  }
-
-  readonly dateTime: Temporal.PlainDateTime;
-  readonly duration: Temporal.Duration;
-  readonly client: string;
-  readonly project: string;
-  readonly task: string;
-  readonly notes?: string;
-
-  constructor(
-    dateTime: Temporal.PlainDateTimeLike | string,
-    duration: Temporal.DurationLike | string,
-    client: string,
-    project: string,
-    task: string,
-    notes?: string,
-  ) {
-    this.dateTime = Temporal.PlainDateTime.from(dateTime);
-    this.duration = Temporal.Duration.from(duration);
-    this.client = client;
-    this.project = project;
-    this.task = task;
-    this.notes = notes;
-  }
-}
-
-export class WorkingDay {
-  readonly date: Temporal.PlainDate;
-  readonly activities: Activity[];
-
-  constructor(date: Temporal.PlainDateLike | string, activities: Activity[]) {
-    this.date = Temporal.PlainDate.from(date);
-    this.activities = activities;
-  }
-}
-
-export class TimeSummary {
-  readonly hoursToday: Temporal.Duration;
-  readonly hoursYesterday: Temporal.Duration;
-  readonly hoursThisWeek: Temporal.Duration;
-  readonly hoursThisMonth: Temporal.Duration;
-
-  constructor(
-    hoursToday: Temporal.DurationLike | string,
-    hoursYesterday: Temporal.DurationLike | string,
-    hoursThisWeek: Temporal.DurationLike | string,
-    hoursThisMonth: Temporal.DurationLike | string,
-  ) {
-    this.hoursToday = Temporal.Duration.from(hoursToday);
-    this.hoursYesterday = Temporal.Duration.from(hoursYesterday);
-    this.hoursThisWeek = Temporal.Duration.from(hoursThisWeek);
-    this.hoursThisMonth = Temporal.Duration.from(hoursThisMonth);
   }
 }
 
