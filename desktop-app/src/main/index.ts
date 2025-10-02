@@ -29,6 +29,8 @@ import {
   LogActivityCommandDto,
   RecentActivitiesQueryDto,
   RecentActivitiesQueryResultDto,
+  ReportQueryDto,
+  ReportQueryResultDto,
   TimesheetQueryDto,
   TimesheetQueryResultDto,
 } from "../shared/infrastructure/activities";
@@ -109,6 +111,11 @@ function createIpc() {
     const query = RecentActivitiesQueryDto.create(queryDto).validate();
     const result = await activitiesService.queryRecentActivities(query);
     return RecentActivitiesQueryResultDto.from(result);
+  });
+  ipcMain.handle("queryReport", async (_event, queryDto) => {
+    const query = ReportQueryDto.create(queryDto).validate();
+    const result = await activitiesService.queryReport(query);
+    return ReportQueryResultDto.from(result);
   });
   ipcMain.handle("queryTimesheet", async (_event, queryDto) => {
     const query = TimesheetQueryDto.create(queryDto).validate();
@@ -270,7 +277,7 @@ const template: MenuItemConstructorOptions[] = [
     label: "Reports",
     submenu: [
       {
-        label: "Reports",
+        label: "Report",
         click: () => {
           const reportWindow = new BrowserWindow({
             width: 1000,
@@ -282,11 +289,11 @@ const template: MenuItemConstructorOptions[] = [
           });
           if (!isProduction() && process.env["ELECTRON_RENDERER_URL"]) {
             void reportWindow.loadURL(
-              `${process.env["ELECTRON_RENDERER_URL"]}/reports.html`,
+              `${process.env["ELECTRON_RENDERER_URL"]}/report.html`,
             );
           } else {
             void reportWindow.loadFile(
-              path.join(import.meta.dirname, "../renderer/reports.html"),
+              path.join(import.meta.dirname, "../renderer/report.html"),
             );
           }
         },

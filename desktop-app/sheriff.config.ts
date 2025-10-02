@@ -10,7 +10,7 @@ export const config: SheriffConfig = {
     main: "src/main/index.ts",
     preload: "src/preload/index.ts",
     log: "src/renderer/log.tsx",
-    reports: "src/renderer/reports.tsx",
+    reports: "src/renderer/report.tsx",
     timesheet: "src/renderer/timesheet.tsx",
   },
   modules: {

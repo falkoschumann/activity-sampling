@@ -5,6 +5,8 @@ import {
   LogActivityCommandDto,
   RecentActivitiesQueryDto,
   RecentActivitiesQueryResultDto,
+  ReportQueryDto,
+  ReportQueryResultDto,
   TimesheetQueryDto,
   TimesheetQueryResultDto,
 } from "../shared/infrastructure/activities";
@@ -27,6 +29,8 @@ export interface ActivitySampling {
   queryCurrentIntervalQuery(
     query: CurrentIntervalQueryDto,
   ): CurrentIntervalQueryDto;
+
+  queryReport(query: ReportQueryDto): Promise<ReportQueryResultDto>;
 
   queryTimesheet(query: TimesheetQueryDto): Promise<TimesheetQueryResultDto>;
 

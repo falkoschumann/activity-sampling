@@ -196,6 +196,10 @@ export const Scope = Object.freeze({
 export type Scope = (typeof Scope)[keyof typeof Scope];
 
 export class ReportQueryResult {
+  static empty(): ReportQueryResult {
+    return new ReportQueryResult([], Temporal.Duration.from("PT0S"));
+  }
+
   readonly entries: ReportEntry[];
   readonly totalHours: Temporal.Duration;
 

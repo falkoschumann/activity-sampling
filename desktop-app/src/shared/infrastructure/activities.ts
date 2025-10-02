@@ -9,6 +9,10 @@ import {
   LogActivityCommand,
   RecentActivitiesQuery,
   RecentActivitiesQueryResult,
+  ReportEntry,
+  ReportQuery,
+  ReportQueryResult,
+  type Scope,
   TimesheetEntry,
   TimesheetQuery,
   TimesheetQueryResult,
@@ -298,6 +302,93 @@ export class TimeSummaryDto {
       Temporal.Duration.from(this.hoursYesterday),
       Temporal.Duration.from(this.hoursThisWeek),
       Temporal.Duration.from(this.hoursThisMonth),
+    );
+  }
+}
+
+export class ReportQueryDto {
+  static create(dto: ReportQueryDto): ReportQueryDto {
+    return new ReportQueryDto(dto.scope, dto.from, dto.to, dto.timeZone);
+  }
+
+  static from(model: ReportQuery): ReportQueryDto {
+    return new ReportQueryDto(
+      model.scope,
+      model.from?.toString(),
+      model.to?.toString(),
+      model.timeZone?.toString(),
+    );
+  }
+
+  readonly scope: Scope;
+  readonly from?: string;
+  readonly to?: string;
+  readonly timeZone?: string;
+
+  constructor(scope: Scope, from?: string, to?: string, timeZone?: string) {
+    this.scope = scope;
+    this.from = from;
+    this.to = to;
+    this.timeZone = timeZone;
+  }
+
+  validate(): ReportQuery {
+    return new ReportQuery(this.scope, this.from, this.to, this.timeZone);
+  }
+}
+
+export class ReportQueryResultDto {
+  static create(dto: ReportQueryResultDto) {
+    return new ReportQueryResultDto(dto.entries, dto.totalHours);
+  }
+
+  static from(model: ReportQueryResult): ReportQueryResultDto {
+    return new ReportQueryResultDto(
+      model.entries.map((entry) => ReportEntryDto.from(entry)),
+      model.totalHours.toString(),
+    );
+  }
+
+  readonly entries: ReportEntryDto[];
+  readonly totalHours: string;
+
+  constructor(entries: ReportEntryDto[], totalHours: string) {
+    this.entries = entries;
+    this.totalHours = totalHours;
+  }
+
+  validate(): ReportQueryResult {
+    return new ReportQueryResult(
+      this.entries.map((entry) => ReportEntryDto.create(entry).validate()),
+      this.totalHours,
+    );
+  }
+}
+
+export class ReportEntryDto {
+  static create(dto: ReportEntryDto): ReportEntryDto {
+    return new ReportEntryDto(dto.name, dto.hours, dto.client);
+  }
+
+  static from(model: ReportEntry): ReportEntryDto {
+    return new ReportEntryDto(model.name, model.hours.toString(), model.client);
+  }
+
+  readonly name: string;
+  readonly hours: string;
+  readonly client?: string;
+
+  constructor(name: string, hours: string, client?: string) {
+    this.name = name;
+    this.hours = hours;
+    this.client = client;
+  }
+
+  validate(): ReportEntry {
+    return new ReportEntry(
+      this.name,
+      Temporal.Duration.from(this.hours),
+      this.client,
     );
   }
 }

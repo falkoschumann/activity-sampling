@@ -15,7 +15,7 @@ export default defineConfig({
       rollupOptions: {
         input: {
           main: "src/renderer/log.html",
-          reports: "src/renderer/reports.html",
+          reports: "src/renderer/report.html",
           timesheet: "src/renderer/timesheet.html",
         },
       },
