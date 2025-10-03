@@ -1,5 +1,6 @@
 export NPM_CONFIG_YES=true
 SUBDIRS = desktop-app web-app api-app
+APP_DIRS = web-app api-app
 ROOT_FILES = .github/ doc/ README.md
 PLANTUML_FILES = $(wildcard doc/*.puml)
 DIAGRAM_FILES = $(subst .puml,.png,$(PLANTUML_FILES))
@@ -47,7 +48,7 @@ dev: build
 		--kill-others \
 		--names "WEB,API" \
 		--prefix-colors "bgMagenta.bold,bgGreen.bold" \
-		$(foreach dir,$(SUBDIRS),"$(MAKE) -C $(dir) dev")
+		$(foreach app,$(APP_DIRS),"$(MAKE) -C $(app) dev")
 
 test: $(SUBDIRS)
 test: TARGET=test
