@@ -150,7 +150,9 @@ describe("Activities service", () => {
             duration: "PT8H",
           }),
         ],
-        holidays: [{ date: "2025-06-10", title: "Pfingstmontag" }],
+        holidays: [
+          HolidayDto.create({ date: "2025-06-10", title: "Pfingstmontag" }),
+        ],
         fixedInstant: "2025-06-11T15:00:00Z",
       });
 

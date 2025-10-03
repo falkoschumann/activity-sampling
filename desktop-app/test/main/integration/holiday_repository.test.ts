@@ -88,7 +88,9 @@ describe("Holiday repository", () => {
 
       it("should return configurable responses", async () => {
         const repository = HolidayRepository.createNull({
-          readFileResponses: [[{ date: "2025-06-09", title: "Pfingstmontag" }]],
+          readFileResponses: [
+            [HolidayDto.create({ date: "2025-06-09", title: "Pfingstmontag" })],
+          ],
         });
 
         const holidays = await repository.findAllByDate(

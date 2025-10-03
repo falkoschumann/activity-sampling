@@ -70,8 +70,7 @@ export class HolidayRepository extends EventTarget {
       });
       const holidays: Holiday[] = [];
       for await (const record of records) {
-        const dto = HolidayDto.from(record);
-        const holiday = validateHoliday(dto);
+        const holiday = HolidayDto.from(record).validate();
         if (
           Temporal.PlainDate.compare(holiday.date, startInclusive) >= 0 &&
           Temporal.PlainDate.compare(holiday.date, endExclusive) < 0
@@ -92,8 +91,8 @@ export class HolidayRepository extends EventTarget {
 }
 
 export class HolidayDto {
-  static create(data: HolidayDto): HolidayDto {
-    return new HolidayDto(data);
+  static create({ date, title }: { date: string; title: string }): HolidayDto {
+    return new HolidayDto(date, title);
   }
 
   static from(data: unknown): HolidayDto {
@@ -111,14 +110,14 @@ export class HolidayDto {
   readonly date: string;
   readonly title: string;
 
-  constructor(data: HolidayDto) {
-    this.date = data.date;
-    this.title = data.title;
+  constructor(date: string, title: string) {
+    this.date = date;
+    this.title = title;
   }
-}
 
-function validateHoliday(dto: HolidayDto): Holiday {
-  return new Holiday(dto.date, dto.title);
+  validate(): Holiday {
+    return new Holiday(this.date, this.title);
+  }
 }
 
 class FsPromiseStub {
