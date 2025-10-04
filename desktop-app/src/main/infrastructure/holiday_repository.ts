@@ -70,7 +70,7 @@ export class HolidayRepository extends EventTarget {
       });
       const holidays: Holiday[] = [];
       for await (const record of records) {
-        const holiday = HolidayDto.from(record).validate();
+        const holiday = HolidayDto.fromJson(record).validate();
         if (
           Temporal.PlainDate.compare(holiday.date, startInclusive) >= 0 &&
           Temporal.PlainDate.compare(holiday.date, endExclusive) < 0
@@ -95,12 +95,12 @@ export class HolidayDto {
     return new HolidayDto(date, title);
   }
 
-  static from(data: unknown): HolidayDto {
+  static fromJson(json: unknown): HolidayDto {
     const ajv = new Ajv();
     addFormats(ajv);
-    const valid = ajv.validate(schema, data);
+    const valid = ajv.validate(schema, json);
     if (valid) {
-      return HolidayDto.create(data as HolidayDto);
+      return HolidayDto.create(json as HolidayDto);
     }
 
     const errors = JSON.stringify(ajv.errors, null, 2);
@@ -110,13 +110,13 @@ export class HolidayDto {
   readonly date: string;
   readonly title: string;
 
-  constructor(date: string, title: string) {
+  private constructor(date: string, title: string) {
     this.date = date;
     this.title = title;
   }
 
   validate(): Holiday {
-    return new Holiday(this.date, this.title);
+    return Holiday.create(this);
   }
 }
 

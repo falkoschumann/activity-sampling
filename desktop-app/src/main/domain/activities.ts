@@ -170,14 +170,14 @@ export async function projectReport(
     }
   }
 
-  function updateEntry(name: string, duration: Temporal.DurationLike) {
+  function updateEntry(name: string, hours: Temporal.DurationLike) {
     const index = entries.findIndex((entry) => entry.name === name);
     if (index == -1) {
-      entries.push(new ReportEntry(name, duration));
+      entries.push(ReportEntry.create({ name, hours }));
     } else {
       const existingEntry = entries[index];
       const accumulatedHours = Temporal.Duration.from(existingEntry.hours).add(
-        Temporal.Duration.from(duration),
+        Temporal.Duration.from(hours),
       );
       entries[index] = {
         ...existingEntry,
@@ -187,13 +187,13 @@ export async function projectReport(
   }
 
   function updateProject(
-    project: string,
+    name: string,
     client: string,
-    duration: Temporal.DurationLike,
+    hours: Temporal.DurationLike,
   ) {
-    const index = entries.findIndex((entry) => entry.name === project);
+    const index = entries.findIndex((entry) => entry.name === name);
     if (index == -1) {
-      entries.push(new ReportEntry(project, duration, client));
+      entries.push(ReportEntry.create({ name, hours, client }));
     } else {
       const existingEntry = entries[index];
       let existingClient = existingEntry.client;
@@ -203,7 +203,7 @@ export async function projectReport(
           : client;
       }
       const accumulatedHours = Temporal.Duration.from(existingEntry.hours).add(
-        Temporal.Duration.from(duration),
+        Temporal.Duration.from(hours),
       );
       entries[index] = {
         ...existingEntry,
@@ -353,14 +353,14 @@ async function* mapEvents(
     const dateTime = event.timestamp
       .toZonedDateTimeISO(timeZone)
       .toPlainDateTime();
-    const activity = new Activity(
+    const activity = Activity.create({
       dateTime,
-      event.duration,
-      event.client,
-      event.project,
-      event.task,
-      event.notes,
-    );
+      duration: event.duration,
+      client: event.client,
+      project: event.project,
+      task: event.task,
+      notes: event.notes,
+    });
     yield activity;
   }
 }

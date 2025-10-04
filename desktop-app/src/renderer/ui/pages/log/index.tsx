@@ -47,14 +47,14 @@ export default function LogPage() {
 
   async function handleSubmitActivity() {
     await logActivity(
-      new LogActivityCommand(
-        Temporal.Now.instant(),
-        Temporal.Duration.from(state.countdown.interval),
-        state.form.client,
-        state.form.project,
-        state.form.task,
-        state.form.notes,
-      ),
+      LogActivityCommand.create({
+        timestamp: Temporal.Now.instant(),
+        duration: Temporal.Duration.from(state.countdown.interval),
+        client: state.form.client,
+        project: state.form.project,
+        task: state.form.task,
+        notes: state.form.notes,
+      }),
     );
     dispatch(activityLogged());
     await handleQueryRecentActivities();

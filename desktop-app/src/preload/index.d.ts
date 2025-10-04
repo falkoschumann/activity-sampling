@@ -1,7 +1,7 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
-import {
-  type CommandStatusDto,
+import type {
+  CommandStatusDto,
   LogActivityCommandDto,
   RecentActivitiesQueryDto,
   RecentActivitiesQueryResultDto,
@@ -10,8 +10,9 @@ import {
   TimesheetQueryDto,
   TimesheetQueryResultDto,
 } from "../shared/infrastructure/activities";
-import {
+import type {
   CurrentIntervalQueryDto,
+  CurrentIntervalQueryResultDto,
   IntervalElapsedEventDto,
   TimerStartedEventDto,
   TimerStoppedEventDto,
@@ -28,7 +29,7 @@ export interface ActivitySampling {
 
   queryCurrentIntervalQuery(
     query: CurrentIntervalQueryDto,
-  ): CurrentIntervalQueryDto;
+  ): CurrentIntervalQueryResultDto;
 
   queryReport(query: ReportQueryDto): Promise<ReportQueryResultDto>;
 

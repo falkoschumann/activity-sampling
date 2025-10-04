@@ -53,24 +53,29 @@ export class TimerService extends EventTarget {
       Temporal.Duration.from(command.interval).total("milliseconds"),
     );
     this.dispatchEvent(
-      new TimerStartedEvent(this.#clock.instant(), command.interval),
+      TimerStartedEvent.create({
+        timestamp: this.#clock.instant(),
+        interval: command.interval,
+      }),
     );
     return new Success();
   }
 
   async stopTimer(_command: StopTimerCommand): Promise<CommandStatus> {
     this.#timer.clearInterval(this.#intervalId);
-    this.dispatchEvent(new TimerStoppedEvent(this.#clock.instant()));
+    this.dispatchEvent(
+      TimerStoppedEvent.create({ timestamp: this.#clock.instant() }),
+    );
     return new Success();
   }
 
   async queryCurrentInterval(
     _query: CurrentIntervalQuery,
   ): Promise<CurrentIntervalQueryResult> {
-    return new CurrentIntervalQueryResult(
-      this.#clock.instant(),
-      this.#currentInterval ?? Temporal.Duration.from("PT30M"),
-    );
+    return CurrentIntervalQueryResult.create({
+      timestamp: this.#clock.instant(),
+      duration: this.#currentInterval ?? Temporal.Duration.from("PT30M"),
+    });
   }
 
   async simulateTimePassing(duration: Temporal.DurationLike | string) {
@@ -90,7 +95,10 @@ export class TimerService extends EventTarget {
   #handleIntervalElapsed() {
     this.#currentInterval = this.#interval!;
     this.dispatchEvent(
-      new IntervalElapsedEvent(this.#clock.instant(), this.#currentInterval),
+      IntervalElapsedEvent.create({
+        timestamp: this.#clock.instant(),
+        interval: this.#currentInterval,
+      }),
     );
   }
 }

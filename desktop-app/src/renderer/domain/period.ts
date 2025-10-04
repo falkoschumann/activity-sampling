@@ -21,7 +21,7 @@ export type PeriodUnit = (typeof PeriodUnit)[keyof typeof PeriodUnit];
 const GO_TO_NEXT_PERIOD_ACTION = "goToNextPeriod";
 
 interface GoToNextPeriodPayload {
-  today?: Temporal.PlainDate | string;
+  today?: Temporal.PlainDateLike | string;
 }
 
 export function goToNextPeriod(
@@ -33,7 +33,7 @@ export function goToNextPeriod(
 const GO_TO_PREVIOUS_PERIOD_ACTION = "goToPreviousPeriod";
 
 interface GoToPreviousPeriodPayload {
-  today?: Temporal.PlainDate | string;
+  today?: Temporal.PlainDateLike | string;
 }
 
 export function goToPreviousPeriod(
@@ -49,7 +49,7 @@ const CHANGE_PERIOD_ACTION = "changePeriod";
 
 interface ChangePeriodPayload {
   unit: PeriodUnit;
-  today?: Temporal.PlainDate | string;
+  today?: Temporal.PlainDateLike | string;
 }
 
 export function changePeriod(
@@ -68,8 +68,8 @@ export type Action =
 //
 
 export interface State {
-  from: string;
-  to: string;
+  from: Temporal.PlainDate;
+  to: Temporal.PlainDate;
   unit: PeriodUnit;
   isCurrent: boolean;
 }
@@ -78,28 +78,28 @@ export function init({
   today,
   unit,
 }: {
-  today?: Temporal.PlainDate | string;
+  today?: Temporal.PlainDateLike | string;
   unit: PeriodUnit;
 }): State {
-  today = parseToday(today);
+  const todayDate = parseToday(today);
   let from: Temporal.PlainDate;
   let to: Temporal.PlainDate;
   switch (unit) {
     case PeriodUnit.DAY:
-      from = today;
-      to = today;
+      from = todayDate;
+      to = todayDate;
       break;
     case PeriodUnit.WEEK:
-      from = today.subtract({ days: today.dayOfWeek - 1 });
-      to = today.add({ days: 7 - today.dayOfWeek });
+      from = todayDate.subtract({ days: todayDate.dayOfWeek - 1 });
+      to = todayDate.add({ days: 7 - todayDate.dayOfWeek });
       break;
     case PeriodUnit.MONTH:
-      from = today.with({ day: 1 });
-      to = today.with({ day: 31 });
+      from = todayDate.with({ day: 1 });
+      to = todayDate.with({ day: 31 });
       break;
     case PeriodUnit.YEAR:
-      from = today.with({ month: 1, day: 1 });
-      to = today.with({ month: 12, day: 31 });
+      from = todayDate.with({ month: 1, day: 1 });
+      to = todayDate.with({ month: 12, day: 31 });
       break;
     default:
       // All the time
@@ -109,8 +109,8 @@ export function init({
   }
 
   return {
-    from: from.toString(),
-    to: to.toString(),
+    from,
+    to,
     unit,
     isCurrent: true,
   };
@@ -119,8 +119,8 @@ export function init({
 export function reducer(state: State, action: Action): State {
   switch (action.type) {
     case GO_TO_NEXT_PERIOD_ACTION: {
-      let from = Temporal.PlainDate.from(state.from);
-      let to = Temporal.PlainDate.from(state.to);
+      let from = state.from;
+      let to = state.to;
       switch (state.unit) {
         case PeriodUnit.DAY:
           from = from.add({ days: 1 });
@@ -140,14 +140,14 @@ export function reducer(state: State, action: Action): State {
       }
       return {
         ...state,
-        from: from.toString(),
-        to: to.toString(),
+        from,
+        to,
         isCurrent: getCurrent(from, to, action.payload.today),
       };
     }
     case GO_TO_PREVIOUS_PERIOD_ACTION: {
-      let from = Temporal.PlainDate.from(state.from);
-      let to = Temporal.PlainDate.from(state.to);
+      let from = state.from;
+      let to = state.to;
       switch (state.unit) {
         case PeriodUnit.DAY:
           from = from.subtract({ days: 1 });
@@ -167,8 +167,8 @@ export function reducer(state: State, action: Action): State {
       }
       return {
         ...state,
-        from: from.toString(),
-        to: to.toString(),
+        from,
+        to,
         isCurrent: getCurrent(from, to, action.payload.today),
       };
     }
@@ -181,9 +181,9 @@ export function reducer(state: State, action: Action): State {
 }
 
 function getCurrent(
-  from: Temporal.PlainDate,
-  to: Temporal.PlainDate,
-  today?: Temporal.PlainDate | string,
+  from: Temporal.PlainDateLike,
+  to: Temporal.PlainDateLike,
+  today?: Temporal.PlainDateLike | string,
 ): boolean {
   today = parseToday(today);
   return (
@@ -192,10 +192,10 @@ function getCurrent(
   );
 }
 
-function parseToday(today?: Temporal.PlainDate | string): Temporal.PlainDate {
-  today =
-    today != null
-      ? Temporal.PlainDate.from(today)
-      : Temporal.Now.plainDateISO();
-  return today;
+function parseToday(
+  today?: Temporal.PlainDateLike | string,
+): Temporal.PlainDate {
+  return today != null
+    ? Temporal.PlainDate.from(today)
+    : Temporal.Now.plainDateISO();
 }

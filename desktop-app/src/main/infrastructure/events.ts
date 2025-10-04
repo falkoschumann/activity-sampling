@@ -66,10 +66,10 @@ export class ActivityLoggedEventDto {
     );
   }
 
-  static fromJson(data: unknown): ActivityLoggedEventDto {
-    const valid = ajv.validate(ACTIVITY_LOGGED_EVENT_SCHEMA, data);
+  static fromJson(json: unknown): ActivityLoggedEventDto {
+    const valid = ajv.validate(ACTIVITY_LOGGED_EVENT_SCHEMA, json);
     if (valid) {
-      return ActivityLoggedEventDto.create(data as ActivityLoggedEventDto);
+      return ActivityLoggedEventDto.create(json as ActivityLoggedEventDto);
     }
 
     const errors = JSON.stringify(ajv.errors, null, 2);
@@ -83,7 +83,7 @@ export class ActivityLoggedEventDto {
   readonly task: string;
   readonly notes?: string;
 
-  constructor(
+  private constructor(
     timestamp: string,
     duration: string,
     client: string,
@@ -100,13 +100,6 @@ export class ActivityLoggedEventDto {
   }
 
   validate(): ActivityLoggedEvent {
-    return new ActivityLoggedEvent(
-      this.timestamp,
-      this.duration,
-      this.client,
-      this.project,
-      this.task,
-      this.notes,
-    );
+    return ActivityLoggedEvent.create(this);
   }
 }

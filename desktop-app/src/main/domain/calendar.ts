@@ -3,10 +3,20 @@
 import { Temporal } from "@js-temporal/polyfill";
 
 export class Holiday {
+  static create({
+    date,
+    title,
+  }: {
+    date: Temporal.PlainDateLike | string;
+    title: string;
+  }) {
+    return new Holiday(date, title);
+  }
+
   date: Temporal.PlainDate;
   title: string;
 
-  constructor(date: Temporal.PlainDateLike | string, title: string) {
+  private constructor(date: Temporal.PlainDateLike | string, title: string) {
     this.date = Temporal.PlainDate.from(date);
     this.title = title;
   }

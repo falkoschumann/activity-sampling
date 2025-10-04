@@ -38,6 +38,11 @@ import icon from "../../resources/icon.png?asset";
 import { Configuration } from "./infrastructure/configuration_gateway";
 import { EventStore } from "./infrastructure/event_store";
 import { HolidayRepository } from "./infrastructure/holiday_repository";
+import {
+  IntervalElapsedEventDto,
+  TimerStartedEventDto,
+  TimerStoppedEventDto,
+} from "../shared/infrastructure/timer";
 
 const configuration = Configuration.createDefault();
 const eventStore = EventStore.create(configuration.eventStore);
@@ -102,26 +107,35 @@ function installDevTools() {
 }
 
 function createIpc() {
-  ipcMain.handle("logActivity", async (_event, commandDto) => {
-    const command = LogActivityCommandDto.create(commandDto).validate();
-    const status = await activitiesService.logActivity(command);
-    return CommandStatusDto.from(status);
-  });
-  ipcMain.handle("queryRecentActivities", async (_event, queryDto) => {
-    const query = RecentActivitiesQueryDto.create(queryDto).validate();
-    const result = await activitiesService.queryRecentActivities(query);
-    return RecentActivitiesQueryResultDto.from(result);
-  });
-  ipcMain.handle("queryReport", async (_event, queryDto) => {
+  ipcMain.handle(
+    "logActivity",
+    async (_event, commandDto: LogActivityCommandDto) => {
+      const command = LogActivityCommandDto.create(commandDto).validate();
+      const status = await activitiesService.logActivity(command);
+      return CommandStatusDto.fromModel(status);
+    },
+  );
+  ipcMain.handle(
+    "queryRecentActivities",
+    async (_event, queryDto: RecentActivitiesQueryDto) => {
+      const query = RecentActivitiesQueryDto.create(queryDto).validate();
+      const result = await activitiesService.queryRecentActivities(query);
+      return RecentActivitiesQueryResultDto.from(result);
+    },
+  );
+  ipcMain.handle("queryReport", async (_event, queryDto: ReportQueryDto) => {
     const query = ReportQueryDto.create(queryDto).validate();
     const result = await activitiesService.queryReport(query);
     return ReportQueryResultDto.from(result);
   });
-  ipcMain.handle("queryTimesheet", async (_event, queryDto) => {
-    const query = TimesheetQueryDto.create(queryDto).validate();
-    const result = await activitiesService.queryTimesheet(query);
-    return TimesheetQueryResultDto.from(result);
-  });
+  ipcMain.handle(
+    "queryTimesheet",
+    async (_event, queryDto: TimesheetQueryDto) => {
+      const query = TimesheetQueryDto.create(queryDto).validate();
+      const result = await activitiesService.queryTimesheet(query);
+      return TimesheetQueryResultDto.from(result);
+    },
+  );
 }
 
 function createWindow(): void {
@@ -134,26 +148,24 @@ function createWindow(): void {
     },
   });
 
-  timerService.addEventListener(TimerStartedEvent.TYPE, (event) => {
-    const timerStartedEvent = event as TimerStartedEvent;
-    mainWindow.webContents.send(TimerStartedEvent.TYPE, {
-      timestamp: timerStartedEvent.timestamp.toString(),
-      interval: timerStartedEvent.interval.toString(),
-    });
-  });
-  timerService.addEventListener(TimerStoppedEvent.TYPE, (event) => {
-    const timerStoppedEvent = event as TimerStoppedEvent;
-    mainWindow.webContents.send(TimerStoppedEvent.TYPE, {
-      timestamp: timerStoppedEvent.timestamp.toString(),
-    });
-  });
-  timerService.addEventListener(IntervalElapsedEvent.TYPE, (event) => {
-    const intervalElapsedEvent = event as IntervalElapsedEvent;
-    mainWindow.webContents.send(IntervalElapsedEvent.TYPE, {
-      timestamp: intervalElapsedEvent.timestamp.toString(),
-      interval: intervalElapsedEvent.interval.toString(),
-    });
-  });
+  timerService.addEventListener(TimerStartedEvent.TYPE, (event) =>
+    mainWindow.webContents.send(
+      TimerStartedEvent.TYPE,
+      TimerStartedEventDto.fromModel(event as TimerStartedEvent),
+    ),
+  );
+  timerService.addEventListener(TimerStoppedEvent.TYPE, (event) =>
+    mainWindow.webContents.send(
+      TimerStoppedEvent.TYPE,
+      TimerStoppedEventDto.fromModel(event as TimerStoppedEvent),
+    ),
+  );
+  timerService.addEventListener(IntervalElapsedEvent.TYPE, (event) =>
+    mainWindow.webContents.send(
+      IntervalElapsedEvent.TYPE,
+      IntervalElapsedEventDto.fromModel(event as IntervalElapsedEvent),
+    ),
+  );
 
   // HMR for renderer base on electron-vite cli.
   // Load the remote URL for development or the local HTML file for production.
@@ -234,41 +246,58 @@ const template: MenuItemConstructorOptions[] = [
         submenu: [
           {
             label: "5 min",
-            click: () => timerService.startTimer(new StartTimerCommand("PT5M")),
+            click: () =>
+              timerService.startTimer(
+                StartTimerCommand.create({ interval: "PT5M" }),
+              ),
           },
           {
             label: "10 min",
             click: () =>
-              timerService.startTimer(new StartTimerCommand("PT10M")),
+              timerService.startTimer(
+                StartTimerCommand.create({ interval: "PT10M" }),
+              ),
           },
           {
             label: "15 min",
             click: () =>
-              timerService.startTimer(new StartTimerCommand("PT15M")),
+              timerService.startTimer(
+                StartTimerCommand.create({ interval: "PT15M" }),
+              ),
           },
           {
             label: "20 min",
             click: () =>
-              timerService.startTimer(new StartTimerCommand("PT20M")),
+              timerService.startTimer(
+                StartTimerCommand.create({ interval: "PT20M" }),
+              ),
           },
           {
             label: "30 min",
             click: () =>
-              timerService.startTimer(new StartTimerCommand("PT30M")),
+              timerService.startTimer(
+                StartTimerCommand.create({ interval: "PT30M" }),
+              ),
           },
           {
             label: "60 min",
-            click: () => timerService.startTimer(new StartTimerCommand("PT1H")),
+            click: () =>
+              timerService.startTimer(
+                StartTimerCommand.create({ interval: "PT1H" }),
+              ),
           },
           {
             label: "1 min",
-            click: () => timerService.startTimer(new StartTimerCommand("PT1M")),
+            click: () =>
+              timerService.startTimer(
+                StartTimerCommand.create({ interval: "PT1M" }),
+              ),
           },
         ],
       },
       {
         label: "Stop",
-        click: () => timerService.stopTimer(new StopTimerCommand()),
+        click: () => timerService.stopTimer(StopTimerCommand.create()),
       },
     ],
   },

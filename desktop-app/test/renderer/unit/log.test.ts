@@ -12,8 +12,9 @@ import {
   type State,
   timerStarted,
   timerStopped,
-  timerTicked,
+  timerTicked
 } from "../../../src/renderer/domain/log";
+import { Temporal } from "@js-temporal/polyfill";
 
 describe("Timer", () => {
   describe("Change text", () => {
@@ -123,7 +124,7 @@ describe("Timer", () => {
         },
         countdown: {
           ...initialState.countdown,
-          remaining: "PT10M",
+          remaining: Temporal.Duration.from("PT10M"),
           percentage: 50,
           isRunning: true,
         },
@@ -143,7 +144,7 @@ describe("Timer", () => {
         },
         countdown: {
           ...initialState.countdown,
-          remaining: "PT10M",
+          remaining: Temporal.Duration.from("PT10M"),
           percentage: 50,
           isRunning: true,
         },
@@ -193,8 +194,8 @@ describe("Timer", () => {
         },
         countdown: {
           ...initialState.countdown,
-          interval: "PT20M",
-          remaining: "PT20M",
+          interval: Temporal.Duration.from("PT20M"),
+          remaining: Temporal.Duration.from("PT20M"),
           percentage: 0,
           isRunning: true,
         },
@@ -213,8 +214,8 @@ describe("Timer", () => {
         },
         countdown: {
           ...initialState.countdown,
-          interval: "PT20M",
-          remaining: "PT15M",
+          interval: Temporal.Duration.from("PT20M"),
+          remaining: Temporal.Duration.from("PT15M"),
           percentage: 25,
           isRunning: true,
         },
@@ -231,8 +232,8 @@ describe("Timer", () => {
         },
         countdown: {
           ...initialState.countdown,
-          interval: "PT20M",
-          remaining: "PT14M",
+          interval: Temporal.Duration.from("PT20M"),
+          remaining: Temporal.Duration.from("PT14M"),
           percentage: 30,
           isRunning: true,
         },
@@ -249,8 +250,8 @@ describe("Timer", () => {
         },
         countdown: {
           ...initialState.countdown,
-          interval: "PT20M",
-          remaining: "PT0M",
+          interval: Temporal.Duration.from("PT20M"),
+          remaining: Temporal.Duration.from("PT0M"),
           percentage: 100,
           isRunning: true,
         },
@@ -267,8 +268,8 @@ describe("Timer", () => {
         },
         countdown: {
           ...initialState.countdown,
-          interval: "PT20M",
-          remaining: "PT0S",
+          interval: Temporal.Duration.from("PT20M"),
+          remaining: Temporal.Duration.from("PT0S"),
           percentage: 100,
           isRunning: true,
         },
@@ -287,8 +288,8 @@ describe("Timer", () => {
         },
         countdown: {
           ...initialState.countdown,
-          interval: "PT20M",
-          remaining: "PT15M",
+          interval: Temporal.Duration.from("PT20M"),
+          remaining: Temporal.Duration.from("PT15M"),
           percentage: 25,
           isRunning: true,
         },
@@ -305,8 +306,8 @@ describe("Timer", () => {
         },
         countdown: {
           ...initialState.countdown,
-          interval: "PT20M",
-          remaining: "PT15M",
+          interval: Temporal.Duration.from("PT20M"),
+          remaining: Temporal.Duration.from("PT15M"),
           percentage: 25,
           isRunning: false,
         },
@@ -326,8 +327,8 @@ describe("Timer", () => {
         },
         countdown: {
           ...initialState.countdown,
-          interval: "PT20M",
-          remaining: "PT15M",
+          interval: Temporal.Duration.from("PT20M"),
+          remaining: Temporal.Duration.from("PT15M"),
           percentage: 25,
           isRunning: true,
         },
@@ -347,8 +348,8 @@ describe("Timer", () => {
         },
         countdown: {
           ...initialState.countdown,
-          interval: "PT20M",
-          remaining: "PT15M",
+          interval: Temporal.Duration.from("PT20M"),
+          remaining: Temporal.Duration.from("PT15M"),
           percentage: 25,
           isRunning: false,
         },
@@ -367,12 +368,12 @@ describe("Timer", () => {
         },
         countdown: {
           ...initialState.countdown,
-          interval: "PT20M",
-          remaining: "PT0S",
+          interval: Temporal.Duration.from("PT20M"),
+          remaining: Temporal.Duration.from("PT0S"),
           percentage: 100,
           isRunning: true,
         },
-        currentInterval: "PT30M",
+        currentInterval: Temporal.Duration.from("PT30M"),
       };
 
       state = reducer(state, intervalElapsed({ interval: "PT20M" }));
@@ -386,12 +387,12 @@ describe("Timer", () => {
         },
         countdown: {
           ...initialState.countdown,
-          interval: "PT20M",
-          remaining: "PT20M",
+          interval: Temporal.Duration.from("PT20M"),
+          remaining: Temporal.Duration.from("PT20M"),
           percentage: 0,
           isRunning: true,
         },
-        currentInterval: "PT20M",
+        currentInterval: Temporal.Duration.from("PT20M"),
       });
     });
 
@@ -408,12 +409,12 @@ describe("Timer", () => {
         },
         countdown: {
           ...initialState.countdown,
-          interval: "PT20M",
-          remaining: "PT0S",
+          interval: Temporal.Duration.from("PT20M"),
+          remaining: Temporal.Duration.from("PT0S"),
           percentage: 100,
           isRunning: true,
         },
-        currentInterval: "PT30M",
+        currentInterval: Temporal.Duration.from("PT30M"),
       };
 
       state = reducer(state, intervalElapsed({ interval: "PT20M" }));
@@ -430,12 +431,12 @@ describe("Timer", () => {
         },
         countdown: {
           ...initialState.countdown,
-          interval: "PT20M",
-          remaining: "PT20M",
+          interval: Temporal.Duration.from("PT20M"),
+          remaining: Temporal.Duration.from("PT20M"),
           percentage: 0,
           isRunning: true,
         },
-        currentInterval: "PT20M",
+        currentInterval: Temporal.Duration.from("PT20M"),
       });
     });
   });

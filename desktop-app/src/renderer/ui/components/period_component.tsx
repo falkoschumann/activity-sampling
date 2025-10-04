@@ -15,8 +15,8 @@ export function PeriodComponent({
   onNextPeriod,
   onChangePeriod,
 }: {
-  from: string;
-  to: string;
+  from: Temporal.PlainDate;
+  to: Temporal.PlainDate;
   unit: PeriodUnit;
   isCurrent: boolean;
   units: PeriodUnit[];

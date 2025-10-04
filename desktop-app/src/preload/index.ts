@@ -2,7 +2,7 @@
 
 import { contextBridge, ipcRenderer } from "electron/renderer";
 
-import {
+import type {
   CommandStatusDto,
   LogActivityCommandDto,
   RecentActivitiesQueryDto,
@@ -12,8 +12,8 @@ import {
   TimesheetQueryDto,
   TimesheetQueryResultDto,
 } from "../shared/infrastructure/activities";
-import {
-  type CurrentIntervalQueryDto,
+import type {
+  CurrentIntervalQueryDto,
   IntervalElapsedEventDto,
   TimerStartedEventDto,
   TimerStoppedEventDto,

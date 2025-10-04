@@ -19,7 +19,7 @@ describe("Timer service", () => {
       const events: Event[] = [];
       service.addEventListener("timerStarted", (event) => events.push(event));
 
-      service.startTimer(new StartTimerCommand("PT30M"));
+      service.startTimer(StartTimerCommand.create({ interval: "PT30M" }));
 
       expect(events).toEqual([
         expect.objectContaining({
@@ -38,10 +38,10 @@ describe("Timer service", () => {
       });
       const events: Event[] = [];
       service.addEventListener("timerStopped", (event) => events.push(event));
-      service.startTimer(new StartTimerCommand("PT30M"));
+      service.startTimer(StartTimerCommand.create({ interval: "PT30M" }));
 
       service.simulateTimePassing("PT2M");
-      service.stopTimer(new StopTimerCommand());
+      service.stopTimer(StopTimerCommand.create());
 
       expect(events).toEqual([
         expect.objectContaining({
@@ -61,11 +61,11 @@ describe("Timer service", () => {
       service.addEventListener("intervalElapsed", (event) =>
         events.push(event),
       );
-      await service.startTimer(new StartTimerCommand("PT30M"));
+      await service.startTimer(StartTimerCommand.create({ interval: "PT30M" }));
 
       await service.simulateIntervalElapsed();
       const result = await service.queryCurrentInterval(
-        new CurrentIntervalQuery(),
+        CurrentIntervalQuery.create(),
       );
 
       expect(events).toEqual([
@@ -91,7 +91,7 @@ describe("Timer service", () => {
       service.addEventListener("intervalElapsed", (event) =>
         events.push(event),
       );
-      await service.startTimer(new StartTimerCommand("PT20M"));
+      await service.startTimer(StartTimerCommand.create({ interval: "PT20M" }));
 
       await service.simulateIntervalElapsed();
 

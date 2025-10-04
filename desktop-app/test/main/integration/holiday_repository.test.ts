@@ -127,7 +127,7 @@ describe("Holiday DTO", () => {
         title: "Test",
       };
 
-      expect(() => HolidayDto.from(dto)).toThrow(TypeError);
+      expect(() => HolidayDto.fromJson(dto)).toThrow(TypeError);
     });
   });
 });

@@ -19,14 +19,14 @@ import {
 
 export async function logActivity(command: LogActivityCommand) {
   const statusDto = await window.activitySampling.logActivity(
-    LogActivityCommandDto.from(command),
+    LogActivityCommandDto.fromModel(command),
   );
   return CommandStatusDto.create(statusDto).validate();
 }
 
 export async function queryRecentActivities(query: RecentActivitiesQuery) {
   const resultDto = await window.activitySampling.queryRecentActivities(
-    RecentActivitiesQueryDto.from(query),
+    RecentActivitiesQueryDto.fromModel(query),
   );
   return RecentActivitiesQueryResultDto.create(resultDto).validate();
 }

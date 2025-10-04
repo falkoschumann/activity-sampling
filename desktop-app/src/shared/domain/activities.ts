@@ -7,6 +7,31 @@ import { Temporal } from "@js-temporal/polyfill";
 //
 
 export class LogActivityCommand {
+  static create({
+    timestamp,
+    duration,
+    client,
+    project,
+    task,
+    notes,
+  }: {
+    timestamp: Temporal.Instant | string;
+    duration: Temporal.DurationLike | string;
+    client: string;
+    project: string;
+    task: string;
+    notes?: string;
+  }): LogActivityCommand {
+    return new LogActivityCommand(
+      timestamp,
+      duration,
+      client,
+      project,
+      task,
+      notes,
+    );
+  }
+
   static createTestInstance({
     timestamp = "2025-08-14T11:00:00Z",
     duration = "PT30M",
@@ -22,14 +47,14 @@ export class LogActivityCommand {
     task?: string;
     notes?: string;
   } = {}): LogActivityCommand {
-    return new LogActivityCommand(
+    return LogActivityCommand.create({
       timestamp,
       duration,
       client,
       project,
       task,
       notes,
-    );
+    });
   }
 
   readonly timestamp: Temporal.Instant;
@@ -39,7 +64,7 @@ export class LogActivityCommand {
   readonly task: string;
   readonly notes?: string;
 
-  constructor(
+  private constructor(
     timestamp: Temporal.Instant | string,
     duration: Temporal.DurationLike | string,
     client: string,
@@ -61,43 +86,95 @@ export class LogActivityCommand {
 //
 
 export class RecentActivitiesQuery {
+  static create({
+    timeZone,
+  }: {
+    timeZone?: Temporal.TimeZoneLike;
+  }): RecentActivitiesQuery {
+    return new RecentActivitiesQuery(timeZone);
+  }
+
   readonly timeZone?: Temporal.TimeZoneLike;
 
-  constructor(timeZone?: Temporal.TimeZoneLike) {
+  private constructor(timeZone?: Temporal.TimeZoneLike) {
     this.timeZone = timeZone;
   }
 }
 
 export class RecentActivitiesQueryResult {
+  static create({
+    workingDays,
+    timeSummary,
+  }: {
+    workingDays: WorkingDay[];
+    timeSummary: TimeSummary;
+  }): RecentActivitiesQueryResult {
+    return new RecentActivitiesQueryResult(workingDays, timeSummary);
+  }
+
   static empty(): RecentActivitiesQueryResult {
-    return new RecentActivitiesQueryResult([], {
-      hoursToday: Temporal.Duration.from("PT0S"),
-      hoursYesterday: Temporal.Duration.from("PT0S"),
-      hoursThisWeek: Temporal.Duration.from("PT0S"),
-      hoursThisMonth: Temporal.Duration.from("PT0S"),
+    return RecentActivitiesQueryResult.create({
+      workingDays: [],
+      timeSummary: {
+        hoursToday: Temporal.Duration.from("PT0S"),
+        hoursYesterday: Temporal.Duration.from("PT0S"),
+        hoursThisWeek: Temporal.Duration.from("PT0S"),
+        hoursThisMonth: Temporal.Duration.from("PT0S"),
+      },
     });
   }
 
   readonly workingDays: WorkingDay[];
   readonly timeSummary: TimeSummary;
 
-  constructor(workingDays: WorkingDay[], timeSummary: TimeSummary) {
+  private constructor(workingDays: WorkingDay[], timeSummary: TimeSummary) {
     this.workingDays = workingDays;
     this.timeSummary = timeSummary;
   }
 }
 
 export class WorkingDay {
+  static create({
+    date,
+    activities,
+  }: {
+    date: Temporal.PlainDateLike | string;
+    activities: Activity[];
+  }): WorkingDay {
+    return new WorkingDay(date, activities);
+  }
+
   readonly date: Temporal.PlainDate;
   readonly activities: Activity[];
 
-  constructor(date: Temporal.PlainDateLike | string, activities: Activity[]) {
+  private constructor(
+    date: Temporal.PlainDateLike | string,
+    activities: Activity[],
+  ) {
     this.date = Temporal.PlainDate.from(date);
     this.activities = activities;
   }
 }
 
 export class Activity {
+  static create({
+    dateTime,
+    duration,
+    client,
+    project,
+    task,
+    notes,
+  }: {
+    dateTime: Temporal.PlainDateLike | string;
+    duration: Temporal.DurationLike | string;
+    client: string;
+    project: string;
+    task: string;
+    notes?: string;
+  }): Activity {
+    return new Activity(dateTime, duration, client, project, task, notes);
+  }
+
   static createTestInstance({
     dateTime = "2025-08-14T13:00",
     duration = "PT30M",
@@ -113,7 +190,14 @@ export class Activity {
     task?: string;
     notes?: string;
   } = {}): Activity {
-    return new Activity(dateTime, duration, client, project, task, notes);
+    return Activity.create({
+      dateTime,
+      duration,
+      client,
+      project,
+      task,
+      notes,
+    });
   }
 
   readonly dateTime: Temporal.PlainDateTime;
@@ -123,7 +207,7 @@ export class Activity {
   readonly task: string;
   readonly notes?: string;
 
-  constructor(
+  private constructor(
     dateTime: Temporal.PlainDateTimeLike | string,
     duration: Temporal.DurationLike | string,
     client: string,
@@ -141,12 +225,31 @@ export class Activity {
 }
 
 export class TimeSummary {
+  static create({
+    hoursToday,
+    hoursYesterday,
+    hoursThisWeek,
+    hoursThisMonth,
+  }: {
+    hoursToday: Temporal.DurationLike | string;
+    hoursYesterday: Temporal.DurationLike | string;
+    hoursThisWeek: Temporal.DurationLike | string;
+    hoursThisMonth: Temporal.DurationLike | string;
+  }): TimeSummary {
+    return new TimeSummary(
+      hoursToday,
+      hoursYesterday,
+      hoursThisWeek,
+      hoursThisMonth,
+    );
+  }
+
   readonly hoursToday: Temporal.Duration;
   readonly hoursYesterday: Temporal.Duration;
   readonly hoursThisWeek: Temporal.Duration;
   readonly hoursThisMonth: Temporal.Duration;
 
-  constructor(
+  private constructor(
     hoursToday: Temporal.DurationLike | string,
     hoursYesterday: Temporal.DurationLike | string,
     hoursThisWeek: Temporal.DurationLike | string,
@@ -160,12 +263,17 @@ export class TimeSummary {
 }
 
 export class ReportQuery {
-  static createTestInstance({
-    scope = Scope.PROJECTS,
-    from = Temporal.PlainDate.from("2025-06-01"),
-    to = Temporal.PlainDate.from("2025-06-30"),
-    timeZone = "Europe/Berlin",
-  }: Partial<ReportQuery> = {}): ReportQuery {
+  static create({
+    scope,
+    from,
+    to,
+    timeZone,
+  }: {
+    scope: Scope;
+    from?: Temporal.PlainDateLike | string;
+    to?: Temporal.PlainDateLike | string;
+    timeZone?: Temporal.TimeZoneLike;
+  }): ReportQuery {
     return new ReportQuery(scope, from, to, timeZone);
   }
 
@@ -174,7 +282,7 @@ export class ReportQuery {
   readonly to?: Temporal.PlainDate;
   readonly timeZone?: Temporal.TimeZoneLike;
 
-  constructor(
+  private constructor(
     scope: Scope,
     from?: Temporal.PlainDateLike | string,
     to?: Temporal.PlainDateLike | string,
@@ -196,14 +304,27 @@ export const Scope = Object.freeze({
 export type Scope = (typeof Scope)[keyof typeof Scope];
 
 export class ReportQueryResult {
+  static create({
+    entries,
+    totalHours,
+  }: {
+    entries: ReportEntry[];
+    totalHours: Temporal.DurationLike | string;
+  }): ReportQueryResult {
+    return new ReportQueryResult(entries, totalHours);
+  }
+
   static empty(): ReportQueryResult {
-    return new ReportQueryResult([], Temporal.Duration.from("PT0S"));
+    return ReportQueryResult.create({
+      entries: [],
+      totalHours: Temporal.Duration.from("PT0S"),
+    });
   }
 
   readonly entries: ReportEntry[];
   readonly totalHours: Temporal.Duration;
 
-  constructor(
+  private constructor(
     entries: ReportEntry[],
     totalHours: Temporal.DurationLike | string,
   ) {
@@ -213,19 +334,31 @@ export class ReportQueryResult {
 }
 
 export class ReportEntry {
+  static create({
+    name,
+    hours,
+    client,
+  }: {
+    name: string;
+    hours: Temporal.DurationLike | string;
+    client?: string;
+  }): ReportEntry {
+    return new ReportEntry(name, hours, client);
+  }
+
   static createTestInstance({
     name = "Test client",
     hours = Temporal.Duration.from("PT42H"),
     client,
   }: Partial<ReportEntry> = {}): ReportEntry {
-    return new ReportEntry(name, hours, client);
+    return ReportEntry.create({ name, hours, client });
   }
 
   readonly name: string;
   readonly hours: Temporal.Duration;
   readonly client?: string;
 
-  constructor(
+  private constructor(
     name: string,
     hours: Temporal.DurationLike | string,
     client?: string,
@@ -237,11 +370,15 @@ export class ReportEntry {
 }
 
 export class TimesheetQuery {
-  static createTestInstance({
-    from = Temporal.PlainDate.from("2025-06-02"),
-    to = Temporal.PlainDate.from("2025-06-08"),
-    timeZone = "Europe/Berlin",
-  }: Partial<TimesheetQuery> = {}): TimesheetQuery {
+  static create({
+    from,
+    to,
+    timeZone,
+  }: {
+    from: Temporal.PlainDateLike | string;
+    to: Temporal.PlainDateLike | string;
+    timeZone?: Temporal.TimeZoneLike;
+  }): TimesheetQuery {
     return new TimesheetQuery(from, to, timeZone);
   }
 
@@ -249,7 +386,7 @@ export class TimesheetQuery {
   readonly to: Temporal.PlainDate;
   readonly timeZone?: Temporal.TimeZoneLike;
 
-  constructor(
+  private constructor(
     from: Temporal.PlainDateLike | string,
     to: Temporal.PlainDateLike | string,
     timeZone?: Temporal.TimeZoneLike,
@@ -261,19 +398,31 @@ export class TimesheetQuery {
 }
 
 export class TimesheetQueryResult {
+  static create({
+    entries,
+    totalHours,
+    capacity,
+  }: {
+    entries: TimesheetEntry[];
+    totalHours: Temporal.DurationLike | string;
+    capacity: Capacity;
+  }): TimesheetQueryResult {
+    return new TimesheetQueryResult(entries, totalHours, capacity);
+  }
+
   static empty(): TimesheetQueryResult {
-    return new TimesheetQueryResult(
-      [],
-      Temporal.Duration.from("PT0S"),
-      Capacity.empty(),
-    );
+    return TimesheetQueryResult.create({
+      entries: [],
+      totalHours: Temporal.Duration.from("PT0S"),
+      capacity: Capacity.empty(),
+    });
   }
 
   readonly entries: TimesheetEntry[];
   readonly totalHours: Temporal.Duration;
   readonly capacity: Capacity;
 
-  constructor(
+  private constructor(
     entries: TimesheetEntry[],
     totalHours: Temporal.DurationLike | string,
     capacity: Capacity,
@@ -285,6 +434,22 @@ export class TimesheetQueryResult {
 }
 
 export class TimesheetEntry {
+  static create({
+    date,
+    client,
+    project,
+    task,
+    hours,
+  }: {
+    date: Temporal.PlainDateLike | string;
+    client: string;
+    project: string;
+    task: string;
+    hours: Temporal.DurationLike | string;
+  }): TimesheetEntry {
+    return new TimesheetEntry(date, client, project, task, hours);
+  }
+
   static createTestInstance({
     date = Temporal.PlainDate.from("2025-06-04"),
     client = "Test client",
@@ -292,7 +457,7 @@ export class TimesheetEntry {
     task = "Test task",
     hours = Temporal.Duration.from("PT2H"),
   }: Partial<TimesheetEntry> = {}): TimesheetEntry {
-    return new TimesheetEntry(date, client, project, task, hours);
+    return TimesheetEntry.create({ date, client, project, task, hours });
   }
 
   readonly date: Temporal.PlainDate;
@@ -301,7 +466,7 @@ export class TimesheetEntry {
   readonly task: string;
   readonly hours: Temporal.Duration;
 
-  constructor(
+  private constructor(
     date: Temporal.PlainDateLike | string,
     client: string,
     project: string,
@@ -317,17 +482,27 @@ export class TimesheetEntry {
 }
 
 export class Capacity {
+  static create({
+    hours,
+    offset,
+  }: {
+    hours: Temporal.DurationLike | string;
+    offset: Temporal.DurationLike | string;
+  }): Capacity {
+    return new Capacity(hours, offset);
+  }
+
   static empty(): Capacity {
-    return new Capacity(
-      Temporal.Duration.from("PT40M"),
-      Temporal.Duration.from("-PT40M"),
-    );
+    return Capacity.create({
+      hours: Temporal.Duration.from("PT40M"),
+      offset: Temporal.Duration.from("-PT40M"),
+    });
   }
 
   readonly hours: Temporal.Duration;
   readonly offset: Temporal.Duration;
 
-  constructor(
+  private constructor(
     hours: Temporal.DurationLike | string,
     offset: Temporal.DurationLike | string,
   ) {
@@ -341,6 +516,31 @@ export class Capacity {
 //
 
 export class ActivityLoggedEvent {
+  static create({
+    timestamp,
+    duration,
+    client,
+    project,
+    task,
+    notes,
+  }: {
+    timestamp: Temporal.Instant | string;
+    duration: Temporal.DurationLike | string;
+    client: string;
+    project: string;
+    task: string;
+    notes?: string;
+  }): ActivityLoggedEvent {
+    return new ActivityLoggedEvent(
+      timestamp,
+      duration,
+      client,
+      project,
+      task,
+      notes,
+    );
+  }
+
   static createTestInstance({
     timestamp = "2025-08-14T11:00:00Z",
     duration = "PT30M",
@@ -356,14 +556,14 @@ export class ActivityLoggedEvent {
     task?: string;
     notes?: string;
   } = {}): ActivityLoggedEvent {
-    return new ActivityLoggedEvent(
+    return ActivityLoggedEvent.create({
       timestamp,
       duration,
       client,
       project,
       task,
       notes,
-    );
+    });
   }
 
   readonly timestamp: Temporal.Instant;
@@ -373,7 +573,7 @@ export class ActivityLoggedEvent {
   readonly task: string;
   readonly notes?: string;
 
-  constructor(
+  private constructor(
     timestamp: Temporal.Instant | string,
     duration: Temporal.DurationLike | string,
     client: string,

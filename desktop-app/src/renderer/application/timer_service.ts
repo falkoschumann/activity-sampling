@@ -9,9 +9,9 @@ import {
   timerStopped,
   timerTicked,
 } from "../domain/log";
-import {
+import type {
   IntervalElapsedEventDto,
-  type TimerStartedEventDto,
+  TimerStartedEventDto,
   TimerStoppedEventDto,
 } from "../../shared/infrastructure/timer";
 
