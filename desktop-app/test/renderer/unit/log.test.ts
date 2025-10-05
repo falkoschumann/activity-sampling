@@ -12,7 +12,7 @@ import {
   type State,
   timerStarted,
   timerStopped,
-  timerTicked
+  timerTicked,
 } from "../../../src/renderer/domain/log";
 import { Temporal } from "@js-temporal/polyfill";
 

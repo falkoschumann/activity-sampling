@@ -16,7 +16,7 @@ const NON_EXISTING_FILE = path.resolve(
   "../data/holidays/non-existing.csv",
 );
 
-const TEST_FILE = path.resolve(
+const EXAMPLE_FILE = path.resolve(
   import.meta.dirname,
   "../data/holidays/example.csv",
 );
@@ -48,7 +48,7 @@ describe("Holiday repository", () => {
   });
 
   it("should find all saved holidays", async () => {
-    const repository = HolidayRepository.create({ fileName: TEST_FILE });
+    const repository = HolidayRepository.create({ fileName: EXAMPLE_FILE });
 
     const holidays = await repository.findAllByDate("2025-01-01", "2025-12-31");
 
@@ -56,7 +56,7 @@ describe("Holiday repository", () => {
   });
 
   it("should find all by date with lower limit", async () => {
-    const repository = HolidayRepository.create({ fileName: TEST_FILE });
+    const repository = HolidayRepository.create({ fileName: EXAMPLE_FILE });
 
     const holidays = await repository.findAllByDate("2025-04-21", "2025-04-28");
 
@@ -64,7 +64,7 @@ describe("Holiday repository", () => {
   });
 
   it("should find all by date with upper limit", async () => {
-    const repository = HolidayRepository.create({ fileName: TEST_FILE });
+    const repository = HolidayRepository.create({ fileName: EXAMPLE_FILE });
 
     const holidays = await repository.findAllByDate("2025-04-14", "2025-04-21");
 

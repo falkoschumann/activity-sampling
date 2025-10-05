@@ -12,16 +12,6 @@ import { stringify as syncStringify } from "csv-stringify/sync";
 import { Holiday } from "../domain/calendar";
 import { HolidayConfiguration } from "./configuration_gateway";
 
-const schema = {
-  type: "object",
-  properties: {
-    title: { type: "string" },
-    date: { type: "string", format: "date" },
-  },
-  required: ["date", "title"],
-  additionalProperties: false,
-};
-
 export class HolidayRepository extends EventTarget {
   static create(configuration = HolidayConfiguration.createDefault()) {
     return new HolidayRepository(configuration, fsPromise);
@@ -89,6 +79,16 @@ export class HolidayRepository extends EventTarget {
     }
   }
 }
+
+const schema = {
+  type: "object",
+  properties: {
+    title: { type: "string" },
+    date: { type: "string", format: "date" },
+  },
+  required: ["date", "title"],
+  additionalProperties: false,
+};
 
 export class HolidayDto {
   static create({ date, title }: { date: string; title: string }): HolidayDto {
