@@ -34,7 +34,6 @@ import {
 import { openDataDirectory, openWindow } from "./ui/actions";
 import { createMenu } from "./ui/menu";
 
-// TODO send desktop notifications
 const settingsGateway = SettingsGateway.create();
 const activitiesService = ActivitiesService.create();
 const timerService = TimerService.create();
@@ -145,20 +144,21 @@ function createIpc() {
 }
 
 async function createWindow() {
-  const onDataDirectoryChanged = async (dataDir: string) => {
-    let settings = await settingsGateway.load();
-    settings = { ...settings!, dataDir };
-    await settingsGateway.store(settings);
-    activitiesService.applySettings(settings);
-  };
-  const menu = createMenu({ timerService, onDataDirectoryChanged });
-  Menu.setApplicationMenu(menu);
-
   const mainWindow = openWindow({
     rendererFile: "log.html",
     width: 580,
     height: 900,
   });
+
+  const onDataDirectoryChanged = async (dataDir: string) => {
+    let settings = await settingsGateway.load();
+    settings = { ...settings!, dataDir };
+    await settingsGateway.store(settings);
+    activitiesService.applySettings(settings);
+    mainWindow.webContents.reload();
+  };
+  const menu = createMenu({ timerService, onDataDirectoryChanged });
+  Menu.setApplicationMenu(menu);
 
   timerService.addEventListener(TimerStartedEvent.TYPE, (event) =>
     mainWindow.webContents.send(

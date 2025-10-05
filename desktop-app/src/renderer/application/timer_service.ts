@@ -9,6 +9,7 @@ import {
   timerStopped,
   timerTicked,
 } from "../domain/log";
+import { NotificationGateway } from "../infrastructure/notification_gateway";
 import type {
   IntervalElapsedEventDto,
   TimerStartedEventDto,
@@ -40,8 +41,11 @@ export function useCurrentInterval(dispatch: Dispatch<Action>) {
 
     const offIntervalElapsedEvent =
       window.activitySampling.onIntervalElapsedEvent(
-        (event: IntervalElapsedEventDto) =>
-          dispatch(intervalElapsed({ interval: event.interval })),
+        (event: IntervalElapsedEventDto) => {
+          dispatch(intervalElapsed({ interval: event.interval }));
+          NotificationGateway.getInstance().hide();
+          NotificationGateway.getInstance().show();
+        },
       );
 
     return () => {
