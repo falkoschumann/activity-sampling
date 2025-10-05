@@ -19,32 +19,31 @@ import {
   TimesheetQuery,
   TimesheetQueryResult,
 } from "../../../src/shared/domain/activities";
+import { Settings } from "../../../src/main/domain/settings";
 import {
   type CurrentIntervalQuery,
   type CurrentIntervalQueryResult,
   type StartTimerCommand,
   StopTimerCommand,
 } from "../../../src/shared/domain/timer";
-import { ActivitiesConfiguration } from "../../../src/main/infrastructure/configuration_gateway";
 import { EventStore } from "../../../src/main/infrastructure/event_store";
 import { ActivityLoggedEventDto } from "../../../src/main/infrastructure/events";
 import { HolidayRepository } from "../../../src/main/infrastructure/holiday_repository";
 
+const dataDir = path.resolve(import.meta.dirname, "../../../testdata");
+
 export async function startActivitySampling({
   now = "2025-08-26T14:00:00Z",
-  eventsFile = path.resolve(
-    import.meta.dirname,
-    "../../../testdata/events.csv",
-  ),
-  holidayFile = path.resolve(
-    import.meta.dirname,
-    "../../../test/main/data/holidays/example.csv",
-  ),
 } = {}): Promise<Ui> {
+  const eventsFile = path.resolve(dataDir, "activity-log.csv");
   await fs.rm(eventsFile, { force: true });
 
   const clock = Clock.fixed(now, "Europe/Berlin");
-  const activitiesDriver = new ActivitiesDriver(eventsFile, holidayFile, clock);
+  const settings = Settings.create({
+    dataDir,
+    capacity: "PT40H",
+  });
+  const activitiesDriver = new ActivitiesDriver(settings, clock);
   const timerDriver = new TimerDriver(clock);
   const log = new LogDsl(activitiesDriver, timerDriver);
   const reports = new ReportsDsl(activitiesDriver);
@@ -420,6 +419,14 @@ class TimesheetDsl {
       notes,
     });
   }
+
+  async holidaysChanged() {
+    const holidayFile = path.resolve(
+      import.meta.dirname,
+      "../../../test/main/data/holidays/example.csv",
+    );
+    await fs.copyFile(holidayFile, path.resolve(dataDir, "holidays.csv"));
+  }
 }
 
 class ActivitiesDriver {
@@ -430,16 +437,12 @@ class ActivitiesDriver {
   #reportQueryResult?: ReportQueryResult;
   #timesheetQueryResult?: TimesheetQueryResult;
 
-  constructor(eventsFile: string, holidayFile: string, clock: Clock) {
-    const eventStore = (this.#eventStore = EventStore.create({
-      fileName: eventsFile,
-    }));
-    const holidayRepository = HolidayRepository.create({
-      fileName: holidayFile,
-    });
+  constructor(settings: Settings, clock: Clock) {
+    this.#eventStore = EventStore.create();
+    const holidayRepository = HolidayRepository.create();
     this.#activitiesService = new ActivitiesService(
-      ActivitiesConfiguration.createDefault(),
-      eventStore,
+      settings,
+      this.#eventStore,
       holidayRepository,
       clock,
     );

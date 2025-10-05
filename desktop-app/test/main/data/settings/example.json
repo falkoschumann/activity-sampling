@@ -1,3 +1,4 @@
 {
-  "dataDir": "data"
+  "dataDir": "other-data",
+  "capacity": "PT35H"
 }

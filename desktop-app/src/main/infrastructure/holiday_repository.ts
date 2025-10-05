@@ -10,10 +10,17 @@ import { parse } from "csv";
 import { stringify as syncStringify } from "csv-stringify/sync";
 
 import { Holiday } from "../domain/calendar";
-import { HolidayConfiguration } from "./configuration_gateway";
 
-export class HolidayRepository extends EventTarget {
-  static create(configuration = HolidayConfiguration.createDefault()) {
+export interface HolidayConfiguration {
+  readonly fileName: string;
+}
+
+export class HolidayRepository {
+  static create(
+    configuration: HolidayConfiguration = {
+      fileName: "data/holidays.csv",
+    },
+  ) {
     return new HolidayRepository(configuration, fsPromise);
   }
 
@@ -23,17 +30,17 @@ export class HolidayRepository extends EventTarget {
     readFileResponses?: (HolidayDto[] | null | Error)[];
   } = {}): HolidayRepository {
     return new HolidayRepository(
-      new HolidayConfiguration("null-file-csv"),
+      { fileName: "null-holidays.csv" },
       new FsPromiseStub(readFileResponses) as unknown as typeof fsPromise,
     );
   }
 
-  readonly #configuration: HolidayConfiguration;
+  fileName: string;
+
   readonly #fs: typeof fsPromise;
 
   constructor(configuration: HolidayConfiguration, fs: typeof fsPromise) {
-    super();
-    this.#configuration = configuration;
+    this.fileName = configuration.fileName;
     this.#fs = fs;
   }
 
@@ -42,7 +49,7 @@ export class HolidayRepository extends EventTarget {
     endExclusive: Temporal.PlainDateLike | string,
   ): Promise<Holiday[]> {
     try {
-      const fileContent = await this.#fs.readFile(this.#configuration.fileName);
+      const fileContent = await this.#fs.readFile(this.fileName);
       const records = parse(fileContent, {
         cast: (value, context) =>
           value == "" && !context.quoting ? undefined : value,

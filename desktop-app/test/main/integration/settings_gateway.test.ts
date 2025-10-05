@@ -4,8 +4,8 @@ import path from "node:path";
 
 import { describe, expect, it } from "vitest";
 
+import { Settings } from "../../../src/main/domain/settings";
 import {
-  Settings,
   SettingsDto,
   SettingsGateway,
 } from "../../../src/main/infrastructure/settings_gateway";
@@ -27,32 +27,90 @@ const TEST_FILE = path.resolve(
 
 describe("Settings gateway", () => {
   describe("Load", () => {
-    it("should return defaults when file does not exist", async () => {
+    it("should return nothing when file does not exist", async () => {
       const gateway = SettingsGateway.create({ fileName: NON_EXISTING_FILE });
 
       const settings = await gateway.load();
 
-      expect(settings).toEqual({});
+      expect(settings).toBeUndefined();
     });
 
-    it("should return defaults when file does not exist", async () => {
+    it("should return example file", async () => {
       const gateway = SettingsGateway.create({ fileName: EXAMPLE_FILE });
 
       const settings = await gateway.load();
 
-      expect(settings).toEqual({ dataDir: "data" });
+      expect(settings).toEqual<Settings>(
+        Settings.create({ dataDir: "other-data", capacity: "PT35H" }),
+      );
     });
   });
 
   describe("Store", () => {
     it("should store and load settings", async () => {
       const gateway = SettingsGateway.create({ fileName: TEST_FILE });
-      const example: Settings = { dataDir: "test-data-dir" };
+      const example = Settings.create({
+        dataDir: "test-data-dir",
+        capacity: "PT30H",
+      });
 
       await gateway.store(example);
       const settings = await gateway.load();
 
-      expect(settings).toEqual(example);
+      expect(settings).toEqual<Settings>(example);
+    });
+  });
+
+  describe("Nullable", () => {
+    describe("Load", () => {
+      it("should return default when configurable response is null", async () => {
+        const gateway = SettingsGateway.createNull({
+          readFileResponses: [null],
+        });
+
+        const settings = await gateway.load();
+
+        expect(settings).toBeUndefined();
+      });
+
+      it("should return configurable responses", async () => {
+        const gateway = SettingsGateway.createNull({
+          readFileResponses: [
+            SettingsDto.create({ capacity: "PT35H", dataDir: "data-dir" }),
+          ],
+        });
+
+        const settings = await gateway.load();
+
+        expect(settings).toEqual<Settings>(
+          Settings.create({ capacity: "PT35H", dataDir: "data-dir" }),
+        );
+      });
+
+      it("should throw an error when configurable response is an error", async () => {
+        const gateway = SettingsGateway.createNull({
+          readFileResponses: [new Error("Test error")],
+        });
+
+        const settings = gateway.load();
+
+        await expect(settings).rejects.toThrow("Test error");
+      });
+    });
+
+    describe("Store", () => {
+      it("should store settings", async () => {
+        const gateway = SettingsGateway.createNull();
+        const storedSettings = gateway.trackStored();
+
+        await gateway.store(
+          Settings.create({ capacity: "PT35H", dataDir: "data-dir" }),
+        );
+
+        expect(storedSettings.data).toEqual<Settings[]>([
+          Settings.create({ capacity: "PT35H", dataDir: "data-dir" }),
+        ]);
+      });
     });
   });
 });

@@ -17,27 +17,45 @@ import {
   projectReport,
   projectTimesheet,
 } from "../domain/activities";
-import { ActivitiesConfiguration } from "../infrastructure/configuration_gateway";
+import { Settings } from "../domain/settings";
 import { EventStore } from "../infrastructure/event_store";
 import { ActivityLoggedEventDto } from "../infrastructure/events";
 import { HolidayRepository } from "../infrastructure/holiday_repository";
 
 export class ActivitiesService {
-  readonly #configuration: ActivitiesConfiguration;
+  static create({
+    settings = Settings.createDefault(),
+  } = {}): ActivitiesService {
+    return new ActivitiesService(
+      settings,
+      EventStore.create(),
+      HolidayRepository.create(),
+    );
+  }
+
+  #settings: Settings;
   readonly #eventStore: EventStore;
   readonly #holidayRepository: HolidayRepository;
   readonly #clock: Clock;
 
   constructor(
-    configuration: ActivitiesConfiguration,
+    settings: Settings,
     eventStore: EventStore,
     holidayRepository: HolidayRepository,
     clock = Clock.systemDefaultZone(),
   ) {
-    this.#configuration = configuration;
+    this.#settings = settings;
     this.#eventStore = eventStore;
     this.#holidayRepository = holidayRepository;
     this.#clock = clock;
+
+    this.applySettings(settings);
+  }
+
+  applySettings(settings: Settings) {
+    this.#settings = settings;
+    this.#eventStore.fileName = `${settings.dataDir}/activity-log.csv`;
+    this.#holidayRepository.fileName = `${settings.dataDir}/holidays.csv`;
   }
 
   async logActivity(command: LogActivityCommand): Promise<CommandStatus> {
@@ -54,7 +72,7 @@ export class ActivitiesService {
     query: RecentActivitiesQuery,
   ): Promise<RecentActivitiesQueryResult> {
     const replay = replayTyped(this.#eventStore.replay());
-    return projectRecentActivities(replay, query, this.#clock);
+    return await projectRecentActivities(replay, query, this.#clock);
   }
 
   async queryReport(query: ReportQuery): Promise<ReportQueryResult> {
@@ -72,7 +90,7 @@ export class ActivitiesService {
       replay,
       holidays,
       query,
-      this.#configuration.capacity,
+      this.#settings.capacity,
       this.#clock,
     );
   }

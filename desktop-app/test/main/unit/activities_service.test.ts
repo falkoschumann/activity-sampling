@@ -13,7 +13,7 @@ import {
   Scope,
   TimesheetEntry,
 } from "../../../src/shared/domain/activities";
-import { ActivitiesConfiguration } from "../../../src/main/infrastructure/configuration_gateway";
+import { Settings } from "../../../src/main/domain/settings";
 import { EventStore } from "../../../src/main/infrastructure/event_store";
 import { ActivityLoggedEventDto } from "../../../src/main/infrastructure/events";
 import {
@@ -191,7 +191,6 @@ function configure({
   holidays?: HolidayDto[];
   fixedInstant?: string;
 } = {}) {
-  const configuration = ActivitiesConfiguration.createDefault();
   const eventStore = EventStore.createNull({ events });
   const holidayRepository = HolidayRepository.createNull({
     readFileResponses: holidays ? [holidays] : undefined,
@@ -201,7 +200,7 @@ function configure({
     "Europe/Berlin",
   );
   const service = new ActivitiesService(
-    configuration,
+    Settings.createDefault(),
     eventStore,
     holidayRepository,
     clock,

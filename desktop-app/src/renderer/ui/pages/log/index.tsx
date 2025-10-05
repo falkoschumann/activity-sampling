@@ -90,7 +90,7 @@ export default function LogPage() {
           <button
             className="btn"
             title="Refresh logged activities."
-            onClick={() => queryRecentActivities({})}
+            onClick={() => handleQueryRecentActivities()}
           >
             <span className="visually-hidden">Refresh logged activities.</span>
             <i className="bi bi-arrow-clockwise"></i>

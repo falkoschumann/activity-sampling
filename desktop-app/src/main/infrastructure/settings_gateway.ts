@@ -1,64 +1,59 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
-import fs from "node:fs/promises";
+import fsPromise from "node:fs/promises";
 import path from "node:path";
 
+import { ConfigurableResponses, OutputTracker } from "@muspellheim/shared";
 import Ajv from "ajv";
 import addFormats from "ajv-formats";
 import { app } from "electron";
 
-export class Settings {
-  static create(settings: Settings = {}): Settings {
-    return new Settings(settings.dataDir);
-  }
+import { Settings } from "../domain/settings";
 
-  dataDir?: string;
+const STORED_EVENT = "stored";
 
-  private constructor(dataDir?: string) {
-    this.dataDir = dataDir;
-  }
+export interface SettingsConfiguration {
+  readonly fileName: string;
 }
 
-export class SettingsConfiguration {
-  static create(configuration: SettingsConfiguration): SettingsConfiguration {
-    return new SettingsConfiguration(configuration.fileName);
+export class SettingsGateway extends EventTarget {
+  static create(
+    configuration: SettingsConfiguration = {
+      fileName: path.join(app.getPath("userData"), "settings.json"),
+    },
+  ): SettingsGateway {
+    return new SettingsGateway(configuration, fsPromise);
   }
 
-  static createDefault(): SettingsConfiguration {
-    const file = path.join(app.getPath("userData"), "settings.json");
-    return new SettingsConfiguration(file);
+  static createNull({
+    readFileResponses = [],
+  }: {
+    readFileResponses?: (SettingsDto | null | Error)[];
+  } = {}): SettingsGateway {
+    return new SettingsGateway(
+      { fileName: "null-settings.json" },
+      new FsPromiseStub(readFileResponses) as unknown as typeof fsPromise,
+    );
   }
 
-  fileName: string;
+  readonly #fileName: string;
+  readonly #fs: typeof fsPromise;
 
-  constructor(fileName: string) {
-    this.fileName = fileName;
-  }
-}
-
-export class SettingsGateway {
-  static create(configuration: SettingsConfiguration): SettingsGateway {
-    return new SettingsGateway(configuration);
+  constructor(configuration: SettingsConfiguration, fs: typeof fsPromise) {
+    super();
+    this.#fileName = configuration.fileName;
+    this.#fs = fs;
   }
 
-  readonly #configuration: SettingsConfiguration;
-
-  constructor(configuration: SettingsConfiguration) {
-    this.#configuration = configuration;
-  }
-
-  async load(): Promise<Settings> {
+  async load(): Promise<Settings | undefined> {
     try {
-      const fileContent = await fs.readFile(
-        this.#configuration.fileName,
-        "utf-8",
-      );
+      const fileContent = await this.#fs.readFile(this.#fileName, "utf-8");
       const json = JSON.parse(fileContent);
       return SettingsDto.fromJson(json).validate();
     } catch (error) {
       if ((error as NodeJS.ErrnoException).code === "ENOENT") {
         // No such file or directory, no events recorded yet
-        return {};
+        return;
       }
 
       throw error;
@@ -66,10 +61,15 @@ export class SettingsGateway {
   }
 
   async store(settings: Settings) {
-    const dir = path.dirname(this.#configuration.fileName);
-    await fs.mkdir(dir, { recursive: true });
+    const dir = path.dirname(this.#fileName);
+    await this.#fs.mkdir(dir, { recursive: true });
     const json = JSON.stringify(settings, null, 2);
-    await fs.writeFile(this.#configuration.fileName, json, "utf-8");
+    await this.#fs.writeFile(this.#fileName, json, "utf-8");
+    this.dispatchEvent(new CustomEvent(STORED_EVENT, { detail: settings }));
+  }
+
+  trackStored(): OutputTracker<Settings> {
+    return OutputTracker.create(this, STORED_EVENT);
   }
 }
 
@@ -77,13 +77,21 @@ const schema = {
   type: "object",
   properties: {
     dataDir: { type: "string" },
+    capacity: { type: "string", format: "duration" },
   },
+  required: ["capacity"],
   additionalProperties: false,
 };
 
 export class SettingsDto {
-  static create({ dataDir }: { dataDir?: string } = {}): SettingsDto {
-    return new SettingsDto(dataDir);
+  static create({
+    dataDir,
+    capacity,
+  }: {
+    dataDir: string;
+    capacity: string;
+  }): SettingsDto {
+    return new SettingsDto(dataDir, capacity);
   }
 
   static fromJson(json: unknown): SettingsDto {
@@ -98,13 +106,45 @@ export class SettingsDto {
     throw new TypeError(`Invalid settings data:\n${errors}`);
   }
 
-  readonly dataDir?: string;
+  readonly dataDir: string;
+  readonly capacity: string;
 
-  private constructor(dataDir?: string) {
+  private constructor(dataDir: string, capacity: string) {
     this.dataDir = dataDir;
+    this.capacity = capacity;
   }
 
   validate(): Settings {
     return Settings.create(this);
   }
+}
+
+class FsPromiseStub {
+  readonly #readFileResponses: ConfigurableResponses<
+    SettingsDto | null | Error
+  >;
+
+  constructor(readFileResponses: (SettingsDto | null | Error)[]) {
+    this.#readFileResponses = ConfigurableResponses.create(
+      readFileResponses,
+      "read file",
+    );
+  }
+
+  async mkdir() {}
+
+  async readFile() {
+    const response = this.#readFileResponses.next();
+    if (response === null) {
+      throw { code: "ENOENT" };
+    }
+    if (response instanceof Error) {
+      throw response;
+    }
+
+    const s = JSON.stringify(response);
+    return Promise.resolve(s);
+  }
+
+  async writeFile() {}
 }
