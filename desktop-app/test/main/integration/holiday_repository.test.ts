@@ -3,13 +3,14 @@
 import path from "node:path";
 
 import { Temporal } from "@js-temporal/polyfill";
-import { describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
 
-import type { Holiday } from "../../../src/main/domain/calendar";
+import { Holiday } from "../../../src/main/domain/calendar";
 import {
   HolidayDto,
   HolidayRepository,
 } from "../../../src/main/infrastructure/holiday_repository";
+import fsPromise from "node:fs/promises";
 
 const NON_EXISTING_FILE = path.resolve(
   import.meta.dirname,
@@ -19,6 +20,11 @@ const NON_EXISTING_FILE = path.resolve(
 const EXAMPLE_FILE = path.resolve(
   import.meta.dirname,
   "../data/holidays/example.csv",
+);
+
+const TEST_FILE = path.resolve(
+  import.meta.dirname,
+  "../../../testdata/test-holidays.csv",
 );
 
 const KARFREITAG: Holiday = {
@@ -37,38 +43,106 @@ const OSTERMONTAG: Holiday = {
 };
 
 describe("Holiday repository", () => {
-  it("should find nothing when file does not exist", async () => {
-    const repository = HolidayRepository.create({
-      fileName: NON_EXISTING_FILE,
+  describe("Find all by date", () => {
+    it("should find nothing when file does not exist", async () => {
+      const repository = HolidayRepository.create({
+        fileName: NON_EXISTING_FILE,
+      });
+
+      const holidays = await repository.findAllByDate(
+        "2025-01-01",
+        "2025-12-31",
+      );
+
+      expect(holidays).toEqual([]);
     });
 
-    const holidays = await repository.findAllByDate("2025-01-01", "2025-12-31");
+    it("should find all saved holidays", async () => {
+      const repository = HolidayRepository.create({ fileName: EXAMPLE_FILE });
 
-    expect(holidays).toEqual([]);
+      const holidays = await repository.findAllByDate(
+        "2025-01-01",
+        "2025-12-31",
+      );
+
+      expect(holidays).toEqual([KARFREITAG, OSTERSONNTAG, OSTERMONTAG]);
+    });
+
+    it("should find all by date with lower limit", async () => {
+      const repository = HolidayRepository.create({ fileName: EXAMPLE_FILE });
+
+      const holidays = await repository.findAllByDate(
+        "2025-04-21",
+        "2025-04-28",
+      );
+
+      expect(holidays).toEqual([OSTERMONTAG]);
+    });
+
+    it("should find all by date with upper limit", async () => {
+      const repository = HolidayRepository.create({ fileName: EXAMPLE_FILE });
+
+      const holidays = await repository.findAllByDate(
+        "2025-04-14",
+        "2025-04-21",
+      );
+
+      expect(holidays).toEqual([KARFREITAG, OSTERSONNTAG]);
+    });
   });
 
-  it("should find all saved holidays", async () => {
-    const repository = HolidayRepository.create({ fileName: EXAMPLE_FILE });
+  describe("Save all", () => {
+    beforeEach(async () => {
+      await fsPromise.rm(TEST_FILE, { force: true });
+    });
 
-    const holidays = await repository.findAllByDate("2025-01-01", "2025-12-31");
+    it("should load saved holidays", async () => {
+      const repository = HolidayRepository.create({ fileName: TEST_FILE });
 
-    expect(holidays).toEqual([KARFREITAG, OSTERSONNTAG, OSTERMONTAG]);
-  });
+      await repository.saveAll([KARFREITAG, OSTERSONNTAG]);
+      const holidays = await repository.findAllByDate(
+        "2025-04-14",
+        "2025-04-21",
+      );
 
-  it("should find all by date with lower limit", async () => {
-    const repository = HolidayRepository.create({ fileName: EXAMPLE_FILE });
+      expect(holidays).toEqual([KARFREITAG, OSTERSONNTAG]);
+    });
 
-    const holidays = await repository.findAllByDate("2025-04-21", "2025-04-28");
+    it("should update existing holidays", async () => {
+      const repository = HolidayRepository.create({ fileName: TEST_FILE });
 
-    expect(holidays).toEqual([OSTERMONTAG]);
-  });
+      await repository.saveAll([
+        Holiday.create({
+          date: "2025-10-08",
+          title: "Foo",
+        }),
+        Holiday.create({
+          date: "2025-10-10",
+          title: "Bar",
+        }),
+      ]);
+      await repository.saveAll([
+        Holiday.create({
+          date: "2025-10-08",
+          title: "Changed",
+        }),
+      ]);
 
-  it("should find all by date with upper limit", async () => {
-    const repository = HolidayRepository.create({ fileName: EXAMPLE_FILE });
-
-    const holidays = await repository.findAllByDate("2025-04-14", "2025-04-21");
-
-    expect(holidays).toEqual([KARFREITAG, OSTERSONNTAG]);
+      const holidays = await repository.findAllByDate(
+        "2025-10-06",
+        "2025-10-12",
+      );
+      expect(holidays).toEqual([
+        Holiday.create({
+          date: "2025-10-08",
+          title: "Changed",
+        }),
+        Holiday.create({
+          date: "2025-10-10",
+          title: "Bar",
+        }),
+      ]);
+    });
   });
 
   describe("Nullable", () => {
