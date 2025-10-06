@@ -149,6 +149,7 @@ async function createWindow() {
     width: 580,
     height: 900,
   });
+  mainWindow.webContents.backgroundThrottling = false;
 
   const onDataDirectoryChanged = async (dataDir: string) => {
     let settings = await settingsGateway.load();
