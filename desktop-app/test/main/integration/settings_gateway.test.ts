@@ -22,7 +22,7 @@ const EXAMPLE_FILE = path.resolve(
 
 const TEST_FILE = path.resolve(
   import.meta.dirname,
-  "../../../testdata/settings_test.csv",
+  "../../../testdata/test-settings.csv",
 );
 
 describe("Settings gateway", () => {

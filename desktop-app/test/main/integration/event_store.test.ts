@@ -11,7 +11,7 @@ import { ActivityLoggedEventDto } from "../../../src/main/infrastructure/events"
 
 const TEST_FILE = path.resolve(
   import.meta.dirname,
-  "../../../testdata/event_store_test.csv",
+  "../../../testdata/test-events.csv",
 );
 
 const NON_EXISTING_FILE = path.resolve(
