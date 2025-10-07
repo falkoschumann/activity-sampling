@@ -210,20 +210,8 @@ class LogDsl {
     task?: string;
     notes?: string;
   }) {
-    const timestamp = args.timestamp ?? "2025-08-14T11:00:00Z";
-    const duration = args.duration ?? "PT30M";
-    const client = args.client ?? "Test client";
-    const project = args.project ?? "Test project";
-    const task = args.task ?? "Test task";
-    const notes = args.notes;
-    await this.#activitiesDriver.record({
-      timestamp,
-      duration,
-      client,
-      project,
-      task,
-      notes,
-    });
+    const event = parseActivityLogged(args);
+    await this.#activitiesDriver.record(event);
   }
 
   async assertActivityLogged(args: {
@@ -318,20 +306,8 @@ class ReportsDsl {
     task?: string;
     notes?: string;
   }) {
-    const timestamp = args.timestamp ?? "2025-08-14T11:00:00Z";
-    const duration = args.duration ?? "PT30M";
-    const client = args.client ?? "Test client";
-    const project = args.project ?? "Test project";
-    const task = args.task ?? "Test task";
-    const notes = args.notes;
-    await this.#activitiesDriver.record({
-      timestamp,
-      duration,
-      client,
-      project,
-      task,
-      notes,
-    });
+    const event = parseActivityLogged(args);
+    await this.#activitiesDriver.record(event);
   }
 }
 
@@ -404,20 +380,8 @@ class TimesheetDsl {
     task?: string;
     notes?: string;
   }) {
-    const timestamp = args.timestamp ?? "2025-08-14T11:00:00Z";
-    const duration = args.duration ?? "PT30M";
-    const client = args.client ?? "Test client";
-    const project = args.project ?? "Test project";
-    const task = args.task ?? "Test task";
-    const notes = args.notes;
-    await this.#activitiesDriver.record({
-      timestamp,
-      duration,
-      client,
-      project,
-      task,
-      notes,
-    });
+    const event = parseActivityLogged(args);
+    await this.#activitiesDriver.record(event);
   }
 
   async holidaysChanged() {
@@ -427,6 +391,30 @@ class TimesheetDsl {
     );
     await fs.copyFile(holidayFile, path.resolve(dataDir, "holidays.csv"));
   }
+}
+
+function parseActivityLogged(args: {
+  timestamp?: string;
+  duration?: string;
+  client?: string;
+  project?: string;
+  task?: string;
+  notes?: string;
+}) {
+  const timestamp = args.timestamp ?? "2025-08-14T11:00:00Z";
+  const duration = args.duration ?? "PT30M";
+  const client = args.client ?? "Test client";
+  const project = args.project ?? "Test project";
+  const task = args.task ?? "Test task";
+  const notes = args.notes;
+  return ActivityLoggedEventDto.create({
+    timestamp,
+    duration,
+    client,
+    project,
+    task,
+    notes,
+  });
 }
 
 class ActivitiesDriver {
