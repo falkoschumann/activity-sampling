@@ -19,6 +19,7 @@ import {
   TimesheetQuery,
   TimesheetQueryResult,
 } from "../../../src/shared/domain/activities";
+import { Holiday } from "../../../src/main/domain/calendar";
 import { Settings } from "../../../src/main/domain/settings";
 import {
   type CurrentIntervalQuery,
@@ -384,12 +385,11 @@ class TimesheetDsl {
     await this.#activitiesDriver.record(event);
   }
 
-  async holidaysChanged() {
-    const holidayFile = path.resolve(
-      import.meta.dirname,
-      "../../../test/main/data/holidays/example.csv",
+  async holidaysChanged(args: { holidays: string[] }) {
+    const holidays: Holiday[] = args.holidays.map((date) =>
+      Holiday.create({ date, title: "Holiday" }),
     );
-    await fs.copyFile(holidayFile, path.resolve(dataDir, "holidays.csv"));
+    await this.#activitiesDriver.holidaysChanged({ holidays });
   }
 }
 
@@ -419,6 +419,7 @@ function parseActivityLogged(args: {
 
 class ActivitiesDriver {
   readonly #eventStore: EventStore;
+  readonly #holidayRepository: HolidayRepository;
   readonly #activitiesService: ActivitiesService;
 
   #recentActivitiesQueryResult?: RecentActivitiesQueryResult;
@@ -427,11 +428,11 @@ class ActivitiesDriver {
 
   constructor(settings: Settings, clock: Clock) {
     this.#eventStore = EventStore.create();
-    const holidayRepository = HolidayRepository.create();
+    this.#holidayRepository = HolidayRepository.create();
     this.#activitiesService = new ActivitiesService(
       settings,
       this.#eventStore,
-      holidayRepository,
+      this.#holidayRepository,
       clock,
     );
   }
@@ -507,6 +508,10 @@ class ActivitiesDriver {
   async assertActivityLogged(event: ActivityLoggedEventDto) {
     const events = await arrayFromAsync(this.#eventStore.replay());
     expect(events.at(-1)).toEqual(event);
+  }
+
+  async holidaysChanged({ holidays }: { holidays: Holiday[] }) {
+    await this.#holidayRepository.saveAll(holidays);
   }
 }
 

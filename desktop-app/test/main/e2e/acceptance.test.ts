@@ -465,7 +465,9 @@ describe("Activity Sampling", () => {
           timestamp: "2025-04-23T15:00:00Z",
           duration: "PT8H",
         });
-        await timesheet.holidaysChanged();
+        await timesheet.holidaysChanged({
+          holidays: ["2025-04-20", "2025-04-21"],
+        });
 
         await timesheet.queryTimesheet({
           from: "2025-04-21",
