@@ -11,8 +11,6 @@ import type {
   TimesheetQueryResultDto,
 } from "../shared/infrastructure/activities";
 import type {
-  CurrentIntervalQueryDto,
-  CurrentIntervalQueryResultDto,
   IntervalElapsedEventDto,
   TimerStartedEventDto,
   TimerStoppedEventDto,
@@ -26,10 +24,6 @@ export interface ActivitySampling {
   queryRecentActivities(
     query: RecentActivitiesQueryDto,
   ): Promise<RecentActivitiesQueryResultDto>;
-
-  queryCurrentIntervalQuery(
-    query: CurrentIntervalQueryDto,
-  ): CurrentIntervalQueryResultDto;
 
   queryReport(query: ReportQueryDto): Promise<ReportQueryResultDto>;
 

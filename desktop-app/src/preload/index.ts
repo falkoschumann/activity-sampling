@@ -13,37 +13,41 @@ import type {
   TimesheetQueryResultDto,
 } from "../shared/infrastructure/activities";
 import type {
-  CurrentIntervalQueryDto,
   IntervalElapsedEventDto,
   TimerStartedEventDto,
   TimerStoppedEventDto,
 } from "../shared/infrastructure/timer";
+import {
+  INTERVAL_ELAPSED_CHANNEL,
+  LOG_ACTIVITY_CHANNEL,
+  QUERY_RECENT_ACTIVITIES_CHANNEL,
+  QUERY_REPORT_CHANNEL,
+  QUERY_TIMESHEET_CHANNEL,
+  TIMER_STARTED_CHANNEL,
+  TIMER_STOPPED_CHANNEL,
+} from "../shared/infrastructure/channels";
 
 contextBridge.exposeInMainWorld("activitySampling", {
   logActivity: async (
     command: LogActivityCommandDto,
   ): Promise<CommandStatusDto> => {
-    return ipcRenderer.invoke("logActivity", command);
+    return ipcRenderer.invoke(LOG_ACTIVITY_CHANNEL, command);
   },
 
   queryRecentActivities: async (
     query: RecentActivitiesQueryDto,
   ): Promise<RecentActivitiesQueryResultDto> => {
-    return ipcRenderer.invoke("queryRecentActivities", query);
-  },
-
-  queryCurrentIntervalQuery: (query: CurrentIntervalQueryDto) => {
-    return ipcRenderer.invoke("queryCurrentInterval", query);
+    return ipcRenderer.invoke(QUERY_RECENT_ACTIVITIES_CHANNEL, query);
   },
 
   queryReport: async (query: ReportQueryDto): Promise<ReportQueryResultDto> => {
-    return ipcRenderer.invoke("queryReport", query);
+    return ipcRenderer.invoke(QUERY_REPORT_CHANNEL, query);
   },
 
   queryTimesheet: async (
     query: TimesheetQueryDto,
   ): Promise<TimesheetQueryResultDto> => {
-    return ipcRenderer.invoke("queryTimesheet", query);
+    return ipcRenderer.invoke(QUERY_TIMESHEET_CHANNEL, query);
   },
 
   onTimerStartedEvent: (
@@ -53,8 +57,8 @@ contextBridge.exposeInMainWorld("activitySampling", {
       eventHandler(args);
     }
 
-    ipcRenderer.on("timerStarted", listener);
-    return () => ipcRenderer.off("timerStarted", listener);
+    ipcRenderer.on(TIMER_STARTED_CHANNEL, listener);
+    return () => ipcRenderer.off(TIMER_STARTED_CHANNEL, listener);
   },
 
   onTimerStoppedEvent: (
@@ -64,8 +68,8 @@ contextBridge.exposeInMainWorld("activitySampling", {
       eventHandler(args);
     }
 
-    ipcRenderer.on("timerStopped", listener);
-    return () => ipcRenderer.off("timerStopped", listener);
+    ipcRenderer.on(TIMER_STOPPED_CHANNEL, listener);
+    return () => ipcRenderer.off(TIMER_STOPPED_CHANNEL, listener);
   },
 
   onIntervalElapsedEvent: (
@@ -75,7 +79,7 @@ contextBridge.exposeInMainWorld("activitySampling", {
       eventListener(args);
     }
 
-    ipcRenderer.on("intervalElapsed", listener);
-    return () => ipcRenderer.off("intervalElapsed", listener);
+    ipcRenderer.on(INTERVAL_ELAPSED_CHANNEL, listener);
+    return () => ipcRenderer.off(INTERVAL_ELAPSED_CHANNEL, listener);
   },
 });

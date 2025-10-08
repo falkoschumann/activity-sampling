@@ -33,6 +33,15 @@ import {
 } from "../shared/infrastructure/timer";
 import { openDataDirectory, openWindow } from "./ui/actions";
 import { createMenu } from "./ui/menu";
+import {
+  INTERVAL_ELAPSED_CHANNEL,
+  LOG_ACTIVITY_CHANNEL,
+  QUERY_RECENT_ACTIVITIES_CHANNEL,
+  QUERY_REPORT_CHANNEL,
+  QUERY_TIMESHEET_CHANNEL,
+  TIMER_STARTED_CHANNEL,
+  TIMER_STOPPED_CHANNEL,
+} from "../shared/infrastructure/channels";
 
 const settingsGateway = SettingsGateway.create();
 const activitiesService = ActivitiesService.create();
@@ -43,7 +52,7 @@ const isProduction = app.isPackaged;
 app.whenReady().then(async () => {
   await initializeApplication();
   await installDevTools();
-  createIpc();
+  createRendererToMainChannels();
   await createWindow();
 });
 
@@ -111,9 +120,9 @@ async function installDevTools() {
     .catch((err) => console.error("An error occurred: ", err));
 }
 
-function createIpc() {
+function createRendererToMainChannels() {
   ipcMain.handle(
-    "logActivity",
+    LOG_ACTIVITY_CHANNEL,
     async (_event, commandDto: LogActivityCommandDto) => {
       const command = LogActivityCommandDto.create(commandDto).validate();
       const status = await activitiesService.logActivity(command);
@@ -121,20 +130,23 @@ function createIpc() {
     },
   );
   ipcMain.handle(
-    "queryRecentActivities",
+    QUERY_RECENT_ACTIVITIES_CHANNEL,
     async (_event, queryDto: RecentActivitiesQueryDto) => {
       const query = RecentActivitiesQueryDto.create(queryDto).validate();
       const result = await activitiesService.queryRecentActivities(query);
       return RecentActivitiesQueryResultDto.from(result);
     },
   );
-  ipcMain.handle("queryReport", async (_event, queryDto: ReportQueryDto) => {
-    const query = ReportQueryDto.create(queryDto).validate();
-    const result = await activitiesService.queryReport(query);
-    return ReportQueryResultDto.from(result);
-  });
   ipcMain.handle(
-    "queryTimesheet",
+    QUERY_REPORT_CHANNEL,
+    async (_event, queryDto: ReportQueryDto) => {
+      const query = ReportQueryDto.create(queryDto).validate();
+      const result = await activitiesService.queryReport(query);
+      return ReportQueryResultDto.from(result);
+    },
+  );
+  ipcMain.handle(
+    QUERY_TIMESHEET_CHANNEL,
     async (_event, queryDto: TimesheetQueryDto) => {
       const query = TimesheetQueryDto.create(queryDto).validate();
       const result = await activitiesService.queryTimesheet(query);
@@ -160,21 +172,25 @@ async function createWindow() {
   const menu = createMenu({ timerService, onDataDirectoryChanged });
   Menu.setApplicationMenu(menu);
 
+  createMainToLogWindowChannels(mainWindow);
+}
+
+function createMainToLogWindowChannels(window: BrowserWindow) {
   timerService.addEventListener(TimerStartedEvent.TYPE, (event) =>
-    mainWindow.webContents.send(
-      TimerStartedEvent.TYPE,
+    window.webContents.send(
+      TIMER_STARTED_CHANNEL,
       TimerStartedEventDto.fromModel(event as TimerStartedEvent),
     ),
   );
   timerService.addEventListener(TimerStoppedEvent.TYPE, (event) =>
-    mainWindow.webContents.send(
-      TimerStoppedEvent.TYPE,
+    window.webContents.send(
+      TIMER_STOPPED_CHANNEL,
       TimerStoppedEventDto.fromModel(event as TimerStoppedEvent),
     ),
   );
   timerService.addEventListener(IntervalElapsedEvent.TYPE, (event) =>
-    mainWindow.webContents.send(
-      IntervalElapsedEvent.TYPE,
+    window.webContents.send(
+      INTERVAL_ELAPSED_CHANNEL,
       IntervalElapsedEventDto.fromModel(event as IntervalElapsedEvent),
     ),
   );
