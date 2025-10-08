@@ -41,8 +41,8 @@ export async function startActivitySampling({
 
   const clock = Clock.fixed(now, "Europe/Berlin");
   const settings = Settings.create({
+    ...Settings.createDefault(),
     dataDir,
-    capacity: "PT40H",
   });
   const activitiesDriver = new ActivitiesDriver(settings, clock);
   const timerDriver = new TimerDriver(clock);
