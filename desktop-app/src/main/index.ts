@@ -146,7 +146,7 @@ function createIpc() {
 async function createWindow() {
   const mainWindow = openWindow({
     rendererFile: "log.html",
-    width: 580,
+    width: 600,
     height: 900,
   });
 
