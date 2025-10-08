@@ -151,7 +151,7 @@ export function createMenu({
       submenu: [
         {
           label: "Report",
-          accelerator: "Shift+CmdOrCtrl+R",
+          accelerator: "Alt+CmdOrCtrl+R",
           click: () =>
             openWindow({
               rendererFile: "report.html",
@@ -161,7 +161,7 @@ export function createMenu({
         },
         {
           label: "Timesheet",
-          accelerator: "Shift+CmdOrCtrl+T",
+          accelerator: "Alt+CmdOrCtrl+T",
           click: () =>
             openWindow({
               rendererFile: "timesheet.html",
