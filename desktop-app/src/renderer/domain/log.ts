@@ -3,6 +3,7 @@
 import { Temporal } from "@js-temporal/polyfill";
 
 import type { FluxStandardAction } from "../common/reducer";
+import { normalizeDuration } from "../../shared/common/temporal";
 
 export interface ActivityTemplate {
   client: string;
@@ -54,6 +55,7 @@ export function activitySelected(
 const TIMER_STARTED_ACTION = "timerStarted";
 
 interface TimerStartedPayload {
+  timestamp: Temporal.Instant | string;
   interval: Temporal.DurationLike | string;
 }
 
@@ -66,7 +68,7 @@ export function timerStarted(
 const TIMER_TICKED_ACTION = "timerTicked";
 
 interface TimerTickedPayload {
-  duration: Temporal.DurationLike | string;
+  timestamp: Temporal.Instant | string;
 }
 
 export function timerTicked(
@@ -77,15 +79,20 @@ export function timerTicked(
 
 const TIMER_STOPPED_ACTION = "timerStopped";
 
-export function timerStopped(): FluxStandardAction<
-  typeof TIMER_STOPPED_ACTION
-> {
-  return { type: TIMER_STOPPED_ACTION, payload: undefined };
+interface TimerStoppedPayload {
+  timestamp: Temporal.Instant | string;
+}
+
+export function timerStopped(
+  payload: TimerStoppedPayload,
+): FluxStandardAction<typeof TIMER_STOPPED_ACTION, TimerStoppedPayload> {
+  return { type: TIMER_STOPPED_ACTION, payload };
 }
 
 const INTERVAL_ELAPSED_ACTION = "intervalElapsed";
 
 interface IntervalElapsedPayload {
+  timestamp: Temporal.Instant | string;
   interval: Temporal.DurationLike | string;
 }
 
@@ -122,6 +129,7 @@ export interface State {
     remaining: Temporal.Duration;
     percentage: number;
     isRunning: boolean;
+    end: Temporal.Instant;
   };
   currentInterval: Temporal.Duration;
 }
@@ -140,6 +148,7 @@ export const initialState: State = {
     remaining: Temporal.Duration.from("PT30M"),
     percentage: 0,
     isRunning: false,
+    end: Temporal.Instant.fromEpochMilliseconds(0),
   },
   currentInterval: Temporal.Duration.from("PT30M"),
 };
@@ -194,25 +203,27 @@ export function reducer(state: State, action: Action): State {
           remaining: Temporal.Duration.from(action.payload.interval),
           percentage: 0,
           isRunning: true,
+          end: Temporal.Instant.from(action.payload.timestamp).add(
+            action.payload.interval,
+          ),
         },
       };
     case TIMER_TICKED_ACTION: {
-      const duration = Temporal.Duration.from(action.payload.duration);
-      const previousRemaining = state.countdown.remaining;
-      const newRemaining = previousRemaining.subtract(duration);
+      let remaining = state.countdown.end.since(action.payload.timestamp);
+      if (remaining.sign === -1) {
+        remaining = Temporal.Duration.from("PT0S");
+      }
+      remaining = normalizeDuration(remaining, "seconds");
 
       const interval = state.countdown.interval;
-      const elapsed = interval.subtract(newRemaining);
+      const elapsed = interval.subtract(remaining);
       const newPercentage =
         (elapsed.total("seconds") / interval.total("seconds")) * 100;
       return {
         ...state,
         countdown: {
           ...state.countdown,
-          remaining:
-            newRemaining.total("seconds") < 0
-              ? Temporal.Duration.from("PT0S")
-              : newRemaining,
+          remaining,
           percentage: newPercentage > 100 ? 100 : newPercentage,
         },
       };
@@ -243,6 +254,9 @@ export function reducer(state: State, action: Action): State {
           interval: Temporal.Duration.from(action.payload.interval),
           remaining: Temporal.Duration.from(action.payload.interval),
           percentage: 0,
+          end: Temporal.Instant.from(action.payload.timestamp).add(
+            action.payload.interval,
+          ),
         },
         currentInterval: Temporal.Duration.from(action.payload.interval),
       };

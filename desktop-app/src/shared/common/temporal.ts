@@ -61,10 +61,16 @@ class OffsetClock extends Clock {
 
 export function normalizeDuration(
   duration: Temporal.Duration | Temporal.DurationLike | string,
+  smallestUnit:
+    | "hours"
+    | "minutes"
+    | "seconds"
+    | "milliseconds"
+    | "nanoseconds" = "nanoseconds",
 ): Temporal.Duration {
   return Temporal.Duration.from(duration).round({
     largestUnit: "hours",
-    smallestUnit: "nanoseconds",
+    smallestUnit,
   });
 }
 

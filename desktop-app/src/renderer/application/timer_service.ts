@@ -15,6 +15,7 @@ import type {
   TimerStartedEventDto,
   TimerStoppedEventDto,
 } from "../../shared/infrastructure/timer";
+import { Temporal } from "@js-temporal/polyfill";
 
 export function useCurrentInterval(dispatch: Dispatch<Action>) {
   const timeoutId =
@@ -25,24 +26,29 @@ export function useCurrentInterval(dispatch: Dispatch<Action>) {
       (event: TimerStartedEventDto) => {
         clearInterval(timeoutId.current);
         timeoutId.current = setInterval(
-          () => dispatch(timerTicked({ duration: "PT1S" })),
+          () =>
+            dispatch(
+              timerTicked({
+                timestamp: Temporal.Now.instant(),
+              }),
+            ),
           1000,
         );
-        dispatch(timerStarted({ interval: event.interval }));
+        dispatch(timerStarted(event));
       },
     );
 
     const offTimerStoppedEvent = window.activitySampling.onTimerStoppedEvent(
-      (_event: TimerStoppedEventDto) => {
+      (event: TimerStoppedEventDto) => {
         clearInterval(timeoutId.current);
-        dispatch(timerStopped());
+        dispatch(timerStopped(event));
       },
     );
 
     const offIntervalElapsedEvent =
       window.activitySampling.onIntervalElapsedEvent(
         (event: IntervalElapsedEventDto) => {
-          dispatch(intervalElapsed({ interval: event.interval }));
+          dispatch(intervalElapsed(event));
           NotificationGateway.getInstance().hide();
           NotificationGateway.getInstance().show();
         },

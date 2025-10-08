@@ -31,7 +31,7 @@ export class TimerService extends EventTarget {
   #clock: Clock;
   #timer: typeof globalThis;
 
-  #start?: Temporal.Instant;
+  #end?: Temporal.Instant;
   #interval?: Temporal.DurationLike;
   #intervalId?: ReturnType<typeof globalThis.setInterval>;
 
@@ -46,15 +46,18 @@ export class TimerService extends EventTarget {
   async startTimer(command: StartTimerCommand): Promise<CommandStatus> {
     this.#timer.clearInterval(this.#intervalId);
 
-    this.#start = this.#clock.instant();
-    this.#interval = Temporal.Duration.from(command.interval);
-    this.#intervalId = this.#timer.setInterval(
-      () => this.#handleIntervalElapsed(),
-      Temporal.Duration.from(command.interval).total("milliseconds"),
-    );
+    const start = this.#clock.instant();
+    this.#interval = command.interval;
+    this.#end = start.add(this.#interval);
+    this.#intervalId = this.#timer.setInterval(() => {
+      const now = this.#clock.instant();
+      if (Temporal.Instant.compare(now, this.#end!) >= 0) {
+        this.#handleIntervalElapsed();
+      }
+    }, 3000);
     this.dispatchEvent(
       TimerStartedEvent.create({
-        timestamp: this.#clock.instant(),
+        timestamp: start,
         interval: command.interval,
       }),
     );
@@ -83,12 +86,11 @@ export class TimerService extends EventTarget {
   }
 
   async simulateIntervalElapsed() {
-    if (!this.#start || !this.#interval) {
+    if (!this.#end) {
       throw new Error("Timer has not been started");
     }
 
-    const end = this.#start.add(this.#interval);
-    this.#clock = Clock.fixed(end, this.#clock.zone);
+    this.#clock = Clock.fixed(this.#end, this.#clock.zone);
     this.#handleIntervalElapsed();
   }
 
@@ -96,10 +98,11 @@ export class TimerService extends EventTarget {
     this.#currentInterval = this.#interval!;
     this.dispatchEvent(
       IntervalElapsedEvent.create({
-        timestamp: this.#clock.instant(),
+        timestamp: this.#end!,
         interval: this.#currentInterval,
       }),
     );
+    this.#end = this.#end!.add(this.#interval!);
   }
 }
 
