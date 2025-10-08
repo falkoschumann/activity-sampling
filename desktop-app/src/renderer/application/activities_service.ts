@@ -8,7 +8,9 @@ import {
   RecentActivitiesQuery,
   RecentActivitiesQueryResult,
   ReportQuery,
+  ReportQueryResult,
   TimesheetQuery,
+  TimesheetQueryResult,
 } from "../../shared/domain/activities";
 import {
   activityLogged,
@@ -121,7 +123,7 @@ export function useLog() {
   };
 }
 
-export async function logActivity(command: LogActivityCommand) {
+async function logActivity(command: LogActivityCommand) {
   NotificationGateway.getInstance().hide();
   const statusDto = await window.activitySampling.logActivity(
     LogActivityCommandDto.fromModel(command),
@@ -129,7 +131,7 @@ export async function logActivity(command: LogActivityCommand) {
   return CommandStatusDto.create(statusDto).validate();
 }
 
-export async function queryRecentActivities(query: RecentActivitiesQuery) {
+async function queryRecentActivities(query: RecentActivitiesQuery) {
   const resultDto = await window.activitySampling.queryRecentActivities(
     RecentActivitiesQueryDto.fromModel(query),
   );
@@ -141,14 +143,47 @@ export async function queryRecentActivities(query: RecentActivitiesQuery) {
   return result;
 }
 
-export async function queryReport(query: ReportQuery) {
+export function useReport(query: ReportQuery) {
+  const [result, setResult] = useState(ReportQueryResult.empty());
+
+  useEffect(() => {
+    (async function () {
+      const result = await queryReport({
+        scope: query.scope,
+        from: query.from ? Temporal.PlainDate.from(query.from) : undefined,
+        to: query.to ? Temporal.PlainDate.from(query.to) : undefined,
+      });
+      setResult(result);
+    })();
+  }, [query.scope, query.from, query.to]);
+
+  return result;
+}
+
+async function queryReport(query: ReportQuery) {
   const resultDto = await window.activitySampling.queryReport(
     ReportQueryDto.from(query),
   );
   return ReportQueryResultDto.create(resultDto).validate();
 }
 
-export async function queryTimesheet(query: TimesheetQuery) {
+export function useTimesheet(query: TimesheetQuery) {
+  const [result, setResul] = useState(TimesheetQueryResult.empty());
+
+  useEffect(() => {
+    (async function () {
+      const result = await queryTimesheet({
+        from: Temporal.PlainDate.from(query.from),
+        to: Temporal.PlainDate.from(query.to),
+      });
+      setResul(result);
+    })();
+  }, [query.from, query.to]);
+
+  return result;
+}
+
+async function queryTimesheet(query: TimesheetQuery) {
   const resultDto = await window.activitySampling.queryTimesheet(
     TimesheetQueryDto.from(query),
   );

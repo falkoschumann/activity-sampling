@@ -1,10 +1,9 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
-import { Temporal } from "@js-temporal/polyfill";
-import { useEffect, useReducer, useState } from "react";
+import { useReducer, useState } from "react";
 
-import { queryReport } from "../../../application/activities_service";
-import { ReportQueryResult, Scope } from "../../../../shared/domain/activities";
+import { useReport } from "../../../application/activities_service";
+import { Scope } from "../../../../shared/domain/activities";
 import {
   changePeriod,
   goToNextPeriod,
@@ -25,18 +24,8 @@ export default function ReportPage() {
     init,
   );
   const [scope, setScope] = useState<Scope>(Scope.PROJECTS);
-  const [report, setReport] = useState(ReportQueryResult.empty());
 
-  useEffect(() => {
-    (async function () {
-      const result = await queryReport({
-        scope,
-        from: Temporal.PlainDate.from(state.from),
-        to: Temporal.PlainDate.from(state.to),
-      });
-      setReport(result);
-    })();
-  }, [scope, state.from, state.to]);
+  const report = useReport({ ...state, scope });
 
   return (
     <>

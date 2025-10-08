@@ -1,10 +1,8 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
-import { Temporal } from "@js-temporal/polyfill";
-import { useEffect, useReducer, useState } from "react";
+import { useReducer } from "react";
 
-import { queryTimesheet } from "../../../application/activities_service";
-import { TimesheetQueryResult } from "../../../../shared/domain/activities";
+import { useTimesheet } from "../../../application/activities_service";
 import {
   changePeriod,
   goToNextPeriod,
@@ -23,17 +21,8 @@ export default function TimesheetPage() {
     { unit: PeriodUnit.WEEK },
     init,
   );
-  const [timesheet, setTimesheet] = useState(TimesheetQueryResult.empty());
 
-  useEffect(() => {
-    (async function () {
-      const result = await queryTimesheet({
-        from: Temporal.PlainDate.from(state.from),
-        to: Temporal.PlainDate.from(state.to),
-      });
-      setTimesheet(result);
-    })();
-  }, [state.from, state.to]);
+  const timesheet = useTimesheet(state);
 
   return (
     <>
