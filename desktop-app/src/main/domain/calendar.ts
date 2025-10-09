@@ -9,7 +9,7 @@ export class Holiday {
   }: {
     date: Temporal.PlainDateLike | string;
     title: string;
-  }) {
+  }): Holiday {
     return new Holiday(date, title);
   }
 
@@ -22,43 +22,72 @@ export class Holiday {
   }
 }
 
+export class Vacation {
+  static create({ date }: { date: Temporal.PlainDateLike | string }): Vacation {
+    return new Vacation(date);
+  }
+
+  date: Temporal.PlainDate;
+
+  private constructor(date: Temporal.PlainDateLike | string) {
+    this.date = Temporal.PlainDate.from(date);
+  }
+}
+
 export class Calendar {
   static create({
     holidays = [],
+    vacations = [],
   }: {
-    holidays?: (Temporal.PlainDate | Temporal.PlainDateLike | string)[];
+    holidays?: Holiday[];
+    vacations?: Vacation[];
   } = {}): Calendar {
-    return new Calendar(holidays.map((date) => date.toString()));
+    return new Calendar(holidays, vacations);
   }
 
   // Monday to Friday
   readonly #businessDays = [1, 2, 3, 4, 5];
 
-  readonly #holidays: string[];
+  readonly #holidays: Holiday[];
+  readonly #vacations: Vacation[];
 
-  private constructor(holidays: string[]) {
+  private constructor(holidays: Holiday[], vacations: Vacation[]) {
     this.#holidays = holidays;
+    this.#vacations = vacations;
   }
 
-  isBusinessDay(date: Temporal.PlainDate | Temporal.PlainDateLike | string) {
+  isBusinessDay(date: Temporal.PlainDateLike | string) {
     const plainDate = Temporal.PlainDate.from(date);
     return this.#businessDays.includes(plainDate.dayOfWeek);
   }
 
   isHoliday(date: Temporal.PlainDateLike | string) {
-    const s = date.toString();
-    return this.#holidays.includes(s);
+    date = Temporal.PlainDate.from(date);
+    return this.#holidays.some(
+      (holiday) => Temporal.PlainDate.compare(holiday.date, date) === 0,
+    );
+  }
+
+  isVacation(date: Temporal.PlainDateLike | string) {
+    date = Temporal.PlainDate.from(date);
+    return this.#vacations.some(
+      (vacation) => Temporal.PlainDate.compare(vacation.date, date) === 0,
+    );
   }
 
   countBusinessDays(
-    startInclusive: Temporal.PlainDate | Temporal.PlainDateLike | string,
-    endExclusive: Temporal.PlainDate | Temporal.PlainDateLike | string,
+    startInclusive: Temporal.PlainDateLike | string,
+    endExclusive: Temporal.PlainDateLike | string,
   ) {
     let date = Temporal.PlainDate.from(startInclusive);
     const end = Temporal.PlainDate.from(endExclusive);
     let count = 0;
     while (Temporal.PlainDate.compare(date, end) === -1) {
-      if (this.isBusinessDay(date) && !this.isHoliday(date)) {
+      if (
+        this.isBusinessDay(date) &&
+        !this.isHoliday(date) &&
+        !this.isVacation(date)
+      ) {
         count++;
       }
       date = date.add({ days: 1 });

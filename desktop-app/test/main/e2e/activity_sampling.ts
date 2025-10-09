@@ -19,7 +19,7 @@ import {
   TimesheetQuery,
   TimesheetQueryResult,
 } from "../../../src/shared/domain/activities";
-import { Holiday } from "../../../src/main/domain/calendar";
+import { Holiday, Vacation } from "../../../src/main/domain/calendar";
 import { Settings } from "../../../src/main/domain/settings";
 import {
   type CurrentIntervalQuery,
@@ -30,6 +30,7 @@ import {
 import { EventStore } from "../../../src/main/infrastructure/event_store";
 import { ActivityLoggedEventDto } from "../../../src/main/infrastructure/events";
 import { HolidayRepository } from "../../../src/main/infrastructure/holiday_repository";
+import { VacationRepository } from "../../../src/main/infrastructure/vacation_repository";
 
 const dataDir = path.resolve(import.meta.dirname, "../../../testdata");
 
@@ -38,6 +39,10 @@ export async function startActivitySampling({
 } = {}): Promise<Ui> {
   const eventsFile = path.resolve(dataDir, "activity-log.csv");
   await fs.rm(eventsFile, { force: true });
+  const holidaysFile = path.resolve(dataDir, "holidays.csv");
+  await fs.rm(holidaysFile, { force: true });
+  const vacationFile = path.resolve(dataDir, "vacation.csv");
+  await fs.rm(vacationFile, { force: true });
 
   const clock = Clock.fixed(now, "Europe/Berlin");
   const settings = Settings.create({
@@ -391,6 +396,13 @@ class TimesheetDsl {
     );
     await this.#activitiesDriver.holidaysChanged({ holidays });
   }
+
+  async vacationChanged(args: { vacations: string[] }) {
+    const vacations: Vacation[] = args.vacations.map((date) =>
+      Vacation.create({ date }),
+    );
+    await this.#activitiesDriver.vacationsChanged({ vacations });
+  }
 }
 
 function parseActivityLogged(args: {
@@ -420,6 +432,7 @@ function parseActivityLogged(args: {
 class ActivitiesDriver {
   readonly #eventStore: EventStore;
   readonly #holidayRepository: HolidayRepository;
+  readonly #vacationRepository: VacationRepository;
   readonly #activitiesService: ActivitiesService;
 
   #recentActivitiesQueryResult?: RecentActivitiesQueryResult;
@@ -429,10 +442,12 @@ class ActivitiesDriver {
   constructor(settings: Settings, clock: Clock) {
     this.#eventStore = EventStore.create();
     this.#holidayRepository = HolidayRepository.create();
+    this.#vacationRepository = VacationRepository.create();
     this.#activitiesService = new ActivitiesService(
       settings,
       this.#eventStore,
       this.#holidayRepository,
+      this.#vacationRepository,
       clock,
     );
   }
@@ -512,6 +527,10 @@ class ActivitiesDriver {
 
   async holidaysChanged({ holidays }: { holidays: Holiday[] }) {
     await this.#holidayRepository.saveAll(holidays);
+  }
+
+  async vacationsChanged({ vacations }: { vacations: Vacation[] }) {
+    await this.#vacationRepository.saveAll(vacations);
   }
 }
 

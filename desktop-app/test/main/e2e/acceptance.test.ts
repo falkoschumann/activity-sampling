@@ -478,10 +478,42 @@ describe("Activity Sampling", () => {
           capacity: { hours: "PT32H", offset: "PT0S" },
         });
       });
+
+      it.todo("should handle half holiday");
     });
 
     describe("Take vacation into account", () => {
-      it.todo("should reduce capacity by number of vacation days");
+      it("should reduce capacity by number of vacation days", async () => {
+        const { timesheet } = await startActivitySampling({
+          now: "2025-09-12T06:00:00Z",
+        });
+        await timesheet.activityLogged({
+          timestamp: "2025-09-08T15:00:00Z",
+          duration: "PT8H",
+        });
+        await timesheet.activityLogged({
+          timestamp: "2025-09-09T15:00:00Z",
+          duration: "PT8H",
+        });
+        await timesheet.activityLogged({
+          timestamp: "2025-09-11T15:00:00Z",
+          duration: "PT8H",
+        });
+        await timesheet.vacationChanged({
+          vacations: ["2025-09-10"],
+        });
+
+        await timesheet.queryTimesheet({
+          from: "2025-09-08",
+          to: "2025-09-14",
+        });
+
+        timesheet.assertTimesheet({
+          capacity: { hours: "PT32H", offset: "-PT8H" },
+        });
+      });
+
+      it.todo("should handle half vacation day");
     });
   });
 });

@@ -1,5 +1,6 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
+import fs from "node:fs/promises";
 import path from "node:path";
 
 import { Temporal } from "@js-temporal/polyfill";
@@ -10,7 +11,6 @@ import {
   HolidayDto,
   HolidayRepository,
 } from "../../../src/main/infrastructure/holiday_repository";
-import fsPromise from "node:fs/promises";
 
 const NON_EXISTING_FILE = path.resolve(
   import.meta.dirname,
@@ -93,7 +93,7 @@ describe("Holiday repository", () => {
 
   describe("Save all", () => {
     beforeEach(async () => {
-      await fsPromise.rm(TEST_FILE, { force: true });
+      await fs.rm(TEST_FILE, { force: true });
     });
 
     it("should load saved holidays", async () => {
@@ -112,20 +112,11 @@ describe("Holiday repository", () => {
       const repository = HolidayRepository.create({ fileName: TEST_FILE });
 
       await repository.saveAll([
-        Holiday.create({
-          date: "2025-10-08",
-          title: "Foo",
-        }),
-        Holiday.create({
-          date: "2025-10-10",
-          title: "Bar",
-        }),
+        Holiday.create({ date: "2025-10-08", title: "Foo" }),
+        Holiday.create({ date: "2025-10-10", title: "Bar" }),
       ]);
       await repository.saveAll([
-        Holiday.create({
-          date: "2025-10-08",
-          title: "Changed",
-        }),
+        Holiday.create({ date: "2025-10-08", title: "Changed" }),
       ]);
 
       const holidays = await repository.findAllByDate(
@@ -133,14 +124,8 @@ describe("Holiday repository", () => {
         "2025-10-12",
       );
       expect(holidays).toEqual([
-        Holiday.create({
-          date: "2025-10-08",
-          title: "Changed",
-        }),
-        Holiday.create({
-          date: "2025-10-10",
-          title: "Bar",
-        }),
+        Holiday.create({ date: "2025-10-08", title: "Changed" }),
+        Holiday.create({ date: "2025-10-10", title: "Bar" }),
       ]);
     });
   });
@@ -173,10 +158,7 @@ describe("Holiday repository", () => {
         );
 
         expect(holidays).toEqual([
-          {
-            date: Temporal.PlainDate.from("2025-06-09"),
-            title: "Pfingstmontag",
-          },
+          Holiday.create({ date: "2025-06-09", title: "Pfingstmontag" }),
         ]);
       });
 

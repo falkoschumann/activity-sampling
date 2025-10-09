@@ -20,6 +20,10 @@ import {
   HolidayDto,
   HolidayRepository,
 } from "../../../src/main/infrastructure/holiday_repository";
+import {
+  VacationDto,
+  VacationRepository,
+} from "../../../src/main/infrastructure/vacation_repository";
 
 describe("Activities service", () => {
   describe("Log activity", () => {
@@ -153,6 +157,7 @@ describe("Activities service", () => {
         holidays: [
           HolidayDto.create({ date: "2025-06-10", title: "Pfingstmontag" }),
         ],
+        vacations: [],
         fixedInstant: "2025-06-11T15:00:00Z",
       });
 
@@ -185,15 +190,20 @@ describe("Activities service", () => {
 function configure({
   events,
   holidays,
+  vacations,
   fixedInstant,
 }: {
   events?: unknown[];
   holidays?: HolidayDto[];
+  vacations?: VacationDto[];
   fixedInstant?: string;
 } = {}) {
   const eventStore = EventStore.createNull({ events });
   const holidayRepository = HolidayRepository.createNull({
     readFileResponses: holidays ? [holidays] : undefined,
+  });
+  const vacationRepository = VacationRepository.createNull({
+    readFileResponses: vacations ? [vacations] : undefined,
   });
   const clock = Clock.fixed(
     fixedInstant ?? "1970-01-01T00:00:00Z",
@@ -203,6 +213,7 @@ function configure({
     Settings.createDefault(),
     eventStore,
     holidayRepository,
+    vacationRepository,
     clock,
   );
   return { service, eventStore, holidayRepository, clock };

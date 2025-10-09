@@ -21,6 +21,7 @@ import { Settings } from "../domain/settings";
 import { EventStore } from "../infrastructure/event_store";
 import { ActivityLoggedEventDto } from "../infrastructure/events";
 import { HolidayRepository } from "../infrastructure/holiday_repository";
+import { VacationRepository } from "../infrastructure/vacation_repository";
 
 export class ActivitiesService {
   static create({
@@ -30,23 +31,27 @@ export class ActivitiesService {
       settings,
       EventStore.create(),
       HolidayRepository.create(),
+      VacationRepository.create(),
     );
   }
 
   #settings: Settings;
   readonly #eventStore: EventStore;
   readonly #holidayRepository: HolidayRepository;
+  readonly #vacationRepository: VacationRepository;
   readonly #clock: Clock;
 
   constructor(
     settings: Settings,
     eventStore: EventStore,
     holidayRepository: HolidayRepository,
+    vacationRepository: VacationRepository,
     clock = Clock.systemDefaultZone(),
   ) {
     this.#settings = settings;
     this.#eventStore = eventStore;
     this.#holidayRepository = holidayRepository;
+    this.#vacationRepository = vacationRepository;
     this.#clock = clock;
 
     this.applySettings(settings);
@@ -56,6 +61,7 @@ export class ActivitiesService {
     this.#settings = settings;
     this.#eventStore.fileName = `${settings.dataDir}/activity-log.csv`;
     this.#holidayRepository.fileName = `${settings.dataDir}/holidays.csv`;
+    this.#vacationRepository.fileName = `${settings.dataDir}/vacation.csv`;
   }
 
   async logActivity(command: LogActivityCommand): Promise<CommandStatus> {
@@ -86,13 +92,18 @@ export class ActivitiesService {
       query.from,
       query.to,
     );
-    return projectTimesheet(
-      replay,
-      holidays,
-      query,
-      this.#settings.capacity,
-      this.#clock,
+    const vacations = await this.#vacationRepository.findAllByDate(
+      query.from,
+      query.to,
     );
+    return projectTimesheet({
+      replay,
+      query,
+      holidays,
+      vacations,
+      capacity: this.#settings.capacity,
+      clock: this.#clock,
+    });
   }
 }
 

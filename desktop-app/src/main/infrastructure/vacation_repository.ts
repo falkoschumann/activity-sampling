@@ -1,6 +1,7 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
 import fsPromise from "node:fs/promises";
+import path from "node:path";
 
 import { Temporal } from "@js-temporal/polyfill";
 import { ConfigurableResponses } from "@muspellheim/shared";
@@ -9,28 +10,27 @@ import addFormats from "ajv-formats";
 import { parse } from "csv";
 import { stringify } from "csv/sync";
 
-import { Holiday } from "../domain/calendar";
-import path from "node:path";
+import { Vacation } from "../domain/calendar";
 
-export interface HolidayConfiguration {
+export interface VacationConfiguration {
   readonly fileName: string;
 }
 
-export class HolidayRepository {
+export class VacationRepository {
   static create(
-    configuration: HolidayConfiguration = {
-      fileName: "data/holidays.csv",
+    configuration: VacationConfiguration = {
+      fileName: "data/vacation.csv",
     },
-  ): HolidayRepository {
-    return new HolidayRepository(configuration, fsPromise);
+  ): VacationRepository {
+    return new VacationRepository(configuration, fsPromise);
   }
 
   static createNull({
     readFileResponses = [],
   }: {
-    readFileResponses?: (HolidayDto[] | null | Error)[];
-  } = {}): HolidayRepository {
-    return new HolidayRepository(
+    readFileResponses?: (VacationDto[] | null | Error)[];
+  } = {}): VacationRepository {
+    return new VacationRepository(
       { fileName: "null-holidays.csv" },
       new FsPromiseStub(readFileResponses) as unknown as typeof fsPromise,
     );
@@ -40,12 +40,12 @@ export class HolidayRepository {
 
   readonly #fs: typeof fsPromise;
 
-  constructor(configuration: HolidayConfiguration, fs: typeof fsPromise) {
+  constructor(configuration: VacationConfiguration, fs: typeof fsPromise) {
     this.fileName = configuration.fileName;
     this.#fs = fs;
   }
 
-  async findAll(): Promise<Holiday[]> {
+  async findAll(): Promise<Vacation[]> {
     try {
       const fileContent = await this.#fs.readFile(this.fileName);
       const records = parse(fileContent, {
@@ -56,19 +56,17 @@ export class HolidayRepository {
             switch (column) {
               case "Date":
                 return "date";
-              case "Title":
-                return "title";
               default:
                 return column;
             }
           }),
       });
-      const holidays: Holiday[] = [];
+      const vacations: Vacation[] = [];
       for await (const record of records) {
-        const holiday = HolidayDto.fromJson(record).validate();
-        holidays.push(holiday);
+        const vacation = VacationDto.fromJson(record).validate();
+        vacations.push(vacation);
       }
-      return holidays;
+      return vacations;
     } catch (error) {
       if ((error as NodeJS.ErrnoException).code === "ENOENT") {
         // No such file or directory, no events recorded yet
@@ -82,39 +80,38 @@ export class HolidayRepository {
   async findAllByDate(
     startInclusive: Temporal.PlainDateLike | string,
     endExclusive: Temporal.PlainDateLike | string,
-  ): Promise<Holiday[]> {
-    const holidays = await this.findAll();
-    return holidays.filter(
-      (holiday) =>
-        Temporal.PlainDate.compare(holiday.date, startInclusive) >= 0 &&
-        Temporal.PlainDate.compare(holiday.date, endExclusive) < 0,
+  ): Promise<Vacation[]> {
+    const vacations = await this.findAll();
+    return vacations.filter(
+      (vacation) =>
+        Temporal.PlainDate.compare(vacation.date, startInclusive) >= 0 &&
+        Temporal.PlainDate.compare(vacation.date, endExclusive) < 0,
     );
   }
 
-  async saveAll(holidays: Holiday[]): Promise<void> {
+  async saveAll(vacations: Vacation[]): Promise<void> {
     const merged = await this.findAll();
-    for (const holiday of holidays) {
+    for (const vacation of vacations) {
       const index = merged.findIndex(
-        (savedHoliday) =>
-          Temporal.PlainDate.compare(savedHoliday.date, holiday.date) === 0,
+        (savedVacation) =>
+          Temporal.PlainDate.compare(savedVacation.date, vacation.date) === 0,
       );
       if (index >= 0) {
-        merged[index] = holiday;
+        merged[index] = vacation;
       } else {
-        merged.push(holiday);
+        merged.push(vacation);
       }
     }
-    const mergedDtos = merged.map((holiday) => HolidayDto.fromModel(holiday));
+    const mergedDtos = merged.map((vacation) =>
+      VacationDto.fromModel(vacation),
+    );
 
     const dirName = path.resolve(path.dirname(this.fileName));
     await this.#fs.mkdir(dirName, { recursive: true });
     const stringifier = stringify(mergedDtos, {
       header: true,
       record_delimiter: "\r\n",
-      columns: [
-        { key: "date", header: "Date" },
-        { key: "title", header: "Title" },
-      ],
+      columns: [{ key: "date", header: "Date" }],
     });
     await this.#fs.writeFile(this.fileName, stringifier);
   }
@@ -123,56 +120,52 @@ export class HolidayRepository {
 const schema = {
   type: "object",
   properties: {
-    title: { type: "string" },
     date: { type: "string", format: "date" },
   },
-  required: ["date", "title"],
+  required: ["date"],
   additionalProperties: false,
 };
 
-export class HolidayDto {
-  static create({ date, title }: { date: string; title: string }): HolidayDto {
-    return new HolidayDto(date, title);
+export class VacationDto {
+  static create({ date }: { date: string }): VacationDto {
+    return new VacationDto(date);
   }
 
-  static fromModel(model: Holiday): HolidayDto {
-    return HolidayDto.create({
+  static fromModel(model: Vacation): VacationDto {
+    return VacationDto.create({
       date: model.date.toString(),
-      title: model.title,
     });
   }
 
-  static fromJson(json: unknown): HolidayDto {
+  static fromJson(json: unknown): VacationDto {
     const ajv = new Ajv();
     addFormats(ajv);
     const valid = ajv.validate(schema, json);
     if (valid) {
-      return HolidayDto.create(json as HolidayDto);
+      return VacationDto.create(json as VacationDto);
     }
 
     const errors = JSON.stringify(ajv.errors, null, 2);
-    throw new TypeError(`Invalid holiday data:\n${errors}`);
+    throw new TypeError(`Invalid vacation data:\n${errors}`);
   }
 
   readonly date: string;
-  readonly title: string;
 
-  private constructor(date: string, title: string) {
+  private constructor(date: string) {
     this.date = date;
-    this.title = title;
   }
 
-  validate(): Holiday {
-    return Holiday.create(this);
+  validate(): Vacation {
+    return Vacation.create(this);
   }
 }
 
 class FsPromiseStub {
   readonly #readFileResponses: ConfigurableResponses<
-    HolidayDto[] | null | Error
+    VacationDto[] | null | Error
   >;
 
-  constructor(readFileResponses: (HolidayDto[] | null | Error)[]) {
+  constructor(readFileResponses: (VacationDto[] | null | Error)[]) {
     this.#readFileResponses = ConfigurableResponses.create(
       readFileResponses,
       "read file",

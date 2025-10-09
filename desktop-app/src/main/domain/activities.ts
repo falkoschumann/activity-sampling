@@ -17,7 +17,7 @@ import {
   TimesheetQueryResult,
   type WorkingDay,
 } from "../../shared/domain/activities";
-import { Calendar, type Holiday } from "./calendar";
+import { Calendar, type Holiday, Vacation } from "./calendar";
 
 export async function projectRecentActivities(
   replay: AsyncGenerator<ActivityLoggedEvent>,
@@ -219,19 +219,26 @@ export async function projectReport(
   }
 }
 
-export async function projectTimesheet(
-  replay: AsyncGenerator<ActivityLoggedEvent>,
-  holidays: Holiday[],
-  query: TimesheetQuery,
-  defaultCapacity = Temporal.Duration.from("PT40H"),
+export async function projectTimesheet({
+  replay,
+  query,
+  holidays = [],
+  vacations = [],
+  capacity = Temporal.Duration.from("PT40H"),
   clock = Clock.systemDefaultZone(),
-): Promise<TimesheetQueryResult> {
+}: {
+  replay: AsyncGenerator<ActivityLoggedEvent>;
+  query: TimesheetQuery;
+  holidays?: Holiday[];
+  vacations?: Vacation[];
+  capacity?: Temporal.Duration;
+  clock?: Clock;
+}): Promise<TimesheetQueryResult> {
   const startInclusive = Temporal.PlainDate.from(query.from);
   const endExclusive = Temporal.PlainDate.from(query.to).add("P1D");
   const timeZone = query.timeZone ?? clock.zone;
   const today = clock.instant().toZonedDateTimeISO(timeZone).toPlainDate();
-  const holidaysDates = holidays.map((h) => h.date);
-  const calendar = Calendar.create({ holidays: holidaysDates });
+  const calendar = Calendar.create({ holidays, vacations });
 
   let entries: TimesheetEntry[] = [];
   let totalHours = Temporal.Duration.from("PT0S");
@@ -245,7 +252,7 @@ export async function projectTimesheet(
     updateTotalHours(activity);
   }
 
-  const capacity = determineCapacity();
+  const capacityHours = determineCapacity();
   const offset = determineOffset();
   entries = entries.sort((entry1, entry2) => {
     const dateComparison = Temporal.PlainDate.compare(entry1.date, entry2.date);
@@ -265,7 +272,7 @@ export async function projectTimesheet(
     entries,
     totalHours,
     capacity: {
-      hours: capacity,
+      hours: capacityHours,
       offset,
     },
   };
@@ -310,11 +317,11 @@ export async function projectTimesheet(
       startInclusive,
       endExclusive,
     );
-    const defaultCapacityPerDay = defaultCapacity.hours / 5;
-    const capacity = Temporal.Duration.from({
+    const defaultCapacityPerDay = capacity.hours / 5;
+    const capacityHours = Temporal.Duration.from({
       hours: businessDays * defaultCapacityPerDay,
     });
-    return normalizeDuration(capacity);
+    return normalizeDuration(capacityHours);
   }
 
   function determineOffset(): Temporal.Duration {
