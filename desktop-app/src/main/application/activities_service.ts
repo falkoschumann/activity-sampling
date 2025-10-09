@@ -109,7 +109,6 @@ export class ActivitiesService {
 
 async function* replayTyped(events: AsyncGenerator) {
   for await (const e of events) {
-    const event = ActivityLoggedEventDto.fromJson(e).validate();
-    yield event;
+    yield ActivityLoggedEventDto.fromJson(e).validate();
   }
 }
