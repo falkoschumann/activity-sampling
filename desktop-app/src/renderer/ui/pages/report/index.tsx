@@ -20,7 +20,7 @@ import TotalHoursComponent from "./total_hours";
 export default function ReportPage() {
   const [state, dispatch] = useReducer(
     reducer,
-    { unit: PeriodUnit.WEEK },
+    { unit: PeriodUnit.MONTH },
     init,
   );
   const [scope, setScope] = useState<Scope>(Scope.PROJECTS);
