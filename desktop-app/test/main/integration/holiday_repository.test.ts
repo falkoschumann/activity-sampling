@@ -40,6 +40,7 @@ const OSTERSONNTAG: Holiday = {
 const OSTERMONTAG: Holiday = {
   date: Temporal.PlainDate.from("2025-04-21"),
   title: "Ostermontag",
+  duration: Temporal.Duration.from("PT8H"),
 };
 
 describe("Holiday repository", () => {

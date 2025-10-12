@@ -29,6 +29,7 @@ const TEST_FILE = path.resolve(
 
 const VACATION_DAY_1: Vacation = {
   date: Temporal.PlainDate.from("2025-09-11"),
+  duration: Temporal.Duration.from("PT8H"),
 };
 
 const VACATION_DAY_2: Vacation = {

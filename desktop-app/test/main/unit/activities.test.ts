@@ -444,7 +444,6 @@ describe("Activities", () => {
             from: "2025-06-09",
             to: "2025-06-15",
           }),
-          capacity: Temporal.Duration.from("PT40H"),
           clock: Clock.fixed("2025-06-11T16:00:00Z", "Europe/Berlin"),
         });
 
@@ -480,7 +479,6 @@ describe("Activities", () => {
             from: "2025-06-09",
             to: "2025-06-15",
           }),
-          capacity: Temporal.Duration.from("PT40H"),
           clock: Clock.fixed("2025-06-12T16:00:00Z", "Europe/Berlin"),
         });
 
@@ -516,7 +514,6 @@ describe("Activities", () => {
             from: "2025-06-09",
             to: "2025-06-15",
           }),
-          capacity: Temporal.Duration.from("PT40H"),
           clock: Clock.fixed("2025-06-12T16:00:00Z", "Europe/Berlin"),
         });
 
@@ -552,7 +549,6 @@ describe("Activities", () => {
             from: "2025-06-09",
             to: "2025-06-15",
           }),
-          capacity: Temporal.Duration.from("PT40H"),
           clock: Clock.fixed("2025-06-12T16:00:00Z", "Europe/Berlin"),
         });
 
@@ -585,7 +581,6 @@ describe("Activities", () => {
           Holiday.create({ date: "2025-06-09", title: "Pfingstmontag" }),
         ],
         query: TimesheetQuery.create({ from: "2025-06-09", to: "2025-06-15" }),
-        capacity: Temporal.Duration.from("PT40H"),
         clock: Clock.fixed("2025-06-12T16:00:00Z", "Europe/Berlin"),
       });
 
@@ -615,7 +610,6 @@ describe("Activities", () => {
         replay,
         query: TimesheetQuery.create({ from: "2025-09-08", to: "2025-09-14" }),
         vacations: [Vacation.create({ date: "2025-09-10" })],
-        capacity: Temporal.Duration.from("PT40H"),
         clock: Clock.fixed("2025-09-11T16:00:00Z", "Europe/Berlin"),
       });
 

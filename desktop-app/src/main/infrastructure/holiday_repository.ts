@@ -58,6 +58,8 @@ export class HolidayRepository {
                 return "date";
               case "Title":
                 return "title";
+              case "Duration":
+                return "duration";
               default:
                 return column;
             }
@@ -114,6 +116,7 @@ export class HolidayRepository {
       columns: [
         { key: "date", header: "Date" },
         { key: "title", header: "Title" },
+        { key: "duration", header: "Duration" },
       ],
     });
     await this.#fs.writeFile(this.fileName, stringifier);
@@ -125,20 +128,30 @@ const schema = {
   properties: {
     title: { type: "string" },
     date: { type: "string", format: "date" },
+    duration: { type: "string", format: "duration" },
   },
   required: ["date", "title"],
   additionalProperties: false,
 };
 
 export class HolidayDto {
-  static create({ date, title }: { date: string; title: string }): HolidayDto {
-    return new HolidayDto(date, title);
+  static create({
+    date,
+    title,
+    duration,
+  }: {
+    date: string;
+    title: string;
+    duration?: string;
+  }): HolidayDto {
+    return new HolidayDto(date, title, duration);
   }
 
   static fromModel(model: Holiday): HolidayDto {
     return HolidayDto.create({
       date: model.date.toString(),
       title: model.title,
+      duration: model.duration?.toString(),
     });
   }
 
@@ -156,10 +169,12 @@ export class HolidayDto {
 
   readonly date: string;
   readonly title: string;
+  readonly duration?: string;
 
-  private constructor(date: string, title: string) {
+  private constructor(date: string, title: string, duration?: string) {
     this.date = date;
     this.title = title;
+    this.duration = duration;
   }
 
   validate(): Holiday {

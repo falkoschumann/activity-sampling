@@ -224,14 +224,12 @@ export async function projectTimesheet({
   query,
   holidays = [],
   vacations = [],
-  capacity = Temporal.Duration.from("PT40H"),
   clock = Clock.systemDefaultZone(),
 }: {
   replay: AsyncGenerator<ActivityLoggedEvent>;
   query: TimesheetQuery;
   holidays?: Holiday[];
   vacations?: Vacation[];
-  capacity?: Temporal.Duration;
   clock?: Clock;
 }): Promise<TimesheetQueryResult> {
   const startInclusive = Temporal.PlainDate.from(query.from);
@@ -313,15 +311,7 @@ export async function projectTimesheet({
   }
 
   function determineCapacity(): Temporal.Duration {
-    const businessDays = calendar.countBusinessDays(
-      startInclusive,
-      endExclusive,
-    );
-    const defaultCapacityPerDay = capacity.hours / 5;
-    const capacityHours = Temporal.Duration.from({
-      hours: businessDays * defaultCapacityPerDay,
-    });
-    return normalizeDuration(capacityHours);
+    return calendar.countBusinessHours(startInclusive, endExclusive);
   }
 
   function determineOffset(): Temporal.Duration {
@@ -333,8 +323,8 @@ export async function projectTimesheet({
     } else {
       end = today.add("P1D");
     }
-    const businessDays = calendar.countBusinessDays(startInclusive, end);
-    const offset = totalHours.subtract({ hours: businessDays * 8 });
+    const businessDays = calendar.countBusinessHours(startInclusive, end);
+    const offset = totalHours.subtract(businessDays);
     return normalizeDuration(offset);
   }
 }

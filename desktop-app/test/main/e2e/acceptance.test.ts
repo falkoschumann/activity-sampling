@@ -479,7 +479,35 @@ describe("Activity Sampling", () => {
         });
       });
 
-      it.todo("should handle half holiday");
+      it("should handle half holiday", async () => {
+        const { timesheet } = await startActivitySampling({
+          now: "2025-12-24T15:00:00Z",
+        });
+        await timesheet.activityLogged({
+          timestamp: "2025-12-22T15:00:00Z",
+          duration: "PT8H",
+        });
+        await timesheet.activityLogged({
+          timestamp: "2025-12-23T15:00:00Z",
+          duration: "PT8H",
+        });
+        await timesheet.holidaysChanged({
+          holidays: [
+            { date: "2025-12-23", duration: "PT4H" },
+            "2025-12-25",
+            "2025-12-26",
+          ],
+        });
+
+        await timesheet.queryTimesheet({
+          from: "2025-12-22",
+          to: "2025-12-28",
+        });
+
+        timesheet.assertTimesheet({
+          capacity: { hours: "PT20H", offset: "-PT4H" },
+        });
+      });
     });
 
     describe("Take vacation into account", () => {
@@ -513,7 +541,34 @@ describe("Activity Sampling", () => {
         });
       });
 
-      it.todo("should handle half vacation day");
+      it("should handle half vacation day", async () => {
+        const { timesheet } = await startActivitySampling({
+          now: "2025-12-26T15:00:00Z",
+        });
+        await timesheet.holidaysChanged({
+          holidays: [
+            { date: "2025-12-24", duration: "PT4H" },
+            "2025-12-25",
+            "2025-12-26",
+          ],
+        });
+        await timesheet.vacationChanged({
+          vacations: [
+            "2025-12-22",
+            "2025-12-23",
+            { date: "2025-12-24", duration: "PT4H" },
+          ],
+        });
+
+        await timesheet.queryTimesheet({
+          from: "2025-12-22",
+          to: "2025-12-28",
+        });
+
+        timesheet.assertTimesheet({
+          capacity: { hours: "PT0S", offset: "PT0S" },
+        });
+      });
     });
   });
 });

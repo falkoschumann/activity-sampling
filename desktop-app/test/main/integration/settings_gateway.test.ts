@@ -41,7 +41,7 @@ describe("Settings gateway", () => {
       const settings = await gateway.load();
 
       expect(settings).toEqual<Settings>(
-        Settings.create({ dataDir: "other-data", capacity: "PT35H" }),
+        Settings.create({ dataDir: "other-data" }),
       );
     });
   });
@@ -51,7 +51,6 @@ describe("Settings gateway", () => {
       const gateway = SettingsGateway.create({ fileName: TEST_FILE });
       const example = Settings.create({
         dataDir: "test-data-dir",
-        capacity: "PT30H",
       });
 
       await gateway.store(example);
@@ -75,15 +74,13 @@ describe("Settings gateway", () => {
 
       it("should return configurable responses", async () => {
         const gateway = SettingsGateway.createNull({
-          readFileResponses: [
-            SettingsDto.create({ capacity: "PT35H", dataDir: "data-dir" }),
-          ],
+          readFileResponses: [SettingsDto.create({ dataDir: "data-dir" })],
         });
 
         const settings = await gateway.load();
 
         expect(settings).toEqual<Settings>(
-          Settings.create({ capacity: "PT35H", dataDir: "data-dir" }),
+          Settings.create({ dataDir: "data-dir" }),
         );
       });
 
@@ -103,12 +100,10 @@ describe("Settings gateway", () => {
         const gateway = SettingsGateway.createNull();
         const storedSettings = gateway.trackStored();
 
-        await gateway.store(
-          Settings.create({ capacity: "PT35H", dataDir: "data-dir" }),
-        );
+        await gateway.store(Settings.create({ dataDir: "data-dir" }));
 
         expect(storedSettings.data).toEqual<Settings[]>([
-          Settings.create({ capacity: "PT35H", dataDir: "data-dir" }),
+          Settings.create({ dataDir: "data-dir" }),
         ]);
       });
     });

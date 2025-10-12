@@ -390,17 +390,27 @@ class TimesheetDsl {
     await this.#activitiesDriver.record(event);
   }
 
-  async holidaysChanged(args: { holidays: string[] }) {
-    const holidays: Holiday[] = args.holidays.map((date) =>
-      Holiday.create({ date, title: "Holiday" }),
-    );
+  async holidaysChanged(args: {
+    holidays: ({ date: string; duration: string } | string)[];
+  }) {
+    const holidays: Holiday[] = args.holidays.map((holiday) => {
+      const date = typeof holiday === "string" ? holiday : holiday.date;
+      const duration =
+        typeof holiday === "string" ? undefined : holiday.duration;
+      return Holiday.create({ date, title: "Holiday", duration });
+    });
     await this.#activitiesDriver.holidaysChanged({ holidays });
   }
 
-  async vacationChanged(args: { vacations: string[] }) {
-    const vacations: Vacation[] = args.vacations.map((date) =>
-      Vacation.create({ date }),
-    );
+  async vacationChanged(args: {
+    vacations: ({ date: string; duration: string } | string)[];
+  }) {
+    const vacations: Vacation[] = args.vacations.map((vacation) => {
+      const date = typeof vacation === "string" ? vacation : vacation.date;
+      const duration =
+        typeof vacation === "string" ? undefined : vacation.duration;
+      return Vacation.create({ date, duration });
+    });
     await this.#activitiesDriver.vacationsChanged({ vacations });
   }
 }

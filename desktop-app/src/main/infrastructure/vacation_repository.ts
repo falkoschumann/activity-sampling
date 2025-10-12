@@ -56,6 +56,8 @@ export class VacationRepository {
             switch (column) {
               case "Date":
                 return "date";
+              case "Duration":
+                return "duration";
               default:
                 return column;
             }
@@ -111,7 +113,10 @@ export class VacationRepository {
     const stringifier = stringify(mergedDtos, {
       header: true,
       record_delimiter: "\r\n",
-      columns: [{ key: "date", header: "Date" }],
+      columns: [
+        { key: "date", header: "Date" },
+        { key: "duration", header: "Duration" },
+      ],
     });
     await this.#fs.writeFile(this.fileName, stringifier);
   }
@@ -121,19 +126,27 @@ const schema = {
   type: "object",
   properties: {
     date: { type: "string", format: "date" },
+    duration: { type: "string", format: "duration" },
   },
   required: ["date"],
   additionalProperties: false,
 };
 
 export class VacationDto {
-  static create({ date }: { date: string }): VacationDto {
-    return new VacationDto(date);
+  static create({
+    date,
+    duration,
+  }: {
+    date: string;
+    duration?: string;
+  }): VacationDto {
+    return new VacationDto(date, duration);
   }
 
   static fromModel(model: Vacation): VacationDto {
     return VacationDto.create({
       date: model.date.toString(),
+      duration: model.duration?.toString(),
     });
   }
 
@@ -150,9 +163,11 @@ export class VacationDto {
   }
 
   readonly date: string;
+  readonly duration?: string;
 
-  private constructor(date: string) {
+  private constructor(date: string, duration?: string) {
     this.date = date;
+    this.duration = duration;
   }
 
   validate(): Vacation {

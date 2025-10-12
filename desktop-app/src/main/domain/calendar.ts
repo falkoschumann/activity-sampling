@@ -1,36 +1,60 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
 import { Temporal } from "@js-temporal/polyfill";
+import { normalizeDuration } from "../../shared/common/temporal";
 
 export class Holiday {
   static create({
     date,
     title,
+    duration,
   }: {
     date: Temporal.PlainDateLike | string;
     title: string;
+    duration?: Temporal.DurationLike | string;
   }): Holiday {
-    return new Holiday(date, title);
+    return new Holiday(date, title, duration);
   }
 
   date: Temporal.PlainDate;
   title: string;
+  duration?: Temporal.Duration;
 
-  private constructor(date: Temporal.PlainDateLike | string, title: string) {
+  private constructor(
+    date: Temporal.PlainDateLike | string,
+    title: string,
+    duration?: Temporal.DurationLike | string,
+  ) {
     this.date = Temporal.PlainDate.from(date);
     this.title = title;
+    if (duration != null) {
+      this.duration = Temporal.Duration.from(duration);
+    }
   }
 }
 
 export class Vacation {
-  static create({ date }: { date: Temporal.PlainDateLike | string }): Vacation {
-    return new Vacation(date);
+  static create({
+    date,
+    duration,
+  }: {
+    date: Temporal.PlainDateLike | string;
+    duration?: Temporal.DurationLike | string;
+  }): Vacation {
+    return new Vacation(date, duration);
   }
 
   date: Temporal.PlainDate;
+  duration?: Temporal.Duration;
 
-  private constructor(date: Temporal.PlainDateLike | string) {
+  private constructor(
+    date: Temporal.PlainDateLike | string,
+    duration?: Temporal.DurationLike | string,
+  ) {
     this.date = Temporal.PlainDate.from(date);
+    if (duration != null) {
+      this.duration = Temporal.Duration.from(duration);
+    }
   }
 }
 
@@ -50,48 +74,55 @@ export class Calendar {
 
   readonly #holidays: Holiday[];
   readonly #vacations: Vacation[];
+  readonly #hoursPerDay = Temporal.Duration.from("PT8H");
 
   private constructor(holidays: Holiday[], vacations: Vacation[]) {
     this.#holidays = holidays;
     this.#vacations = vacations;
   }
 
-  isBusinessDay(date: Temporal.PlainDateLike | string) {
+  isBusinessDay(date: Temporal.PlainDateLike | string): boolean {
     const plainDate = Temporal.PlainDate.from(date);
     return this.#businessDays.includes(plainDate.dayOfWeek);
   }
 
-  isHoliday(date: Temporal.PlainDateLike | string) {
-    date = Temporal.PlainDate.from(date);
-    return this.#holidays.some(
+  #findHoliday(date: Temporal.PlainDateLike | string): Holiday | undefined {
+    return this.#holidays.find(
       (holiday) => Temporal.PlainDate.compare(holiday.date, date) === 0,
     );
   }
 
-  isVacation(date: Temporal.PlainDateLike | string) {
-    date = Temporal.PlainDate.from(date);
-    return this.#vacations.some(
+  #findVacation(date: Temporal.PlainDateLike | string): Vacation | undefined {
+    return this.#vacations.find(
       (vacation) => Temporal.PlainDate.compare(vacation.date, date) === 0,
     );
   }
 
-  countBusinessDays(
+  countBusinessHours(
     startInclusive: Temporal.PlainDateLike | string,
     endExclusive: Temporal.PlainDateLike | string,
   ) {
     let date = Temporal.PlainDate.from(startInclusive);
     const end = Temporal.PlainDate.from(endExclusive);
-    let count = 0;
+    let count = Temporal.Duration.from("PT0H");
     while (Temporal.PlainDate.compare(date, end) === -1) {
-      if (
-        this.isBusinessDay(date) &&
-        !this.isHoliday(date) &&
-        !this.isVacation(date)
-      ) {
-        count++;
+      if (this.isBusinessDay(date)) {
+        let hours = this.#hoursPerDay;
+
+        const holiday = this.#findHoliday(date);
+        if (holiday != null) {
+          hours = hours.subtract(holiday.duration ?? this.#hoursPerDay);
+        }
+
+        const vacation = this.#findVacation(date);
+        if (vacation != null) {
+          hours = hours.subtract(vacation.duration ?? this.#hoursPerDay);
+        }
+
+        count = count.add(hours);
       }
       date = date.add({ days: 1 });
     }
-    return count;
+    return normalizeDuration(count);
   }
 }
