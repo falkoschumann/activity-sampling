@@ -81,24 +81,7 @@ export class Calendar {
     this.#vacations = vacations;
   }
 
-  isBusinessDay(date: Temporal.PlainDateLike | string): boolean {
-    const plainDate = Temporal.PlainDate.from(date);
-    return this.#businessDays.includes(plainDate.dayOfWeek);
-  }
-
-  #findHoliday(date: Temporal.PlainDateLike | string): Holiday | undefined {
-    return this.#holidays.find(
-      (holiday) => Temporal.PlainDate.compare(holiday.date, date) === 0,
-    );
-  }
-
-  #findVacation(date: Temporal.PlainDateLike | string): Vacation | undefined {
-    return this.#vacations.find(
-      (vacation) => Temporal.PlainDate.compare(vacation.date, date) === 0,
-    );
-  }
-
-  countBusinessHours(
+  countWorkingHours(
     startInclusive: Temporal.PlainDateLike | string,
     endExclusive: Temporal.PlainDateLike | string,
   ) {
@@ -106,7 +89,7 @@ export class Calendar {
     const end = Temporal.PlainDate.from(endExclusive);
     let count = Temporal.Duration.from("PT0H");
     while (Temporal.PlainDate.compare(date, end) === -1) {
-      if (this.isBusinessDay(date)) {
+      if (this.#isBusinessDay(date)) {
         let hours = this.#hoursPerDay;
 
         const holiday = this.#findHoliday(date);
@@ -124,5 +107,22 @@ export class Calendar {
       date = date.add({ days: 1 });
     }
     return normalizeDuration(count);
+  }
+
+  #isBusinessDay(date: Temporal.PlainDateLike | string): boolean {
+    const plainDate = Temporal.PlainDate.from(date);
+    return this.#businessDays.includes(plainDate.dayOfWeek);
+  }
+
+  #findHoliday(date: Temporal.PlainDateLike | string): Holiday | undefined {
+    return this.#holidays.find(
+      (holiday) => Temporal.PlainDate.compare(holiday.date, date) === 0,
+    );
+  }
+
+  #findVacation(date: Temporal.PlainDateLike | string): Vacation | undefined {
+    return this.#vacations.find(
+      (vacation) => Temporal.PlainDate.compare(vacation.date, date) === 0,
+    );
   }
 }

@@ -311,7 +311,7 @@ export async function projectTimesheet({
   }
 
   function determineCapacity(): Temporal.Duration {
-    return calendar.countBusinessHours(startInclusive, endExclusive);
+    return calendar.countWorkingHours(startInclusive, endExclusive);
   }
 
   function determineOffset(): Temporal.Duration {
@@ -323,7 +323,7 @@ export async function projectTimesheet({
     } else {
       end = today.add("P1D");
     }
-    const businessDays = calendar.countBusinessHours(startInclusive, end);
+    const businessDays = calendar.countWorkingHours(startInclusive, end);
     const offset = totalHours.subtract(businessDays);
     return normalizeDuration(offset);
   }

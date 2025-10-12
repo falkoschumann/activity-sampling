@@ -9,7 +9,7 @@ describe("Calendar", () => {
   it("should count business hours", () => {
     const calendar = Calendar.create();
 
-    const hours = calendar.countBusinessHours("2025-06-01", "2025-07-01");
+    const hours = calendar.countWorkingHours("2025-06-01", "2025-07-01");
 
     expect(hours).toEqual(Temporal.Duration.from("PT168H"));
   });
@@ -21,7 +21,7 @@ describe("Calendar", () => {
       ],
     });
 
-    const hours = calendar.countBusinessHours("2025-06-01", "2025-07-01");
+    const hours = calendar.countWorkingHours("2025-06-01", "2025-07-01");
 
     expect(hours).toEqual(Temporal.Duration.from("PT160H"));
   });
@@ -43,7 +43,7 @@ describe("Calendar", () => {
       ],
     });
 
-    const hours = calendar.countBusinessHours("2025-12-22", "2025-12-28");
+    const hours = calendar.countWorkingHours("2025-12-22", "2025-12-28");
 
     expect(hours).toEqual(Temporal.Duration.from("PT20H"));
   });
@@ -53,7 +53,7 @@ describe("Calendar", () => {
       vacations: [Vacation.create({ date: "2025-09-10" })],
     });
 
-    const hours = calendar.countBusinessHours("2025-09-08", "2025-09-14");
+    const hours = calendar.countWorkingHours("2025-09-08", "2025-09-14");
 
     expect(hours).toEqual(Temporal.Duration.from("PT32H"));
   });
@@ -85,7 +85,7 @@ describe("Calendar", () => {
       ],
     });
 
-    const hours = calendar.countBusinessHours("2025-12-22", "2025-12-28");
+    const hours = calendar.countWorkingHours("2025-12-22", "2025-12-28");
 
     expect(hours).toEqual(Temporal.Duration.from("PT0S"));
   });
