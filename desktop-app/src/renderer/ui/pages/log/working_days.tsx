@@ -1,6 +1,7 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
 import { Temporal } from "@js-temporal/polyfill";
+import { memo } from "react";
 
 import { FormatStyle, formatTime } from "../../../../shared/common/temporal";
 import type {
@@ -9,7 +10,11 @@ import type {
 } from "../../../../shared/domain/activities";
 import type { ActivityTemplate } from "../../../domain/log";
 
-export default function WorkingDaysComponent({
+const MemoizedWorkingDaysComponent = memo(WorkingDaysComponent);
+
+export default MemoizedWorkingDaysComponent;
+
+function WorkingDaysComponent({
   workingDays,
   onSelect,
 }: {

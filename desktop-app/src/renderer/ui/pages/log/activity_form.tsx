@@ -1,10 +1,14 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
-import type { FormEvent } from "react";
+import { type FormEvent, memo } from "react";
 
 import type { ActivityTemplate } from "../../../domain/log";
 
-export default function ActivityFormComponent({
+const MemoizedActivityFormComponent = memo(ActivityFormComponent);
+
+export default MemoizedActivityFormComponent;
+
+function ActivityFormComponent({
   isDisabled = false,
   client,
   project,

@@ -1,7 +1,7 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
 import { Temporal } from "@js-temporal/polyfill";
-import { useEffect, useReducer, useState } from "react";
+import { useCallback, useEffect, useReducer, useState } from "react";
 
 import {
   LogActivityCommand,
@@ -41,6 +41,44 @@ export function useLog() {
     RecentActivitiesQueryResult.empty(),
   );
 
+  const handleQueryRecentActivities = useCallback(async () => {
+    const result = await queryRecentActivities({});
+    setRecentActivities(result);
+  }, []);
+
+  const handleSubmitActivity = useCallback(async () => {
+    await logActivity(
+      LogActivityCommand.create({
+        timestamp: Temporal.Now.instant(),
+        duration: Temporal.Duration.from(state.countdown.interval),
+        client: state.form.client,
+        project: state.form.project,
+        task: state.form.task,
+        notes: state.form.notes,
+      }),
+    );
+    dispatch(activityLogged());
+    await handleQueryRecentActivities();
+  }, [
+    handleQueryRecentActivities,
+    state.countdown.interval,
+    state.form.client,
+    state.form.notes,
+    state.form.project,
+    state.form.task,
+  ]);
+
+  const handleTextChange = useCallback(
+    (name: keyof ActivityTemplate, text: string) => {
+      dispatch(changeText({ name, text }));
+    },
+    [],
+  );
+
+  const handleActivitySelected = useCallback((activity: ActivityTemplate) => {
+    dispatch(activitySelected(activity));
+  }, []);
+
   useEffect(() => {
     const activity = recentActivities.workingDays[0]?.activities[0];
     if (activity) {
@@ -50,7 +88,7 @@ export function useLog() {
 
   useEffect(() => {
     void handleQueryRecentActivities();
-  }, []);
+  }, [handleQueryRecentActivities]);
 
   useEffect(() => {
     async function handleEvent(event: NotificationClickedEvent) {
@@ -82,35 +120,7 @@ export function useLog() {
         NotificationClickedEvent.TYPE,
         handleEvent,
       );
-  }, [state.countdown.interval]);
-
-  async function handleSubmitActivity() {
-    await logActivity(
-      LogActivityCommand.create({
-        timestamp: Temporal.Now.instant(),
-        duration: Temporal.Duration.from(state.countdown.interval),
-        client: state.form.client,
-        project: state.form.project,
-        task: state.form.task,
-        notes: state.form.notes,
-      }),
-    );
-    dispatch(activityLogged());
-    await handleQueryRecentActivities();
-  }
-
-  async function handleQueryRecentActivities() {
-    const result = await queryRecentActivities({});
-    setRecentActivities(result);
-  }
-
-  function handleTextChange(name: keyof ActivityTemplate, text: string) {
-    dispatch(changeText({ name, text }));
-  }
-
-  function handleActivitySelected(activity: ActivityTemplate) {
-    dispatch(activitySelected(activity));
-  }
+  }, [handleQueryRecentActivities, state.countdown.interval]);
 
   return {
     state,

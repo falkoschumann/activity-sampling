@@ -1,12 +1,12 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
 import { useLog } from "../../../application/activities_service";
+import { useCurrentInterval } from "../../../application/timer_service";
 import ScrollToTopButton from "../../components/scroll_to_top_button";
 import ActivityFormComponent from "./activity_form";
 import CountdownComponent from "./countdown";
 import TimeSummaryComponent from "./time_summary";
 import WorkingDaysComponent from "./working_days";
-import { useCurrentInterval } from "../../../application/timer_service";
 
 export default function LogPage() {
   const {

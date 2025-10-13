@@ -236,7 +236,7 @@ export async function projectTimesheet({
   const endExclusive = Temporal.PlainDate.from(query.to).add("P1D");
   const timeZone = query.timeZone ?? clock.zone;
   const today = clock.instant().toZonedDateTimeISO(timeZone).toPlainDate();
-  const calendar = Calendar.create({ holidays, vacations });
+  const calendar = Calendar.create({ holidays, vacations, capacity: "PT40H" });
 
   let entries: TimesheetEntry[] = [];
   let totalHours = Temporal.Duration.from("PT0S");
