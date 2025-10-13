@@ -60,25 +60,34 @@ export class Vacation {
 
 export class Calendar {
   static create({
-    holidays = [],
-    vacations = [],
+    holidays,
+    vacations,
+    capacity,
+    businessDays,
   }: {
     holidays?: Holiday[];
     vacations?: Vacation[];
+    capacity?: Temporal.DurationLike | string;
+    businessDays?: number[];
   } = {}): Calendar {
-    return new Calendar(holidays, vacations);
+    return new Calendar(holidays, vacations, capacity, businessDays);
   }
-
-  // Monday to Friday
-  readonly #businessDays = [1, 2, 3, 4, 5];
 
   readonly #holidays: Holiday[];
   readonly #vacations: Vacation[];
-  readonly #hoursPerDay = Temporal.Duration.from("PT8H");
+  readonly #capacity: Temporal.Duration;
+  readonly #businessDays: number[];
 
-  private constructor(holidays: Holiday[], vacations: Vacation[]) {
-    this.#holidays = holidays;
-    this.#vacations = vacations;
+  private constructor(
+    holidays?: Holiday[],
+    vacations?: Vacation[],
+    capacity?: Temporal.DurationLike | string,
+    businessDays?: number[],
+  ) {
+    this.#holidays = holidays ?? [];
+    this.#vacations = vacations ?? [];
+    this.#capacity = Temporal.Duration.from(capacity ?? "PT40H");
+    this.#businessDays = businessDays ?? [1, 2, 3, 4, 5]; // Monday to Friday
   }
 
   countWorkingHours(
@@ -88,18 +97,23 @@ export class Calendar {
     let date = Temporal.PlainDate.from(startInclusive);
     const end = Temporal.PlainDate.from(endExclusive);
     let count = Temporal.Duration.from("PT0H");
+    const hoursPerDay = Temporal.Duration.from({
+      seconds: Math.round(
+        this.#capacity.total("seconds") / this.#businessDays.length,
+      ),
+    });
     while (Temporal.PlainDate.compare(date, end) === -1) {
       if (this.#isBusinessDay(date)) {
-        let hours = this.#hoursPerDay;
+        let hours = hoursPerDay;
 
         const holiday = this.#findHoliday(date);
         if (holiday != null) {
-          hours = hours.subtract(holiday.duration ?? this.#hoursPerDay);
+          hours = hours.subtract(holiday.duration ?? hoursPerDay);
         }
 
         const vacation = this.#findVacation(date);
         if (vacation != null) {
-          hours = hours.subtract(vacation.duration ?? this.#hoursPerDay);
+          hours = hours.subtract(vacation.duration ?? hoursPerDay);
         }
 
         count = count.add(hours);
