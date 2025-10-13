@@ -78,7 +78,6 @@ const schema = {
   properties: {
     dataDir: { type: "string" },
   },
-  additionalProperties: false,
 };
 
 export class SettingsDto {
