@@ -25,7 +25,22 @@ export const config: SheriffConfig = {
       "component:<component>",
       "layer:infrastructure",
     ],
-    "src/<component>/ui": ["component:<component>", "layer:ui"],
+    "src/<component>/ui": ["component:<component>", "layer:ui", "ui:entry"],
+    "src/<component>/ui/components": [
+      "component:<component>",
+      "layer:ui",
+      "ui:components",
+    ],
+    "src/<component>/ui/layouts": [
+      "component:<component>",
+      "layer:ui",
+      "ui:layouts",
+    ],
+    "src/<component>/ui/pages": [
+      "component:<component>",
+      "layer:ui",
+      "ui:pages",
+    ],
   },
   depRules: {
     "component:*": [sameTag, "component:shared"],
@@ -34,5 +49,8 @@ export const config: SheriffConfig = {
     "layer:application": ["layer:domain", "layer:infrastructure"],
     "layer:infrastructure": ["layer:domain"],
     "layer:*": [sameTag, "layer:common"],
+    "ui:entry": ["ui:*", "layer:application"],
+    "ui:pages": ["ui:layouts", "layer:application"],
+    "ui:*": [sameTag, "ui:components", "component:shared", "layer:domain"],
   },
 };
