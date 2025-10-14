@@ -5,10 +5,6 @@ import { startActivitySampling } from "./activity_sampling";
 
 describe("Activity Sampling", () => {
   describe("Start Timer", () => {
-    describe("Start the timer with the default interval when the application starts", () => {
-      it.todo("should start timer at application start");
-    });
-
     describe("Start the timer with a given interval", () => {
       it("should start timer", async () => {
         const { log } = await startActivitySampling();

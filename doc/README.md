@@ -9,42 +9,53 @@ analysis.
 
 ### Start Timer
 
-- Start the timer with the default interval when the application starts
-- Start the timer with a given interval
+- [ ] Start the timer with the default interval when the application starts
+- [x] Start the timer with a given interval
 
 ### Stop Timer
 
-- Stop the timer
+- [x] Stop the timer
 
 ### Current Interval
 
-- Notify the user when an interval is elapsed
+- [x] Notify the user when an interval is elapsed
 
 ### Log Activity
 
-- Log the activity with a client, a project, a task and optional notes
+- [x] Log the activity with a client, a project, a task and optional notes
+- [ ] Log optional
 
 ### Recent Activities
 
-- Group activities by working days for the last 30 days
-- Summarize hours worked today, yesterday, this week and this month
+- [x] Group activities by working days for the last 30 days
+- [x] Summarize hours worked today, yesterday, this week and this month
 
 ### Reports
 
-- Summarize hours worked for clients
-- Summarize hours worked on projects
-- Summarize hours worked on tasks
-- Summarize the total hours worked
-- Summarize in a period
+- [x] Summarize hours worked for clients
+- [x] Summarize hours worked on projects
+- [x] Summarize hours worked on tasks
+- [x] Summarize the total hours worked
+- [x] Summarize in a period
+- [ ] Determine lead time for clients
+- [ ] Determine lead time for projects
+- [ ] Determine lead time for tasks
+- [ ] Determine throughput in a period
+
+### Statistics
+
+- [ ] Create histogram for hours worked on tasks
+- [ ] Create histogram for lead times
+- [ ] Create histogram for throughput
 
 ### Timesheet
 
-- Summarize hours worked on tasks
-- Summarize the total hours worked
-- Summarize in a period
-- Compare with capacity
-- Take holidays into account
-- Take vacation into account
+- [x] Summarize hours worked on tasks
+- [x] Summarize the total hours worked
+- [x] Summarize in a period
+- [x] Compare with capacity
+- [x] Take holidays into account
+- [x] Take vacation into account
 
 ## Architecture
 
