@@ -35,6 +35,7 @@ export class ActivitiesService {
     );
   }
 
+  #settings: Settings;
   readonly #eventStore: EventStore;
   readonly #holidayRepository: HolidayRepository;
   readonly #vacationRepository: VacationRepository;
@@ -47,6 +48,7 @@ export class ActivitiesService {
     vacationRepository: VacationRepository,
     clock = Clock.systemDefaultZone(),
   ) {
+    this.#settings = settings;
     this.#eventStore = eventStore;
     this.#holidayRepository = holidayRepository;
     this.#vacationRepository = vacationRepository;
@@ -56,6 +58,7 @@ export class ActivitiesService {
   }
 
   applySettings(settings: Settings) {
+    this.#settings = settings;
     this.#eventStore.fileName = `${settings.dataDir}/activity-log.csv`;
     this.#holidayRepository.fileName = `${settings.dataDir}/holidays.csv`;
     this.#vacationRepository.fileName = `${settings.dataDir}/vacation.csv`;
@@ -98,6 +101,7 @@ export class ActivitiesService {
       query,
       holidays,
       vacations,
+      capacity: this.#settings.capacity,
       clock: this.#clock,
     });
   }

@@ -77,12 +77,19 @@ const schema = {
   type: "object",
   properties: {
     dataDir: { type: "string" },
+    capacity: { type: "string", format: "duration" },
   },
 };
 
 export class SettingsDto {
-  static create({ dataDir }: { dataDir: string }): SettingsDto {
-    return new SettingsDto(dataDir);
+  static create({
+    dataDir,
+    capacity,
+  }: {
+    dataDir: string;
+    capacity: string;
+  }): SettingsDto {
+    return new SettingsDto(dataDir, capacity);
   }
 
   static fromJson(json: unknown): SettingsDto {
@@ -98,9 +105,11 @@ export class SettingsDto {
   }
 
   readonly dataDir: string;
+  readonly capacity: string;
 
-  private constructor(dataDir: string) {
+  private constructor(dataDir: string, capacity: string) {
     this.dataDir = dataDir;
+    this.capacity = capacity;
   }
 
   validate(): Settings {

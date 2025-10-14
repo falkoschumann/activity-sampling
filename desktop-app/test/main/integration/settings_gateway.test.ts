@@ -9,15 +9,21 @@ import {
   SettingsDto,
   SettingsGateway,
 } from "../../../src/main/infrastructure/settings_gateway";
+import { Temporal } from "@js-temporal/polyfill";
 
 const NON_EXISTING_FILE = path.resolve(
   import.meta.dirname,
   "../data/settings/non-existing.json",
 );
 
-const EXAMPLE_FILE = path.resolve(
+const FULL_FILE = path.resolve(
   import.meta.dirname,
-  "../data/settings/example.json",
+  "../data/settings/full.json",
+);
+
+const MINIMAL_FILE = path.resolve(
+  import.meta.dirname,
+  "../data/settings/minimal.json",
 );
 
 const TEST_FILE = path.resolve(
@@ -35,13 +41,29 @@ describe("Settings gateway", () => {
       expect(settings).toBeUndefined();
     });
 
-    it("should return example file", async () => {
-      const gateway = SettingsGateway.create({ fileName: EXAMPLE_FILE });
+    it("should return full example file", async () => {
+      const gateway = SettingsGateway.create({ fileName: FULL_FILE });
 
       const settings = await gateway.load();
 
       expect(settings).toEqual<Settings>(
-        Settings.create({ dataDir: "other-data" }),
+        Settings.create({
+          dataDir: "other-data",
+          capacity: Temporal.Duration.from("PT20H"),
+        }),
+      );
+    });
+
+    it("should return full minimal file", async () => {
+      const gateway = SettingsGateway.create({ fileName: MINIMAL_FILE });
+
+      const settings = await gateway.load();
+
+      expect(settings).toEqual<Settings>(
+        Settings.create({
+          dataDir: "other-data",
+          capacity: Temporal.Duration.from("PT40H"),
+        }),
       );
     });
   });
@@ -51,6 +73,7 @@ describe("Settings gateway", () => {
       const gateway = SettingsGateway.create({ fileName: TEST_FILE });
       const example = Settings.create({
         dataDir: "test-data-dir",
+        capacity: Temporal.Duration.from("PT35H"),
       });
 
       await gateway.store(example);
@@ -74,13 +97,15 @@ describe("Settings gateway", () => {
 
       it("should return configurable responses", async () => {
         const gateway = SettingsGateway.createNull({
-          readFileResponses: [SettingsDto.create({ dataDir: "data-dir" })],
+          readFileResponses: [
+            SettingsDto.create({ dataDir: "data-dir", capacity: "PT40H" }),
+          ],
         });
 
         const settings = await gateway.load();
 
         expect(settings).toEqual<Settings>(
-          Settings.create({ dataDir: "data-dir" }),
+          Settings.create({ dataDir: "data-dir", capacity: "PT40H" }),
         );
       });
 
@@ -100,10 +125,12 @@ describe("Settings gateway", () => {
         const gateway = SettingsGateway.createNull();
         const storedSettings = gateway.trackStored();
 
-        await gateway.store(Settings.create({ dataDir: "data-dir" }));
+        await gateway.store(
+          Settings.create({ dataDir: "data-dir", capacity: "PT40H" }),
+        );
 
         expect(storedSettings.data).toEqual<Settings[]>([
-          Settings.create({ dataDir: "data-dir" }),
+          Settings.create({ dataDir: "data-dir", capacity: "PT40H" }),
         ]);
       });
     });
