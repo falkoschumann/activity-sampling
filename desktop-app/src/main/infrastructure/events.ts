@@ -73,6 +73,7 @@ export class ActivityLoggedEventDto {
     }
 
     const errors = JSON.stringify(ajv.errors, null, 2);
+    console.error(`Invalid activity logged event data:\n${errors}`, json);
     throw new TypeError(`Invalid activity logged event data:\n${errors}`);
   }
 
