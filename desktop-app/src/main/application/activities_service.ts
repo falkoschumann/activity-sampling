@@ -9,12 +9,15 @@ import {
   type RecentActivitiesQueryResult,
   type ReportQuery,
   type ReportQueryResult,
+  StatisticsQuery,
+  StatisticsQueryResult,
   type TimesheetQuery,
   type TimesheetQueryResult,
 } from "../../shared/domain/activities";
 import {
   projectRecentActivities,
   projectReport,
+  projectStatistics,
   projectTimesheet,
 } from "../domain/activities";
 import { Settings } from "../domain/settings";
@@ -78,12 +81,19 @@ export class ActivitiesService {
     query: RecentActivitiesQuery,
   ): Promise<RecentActivitiesQueryResult> {
     const replay = replayTyped(this.#eventStore.replay());
-    return await projectRecentActivities(replay, query, this.#clock);
+    return await projectRecentActivities({ replay, query, clock: this.#clock });
   }
 
   async queryReport(query: ReportQuery): Promise<ReportQueryResult> {
     const replay = replayTyped(this.#eventStore.replay());
-    return projectReport(replay, query, this.#clock);
+    return projectReport({ replay, query, clock: this.#clock });
+  }
+
+  async queryStatistics(
+    query: StatisticsQuery,
+  ): Promise<StatisticsQueryResult> {
+    const replay = replayTyped(this.#eventStore.replay());
+    return await projectStatistics({ replay, query });
   }
 
   async queryTimesheet(query: TimesheetQuery): Promise<TimesheetQueryResult> {

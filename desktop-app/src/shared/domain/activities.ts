@@ -369,6 +369,47 @@ export class ReportEntry {
   }
 }
 
+export const Statistics = Object.freeze({
+  TASK_DURATION_HISTOGRAM: "TaskDurationHistogram",
+});
+
+export type StatisticsType = (typeof Statistics)[keyof typeof Statistics];
+
+export class StatisticsQuery {
+  static create({ type }: { type: StatisticsType }): StatisticsQuery {
+    return new StatisticsQuery(type);
+  }
+
+  readonly type: StatisticsType;
+
+  constructor(type: StatisticsType) {
+    this.type = type;
+  }
+}
+
+export class StatisticsQueryResult {
+  static create({
+    histogram,
+  }: {
+    histogram?: Histogram;
+  }): StatisticsQueryResult {
+    return new StatisticsQueryResult(histogram);
+  }
+
+  readonly histogram?: Histogram;
+
+  constructor(histogram?: Histogram) {
+    this.histogram = histogram;
+  }
+}
+
+export interface Histogram {
+  binEdges: string[];
+  frequencies: number[];
+  xAxisLabel: string;
+  yAxisLabel: string;
+}
+
 export class TimesheetQuery {
   static create({
     from,

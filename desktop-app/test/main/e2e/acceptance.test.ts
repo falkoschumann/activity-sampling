@@ -288,6 +288,39 @@ describe("Activity Sampling", () => {
     });
   });
 
+  describe("Statistics", () => {
+    describe("Create histogram for hours worked on tasks", () => {
+      it("should return frequency per task duration", async () => {
+        const { statistics } = await startActivitySampling();
+
+        await statistics.activityLogged({
+          timestamp: "2025-10-13T11:00:00Z",
+          task: "Task A",
+          duration: "P3D",
+        });
+        await statistics.activityLogged({
+          timestamp: "2025-10-14T13:00:00Z",
+          task: "Task B",
+          duration: "P5D",
+        });
+        await statistics.activityLogged({
+          timestamp: "2025-10-15T13:00:00Z",
+          task: "Task C",
+          duration: "P5D",
+        });
+
+        await statistics.queryStatistics();
+
+        statistics.assertStatistics({
+          histogram: {
+            binEdges: ["0", "1", "2", "3", "5"],
+            frequencies: [0, 0, 1, 2],
+          },
+        });
+      });
+    });
+  });
+
   describe("Timesheet", () => {
     describe("Summarize hours worked on tasks", () => {
       it("should return summary", async () => {

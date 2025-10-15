@@ -11,6 +11,8 @@ import {
   LogActivityCommand,
   ReportEntry,
   Scope,
+  Statistics,
+  StatisticsQueryResult,
   TimesheetEntry,
 } from "../../../src/shared/domain/activities";
 import { Settings } from "../../../src/main/domain/settings";
@@ -137,6 +139,43 @@ describe("Activities service", () => {
           }),
         ],
         totalHours: Temporal.Duration.from("PT15H"),
+      });
+    });
+  });
+
+  describe("Query statistics", () => {
+    it("should return histogram for tasks per duration", async () => {
+      const { service } = configure({
+        events: [
+          ActivityLoggedEventDto.createTestInstance({
+            timestamp: "2025-10-13T11:00:00Z",
+            task: "Task A",
+            duration: "P3D",
+          }),
+          ActivityLoggedEventDto.createTestInstance({
+            timestamp: "2025-10-14T13:00:00Z",
+            task: "Task B",
+            duration: "P5D",
+          }),
+          ActivityLoggedEventDto.createTestInstance({
+            timestamp: "2025-10-15T13:00:00Z",
+            task: "Task C",
+            duration: "P5D",
+          }),
+        ],
+      });
+
+      const result = await service.queryStatistics({
+        type: Statistics.TASK_DURATION_HISTOGRAM,
+      });
+
+      expect(result).toEqual<StatisticsQueryResult>({
+        histogram: {
+          binEdges: ["0", "1", "2", "3", "5"],
+          frequencies: [0, 0, 1, 2],
+          xAxisLabel: "Duration (days)",
+          yAxisLabel: "Number of Tasks",
+        },
       });
     });
   });

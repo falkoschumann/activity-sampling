@@ -16,6 +16,10 @@ import {
   type RecentActivitiesQueryResult,
   ReportQuery,
   ReportQueryResult,
+  Statistics,
+  StatisticsQuery,
+  StatisticsQueryResult,
+  type StatisticsType,
   TimesheetQuery,
   TimesheetQueryResult,
 } from "../../../src/shared/domain/activities";
@@ -53,14 +57,16 @@ export async function startActivitySampling({
   const timerDriver = new TimerDriver(clock);
   const log = new LogDsl(activitiesDriver, timerDriver);
   const reports = new ReportsDsl(activitiesDriver);
+  const statistics = new StatisticsDsl(activitiesDriver);
   const timesheet = new TimesheetDsl(activitiesDriver);
 
-  return { log, reports, timesheet };
+  return { log, reports, statistics, timesheet };
 }
 
 export interface Ui {
   log: LogDsl;
   reports: ReportsDsl;
+  statistics: StatisticsDsl;
   timesheet: TimesheetDsl;
 }
 
@@ -317,6 +323,57 @@ class ReportsDsl {
   }
 }
 
+class StatisticsDsl {
+  #activitiesDriver: ActivitiesDriver;
+
+  constructor(activitiesDriver: ActivitiesDriver) {
+    this.#activitiesDriver = activitiesDriver;
+  }
+
+  //
+  // Queries
+  //
+
+  async queryStatistics(args: { type?: StatisticsType } = {}) {
+    const query = {
+      type: args.type ?? Statistics.TASK_DURATION_HISTOGRAM,
+    };
+    await this.#activitiesDriver.queryStatistics(query);
+  }
+
+  assertStatistics(args: {
+    histogram: {
+      binEdges: string[];
+      frequencies: number[];
+    };
+  }) {
+    this.#activitiesDriver.assertStatistics({
+      histogram: {
+        binEdges: args.histogram.binEdges,
+        frequencies: args.histogram.frequencies,
+        xAxisLabel: "Duration (days)",
+        yAxisLabel: "Number of Tasks",
+      },
+    });
+  }
+
+  //
+  // Events
+  //
+
+  async activityLogged(args: {
+    timestamp?: string;
+    duration?: string;
+    client?: string;
+    project?: string;
+    task?: string;
+    notes?: string;
+  }) {
+    const event = parseActivityLogged(args);
+    await this.#activitiesDriver.record(event);
+  }
+}
+
 class TimesheetDsl {
   readonly #activitiesDriver: ActivitiesDriver;
 
@@ -447,6 +504,7 @@ class ActivitiesDriver {
 
   #recentActivitiesQueryResult?: RecentActivitiesQueryResult;
   #reportQueryResult?: ReportQueryResult;
+  #statisticsQueryResult?: StatisticsQueryResult;
   #timesheetQueryResult?: TimesheetQueryResult;
 
   constructor(settings: Settings, clock: Clock) {
@@ -503,6 +561,15 @@ class ActivitiesDriver {
     if (result.totalHours) {
       expect(this.#reportQueryResult?.totalHours).toEqual(result.totalHours);
     }
+  }
+
+  async queryStatistics(query: StatisticsQuery) {
+    this.#statisticsQueryResult =
+      await this.#activitiesService.queryStatistics(query);
+  }
+
+  assertStatistics(result: StatisticsQueryResult) {
+    expect(this.#statisticsQueryResult).toEqual(result);
   }
 
   async queryTimesheet(query: TimesheetQuery) {

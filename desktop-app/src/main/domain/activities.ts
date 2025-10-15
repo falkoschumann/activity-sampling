@@ -12,6 +12,9 @@ import {
   ReportQuery,
   ReportQueryResult,
   Scope,
+  Statistics,
+  StatisticsQuery,
+  StatisticsQueryResult,
   type TimesheetEntry,
   TimesheetQuery,
   TimesheetQueryResult,
@@ -19,11 +22,15 @@ import {
 } from "../../shared/domain/activities";
 import { Calendar, type Holiday, Vacation } from "./calendar";
 
-export async function projectRecentActivities(
-  replay: AsyncGenerator<ActivityLoggedEvent>,
-  query: RecentActivitiesQuery,
+export async function projectRecentActivities({
+  replay,
+  query,
   clock = Clock.systemDefaultZone(),
-): Promise<RecentActivitiesQueryResult> {
+}: {
+  replay: AsyncGenerator<ActivityLoggedEvent>;
+  query: RecentActivitiesQuery;
+  clock?: Clock;
+}): Promise<RecentActivitiesQueryResult> {
   const timeZone = query.timeZone ?? clock.zone;
   const today = clock.instant().toZonedDateTimeISO(timeZone).toPlainDate();
   const yesterday = today.subtract({ days: 1 });
@@ -126,11 +133,15 @@ export async function projectRecentActivities(
   }
 }
 
-export async function projectReport(
-  replay: AsyncGenerator<ActivityLoggedEvent>,
-  query: ReportQuery,
+export async function projectReport({
+  replay,
+  query,
   clock = Clock.systemDefaultZone(),
-): Promise<ReportQueryResult> {
+}: {
+  replay: AsyncGenerator<ActivityLoggedEvent>;
+  query: ReportQuery;
+  clock?: Clock;
+}): Promise<ReportQueryResult> {
   const startInclusive = query.from;
   const endExclusive = query.to ? query.to.add("P1D") : undefined;
   const scope = query.scope;
@@ -217,6 +228,70 @@ export async function projectReport(
     const duration = Temporal.Duration.from(activity.duration);
     totalHours = normalizeDuration(totalHours.add(duration));
   }
+}
+
+export async function projectStatistics({
+  replay,
+  query,
+}: {
+  replay: AsyncGenerator<ActivityLoggedEvent>;
+  query: StatisticsQuery;
+}): Promise<StatisticsQueryResult> {
+  const tasks: Record<string, Temporal.Duration> = {};
+  for await (const event of replay) {
+    const duration = Temporal.Duration.from(event.duration);
+    if (tasks[event.task]) {
+      tasks[event.task] = tasks[event.task].add(duration);
+    } else {
+      tasks[event.task] = duration;
+    }
+  }
+
+  if (query.type === Statistics.TASK_DURATION_HISTOGRAM) {
+    const binEdges = [0, 1, 2, 3, 5, 8, 13, 21];
+    const frequencies = [0, 0, 0, 0, 0, 0, 0];
+    for (const duration of Object.values(tasks)) {
+      const days = Math.ceil(duration.total({ unit: "days" }));
+      for (let i = 0; i < binEdges.length - 1; i++) {
+        if (binEdges[i] < days && days <= binEdges[i + 1]) {
+          frequencies[i]++;
+          break;
+        }
+      }
+    }
+
+    let index = -1;
+    for (let i = 0; i < frequencies.length; i++) {
+      if (frequencies[i] > 0) {
+        index = i;
+      }
+    }
+    if (index === -1) {
+      binEdges.splice(0);
+      frequencies.splice(0);
+    } else {
+      binEdges.splice(index + 2);
+      frequencies.splice(index + 1);
+    }
+
+    return {
+      histogram: {
+        binEdges: binEdges.map((edge) => String(edge)),
+        frequencies,
+        xAxisLabel: "Duration (days)",
+        yAxisLabel: "Number of Tasks",
+      },
+    };
+  }
+
+  return {
+    histogram: {
+      binEdges: [],
+      frequencies: [],
+      xAxisLabel: "",
+      yAxisLabel: "",
+    },
+  };
 }
 
 export async function projectTimesheet({

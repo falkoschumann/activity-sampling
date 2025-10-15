@@ -10,12 +10,15 @@ import {
   RecentActivitiesQueryResult,
   ReportEntry,
   Scope,
+  Statistics,
+  StatisticsQueryResult,
   TimesheetEntry,
   TimesheetQuery,
 } from "../../../src/shared/domain/activities";
 import {
   projectRecentActivities,
   projectReport,
+  projectStatistics,
   projectTimesheet,
 } from "../../../src/main/domain/activities";
 import { Holiday, Vacation } from "../../../src/main/domain/calendar";
@@ -23,15 +26,15 @@ import { Holiday, Vacation } from "../../../src/main/domain/calendar";
 describe("Activities", () => {
   describe("Project recent activities", () => {
     it("should return an empty result when no activity is logged", async () => {
-      const events = createAsyncGenerator([]);
+      const replay = createAsyncGenerator([]);
 
-      const result = await projectRecentActivities(events, {});
+      const result = await projectRecentActivities({ replay, query: {} });
 
       expect(result).toEqual(RecentActivitiesQueryResult.empty());
     });
 
     it("should return activities grouped by working day for the last 30 days", async () => {
-      const events = createAsyncGenerator(
+      const replay = createAsyncGenerator(
         mapTimestamps([
           "2025-05-05T14:00:00Z", // is not included
           "2025-05-06T14:00:00Z",
@@ -41,11 +44,11 @@ describe("Activities", () => {
         ]),
       );
 
-      const result = await projectRecentActivities(
-        events,
-        {},
-        Clock.fixed("2025-06-05T10:00:00Z", "Europe/Berlin"),
-      );
+      const result = await projectRecentActivities({
+        replay,
+        query: {},
+        clock: Clock.fixed("2025-06-05T10:00:00Z", "Europe/Berlin"),
+      });
 
       expect(result.workingDays).toEqual([
         {
@@ -79,7 +82,7 @@ describe("Activities", () => {
     });
 
     it("should summarize hours worked today, yesterday, this week and this month", async () => {
-      const events = createAsyncGenerator(
+      const replay = createAsyncGenerator(
         mapTimestamps([
           // the end of last month
           "2025-05-31T14:00:00Z", // is not included
@@ -107,11 +110,11 @@ describe("Activities", () => {
         ]),
       );
 
-      const result = await projectRecentActivities(
-        events,
-        {},
-        Clock.fixed("2025-06-05T10:00:00Z", "Europe/Berlin"),
-      );
+      const result = await projectRecentActivities({
+        replay,
+        query: {},
+        clock: Clock.fixed("2025-06-05T10:00:00Z", "Europe/Berlin"),
+      });
 
       expect(result.timeSummary).toEqual({
         hoursToday: Temporal.Duration.from("PT1H"),
@@ -124,9 +127,12 @@ describe("Activities", () => {
 
   describe("Project report", () => {
     it("should return an empty result when no activity is logged", async () => {
-      const events = createAsyncGenerator([]);
+      const replay = createAsyncGenerator([]);
 
-      const result = await projectReport(events, { scope: Scope.TASKS });
+      const result = await projectReport({
+        replay,
+        query: { scope: Scope.TASKS },
+      });
 
       expect(result).toEqual({
         entries: [],
@@ -135,7 +141,7 @@ describe("Activities", () => {
     });
 
     it("should summarize hours worked on clients", async () => {
-      const events = createAsyncGenerator([
+      const replay = createAsyncGenerator([
         ActivityLoggedEvent.createTestInstance({
           timestamp: "2025-06-25T15:00:00Z",
           client: "Client 2",
@@ -153,7 +159,10 @@ describe("Activities", () => {
         }),
       ]);
 
-      const result = await projectReport(events, { scope: Scope.CLIENTS });
+      const result = await projectReport({
+        replay,
+        query: { scope: Scope.CLIENTS },
+      });
 
       expect(result).toEqual({
         entries: [
@@ -171,7 +180,7 @@ describe("Activities", () => {
     });
 
     it("should summarize hours worked on projects", async () => {
-      const events = createAsyncGenerator([
+      const replay = createAsyncGenerator([
         ActivityLoggedEvent.createTestInstance({
           timestamp: "2025-06-02T15:00:00Z",
           client: "Client 2",
@@ -204,7 +213,10 @@ describe("Activities", () => {
         }),
       ]);
 
-      const result = await projectReport(events, { scope: Scope.PROJECTS });
+      const result = await projectReport({
+        replay,
+        query: { scope: Scope.PROJECTS },
+      });
 
       expect(result).toEqual({
         entries: [
@@ -224,7 +236,7 @@ describe("Activities", () => {
     });
 
     it("should summarize hours worked on projects and combines projects with multiple clients", async () => {
-      const events = createAsyncGenerator([
+      const replay = createAsyncGenerator([
         ActivityLoggedEvent.createTestInstance({
           timestamp: "2025-06-02T15:00:00Z",
           client: "Client 2",
@@ -239,7 +251,10 @@ describe("Activities", () => {
         }),
       ]);
 
-      const result = await projectReport(events, { scope: Scope.PROJECTS });
+      const result = await projectReport({
+        replay,
+        query: { scope: Scope.PROJECTS },
+      });
 
       expect(result).toEqual({
         entries: [
@@ -254,7 +269,7 @@ describe("Activities", () => {
     });
 
     it("should summarize hours worked on tasks", async () => {
-      const events = createAsyncGenerator([
+      const replay = createAsyncGenerator([
         ActivityLoggedEvent.createTestInstance({
           timestamp: "2025-06-25T15:00:00Z",
           task: "Task 2",
@@ -272,7 +287,10 @@ describe("Activities", () => {
         }),
       ]);
 
-      const result = await projectReport(events, { scope: Scope.TASKS });
+      const result = await projectReport({
+        replay,
+        query: { scope: Scope.TASKS },
+      });
 
       expect(result).toEqual({
         entries: [
@@ -290,7 +308,7 @@ describe("Activities", () => {
     });
 
     it("Summarize hours worked in a custom period", async () => {
-      const events = createAsyncGenerator(
+      const replay = createAsyncGenerator(
         mapTimestamps([
           "2025-09-14T15:00:00Z", // before
           "2025-09-15T15:00:00Z", // start
@@ -300,13 +318,70 @@ describe("Activities", () => {
         ]),
       );
 
-      const result = await projectReport(events, {
-        scope: Scope.TASKS,
-        from: Temporal.PlainDate.from("2025-09-15"),
-        to: Temporal.PlainDate.from("2025-09-21"),
+      const result = await projectReport({
+        replay,
+        query: {
+          scope: Scope.TASKS,
+          from: Temporal.PlainDate.from("2025-09-15"),
+          to: Temporal.PlainDate.from("2025-09-21"),
+        },
       });
 
       expect(result.totalHours).toEqual(Temporal.Duration.from("PT1H30M"));
+    });
+  });
+
+  describe("Project statistics", () => {
+    it("should return empty histogram when no activities are logged", async () => {
+      const replay = createAsyncGenerator([]);
+
+      const result = await projectStatistics({
+        replay,
+        query: { type: Statistics.TASK_DURATION_HISTOGRAM },
+      });
+
+      expect(result).toEqual<StatisticsQueryResult>({
+        histogram: {
+          binEdges: [],
+          frequencies: [],
+          xAxisLabel: "Duration (days)",
+          yAxisLabel: "Number of Tasks",
+        },
+      });
+    });
+
+    it("should determine frequencies per bin", async () => {
+      const replay = createAsyncGenerator([
+        ActivityLoggedEvent.createTestInstance({
+          timestamp: "2025-10-13T11:00:00Z",
+          task: "Task A",
+          duration: "P3D",
+        }),
+        ActivityLoggedEvent.createTestInstance({
+          timestamp: "2025-10-14T13:00:00Z",
+          task: "Task B",
+          duration: "P5D",
+        }),
+        ActivityLoggedEvent.createTestInstance({
+          timestamp: "2025-10-15T13:00:00Z",
+          task: "Task C",
+          duration: "P5D",
+        }),
+      ]);
+
+      const result = await projectStatistics({
+        replay,
+        query: { type: Statistics.TASK_DURATION_HISTOGRAM },
+      });
+
+      expect(result).toEqual<StatisticsQueryResult>({
+        histogram: {
+          binEdges: ["0", "1", "2", "3", "5"],
+          frequencies: [0, 0, 1, 2],
+          xAxisLabel: "Duration (days)",
+          yAxisLabel: "Number of Tasks",
+        },
+      });
     });
   });
 
