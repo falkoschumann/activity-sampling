@@ -248,12 +248,14 @@ export async function projectStatistics({
   }
 
   if (query.type === Statistics.TASK_DURATION_HISTOGRAM) {
-    const binEdges = [0, 1, 2, 3, 5, 8, 13, 21];
-    const frequencies = [0, 0, 0, 0, 0, 0, 0];
-    for (const duration of Object.values(tasks)) {
-      const days = Math.ceil(duration.total({ unit: "days" }));
+    const days = Object.values(tasks).map((duration) =>
+      Math.ceil(duration.total("days")),
+    );
+    const binEdges: number[] = [0, 1, 2, 3, 5, 8, 13, 21];
+    const frequencies: number[] = [0, 0, 0, 0, 0, 0];
+    for (const day of days) {
       for (let i = 0; i < binEdges.length - 1; i++) {
-        if (binEdges[i] < days && days <= binEdges[i + 1]) {
+        if (binEdges[i] < day && day <= binEdges[i + 1]) {
           frequencies[i]++;
           break;
         }
