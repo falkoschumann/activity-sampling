@@ -61,18 +61,21 @@ class OffsetClock extends Clock {
 
 export function normalizeDuration(
   duration: Temporal.Duration | Temporal.DurationLike | string,
-  smallestUnit:
-    | "hours"
-    | "minutes"
-    | "seconds"
-    | "milliseconds"
-    | "nanoseconds" = "nanoseconds",
+  smallestUnit: DurationType = "milliseconds",
+  largestUnit: DurationType = "hours",
 ): Temporal.Duration {
   return Temporal.Duration.from(duration).round({
-    largestUnit: "hours",
     smallestUnit,
+    largestUnit,
   });
 }
+
+export type DurationType =
+  | "days"
+  | "hours"
+  | "minutes"
+  | "seconds"
+  | "milliseconds";
 
 export const FormatStyle = Object.freeze({
   // Example: Samstag, 28. Juni 2025

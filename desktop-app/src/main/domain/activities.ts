@@ -1,5 +1,7 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
+import fs from "fs/promises";
+
 import { Temporal } from "@js-temporal/polyfill";
 
 import { Clock, normalizeDuration } from "../../shared/common/temporal";
@@ -12,8 +14,6 @@ import {
   ReportQuery,
   ReportQueryResult,
   Scope,
-  Statistics,
-  StatisticsQuery,
   StatisticsQueryResult,
   type TimesheetEntry,
   TimesheetQuery,
@@ -232,66 +232,65 @@ export async function projectReport({
 
 export async function projectStatistics({
   replay,
-  query,
 }: {
   replay: AsyncGenerator<ActivityLoggedEvent>;
-  query: StatisticsQuery;
 }): Promise<StatisticsQueryResult> {
   const tasks: Record<string, Temporal.Duration> = {};
   for await (const event of replay) {
     const duration = Temporal.Duration.from(event.duration);
     if (tasks[event.task]) {
-      tasks[event.task] = tasks[event.task].add(duration);
+      tasks[event.task] = normalizeDuration(tasks[event.task].add(duration));
     } else {
-      tasks[event.task] = duration;
+      tasks[event.task] = normalizeDuration(duration);
     }
   }
 
-  if (query.type === Statistics.TASK_DURATION_HISTOGRAM) {
-    const days = Object.values(tasks).map((duration) =>
-      Math.ceil(duration.total("days")),
-    );
-    const binEdges: number[] = [0, 1, 2, 3, 5, 8, 13, 21];
-    const frequencies: number[] = [0, 0, 0, 0, 0, 0];
-    for (const day of days) {
-      for (let i = 0; i < binEdges.length - 1; i++) {
-        if (binEdges[i] < day && day <= binEdges[i + 1]) {
-          frequencies[i]++;
-          break;
-        }
-      }
-    }
+  const sortedTasks = Object.entries(tasks).sort((a, b) =>
+    Temporal.Duration.compare(b[1], a[1]),
+  );
+  await fs.writeFile("data/tasks.json", JSON.stringify(sortedTasks));
 
-    let index = -1;
-    for (let i = 0; i < frequencies.length; i++) {
-      if (frequencies[i] > 0) {
-        index = i;
-      }
-    }
-    if (index === -1) {
-      binEdges.splice(0);
-      frequencies.splice(0);
+  const days = Object.values(tasks)
+    .map((duration) => duration.total("hours"))
+    .map((hours) => hours / 8)
+    .sort((a, b) => a - b);
+
+  const maxDay = days[days.length - 1];
+  const binEdges: number[] = [];
+  const frequencies: number[] = [];
+  let i = 0;
+  while (i < Math.ceil(maxDay)) {
+    if (i === 0) {
+      binEdges.push(0);
+      frequencies.push(0);
+      binEdges.push(0.5);
+      frequencies.push(0);
+      binEdges.push(1);
+      frequencies.push(0);
+      binEdges.push(2);
+      i = 2;
     } else {
-      binEdges.splice(index + 2);
-      frequencies.splice(index + 1);
+      i = binEdges.at(-2)! + binEdges.at(-1)!;
+      frequencies.push(0);
+      binEdges.push(i);
     }
+  }
 
-    return {
-      histogram: {
-        binEdges: binEdges.map((edge) => String(edge)),
-        frequencies,
-        xAxisLabel: "Duration (days)",
-        yAxisLabel: "Number of Tasks",
-      },
-    };
+  for (const day of days) {
+    for (let i = 0; i < binEdges.length - 1; i++) {
+      if (binEdges[i] < day && day <= binEdges[i + 1]) {
+        frequencies[i]++;
+        break;
+      }
+    }
   }
 
   return {
     histogram: {
-      binEdges: [],
-      frequencies: [],
-      xAxisLabel: "",
-      yAxisLabel: "",
+      binEdges: binEdges.map((edge) => String(edge)),
+      frequencies,
+      xAxisLabel: "Duration (days)",
+      yAxisLabel: "Number of Tasks",
     },
   };
 }

@@ -296,28 +296,32 @@ describe("Activity Sampling", () => {
         await statistics.activityLogged({
           timestamp: "2025-10-13T11:00:00Z",
           task: "Task A",
-          duration: "P3D",
+          duration: "PT24H",
         });
         await statistics.activityLogged({
           timestamp: "2025-10-14T13:00:00Z",
           task: "Task B",
-          duration: "P5D",
+          duration: "PT40H",
         });
         await statistics.activityLogged({
           timestamp: "2025-10-15T13:00:00Z",
           task: "Task C",
-          duration: "P5D",
+          duration: "PT40H",
         });
 
         await statistics.queryStatistics();
 
         statistics.assertStatistics({
           histogram: {
-            binEdges: ["0", "1", "2", "3", "5"],
-            frequencies: [0, 0, 1, 2],
+            binEdges: ["0", "0.5", "1", "2", "3", "5"],
+            frequencies: [0, 0, 0, 1, 2],
           },
         });
       });
+    });
+
+    describe("Determine median for hours worked on tasks", () => {
+      it.todo("should return median task duration");
     });
   });
 

@@ -22,6 +22,8 @@ import {
   RecentActivitiesQueryResultDto,
   ReportQueryDto,
   ReportQueryResultDto,
+  StatisticsQueryDto,
+  StatisticsQueryResultDto,
   TimesheetQueryDto,
   TimesheetQueryResultDto,
 } from "../shared/infrastructure/activities";
@@ -38,6 +40,7 @@ import {
   LOG_ACTIVITY_CHANNEL,
   QUERY_RECENT_ACTIVITIES_CHANNEL,
   QUERY_REPORT_CHANNEL,
+  QUERY_STATISTICS_CHANNEL,
   QUERY_TIMESHEET_CHANNEL,
   TIMER_STARTED_CHANNEL,
   TIMER_STOPPED_CHANNEL,
@@ -143,6 +146,14 @@ function createRendererToMainChannels() {
       const query = ReportQueryDto.create(queryDto).validate();
       const result = await activitiesService.queryReport(query);
       return ReportQueryResultDto.from(result);
+    },
+  );
+  ipcMain.handle(
+    QUERY_STATISTICS_CHANNEL,
+    async (_event, queryDto: StatisticsQueryDto) => {
+      const query = StatisticsQueryDto.create(queryDto).validate();
+      const result = await activitiesService.queryStatistics(query);
+      return StatisticsQueryResultDto.from(result);
     },
   );
   ipcMain.handle(

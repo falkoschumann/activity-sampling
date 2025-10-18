@@ -10,7 +10,6 @@ import {
   RecentActivitiesQueryResult,
   ReportEntry,
   Scope,
-  Statistics,
   StatisticsQueryResult,
   TimesheetEntry,
   TimesheetQuery,
@@ -335,10 +334,7 @@ describe("Activities", () => {
     it("should return empty histogram when no activities are logged", async () => {
       const replay = createAsyncGenerator([]);
 
-      const result = await projectStatistics({
-        replay,
-        query: { type: Statistics.TASK_DURATION_HISTOGRAM },
-      });
+      const result = await projectStatistics({ replay });
 
       expect(result).toEqual<StatisticsQueryResult>({
         histogram: {
@@ -353,31 +349,29 @@ describe("Activities", () => {
     it("should determine frequencies per bin", async () => {
       const replay = createAsyncGenerator([
         ActivityLoggedEvent.createTestInstance({
-          timestamp: "2025-10-13T11:00:00Z",
           task: "Task A",
-          duration: "P3D",
+          duration: "PT24H", // 3 person days
         }),
         ActivityLoggedEvent.createTestInstance({
-          timestamp: "2025-10-14T13:00:00Z",
           task: "Task B",
-          duration: "P5D",
+          duration: "PT40H", // 5 person days
         }),
         ActivityLoggedEvent.createTestInstance({
-          timestamp: "2025-10-15T13:00:00Z",
           task: "Task C",
-          duration: "P5D",
+          duration: "PT40H", // 5 person days
+        }),
+        ActivityLoggedEvent.createTestInstance({
+          task: "Task D",
+          duration: "PT30M", // 5 person days
         }),
       ]);
 
-      const result = await projectStatistics({
-        replay,
-        query: { type: Statistics.TASK_DURATION_HISTOGRAM },
-      });
+      const result = await projectStatistics({ replay });
 
       expect(result).toEqual<StatisticsQueryResult>({
         histogram: {
-          binEdges: ["0", "1", "2", "3", "5"],
-          frequencies: [0, 0, 1, 2],
+          binEdges: ["0", "0.5", "1", "2", "3", "5"],
+          frequencies: [1, 0, 0, 1, 2],
           xAxisLabel: "Duration (days)",
           yAxisLabel: "Number of Tasks",
         },

@@ -6,6 +6,7 @@ import { type CommandStatus, Failure, Success } from "@muspellheim/shared";
 import {
   Activity,
   Capacity,
+  Histogram,
   LogActivityCommand,
   RecentActivitiesQuery,
   RecentActivitiesQueryResult,
@@ -13,6 +14,8 @@ import {
   ReportQuery,
   ReportQueryResult,
   type Scope,
+  StatisticsQuery,
+  StatisticsQueryResult,
   TimesheetEntry,
   TimesheetQuery,
   TimesheetQueryResult,
@@ -470,6 +473,111 @@ export class ReportEntryDto {
       name: this.name,
       hours: Temporal.Duration.from(this.hours),
       client: this.client,
+    });
+  }
+}
+
+export class StatisticsQueryDto {
+  static create(_other: unknown): StatisticsQueryDto {
+    return new StatisticsQueryDto();
+  }
+
+  static from(model: StatisticsQuery): StatisticsQueryDto {
+    return StatisticsQueryDto.create(model);
+  }
+
+  private constructor() {}
+
+  validate(): StatisticsQuery {
+    return StatisticsQuery.create();
+  }
+}
+
+export class StatisticsQueryResultDto {
+  static create({
+    histogram,
+  }: {
+    histogram: {
+      binEdges: string[];
+      frequencies: number[];
+      xAxisLabel: string;
+      yAxisLabel: string;
+    };
+  }): StatisticsQueryResultDto {
+    return new StatisticsQueryResultDto(HistogramDto.create(histogram));
+  }
+
+  static from(model: StatisticsQueryResult): StatisticsQueryResultDto {
+    return StatisticsQueryResultDto.create({
+      histogram: model.histogram,
+    });
+  }
+
+  readonly histogram: HistogramDto;
+
+  private constructor(histogram: HistogramDto) {
+    this.histogram = histogram;
+  }
+
+  validate(): StatisticsQueryResult {
+    return StatisticsQueryResult.create({
+      histogram: this.histogram.validate(),
+    });
+  }
+}
+
+export class HistogramDto {
+  static create({
+    binEdges,
+    frequencies,
+    xAxisLabel,
+    yAxisLabel,
+  }: {
+    binEdges: string[];
+    frequencies: number[];
+    xAxisLabel: string;
+    yAxisLabel: string;
+  }): HistogramDto {
+    return new HistogramDto(binEdges, frequencies, xAxisLabel, yAxisLabel);
+  }
+
+  static from(model: {
+    binEdges: string[];
+    frequencies: number[];
+    xAxisLabel: string;
+    yAxisLabel: string;
+  }): HistogramDto {
+    return HistogramDto.create({
+      binEdges: model.binEdges,
+      frequencies: model.frequencies,
+      xAxisLabel: model.xAxisLabel,
+      yAxisLabel: model.yAxisLabel,
+    });
+  }
+
+  readonly binEdges: string[];
+  readonly frequencies: number[];
+  readonly xAxisLabel: string;
+  readonly yAxisLabel: string;
+
+  private constructor(
+    binEdges: string[],
+    frequencies: number[],
+    xAxisLabel: string,
+    yAxisLabel: string,
+  ) {
+    this.binEdges = binEdges;
+    this.frequencies = frequencies;
+    this.xAxisLabel = xAxisLabel;
+    this.yAxisLabel = yAxisLabel;
+  }
+
+  validate(): Histogram {
+    return Histogram.create({
+      binEdges: this.binEdges,
+      frequencies: this.frequencies,
+      xAxisLabel: this.xAxisLabel,
+      yAxisLabel: this.yAxisLabel,
     });
   }
 }

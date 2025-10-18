@@ -16,10 +16,8 @@ import {
   type RecentActivitiesQueryResult,
   ReportQuery,
   ReportQueryResult,
-  Statistics,
   StatisticsQuery,
   StatisticsQueryResult,
-  type StatisticsType,
   TimesheetQuery,
   TimesheetQueryResult,
 } from "../../../src/shared/domain/activities";
@@ -334,11 +332,8 @@ class StatisticsDsl {
   // Queries
   //
 
-  async queryStatistics(args: { type?: StatisticsType } = {}) {
-    const query = {
-      type: args.type ?? Statistics.TASK_DURATION_HISTOGRAM,
-    };
-    await this.#activitiesDriver.queryStatistics(query);
+  async queryStatistics() {
+    await this.#activitiesDriver.queryStatistics({});
   }
 
   assertStatistics(args: {

@@ -6,6 +6,7 @@ export const LOG_ACTIVITY_CHANNEL = "logActivity";
 // Queries
 export const QUERY_RECENT_ACTIVITIES_CHANNEL = "queryRecentActivities";
 export const QUERY_REPORT_CHANNEL = "queryReport";
+export const QUERY_STATISTICS_CHANNEL = "queryStatistics";
 export const QUERY_TIMESHEET_CHANNEL = "queryTimesheet";
 
 // Events

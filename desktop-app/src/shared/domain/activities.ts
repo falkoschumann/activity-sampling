@@ -369,21 +369,9 @@ export class ReportEntry {
   }
 }
 
-export const Statistics = Object.freeze({
-  TASK_DURATION_HISTOGRAM: "TaskDurationHistogram",
-});
-
-export type StatisticsType = (typeof Statistics)[keyof typeof Statistics];
-
 export class StatisticsQuery {
-  static create({ type }: { type: StatisticsType }): StatisticsQuery {
-    return new StatisticsQuery(type);
-  }
-
-  readonly type: StatisticsType;
-
-  constructor(type: StatisticsType) {
-    this.type = type;
+  static create(): StatisticsQuery {
+    return new StatisticsQuery();
   }
 }
 
@@ -391,23 +379,55 @@ export class StatisticsQueryResult {
   static create({
     histogram,
   }: {
-    histogram?: Histogram;
+    histogram: Histogram;
   }): StatisticsQueryResult {
-    return new StatisticsQueryResult(histogram);
+    return new StatisticsQueryResult(Histogram.create(histogram));
   }
 
-  readonly histogram?: Histogram;
+  static empty(): StatisticsQueryResult {
+    return StatisticsQueryResult.create({
+      histogram: Histogram.create({
+        binEdges: [],
+        frequencies: [],
+        xAxisLabel: "",
+        yAxisLabel: "",
+      }),
+    });
+  }
 
-  constructor(histogram?: Histogram) {
+  readonly histogram: Histogram;
+
+  private constructor(histogram: Histogram) {
     this.histogram = histogram;
   }
 }
 
-export interface Histogram {
+export class Histogram {
+  static create(other: Histogram) {
+    return new Histogram(
+      other.binEdges,
+      other.frequencies,
+      other.xAxisLabel,
+      other.yAxisLabel,
+    );
+  }
+
   binEdges: string[];
   frequencies: number[];
   xAxisLabel: string;
   yAxisLabel: string;
+
+  private constructor(
+    binEdges: string[],
+    frequencies: number[],
+    xAxisLabel: string,
+    yAxisLabel: string,
+  ) {
+    this.binEdges = binEdges;
+    this.frequencies = frequencies;
+    this.xAxisLabel = xAxisLabel;
+    this.yAxisLabel = yAxisLabel;
+  }
 }
 
 export class TimesheetQuery {

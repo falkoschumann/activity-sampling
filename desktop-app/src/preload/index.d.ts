@@ -7,6 +7,8 @@ import type {
   RecentActivitiesQueryResultDto,
   ReportQueryDto,
   ReportQueryResultDto,
+  StatisticsQueryDto,
+  StatisticsQueryResultDto,
   TimesheetQueryDto,
   TimesheetQueryResultDto,
 } from "../shared/infrastructure/activities";
@@ -26,6 +28,8 @@ export interface ActivitySampling {
   ): Promise<RecentActivitiesQueryResultDto>;
 
   queryReport(query: ReportQueryDto): Promise<ReportQueryResultDto>;
+
+  queryStatistics(query: StatisticsQueryDto): Promise<StatisticsQueryResultDto>;
 
   queryTimesheet(query: TimesheetQueryDto): Promise<TimesheetQueryResultDto>;
 

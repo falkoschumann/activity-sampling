@@ -160,6 +160,16 @@ export function createMenu({
             }),
         },
         {
+          label: "Statistics",
+          accelerator: "Alt+CmdOrCtrl+S",
+          click: () =>
+            openWindow({
+              rendererFile: "statistics.html",
+              width: 1000,
+              height: 800,
+            }),
+        },
+        {
           label: "Timesheet",
           accelerator: "Alt+CmdOrCtrl+T",
           click: () =>

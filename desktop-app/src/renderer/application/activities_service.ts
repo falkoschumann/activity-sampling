@@ -9,6 +9,8 @@ import {
   RecentActivitiesQueryResult,
   ReportQuery,
   ReportQueryResult,
+  StatisticsQuery,
+  StatisticsQueryResult,
   TimesheetQuery,
   TimesheetQueryResult,
 } from "../../shared/domain/activities";
@@ -27,6 +29,8 @@ import {
   RecentActivitiesQueryResultDto,
   ReportQueryDto,
   ReportQueryResultDto,
+  StatisticsQueryDto,
+  StatisticsQueryResultDto,
   TimesheetQueryDto,
   TimesheetQueryResultDto,
 } from "../../shared/infrastructure/activities";
@@ -87,7 +91,9 @@ export function useLog() {
   }, [recentActivities.workingDays]);
 
   useEffect(() => {
-    void handleQueryRecentActivities();
+    (async () => {
+      await handleQueryRecentActivities();
+    })();
   }, [handleQueryRecentActivities]);
 
   useEffect(() => {
@@ -175,6 +181,26 @@ async function queryReport(query: ReportQuery) {
     ReportQueryDto.from(query),
   );
   return ReportQueryResultDto.create(resultDto).validate();
+}
+
+export function useStatistics(query: StatisticsQuery) {
+  const [result, setResult] = useState(StatisticsQueryResult.empty());
+
+  useEffect(() => {
+    (async function () {
+      const result = await queryStatistics(query);
+      setResult(result);
+    })();
+  }, [query]);
+
+  return result;
+}
+
+async function queryStatistics(query: StatisticsQuery) {
+  const resultDto = await window.activitySampling.queryStatistics(
+    StatisticsQueryDto.from(query),
+  );
+  return StatisticsQueryResultDto.create(resultDto).validate();
 }
 
 export function useTimesheet(query: TimesheetQuery) {
