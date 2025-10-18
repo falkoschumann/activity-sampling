@@ -292,7 +292,6 @@ describe("Activity Sampling", () => {
     describe("Create histogram for hours worked on tasks", () => {
       it("should return frequency per task duration", async () => {
         const { statistics } = await startActivitySampling();
-
         await statistics.activityLogged({
           timestamp: "2025-10-13T11:00:00Z",
           task: "Task A",
@@ -321,7 +320,28 @@ describe("Activity Sampling", () => {
     });
 
     describe("Determine median for hours worked on tasks", () => {
-      it.todo("should return median task duration");
+      it("should return median task duration", async () => {
+        const { statistics } = await startActivitySampling();
+        await statistics.activityLogged({
+          timestamp: "2025-10-13T11:00:00Z",
+          task: "Task A",
+          duration: "PT24H",
+        });
+        await statistics.activityLogged({
+          timestamp: "2025-10-14T13:00:00Z",
+          task: "Task B",
+          duration: "PT40H",
+        });
+        await statistics.activityLogged({
+          timestamp: "2025-10-15T13:00:00Z",
+          task: "Task C",
+          duration: "PT40H",
+        });
+
+        await statistics.queryStatistics();
+
+        statistics.assertStatistics({ median: 5 });
+      });
     });
   });
 

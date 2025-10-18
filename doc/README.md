@@ -47,7 +47,7 @@ analysis.
 - [x] Create histogram for hours worked on tasks
 - [ ] Create histogram for lead times
 - [ ] Create histogram for throughput
-- [ ] Determine median for hours worked on tasks
+- [x] Determine median for hours worked on tasks
 - [ ] Determine median for lead times
 - [ ] Determine median for throughput
 

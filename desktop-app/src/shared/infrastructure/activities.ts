@@ -8,6 +8,7 @@ import {
   Capacity,
   Histogram,
   LogActivityCommand,
+  Median,
   RecentActivitiesQuery,
   RecentActivitiesQueryResult,
   ReportEntry,
@@ -496,6 +497,7 @@ export class StatisticsQueryDto {
 export class StatisticsQueryResultDto {
   static create({
     histogram,
+    median,
   }: {
     histogram: {
       binEdges: string[];
@@ -503,25 +505,39 @@ export class StatisticsQueryResultDto {
       xAxisLabel: string;
       yAxisLabel: string;
     };
+    median: {
+      edge0: number;
+      edge25: number;
+      edge50: number;
+      edge75: number;
+      edge100: number;
+    };
   }): StatisticsQueryResultDto {
-    return new StatisticsQueryResultDto(HistogramDto.create(histogram));
+    return new StatisticsQueryResultDto(
+      HistogramDto.create(histogram),
+      MedianDto.create(median),
+    );
   }
 
   static from(model: StatisticsQueryResult): StatisticsQueryResultDto {
     return StatisticsQueryResultDto.create({
       histogram: model.histogram,
+      median: model.median,
     });
   }
 
   readonly histogram: HistogramDto;
+  readonly median: MedianDto;
 
-  private constructor(histogram: HistogramDto) {
+  private constructor(histogram: HistogramDto, median: MedianDto) {
     this.histogram = histogram;
+    this.median = median;
   }
 
   validate(): StatisticsQueryResult {
     return StatisticsQueryResult.create({
       histogram: this.histogram.validate(),
+      median: this.median.validate(),
     });
   }
 }
@@ -579,6 +595,64 @@ export class HistogramDto {
       xAxisLabel: this.xAxisLabel,
       yAxisLabel: this.yAxisLabel,
     });
+  }
+}
+
+export class MedianDto {
+  static create({
+    edge0,
+    edge25,
+    edge50,
+    edge75,
+    edge100,
+  }: {
+    edge0: number;
+    edge25: number;
+    edge50: number;
+    edge75: number;
+    edge100: number;
+  }) {
+    return new MedianDto(edge0, edge25, edge50, edge75, edge100);
+  }
+
+  static from(model: Median): MedianDto {
+    return MedianDto.create({
+      edge0: model.edge0,
+      edge25: model.edge25,
+      edge50: model.edge50,
+      edge75: model.edge75,
+      edge100: model.edge100,
+    });
+  }
+
+  readonly edge0: number;
+  readonly edge25: number;
+  readonly edge50: number;
+  readonly edge75: number;
+  readonly edge100: number;
+
+  constructor(
+    edge0: number,
+    edge25: number,
+    edge50: number,
+    edge75: number,
+    edge100: number,
+  ) {
+    this.edge0 = edge0;
+    this.edge25 = edge25;
+    this.edge50 = edge50;
+    this.edge75 = edge75;
+    this.edge100 = edge100;
+  }
+
+  validate(): Median {
+    return {
+      edge0: this.edge0,
+      edge25: this.edge25,
+      edge50: this.edge50,
+      edge75: this.edge75,
+      edge100: this.edge100,
+    };
   }
 }
 

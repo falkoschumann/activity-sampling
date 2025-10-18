@@ -343,10 +343,17 @@ describe("Activities", () => {
           xAxisLabel: "Duration (days)",
           yAxisLabel: "Number of Tasks",
         },
+        median: {
+          edge0: 0,
+          edge25: 0,
+          edge50: 0,
+          edge75: 0,
+          edge100: 0,
+        },
       });
     });
 
-    it("should determine frequencies per bin", async () => {
+    it("should determine frequencies per bin with 3 tasks", async () => {
       const replay = createAsyncGenerator([
         ActivityLoggedEvent.createTestInstance({
           task: "Task A",
@@ -358,11 +365,46 @@ describe("Activities", () => {
         }),
         ActivityLoggedEvent.createTestInstance({
           task: "Task C",
+          duration: "PT16H", // 2 person days
+        }),
+      ]);
+
+      const result = await projectStatistics({ replay });
+
+      expect(result).toEqual<StatisticsQueryResult>({
+        histogram: {
+          binEdges: ["0", "0.5", "1", "2", "3", "5"],
+          frequencies: [0, 0, 1, 1, 1],
+          xAxisLabel: "Duration (days)",
+          yAxisLabel: "Number of Tasks",
+        },
+        median: {
+          edge0: 0,
+          edge25: 2,
+          edge50: 3,
+          edge75: 4,
+          edge100: 5,
+        },
+      });
+    });
+
+    it("should determine frequencies per bin with even number of tasks", async () => {
+      const replay = createAsyncGenerator([
+        ActivityLoggedEvent.createTestInstance({
+          task: "Task A",
+          duration: "PT24H", // 3 person days
+        }),
+        ActivityLoggedEvent.createTestInstance({
+          task: "Task B",
           duration: "PT40H", // 5 person days
         }),
         ActivityLoggedEvent.createTestInstance({
+          task: "Task C",
+          duration: "PT32H", // 4 person days
+        }),
+        ActivityLoggedEvent.createTestInstance({
           task: "Task D",
-          duration: "PT30M", // 5 person days
+          duration: "PT4H", // 0.5 person days
         }),
       ]);
 
@@ -374,6 +416,56 @@ describe("Activities", () => {
           frequencies: [1, 0, 0, 1, 2],
           xAxisLabel: "Duration (days)",
           yAxisLabel: "Number of Tasks",
+        },
+        median: {
+          edge0: 0,
+          edge25: 0.5,
+          edge50: 3.5,
+          edge75: 4,
+          edge100: 5,
+        },
+      });
+    });
+
+    it("should determine frequencies per bin with odd number of tasks", async () => {
+      const replay = createAsyncGenerator([
+        ActivityLoggedEvent.createTestInstance({
+          task: "Task A",
+          duration: "PT24H", // 3 person days
+        }),
+        ActivityLoggedEvent.createTestInstance({
+          task: "Task B",
+          duration: "PT40H", // 5 person days
+        }),
+        ActivityLoggedEvent.createTestInstance({
+          task: "Task C",
+          duration: "PT32H", // 4 person days
+        }),
+        ActivityLoggedEvent.createTestInstance({
+          task: "Task D",
+          duration: "PT8H", // 1 person days
+        }),
+        ActivityLoggedEvent.createTestInstance({
+          task: "Task E",
+          duration: "PT16H", // 2 person days
+        }),
+      ]);
+
+      const result = await projectStatistics({ replay });
+
+      expect(result).toEqual<StatisticsQueryResult>({
+        histogram: {
+          binEdges: ["0", "0.5", "1", "2", "3", "5"],
+          frequencies: [0, 1, 1, 1, 2],
+          xAxisLabel: "Duration (days)",
+          yAxisLabel: "Number of Tasks",
+        },
+        median: {
+          edge0: 0,
+          edge25: 1.5,
+          edge50: 3,
+          edge75: 3.5,
+          edge100: 5,
         },
       });
     });

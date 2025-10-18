@@ -173,6 +173,13 @@ describe("Activities service", () => {
           xAxisLabel: "Duration (days)",
           yAxisLabel: "Number of Tasks",
         },
+        median: {
+          edge0: 0,
+          edge25: 3,
+          edge50: 5,
+          edge75: 5,
+          edge100: 5,
+        },
       });
     });
   });

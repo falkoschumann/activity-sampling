@@ -378,10 +378,15 @@ export class StatisticsQuery {
 export class StatisticsQueryResult {
   static create({
     histogram,
+    median,
   }: {
     histogram: Histogram;
+    median: Median;
   }): StatisticsQueryResult {
-    return new StatisticsQueryResult(Histogram.create(histogram));
+    return new StatisticsQueryResult(
+      Histogram.create(histogram),
+      Median.create(median),
+    );
   }
 
   static empty(): StatisticsQueryResult {
@@ -392,13 +397,16 @@ export class StatisticsQueryResult {
         xAxisLabel: "",
         yAxisLabel: "",
       }),
+      median: { edge0: 0, edge25: 0, edge50: 0, edge75: 0, edge100: 0 },
     });
   }
 
   readonly histogram: Histogram;
+  readonly median: Median;
 
-  private constructor(histogram: Histogram) {
+  private constructor(histogram: Histogram, median: Median) {
     this.histogram = histogram;
+    this.median = median;
   }
 }
 
@@ -412,10 +420,10 @@ export class Histogram {
     );
   }
 
-  binEdges: string[];
-  frequencies: number[];
-  xAxisLabel: string;
-  yAxisLabel: string;
+  readonly binEdges: string[];
+  readonly frequencies: number[];
+  readonly xAxisLabel: string;
+  readonly yAxisLabel: string;
 
   private constructor(
     binEdges: string[],
@@ -427,6 +435,38 @@ export class Histogram {
     this.frequencies = frequencies;
     this.xAxisLabel = xAxisLabel;
     this.yAxisLabel = yAxisLabel;
+  }
+}
+
+export class Median {
+  static create(other: Median) {
+    return new Median(
+      other.edge0,
+      other.edge25,
+      other.edge50,
+      other.edge75,
+      other.edge100,
+    );
+  }
+
+  readonly edge0: number;
+  readonly edge25: number;
+  readonly edge50: number;
+  readonly edge75: number;
+  readonly edge100: number;
+
+  constructor(
+    edge0: number,
+    edge25: number,
+    edge50: number,
+    edge75: number,
+    edge100: number,
+  ) {
+    this.edge0 = edge0;
+    this.edge25 = edge25;
+    this.edge50 = edge50;
+    this.edge75 = edge75;
+    this.edge100 = edge100;
   }
 }
 

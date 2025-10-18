@@ -337,19 +337,30 @@ class StatisticsDsl {
   }
 
   assertStatistics(args: {
-    histogram: {
+    histogram?: {
       binEdges: string[];
       frequencies: number[];
     };
+    median?: number;
   }) {
-    this.#activitiesDriver.assertStatistics({
-      histogram: {
-        binEdges: args.histogram.binEdges,
-        frequencies: args.histogram.frequencies,
-        xAxisLabel: "Duration (days)",
-        yAxisLabel: "Number of Tasks",
-      },
-    });
+    const histogram = args.histogram && {
+      binEdges: args.histogram.binEdges,
+      frequencies: args.histogram.frequencies,
+      xAxisLabel: "Duration (days)",
+      yAxisLabel: "Number of Tasks",
+    };
+    const median =
+      args.median != null
+        ? {
+            edge0: 0,
+            edge25: 0,
+            edge50: args.median,
+            edge75: 0,
+            edge100: 0,
+          }
+        : undefined;
+
+    this.#activitiesDriver.assertStatistics({ histogram, median });
   }
 
   //
@@ -563,8 +574,15 @@ class ActivitiesDriver {
       await this.#activitiesService.queryStatistics(query);
   }
 
-  assertStatistics(result: StatisticsQueryResult) {
-    expect(this.#statisticsQueryResult).toEqual(result);
+  assertStatistics(result: Partial<StatisticsQueryResult>) {
+    if (result.histogram) {
+      expect(this.#statisticsQueryResult?.histogram).toEqual(result.histogram);
+    }
+    if (result.median) {
+      expect(this.#statisticsQueryResult?.median.edge50).toEqual(
+        result.median.edge50,
+      );
+    }
   }
 
   async queryTimesheet(query: TimesheetQuery) {

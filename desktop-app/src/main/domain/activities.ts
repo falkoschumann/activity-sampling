@@ -1,7 +1,5 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
-import fs from "fs/promises";
-
 import { Temporal } from "@js-temporal/polyfill";
 
 import { Clock, normalizeDuration } from "../../shared/common/temporal";
@@ -245,17 +243,12 @@ export async function projectStatistics({
     }
   }
 
-  const sortedTasks = Object.entries(tasks).sort((a, b) =>
-    Temporal.Duration.compare(b[1], a[1]),
-  );
-  await fs.writeFile("data/tasks.json", JSON.stringify(sortedTasks));
-
-  const days = Object.values(tasks)
+  const allDays = Object.values(tasks)
     .map((duration) => duration.total("hours"))
     .map((hours) => hours / 8)
     .sort((a, b) => a - b);
+  const maxDay = allDays.at(-1) ?? 0;
 
-  const maxDay = days[days.length - 1];
   const binEdges: number[] = [];
   const frequencies: number[] = [];
   let i = 0;
@@ -276,13 +269,46 @@ export async function projectStatistics({
     }
   }
 
-  for (const day of days) {
+  for (const day of allDays) {
     for (let i = 0; i < binEdges.length - 1; i++) {
       if (binEdges[i] < day && day <= binEdges[i + 1]) {
         frequencies[i]++;
         break;
       }
     }
+  }
+
+  const days = allDays.filter((day) => day >= 0.5);
+  const edge0 = 0;
+  let edge25 = 0;
+  let edge50 = 0;
+  let edge75 = 0;
+  let edge100 = 0;
+  if (days.length > 0) {
+    const i25 = Math.max(0, days.length * 0.25 - 1);
+    if (Number.isInteger(i25)) {
+      edge25 = days[i25];
+    } else {
+      edge25 = (days[Math.floor(i25)] + days[Math.ceil(i25)]) / 2;
+    }
+    edge25 = Math.round(edge25 * 10) / 10;
+
+    if (days.length % 2 === 0) {
+      edge50 = (days[days.length / 2 - 1] + days[days.length / 2]) / 2;
+    } else {
+      edge50 = days[Math.floor(days.length / 2)];
+    }
+    edge50 = Math.round(edge50 * 10) / 10;
+
+    const i75 = days.length * 0.75 - 1;
+    if (Number.isInteger(i75)) {
+      edge75 = days[i75];
+    } else {
+      edge75 = (days[Math.floor(i75)] + days[Math.ceil(i75)]) / 2;
+    }
+    edge75 = Math.round(edge75 * 10) / 10;
+
+    edge100 = maxDay;
   }
 
   return {
@@ -292,6 +318,7 @@ export async function projectStatistics({
       xAxisLabel: "Duration (days)",
       yAxisLabel: "Number of Tasks",
     },
+    median: { edge0, edge25, edge50, edge75, edge100 },
   };
 }
 
