@@ -23,7 +23,7 @@ analysis.
 ### Log Activity
 
 - [x] Log the activity with a client, a project, a task and optional notes
-- [ ] Log optional
+- [ ] Log optional category like feature, rework, meeting, training, etc.
 
 ### Recent Activities
 
