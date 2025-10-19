@@ -1,0 +1,39 @@
+// Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
+
+import type { StatisticsQuery } from "../../../../shared/domain/activities";
+import { useEffect, useState } from "react";
+
+export default function QueryParametersComponent({
+  onChange,
+}: {
+  onChange: (query: StatisticsQuery) => void;
+}) {
+  const [ignoreSmallTasks, setIgnoreSmallTasks] = useState(false);
+
+  useEffect(() => {
+    onChange({ ignoreSmallTasks });
+  }, [ignoreSmallTasks, onChange]);
+
+  return (
+    <div className="container">
+      <div
+        className="btn-toolbar py-2 gap-2"
+        role="toolbar"
+        aria-label="Toolbar with query parameters"
+      >
+        <div className="form-check">
+          <input
+            id="ignoreSmallTasks"
+            className="form-check-input"
+            type="checkbox"
+            checked={ignoreSmallTasks}
+            onChange={(event) => setIgnoreSmallTasks(event.target.checked)}
+          />
+          <label className="form-check-label" htmlFor="ignoreSmallTasks">
+            Ignore small tasks
+          </label>
+        </div>
+      </div>
+    </div>
+  );
+}

@@ -12,6 +12,7 @@ import {
   ReportQuery,
   ReportQueryResult,
   Scope,
+  StatisticsQuery,
   StatisticsQueryResult,
   type TimesheetEntry,
   TimesheetQuery,
@@ -230,8 +231,10 @@ export async function projectReport({
 
 export async function projectStatistics({
   replay,
+  query,
 }: {
   replay: AsyncGenerator<ActivityLoggedEvent>;
+  query: StatisticsQuery;
 }): Promise<StatisticsQueryResult> {
   const tasks: Record<string, Temporal.Duration> = {};
   for await (const event of replay) {
@@ -243,11 +246,12 @@ export async function projectStatistics({
     }
   }
 
-  const allDays = Object.values(tasks)
+  const days = Object.values(tasks)
     .map((duration) => duration.total("hours"))
     .map((hours) => hours / 8)
+    .filter((days) => (query.ignoreSmallTasks ? days > 0.5 : true))
     .sort((a, b) => a - b);
-  const maxDay = allDays.at(-1) ?? 0;
+  const maxDay = days.at(-1) ?? 0;
 
   const binEdges: number[] = [];
   const frequencies: number[] = [];
@@ -269,7 +273,7 @@ export async function projectStatistics({
     }
   }
 
-  for (const day of allDays) {
+  for (const day of days) {
     for (let i = 0; i < binEdges.length - 1; i++) {
       if (binEdges[i] < day && day <= binEdges[i + 1]) {
         frequencies[i]++;
@@ -278,7 +282,6 @@ export async function projectStatistics({
     }
   }
 
-  const days = allDays.filter((day) => day >= 0.5);
   const edge0 = 0;
   let edge25 = 0;
   let edge50 = 0;

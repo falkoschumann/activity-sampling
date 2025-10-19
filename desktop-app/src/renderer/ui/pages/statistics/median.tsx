@@ -67,7 +67,6 @@ export default function MedianComponent({ median }: { median: Median }) {
         days (upper quartile): 25% of the records are below or above these
         values, respectively.
       </p>
-      <p className="small">Tasks shorter than half a day will be ignored.</p>
     </>
   );
 }

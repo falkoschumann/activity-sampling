@@ -5,15 +5,22 @@ import { useState } from "react";
 import { useStatistics } from "../../../application/activities_service";
 import HistogramComponent from "./histogram";
 import MedianComponent from "./median";
+import QueryParametersComponent from "./query_parameters";
+import type { StatisticsQuery } from "../../../../shared/domain/activities";
 
 export default function StatisticsPage() {
-  const [query] = useState({});
+  const [query, setQuery] = useState<StatisticsQuery>({});
   const statistics = useStatistics(query);
 
   return (
-    <main className="container my-4">
-      <HistogramComponent histogram={statistics.histogram} />
-      <MedianComponent median={statistics.median} />
-    </main>
+    <>
+      <aside className="fixed-top bg-body-secondary">
+        <QueryParametersComponent onChange={setQuery} />
+      </aside>
+      <main className="container my-4" style={{ paddingTop: "3rem" }}>
+        <HistogramComponent histogram={statistics.histogram} />
+        <MedianComponent median={statistics.median} />
+      </main>
+    </>
   );
 }

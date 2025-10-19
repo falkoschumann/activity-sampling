@@ -90,10 +90,10 @@ export class ActivitiesService {
   }
 
   async queryStatistics(
-    _query: StatisticsQuery,
+    query: StatisticsQuery,
   ): Promise<StatisticsQueryResult> {
     const replay = replayTyped(this.#eventStore.replay());
-    return await projectStatistics({ replay });
+    return await projectStatistics({ replay, query });
   }
 
   async queryTimesheet(query: TimesheetQuery): Promise<TimesheetQueryResult> {

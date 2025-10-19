@@ -370,8 +370,17 @@ export class ReportEntry {
 }
 
 export class StatisticsQuery {
-  static create(): StatisticsQuery {
-    return new StatisticsQuery();
+  static create({
+    ignoreSmallTasks,
+  }: { ignoreSmallTasks?: boolean } = {}): StatisticsQuery {
+    return new StatisticsQuery(ignoreSmallTasks);
+  }
+
+  // WORKAROUND: Temporary ignore small tasks until task have categories
+  readonly ignoreSmallTasks?: boolean;
+
+  private constructor(ignoreSmallTasks?: boolean) {
+    this.ignoreSmallTasks = ignoreSmallTasks;
   }
 }
 

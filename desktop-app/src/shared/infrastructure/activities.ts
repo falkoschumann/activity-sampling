@@ -479,18 +479,28 @@ export class ReportEntryDto {
 }
 
 export class StatisticsQueryDto {
-  static create(_other: unknown): StatisticsQueryDto {
-    return new StatisticsQueryDto();
+  static create({
+    ignoreSmallTasks,
+  }: {
+    ignoreSmallTasks?: boolean;
+  }): StatisticsQueryDto {
+    return new StatisticsQueryDto(ignoreSmallTasks);
   }
 
   static from(model: StatisticsQuery): StatisticsQueryDto {
-    return StatisticsQueryDto.create(model);
+    return StatisticsQueryDto.create({
+      ignoreSmallTasks: model.ignoreSmallTasks,
+    });
   }
 
-  private constructor() {}
+  readonly ignoreSmallTasks?: boolean;
+
+  private constructor(ignoreSmallTasks?: boolean) {
+    this.ignoreSmallTasks = ignoreSmallTasks;
+  }
 
   validate(): StatisticsQuery {
-    return StatisticsQuery.create();
+    return StatisticsQuery.create(this);
   }
 }
 

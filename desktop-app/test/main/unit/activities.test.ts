@@ -334,7 +334,7 @@ describe("Activities", () => {
     it("should return empty histogram when no activities are logged", async () => {
       const replay = createAsyncGenerator([]);
 
-      const result = await projectStatistics({ replay });
+      const result = await projectStatistics({ replay, query: {} });
 
       expect(result).toEqual<StatisticsQueryResult>({
         histogram: {
@@ -369,7 +369,7 @@ describe("Activities", () => {
         }),
       ]);
 
-      const result = await projectStatistics({ replay });
+      const result = await projectStatistics({ replay, query: {} });
 
       expect(result).toEqual<StatisticsQueryResult>({
         histogram: {
@@ -408,7 +408,7 @@ describe("Activities", () => {
         }),
       ]);
 
-      const result = await projectStatistics({ replay });
+      const result = await projectStatistics({ replay, query: {} });
 
       expect(result).toEqual<StatisticsQueryResult>({
         histogram: {
@@ -451,7 +451,7 @@ describe("Activities", () => {
         }),
       ]);
 
-      const result = await projectStatistics({ replay });
+      const result = await projectStatistics({ replay, query: {} });
 
       expect(result).toEqual<StatisticsQueryResult>({
         histogram: {
