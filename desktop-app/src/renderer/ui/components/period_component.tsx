@@ -63,7 +63,10 @@ export function PeriodComponent({
               {unit === PeriodUnit.YEAR
                 ? Temporal.PlainDate.from(from).year
                 : formatDate(from)}
-              {(unit === PeriodUnit.WEEK || unit === PeriodUnit.MONTH) &&
+              {(unit === PeriodUnit.WEEK ||
+                unit === PeriodUnit.MONTH ||
+                unit === PeriodUnit.QUARTER ||
+                unit === PeriodUnit.HALF_YEAR) &&
                 " - " + formatDate(to)}
             </div>
           </div>

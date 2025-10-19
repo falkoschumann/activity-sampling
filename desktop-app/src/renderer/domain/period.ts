@@ -8,6 +8,8 @@ export const PeriodUnit = Object.freeze({
   DAY: "Day",
   WEEK: "Week",
   MONTH: "Month",
+  QUARTER: "Quarter",
+  HALF_YEAR: "Half year",
   YEAR: "Year",
   ALL_TIME: "All time",
 });
@@ -97,6 +99,31 @@ export function init({
       from = todayDate.with({ day: 1 });
       to = todayDate.with({ day: 31 });
       break;
+    case PeriodUnit.QUARTER:
+      if (todayDate.month <= 3) {
+        from = todayDate.with({ month: 1, day: 1 });
+        to = todayDate.with({ month: 3, day: 31 });
+      } else if (todayDate.month <= 6) {
+        from = todayDate.with({ month: 4, day: 1 });
+        to = todayDate.with({ month: 6, day: 30 });
+      } else if (todayDate.month <= 9) {
+        from = todayDate.with({ month: 7, day: 1 });
+        to = todayDate.with({ month: 9, day: 30 });
+      } else {
+        from = todayDate.with({ month: 10, day: 1 });
+        to = todayDate.with({ month: 12, day: 31 });
+      }
+      break;
+    case PeriodUnit.HALF_YEAR:
+      from =
+        todayDate.month <= 6
+          ? todayDate.with({ month: 1, day: 1 })
+          : todayDate.with({ month: 7, day: 1 });
+      to =
+        todayDate.month <= 6
+          ? todayDate.with({ month: 6, day: 30 })
+          : todayDate.with({ month: 12, day: 31 });
+      break;
     case PeriodUnit.YEAR:
       from = todayDate.with({ month: 1, day: 1 });
       to = todayDate.with({ month: 12, day: 31 });
@@ -134,6 +161,14 @@ export function reducer(state: State, action: Action): State {
           from = from.add({ months: 1 });
           to = to.add({ months: 1 }).with({ day: 31 });
           break;
+        case PeriodUnit.QUARTER:
+          from = from.add({ months: 3 });
+          to = to.add({ months: 3 }).with({ day: 31 });
+          break;
+        case PeriodUnit.HALF_YEAR:
+          from = from.add({ months: 6 });
+          to = to.add({ months: 6 }).with({ day: 31 });
+          break;
         case PeriodUnit.YEAR:
           from = from.add({ years: 1 }).with({ month: 1, day: 1 });
           to = from.with({ month: 12, day: 31 });
@@ -160,6 +195,14 @@ export function reducer(state: State, action: Action): State {
         case PeriodUnit.MONTH:
           from = from.subtract({ months: 1 });
           to = to.subtract({ months: 1 }).with({ day: 31 });
+          break;
+        case PeriodUnit.QUARTER:
+          from = from.subtract({ months: 3 });
+          to = to.subtract({ months: 3 }).with({ day: 31 });
+          break;
+        case PeriodUnit.HALF_YEAR:
+          from = from.subtract({ months: 6 });
+          to = to.subtract({ months: 6 }).with({ day: 31 });
           break;
         case PeriodUnit.YEAR:
           from = from.subtract({ years: 1 }).with({ month: 1, day: 1 });

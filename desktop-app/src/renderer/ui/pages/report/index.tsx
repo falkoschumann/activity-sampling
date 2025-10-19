@@ -38,6 +38,8 @@ export default function ReportPage() {
           units={[
             PeriodUnit.WEEK,
             PeriodUnit.MONTH,
+            PeriodUnit.QUARTER,
+            PeriodUnit.HALF_YEAR,
             PeriodUnit.YEAR,
             PeriodUnit.ALL_TIME,
           ]}
