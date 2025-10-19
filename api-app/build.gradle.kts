@@ -37,7 +37,7 @@ dependencies {
   implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
   implementation("org.thymeleaf.extras:thymeleaf-extras-springsecurity6")
   compileOnly("org.projectlombok:lombok")
-  compileOnly("com.github.spotbugs:spotbugs-annotations:4.9.6")
+  compileOnly("com.github.spotbugs:spotbugs-annotations:4.9.8")
   developmentOnly("org.springframework.boot:spring-boot-devtools")
   annotationProcessor("org.projectlombok:lombok")
   annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
