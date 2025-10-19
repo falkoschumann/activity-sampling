@@ -2,14 +2,12 @@
 
 import path from "node:path";
 
+import { Temporal } from "@js-temporal/polyfill";
 import { describe, expect, it } from "vitest";
 
-import { Settings } from "../../../src/main/domain/settings";
-import {
-  SettingsDto,
-  SettingsGateway,
-} from "../../../src/main/infrastructure/settings_gateway";
-import { Temporal } from "@js-temporal/polyfill";
+import { Settings } from "../../../src/shared/domain/settings";
+import { SettingsDto } from "../../../src/shared/infrastructure/settings";
+import { SettingsGateway } from "../../../src/main/infrastructure/settings_gateway";
 
 const NON_EXISTING_FILE = path.resolve(
   import.meta.dirname,

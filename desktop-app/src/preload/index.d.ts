@@ -12,6 +12,7 @@ import type {
   TimesheetQueryDto,
   TimesheetQueryResultDto,
 } from "../shared/infrastructure/activities";
+import type { SettingsDto } from "../shared/infrastructure/settings";
 import type {
   IntervalElapsedEventDto,
   TimerStartedEventDto,
@@ -44,6 +45,10 @@ export interface ActivitySampling {
   onIntervalElapsedEvent: (
     callback: (event: IntervalElapsedEventDto) => void,
   ) => Unsubscriber;
+
+  loadSettings(): Promise<SettingsDto>;
+
+  storeSettings(settings: SettingsDto): Promise<void>;
 }
 
 declare global {

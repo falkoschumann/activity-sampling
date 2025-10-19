@@ -20,7 +20,7 @@ import {
   projectStatistics,
   projectTimesheet,
 } from "../domain/activities";
-import { Settings } from "../domain/settings";
+import { Settings } from "../../shared/domain/settings";
 import { EventStore } from "../infrastructure/event_store";
 import { ActivityLoggedEventDto } from "../infrastructure/events";
 import { HolidayRepository } from "../infrastructure/holiday_repository";

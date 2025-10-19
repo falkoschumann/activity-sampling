@@ -14,7 +14,7 @@ import {
   StatisticsQueryResult,
   TimesheetEntry,
 } from "../../../src/shared/domain/activities";
-import { Settings } from "../../../src/main/domain/settings";
+import { Settings } from "../../../src/shared/domain/settings";
 import { EventStore } from "../../../src/main/infrastructure/event_store";
 import { ActivityLoggedEventDto } from "../../../src/main/infrastructure/events";
 import {

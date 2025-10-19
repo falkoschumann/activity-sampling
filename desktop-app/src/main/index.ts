@@ -14,7 +14,8 @@ import {
   TimerStartedEvent,
   TimerStoppedEvent,
 } from "../shared/domain/timer";
-import { Settings } from "./domain/settings";
+import { Settings } from "../shared/domain/settings";
+import { SettingsDto } from "../shared/infrastructure/settings";
 import {
   CommandStatusDto,
   LogActivityCommandDto,
@@ -37,11 +38,13 @@ import { openDataDirectory, openWindow } from "./ui/actions";
 import { createMenu } from "./ui/menu";
 import {
   INTERVAL_ELAPSED_CHANNEL,
+  LOAD_SETTINGS_CHANNEL,
   LOG_ACTIVITY_CHANNEL,
   QUERY_RECENT_ACTIVITIES_CHANNEL,
   QUERY_REPORT_CHANNEL,
   QUERY_STATISTICS_CHANNEL,
   QUERY_TIMESHEET_CHANNEL,
+  STORE_SETTINGS_CHANNEL,
   TIMER_STARTED_CHANNEL,
   TIMER_STOPPED_CHANNEL,
 } from "../shared/infrastructure/channels";
@@ -162,6 +165,18 @@ function createRendererToMainChannels() {
       const query = TimesheetQueryDto.create(queryDto).validate();
       const result = await activitiesService.queryTimesheet(query);
       return TimesheetQueryResultDto.from(result);
+    },
+  );
+  ipcMain.handle(LOAD_SETTINGS_CHANNEL, async (_event) => {
+    const settings = await settingsGateway.load();
+    return SettingsDto.fromModel(settings!);
+  });
+  ipcMain.handle(
+    STORE_SETTINGS_CHANNEL,
+    async (_event, settings: SettingsDto) => {
+      const model = SettingsDto.create(settings).validate();
+      await settingsGateway.store(model);
+      activitiesService.applySettings(model);
     },
   );
 }

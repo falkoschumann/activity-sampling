@@ -14,11 +14,6 @@ import type {
   TimesheetQueryDto,
   TimesheetQueryResultDto,
 } from "../shared/infrastructure/activities";
-import type {
-  IntervalElapsedEventDto,
-  TimerStartedEventDto,
-  TimerStoppedEventDto,
-} from "../shared/infrastructure/timer";
 import {
   INTERVAL_ELAPSED_CHANNEL,
   LOG_ACTIVITY_CHANNEL,
@@ -29,6 +24,12 @@ import {
   TIMER_STARTED_CHANNEL,
   TIMER_STOPPED_CHANNEL,
 } from "../shared/infrastructure/channels";
+import type { SettingsDto } from "../shared/infrastructure/settings";
+import type {
+  IntervalElapsedEventDto,
+  TimerStartedEventDto,
+  TimerStoppedEventDto,
+} from "../shared/infrastructure/timer";
 
 contextBridge.exposeInMainWorld("activitySampling", {
   logActivity: async (
@@ -90,5 +91,13 @@ contextBridge.exposeInMainWorld("activitySampling", {
 
     ipcRenderer.on(INTERVAL_ELAPSED_CHANNEL, listener);
     return () => ipcRenderer.off(INTERVAL_ELAPSED_CHANNEL, listener);
+  },
+
+  loadSettings: async (): Promise<SettingsDto> => {
+    return ipcRenderer.invoke("loadSettings");
+  },
+
+  storeSettings: async (settings: SettingsDto): Promise<void> => {
+    return ipcRenderer.invoke("storeSettings", settings);
   },
 });

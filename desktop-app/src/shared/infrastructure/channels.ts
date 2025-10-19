@@ -13,3 +13,7 @@ export const QUERY_TIMESHEET_CHANNEL = "queryTimesheet";
 export const TIMER_STARTED_CHANNEL = "timerStarted";
 export const TIMER_STOPPED_CHANNEL = "timerStopped";
 export const INTERVAL_ELAPSED_CHANNEL = "intervalElapsed";
+
+// Settings
+export const LOAD_SETTINGS_CHANNEL = "loadSettings";
+export const STORE_SETTINGS_CHANNEL = "storeSettings";

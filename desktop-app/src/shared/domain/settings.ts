@@ -14,7 +14,7 @@ export class Settings {
   }
 
   static createDefault(): Settings {
-    return new Settings("data", "PT40H");
+    return new Settings("data");
   }
 
   dataDir: string;

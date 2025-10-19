@@ -24,6 +24,17 @@ export function createMenu({
             submenu: [
               { role: "about" },
               { type: "separator" },
+              {
+                label: "Settings...",
+                accelerator: "CmdOrCtrl+,",
+                click: () =>
+                  openWindow({
+                    rendererFile: "settings.html",
+                    width: 600,
+                    height: 330,
+                  }),
+              },
+              { type: "separator" },
               { role: "services" },
               { type: "separator" },
               { role: "hide" },

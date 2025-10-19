@@ -22,7 +22,7 @@ import {
   TimesheetQueryResult,
 } from "../../../src/shared/domain/activities";
 import { Holiday, Vacation } from "../../../src/main/domain/calendar";
-import { Settings } from "../../../src/main/domain/settings";
+import { Settings } from "../../../src/shared/domain/settings";
 import {
   type CurrentIntervalQuery,
   type CurrentIntervalQueryResult,
