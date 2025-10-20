@@ -1,29 +1,16 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
-import { useEffect, useState } from "react";
-
-import { Settings } from "../../../../shared/domain/settings";
-import { SettingsDto } from "../../../../shared/infrastructure/settings";
 import { Temporal } from "@js-temporal/polyfill";
 
+import { useSettings } from "../../../application/settings_service";
+import { Settings } from "../../../../shared/domain/settings";
+
 export default function StatisticsPage() {
-  const [settings, setSettings] = useState(Settings.createDefault());
-
-  async function handleSubmit() {
-    const dto = SettingsDto.fromModel(settings);
-    await window.activitySampling.storeSettings(dto);
-  }
-
-  useEffect(() => {
-    (async () => {
-      const dto = await window.activitySampling.loadSettings();
-      setSettings(SettingsDto.create(dto).validate());
-    })();
-  }, []);
+  const settings = useSettings();
 
   return (
     <main className="container my-4">
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={() => settings.store()}>
         <div className="mb-3">
           <label htmlFor="dataDirectory" className="form-label">
             Data directory
@@ -33,9 +20,9 @@ export default function StatisticsPage() {
             type="string"
             className="form-control"
             aria-describedby="dataDirectoryHelp"
-            value={settings?.dataDir}
+            value={settings.current.dataDir}
             onChange={(e) => {
-              setSettings(
+              settings.setCurrent(
                 (prevState) =>
                   ({ ...prevState, dataDir: e.target.value }) as Settings,
               );
@@ -53,9 +40,9 @@ export default function StatisticsPage() {
             id="capacity"
             type="number"
             className="form-control"
-            value={settings?.capacity.total("hours")}
+            value={settings.current.capacity.total("hours")}
             onChange={(e) => {
-              setSettings(
+              settings.setCurrent(
                 (prevState) =>
                   ({
                     ...prevState,
