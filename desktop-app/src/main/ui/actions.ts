@@ -5,15 +5,23 @@ import path from "node:path";
 import { app, BrowserWindow, dialog } from "electron/main";
 
 import icon from "../../../build/icon.png?asset";
+import type { SettingsService } from "../application/settings_service";
 
 const isProduction = app.isPackaged;
 
-export async function openDataDirectory(): Promise<string | undefined> {
+export async function chooseDataDirectory(
+  settingsService: SettingsService,
+): Promise<boolean> {
   const result = await dialog.showOpenDialog({
     title: "Choose data directory",
     properties: ["openDirectory", "createDirectory"],
   });
-  return result.filePaths[0];
+  const dataDir = result.filePaths[0];
+  if (dataDir != null) {
+    const settings = await settingsService.loadSettings();
+    await settingsService.storeSettings({ ...settings, dataDir });
+  }
+  return result.canceled;
 }
 
 export function openWindow({

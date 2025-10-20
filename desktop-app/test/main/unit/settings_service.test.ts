@@ -1,0 +1,84 @@
+// Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
+
+import { describe, expect, it } from "vitest";
+import {
+  SettingsChangedEvent,
+  SettingsService,
+} from "../../../src/main/application/settings_service";
+import { Settings } from "../../../src/shared/domain/settings";
+import { SettingsGateway } from "../../../src/main/infrastructure/settings_gateway";
+import { SettingsDto } from "../../../src/shared/infrastructure/settings";
+import { Temporal } from "@js-temporal/polyfill";
+
+describe("Settings service", () => {
+  describe("Load settings", () => {
+    it("should return defaults when no settings stored", async () => {
+      const { service } = configure({
+        readFileResponses: [null],
+      });
+
+      const settings = await service.loadSettings();
+
+      expect(settings).toEqual(Settings.createDefault());
+    });
+
+    it("should return stored settings", async () => {
+      const { service } = configure({
+        readFileResponses: [
+          SettingsDto.create({ dataDir: "test-data", capacity: "PT35H" }),
+        ],
+      });
+
+      const settings = await service.loadSettings();
+
+      expect(settings).toEqual(
+        Settings.create({ dataDir: "test-data", capacity: "PT35H" }),
+      );
+    });
+  });
+
+  describe("Store settings", () => {
+    it("should store settings", async () => {
+      const { service, gateway } = configure();
+      const storedSettings = gateway.trackStored();
+
+      await service.storeSettings(
+        Settings.create({ dataDir: "test-data", capacity: "PT35H" }),
+      );
+
+      expect(storedSettings.data).toEqual([
+        Settings.create({ dataDir: "test-data", capacity: "PT35H" }),
+      ]);
+    });
+
+    it("should emit event", async () => {
+      const { service } = configure();
+      const events: SettingsChangedEvent[] = [];
+      service.addEventListener(SettingsChangedEvent.TYPE, (event) =>
+        events.push(event as SettingsChangedEvent),
+      );
+
+      await service.storeSettings(
+        Settings.create({ dataDir: "test-data", capacity: "PT35H" }),
+      );
+
+      expect(events).toEqual([
+        expect.objectContaining({
+          type: SettingsChangedEvent.TYPE,
+          dataDir: "test-data",
+          capacity: Temporal.Duration.from("PT35H"),
+        }),
+      ]);
+    });
+  });
+});
+
+function configure({
+  readFileResponses,
+}: {
+  readFileResponses?: (SettingsDto | null | Error)[];
+} = {}) {
+  const gateway = SettingsGateway.createNull({ readFileResponses });
+  const service = new SettingsService(gateway);
+  return { service, gateway };
+}

@@ -28,13 +28,12 @@ import {
   TimesheetQueryDto,
   TimesheetQueryResultDto,
 } from "../shared/infrastructure/activities";
-import { SettingsGateway } from "./infrastructure/settings_gateway";
 import {
   IntervalElapsedEventDto,
   TimerStartedEventDto,
   TimerStoppedEventDto,
 } from "../shared/infrastructure/timer";
-import { openDataDirectory, openWindow } from "./ui/actions";
+import { chooseDataDirectory, openWindow } from "./ui/actions";
 import { createMenu } from "./ui/menu";
 import {
   INTERVAL_ELAPSED_CHANNEL,
@@ -48,10 +47,18 @@ import {
   TIMER_STARTED_CHANNEL,
   TIMER_STOPPED_CHANNEL,
 } from "../shared/infrastructure/channels";
+import {
+  SettingsChangedEvent,
+  SettingsService,
+} from "./application/settings_service";
 
-const settingsGateway = SettingsGateway.create();
+const settingsService = SettingsService.create();
 const activitiesService = ActivitiesService.create();
 const timerService = TimerService.create();
+
+settingsService.addEventListener(SettingsChangedEvent.TYPE, (event) => {
+  applySettings(event as SettingsChangedEvent);
+});
 
 const isProduction = app.isPackaged;
 
@@ -96,18 +103,19 @@ app.on("activate", function () {
 });
 
 async function initializeApplication() {
-  let settings = await settingsGateway.load();
-  if (settings != null) {
-    activitiesService.applySettings(settings);
+  const settings = await settingsService.loadSettings();
+  if (settings.dataDir !== Settings.createDefault().dataDir) {
+    applySettings(settings);
     return;
   }
 
-  let dataDir: string | undefined;
+  let canceled: boolean;
   do {
-    dataDir = await openDataDirectory();
-  } while (dataDir == null);
-  settings = { ...Settings.createDefault(), dataDir };
-  await settingsGateway.store(settings);
+    canceled = await chooseDataDirectory(settingsService);
+  } while (canceled);
+}
+
+function applySettings(settings: Settings) {
   activitiesService.applySettings(settings);
 }
 
@@ -168,14 +176,14 @@ function createRendererToMainChannels() {
     },
   );
   ipcMain.handle(LOAD_SETTINGS_CHANNEL, async (_event) => {
-    const settings = await settingsGateway.load();
+    const settings = await settingsService.loadSettings();
     return SettingsDto.fromModel(settings!);
   });
   ipcMain.handle(
     STORE_SETTINGS_CHANNEL,
     async (_event, settings: SettingsDto) => {
       const model = SettingsDto.create(settings).validate();
-      await settingsGateway.store(model);
+      await settingsService.storeSettings(model);
       activitiesService.applySettings(model);
     },
   );
@@ -188,14 +196,11 @@ async function createWindow() {
     height: 900,
   });
 
-  const onDataDirectoryChanged = async (dataDir: string) => {
-    let settings = await settingsGateway.load();
-    settings = { ...settings!, dataDir };
-    await settingsGateway.store(settings);
-    activitiesService.applySettings(settings);
-    mainWindow.webContents.reload();
-  };
-  const menu = createMenu({ timerService, onDataDirectoryChanged });
+  settingsService.addEventListener(SettingsChangedEvent.TYPE, () =>
+    mainWindow.webContents.reload(),
+  );
+
+  const menu = createMenu({ timerService, settingsService });
   Menu.setApplicationMenu(menu);
 
   createMainToLogWindowChannels(mainWindow);

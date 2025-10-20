@@ -25,6 +25,7 @@ import { EventStore } from "../infrastructure/event_store";
 import { ActivityLoggedEventDto } from "../infrastructure/events";
 import { HolidayRepository } from "../infrastructure/holiday_repository";
 import { VacationRepository } from "../infrastructure/vacation_repository";
+import { Temporal } from "@js-temporal/polyfill";
 
 export class ActivitiesService {
   static create({
@@ -38,7 +39,7 @@ export class ActivitiesService {
     );
   }
 
-  #settings: Settings;
+  #capacity: Temporal.Duration;
   readonly #eventStore: EventStore;
   readonly #holidayRepository: HolidayRepository;
   readonly #vacationRepository: VacationRepository;
@@ -51,7 +52,7 @@ export class ActivitiesService {
     vacationRepository: VacationRepository,
     clock = Clock.systemDefaultZone(),
   ) {
-    this.#settings = settings;
+    this.#capacity = settings.capacity;
     this.#eventStore = eventStore;
     this.#holidayRepository = holidayRepository;
     this.#vacationRepository = vacationRepository;
@@ -61,7 +62,7 @@ export class ActivitiesService {
   }
 
   applySettings(settings: Settings) {
-    this.#settings = settings;
+    this.#capacity = settings.capacity;
     this.#eventStore.fileName = `${settings.dataDir}/activity-log.csv`;
     this.#holidayRepository.fileName = `${settings.dataDir}/holidays.csv`;
     this.#vacationRepository.fileName = `${settings.dataDir}/vacation.csv`;
@@ -111,7 +112,7 @@ export class ActivitiesService {
       query,
       holidays,
       vacations,
-      capacity: this.#settings.capacity,
+      capacity: this.#capacity,
       clock: this.#clock,
     });
   }
