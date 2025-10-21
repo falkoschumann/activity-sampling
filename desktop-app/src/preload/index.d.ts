@@ -1,6 +1,11 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
 import type {
+  OpenDialogOptions,
+  OpenDialogReturnValue,
+} from "electron/renderer";
+
+import type {
   CommandStatusDto,
   LogActivityCommandDto,
   RecentActivitiesQueryDto,
@@ -49,6 +54,8 @@ export interface ActivitySampling {
   loadSettings(): Promise<SettingsDto>;
 
   storeSettings(settings: SettingsDto): Promise<void>;
+
+  showOpenDialog(options: OpenDialogOptions): Promise<OpenDialogReturnValue>;
 }
 
 declare global {

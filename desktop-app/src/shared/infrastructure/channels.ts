@@ -17,3 +17,4 @@ export const INTERVAL_ELAPSED_CHANNEL = "intervalElapsed";
 // Settings
 export const LOAD_SETTINGS_CHANNEL = "loadSettings";
 export const STORE_SETTINGS_CHANNEL = "storeSettings";
+export const SHOW_OPEN_DIALOG_CHANNEL = "showOpenDialog";

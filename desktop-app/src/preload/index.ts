@@ -1,6 +1,11 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
-import { contextBridge, ipcRenderer } from "electron/renderer";
+import {
+  contextBridge,
+  ipcRenderer,
+  type OpenDialogOptions,
+  type OpenDialogReturnValue,
+} from "electron/renderer";
 
 import type {
   CommandStatusDto,
@@ -16,11 +21,14 @@ import type {
 } from "../shared/infrastructure/activities";
 import {
   INTERVAL_ELAPSED_CHANNEL,
+  LOAD_SETTINGS_CHANNEL,
   LOG_ACTIVITY_CHANNEL,
   QUERY_RECENT_ACTIVITIES_CHANNEL,
   QUERY_REPORT_CHANNEL,
   QUERY_STATISTICS_CHANNEL,
   QUERY_TIMESHEET_CHANNEL,
+  SHOW_OPEN_DIALOG_CHANNEL,
+  STORE_SETTINGS_CHANNEL,
   TIMER_STARTED_CHANNEL,
   TIMER_STOPPED_CHANNEL,
 } from "../shared/infrastructure/channels";
@@ -94,10 +102,16 @@ contextBridge.exposeInMainWorld("activitySampling", {
   },
 
   loadSettings: async (): Promise<SettingsDto> => {
-    return ipcRenderer.invoke("loadSettings");
+    return ipcRenderer.invoke(LOAD_SETTINGS_CHANNEL);
   },
 
   storeSettings: async (settings: SettingsDto): Promise<void> => {
-    return ipcRenderer.invoke("storeSettings", settings);
+    return ipcRenderer.invoke(STORE_SETTINGS_CHANNEL, settings);
+  },
+
+  showOpenDialog: async (
+    options: OpenDialogOptions,
+  ): Promise<OpenDialogReturnValue> => {
+    return ipcRenderer.invoke(SHOW_OPEN_DIALOG_CHANNEL, options);
   },
 });

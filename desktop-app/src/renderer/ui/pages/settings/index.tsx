@@ -3,10 +3,35 @@
 import { Temporal } from "@js-temporal/polyfill";
 
 import { useSettings } from "../../../application/settings_service";
-import { Settings } from "../../../../shared/domain/settings";
 
 export default function StatisticsPage() {
   const settings = useSettings();
+
+  async function handleOpenDataDir() {
+    const result = await window.activitySampling.showOpenDialog({
+      title: "Choose data directory",
+      properties: ["openDirectory", "createDirectory"],
+    });
+
+    if (result.canceled || result.filePaths.length === 0) {
+      return;
+    }
+
+    changeDataDir(result.filePaths[0]);
+  }
+
+  function changeDataDir(dataDir: string) {
+    settings.setCurrent((prevState) => ({ ...prevState, dataDir }));
+  }
+
+  function changeCapacity(hours: number) {
+    settings.setCurrent((prevState) => ({
+      ...prevState,
+      capacity: Temporal.Duration.from({
+        hours,
+      }),
+    }));
+  }
 
   return (
     <main className="container my-4">
@@ -15,21 +40,22 @@ export default function StatisticsPage() {
           <label htmlFor="dataDirectory" className="form-label">
             Data directory
           </label>
-          <input
-            id="dataDirectory"
-            type="string"
-            className="form-control"
-            aria-describedby="dataDirectoryHelp"
-            value={settings.current.dataDir}
-            onChange={(e) => {
-              settings.setCurrent(
-                (prevState) =>
-                  ({ ...prevState, dataDir: e.target.value }) as Settings,
-              );
-            }}
-          />
-          <div id="dataDirectoryHelp" className="form-text">
-            We'll never share your email with anyone else.
+          <div className="d-flex gap-2">
+            <input
+              id="dataDirectory"
+              type="string"
+              className="form-control"
+              aria-describedby="dataDirectoryHelp"
+              value={settings.current.dataDir}
+              onChange={(e) => changeDataDir(e.target.value)}
+            />
+            <button
+              className="btn btn-primary"
+              type="button"
+              onClick={handleOpenDataDir}
+            >
+              Choose...
+            </button>
           </div>
         </div>
         <div className="mb-3">
@@ -41,17 +67,7 @@ export default function StatisticsPage() {
             type="number"
             className="form-control"
             value={settings.current.capacity.total("hours")}
-            onChange={(e) => {
-              settings.setCurrent(
-                (prevState) =>
-                  ({
-                    ...prevState,
-                    capacity: Temporal.Duration.from({
-                      hours: Number(e.target.value),
-                    }),
-                  }) as Settings,
-              );
-            }}
+            onChange={(e) => changeCapacity(Number(e.target.value))}
           />
         </div>
         <button type="submit" className="btn btn-primary">

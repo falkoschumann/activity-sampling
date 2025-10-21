@@ -1,7 +1,7 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
 import { shell } from "electron/common";
-import { app, BrowserWindow, ipcMain, Menu } from "electron/main";
+import { app, BrowserWindow, dialog, ipcMain, Menu } from "electron/main";
 import {
   installExtension,
   REACT_DEVELOPER_TOOLS,
@@ -43,6 +43,7 @@ import {
   QUERY_REPORT_CHANNEL,
   QUERY_STATISTICS_CHANNEL,
   QUERY_TIMESHEET_CHANNEL,
+  SHOW_OPEN_DIALOG_CHANNEL,
   STORE_SETTINGS_CHANNEL,
   TIMER_STARTED_CHANNEL,
   TIMER_STOPPED_CHANNEL,
@@ -186,6 +187,11 @@ function createRendererToMainChannels() {
       await settingsService.storeSettings(model);
       activitiesService.applySettings(model);
     },
+  );
+  ipcMain.handle(
+    SHOW_OPEN_DIALOG_CHANNEL,
+    async (_event, options: Electron.OpenDialogOptions) =>
+      dialog.showOpenDialog(options),
   );
 }
 
