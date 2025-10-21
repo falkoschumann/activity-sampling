@@ -16,8 +16,10 @@ import {
   type RecentActivitiesQueryResult,
   ReportQuery,
   ReportQueryResult,
+  Statistics,
   StatisticsQuery,
   StatisticsQueryResult,
+  type StatisticsType,
   TimesheetQuery,
   TimesheetQueryResult,
 } from "../../../src/shared/domain/activities";
@@ -332,8 +334,9 @@ class StatisticsDsl {
   // Queries
   //
 
-  async queryStatistics() {
-    await this.#activitiesDriver.queryStatistics({});
+  async queryStatistics(args: { statistics?: StatisticsType } = {}) {
+    const statistics = args.statistics ?? Statistics.WORKING_HOURS;
+    await this.#activitiesDriver.queryStatistics({ statistics });
   }
 
   assertStatistics(args: {
@@ -346,8 +349,8 @@ class StatisticsDsl {
     const histogram = args.histogram && {
       binEdges: args.histogram.binEdges,
       frequencies: args.histogram.frequencies,
-      xAxisLabel: "Duration (days)",
-      yAxisLabel: "Number of Tasks",
+      xAxisLabel: expect.any(String),
+      yAxisLabel: expect.any(String),
     };
     const median =
       args.median != null

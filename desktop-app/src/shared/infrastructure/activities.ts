@@ -14,9 +14,10 @@ import {
   ReportEntry,
   ReportQuery,
   ReportQueryResult,
-  type Scope,
+  type ScopeType,
   StatisticsQuery,
   StatisticsQueryResult,
+  type StatisticsType,
   TimesheetEntry,
   TimesheetQuery,
   TimesheetQueryResult,
@@ -363,7 +364,7 @@ export class ReportQueryDto {
     to,
     timeZone,
   }: {
-    scope: Scope;
+    scope: ScopeType;
     from?: string;
     to?: string;
     timeZone?: string;
@@ -380,13 +381,13 @@ export class ReportQueryDto {
     });
   }
 
-  readonly scope: Scope;
+  readonly scope: ScopeType;
   readonly from?: string;
   readonly to?: string;
   readonly timeZone?: string;
 
   private constructor(
-    scope: Scope,
+    scope: ScopeType,
     from?: string,
     to?: string,
     timeZone?: string,
@@ -480,22 +481,27 @@ export class ReportEntryDto {
 
 export class StatisticsQueryDto {
   static create({
+    statistics,
     ignoreSmallTasks,
   }: {
+    statistics: StatisticsType;
     ignoreSmallTasks?: boolean;
   }): StatisticsQueryDto {
-    return new StatisticsQueryDto(ignoreSmallTasks);
+    return new StatisticsQueryDto(statistics, ignoreSmallTasks);
   }
 
   static from(model: StatisticsQuery): StatisticsQueryDto {
     return StatisticsQueryDto.create({
+      statistics: model.statistics,
       ignoreSmallTasks: model.ignoreSmallTasks,
     });
   }
 
+  readonly statistics: StatisticsType;
   readonly ignoreSmallTasks?: boolean;
 
-  private constructor(ignoreSmallTasks?: boolean) {
+  private constructor(statistics: StatisticsType, ignoreSmallTasks?: boolean) {
+    this.statistics = statistics;
     this.ignoreSmallTasks = ignoreSmallTasks;
   }
 

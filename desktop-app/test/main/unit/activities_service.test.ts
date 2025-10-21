@@ -11,6 +11,7 @@ import {
   LogActivityCommand,
   ReportEntry,
   Scope,
+  Statistics,
   StatisticsQueryResult,
   TimesheetEntry,
 } from "../../../src/shared/domain/activities";
@@ -143,7 +144,7 @@ describe("Activities service", () => {
   });
 
   describe("Query statistics", () => {
-    it("should return histogram for tasks per duration", async () => {
+    it("should return statistics for working hours", async () => {
       const { service } = configure({
         events: [
           ActivityLoggedEventDto.createTestInstance({
@@ -164,7 +165,9 @@ describe("Activities service", () => {
         ],
       });
 
-      const result = await service.queryStatistics({});
+      const result = await service.queryStatistics({
+        statistics: Statistics.WORKING_HOURS,
+      });
 
       expect(result).toEqual<StatisticsQueryResult>({
         histogram: {
@@ -178,6 +181,49 @@ describe("Activities service", () => {
           edge25: 3,
           edge50: 5,
           edge75: 5,
+          edge100: 5,
+        },
+      });
+    });
+
+    it("should return statistics for lead time", async () => {
+      const { service } = configure({
+        events: [
+          ActivityLoggedEventDto.createTestInstance({
+            timestamp: "2025-08-13T12:00:00Z",
+            task: "Task A",
+          }),
+          ActivityLoggedEventDto.createTestInstance({
+            timestamp: "2025-08-13T12:00:00Z",
+            task: "Task B",
+          }),
+          ActivityLoggedEventDto.createTestInstance({
+            timestamp: "2025-08-16T12:00:00Z",
+            task: "Task A",
+          }),
+          ActivityLoggedEventDto.createTestInstance({
+            timestamp: "2025-08-18T12:00:00Z",
+            task: "Task B",
+          }),
+        ],
+      });
+
+      const result = await service.queryStatistics({
+        statistics: Statistics.LEAD_TIMES,
+      });
+
+      expect(result).toEqual<StatisticsQueryResult>({
+        histogram: {
+          binEdges: ["0", "0.5", "1", "2", "3", "5"],
+          frequencies: [0, 0, 0, 1, 1],
+          xAxisLabel: "Lead time (days)",
+          yAxisLabel: "Number of Tasks",
+        },
+        median: {
+          edge0: 0,
+          edge25: 3,
+          edge50: 4,
+          edge75: 4,
           edge100: 5,
         },
       });

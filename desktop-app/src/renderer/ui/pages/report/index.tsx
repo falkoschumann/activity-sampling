@@ -3,7 +3,7 @@
 import { useReducer, useState } from "react";
 
 import { useReport } from "../../../application/activities_service";
-import { Scope } from "../../../../shared/domain/activities";
+import { Scope, type ScopeType } from "../../../../shared/domain/activities";
 import {
   changePeriod,
   goToNextPeriod,
@@ -23,7 +23,7 @@ export default function ReportPage() {
     { unit: PeriodUnit.MONTH },
     init,
   );
-  const [scope, setScope] = useState<Scope>(Scope.PROJECTS);
+  const [scope, setScope] = useState<ScopeType>(Scope.PROJECTS);
 
   const report = useReport({ ...state, scope });
 

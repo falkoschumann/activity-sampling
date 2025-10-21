@@ -12,6 +12,7 @@ import {
   ReportQuery,
   ReportQueryResult,
   Scope,
+  Statistics,
   StatisticsQuery,
   StatisticsQueryResult,
   type TimesheetEntry,
@@ -235,22 +236,72 @@ export async function projectStatistics({
 }: {
   replay: AsyncGenerator<ActivityLoggedEvent>;
   query: StatisticsQuery;
+  clock?: Clock;
 }): Promise<StatisticsQueryResult> {
-  const tasks: Record<string, Temporal.Duration> = {};
-  for await (const event of replay) {
-    const duration = Temporal.Duration.from(event.duration);
-    if (tasks[event.task]) {
-      tasks[event.task] = normalizeDuration(tasks[event.task].add(duration));
-    } else {
-      tasks[event.task] = normalizeDuration(duration);
+  let xAxisLabel: string;
+  let days: number[];
+  if (query.statistics === Statistics.WORKING_HOURS) {
+    xAxisLabel = "Duration (days)";
+
+    const tasks: Record<string, Temporal.Duration> = {};
+    for await (const event of replay) {
+      const duration = Temporal.Duration.from(event.duration);
+      if (tasks[event.task]) {
+        tasks[event.task] = normalizeDuration(tasks[event.task].add(duration));
+      } else {
+        tasks[event.task] = normalizeDuration(duration);
+      }
     }
+
+    days = Object.values(tasks)
+      .map((duration) => duration.total("hours"))
+      .map((hours) => hours / 8)
+      .filter((days) => (query.ignoreSmallTasks ? days > 0.5 : true))
+      .sort((a, b) => a - b);
+  } else if (query.statistics === Statistics.LEAD_TIMES) {
+    xAxisLabel = "Lead time (days)";
+
+    const leadTimes: Record<
+      string,
+      { from: Temporal.Instant; to: Temporal.Instant }
+    > = {};
+    for await (const event of replay) {
+      if (leadTimes[event.task]) {
+        if (
+          Temporal.Instant.compare(
+            event.timestamp,
+            leadTimes[event.task].from,
+          ) < 0
+        ) {
+          leadTimes[event.task].from = event.timestamp;
+        }
+        if (
+          Temporal.Instant.compare(event.timestamp, leadTimes[event.task].to) >
+          0
+        ) {
+          leadTimes[event.task].to = event.timestamp;
+        }
+      } else {
+        leadTimes[event.task] = {
+          from: event.timestamp,
+          to: event.timestamp,
+        };
+      }
+    }
+
+    const tasks: Record<string, Temporal.Duration> = {};
+    for (const [task, leadTime] of Object.entries(leadTimes)) {
+      tasks[task] = normalizeDuration(leadTime.to.since(leadTime.from));
+    }
+
+    days = Object.values(tasks)
+      .map((duration) => duration.total("days"))
+      .filter((days) => (query.ignoreSmallTasks ? days > 0.5 : true))
+      .sort((a, b) => a - b);
+  } else {
+    throw new Error(`Unknown statistics for ${query.statistics}.`);
   }
 
-  const days = Object.values(tasks)
-    .map((duration) => duration.total("hours"))
-    .map((hours) => hours / 8)
-    .filter((days) => (query.ignoreSmallTasks ? days > 0.5 : true))
-    .sort((a, b) => a - b);
   const maxDay = days.at(-1) ?? 0;
 
   const binEdges: number[] = [];
@@ -318,7 +369,7 @@ export async function projectStatistics({
     histogram: {
       binEdges: binEdges.map((edge) => String(edge)),
       frequencies,
-      xAxisLabel: "Duration (days)",
+      xAxisLabel,
       yAxisLabel: "Number of Tasks",
     },
     median: { edge0, edge25, edge50, edge75, edge100 },

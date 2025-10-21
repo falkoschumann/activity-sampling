@@ -1,13 +1,13 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
-import { Scope } from "../../../../shared/domain/activities";
+import { Scope, type ScopeType } from "../../../../shared/domain/activities";
 
 export default function ScopeComponent({
   scope,
   onChangeScope,
 }: {
-  scope: Scope;
-  onChangeScope: (scope: Scope) => void;
+  scope: ScopeType;
+  onChangeScope: (scope: ScopeType) => void;
 }) {
   return (
     <div className="container">

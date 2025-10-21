@@ -269,7 +269,7 @@ export class ReportQuery {
     to,
     timeZone,
   }: {
-    scope: Scope;
+    scope: ScopeType;
     from?: Temporal.PlainDateLike | string;
     to?: Temporal.PlainDateLike | string;
     timeZone?: Temporal.TimeZoneLike;
@@ -277,13 +277,13 @@ export class ReportQuery {
     return new ReportQuery(scope, from, to, timeZone);
   }
 
-  readonly scope: Scope;
+  readonly scope: ScopeType;
   readonly from?: Temporal.PlainDate;
   readonly to?: Temporal.PlainDate;
   readonly timeZone?: Temporal.TimeZoneLike;
 
   private constructor(
-    scope: Scope,
+    scope: ScopeType,
     from?: Temporal.PlainDateLike | string,
     to?: Temporal.PlainDateLike | string,
     timeZone?: Temporal.TimeZoneLike,
@@ -301,7 +301,7 @@ export const Scope = Object.freeze({
   TASKS: "Tasks",
 });
 
-export type Scope = (typeof Scope)[keyof typeof Scope];
+export type ScopeType = (typeof Scope)[keyof typeof Scope];
 
 export class ReportQueryResult {
   static create({
@@ -369,17 +369,30 @@ export class ReportEntry {
   }
 }
 
+export const Statistics = Object.freeze({
+  WORKING_HOURS: "Working hours",
+  LEAD_TIMES: "Lead times",
+});
+
+export type StatisticsType = (typeof Statistics)[keyof typeof Statistics];
+
 export class StatisticsQuery {
   static create({
+    statistics,
     ignoreSmallTasks,
-  }: { ignoreSmallTasks?: boolean } = {}): StatisticsQuery {
-    return new StatisticsQuery(ignoreSmallTasks);
+  }: {
+    statistics: StatisticsType;
+    ignoreSmallTasks?: boolean;
+  }): StatisticsQuery {
+    return new StatisticsQuery(statistics, ignoreSmallTasks);
   }
 
+  readonly statistics: StatisticsType;
   // WORKAROUND: Temporary ignore small tasks until task have categories
   readonly ignoreSmallTasks?: boolean;
 
-  private constructor(ignoreSmallTasks?: boolean) {
+  private constructor(statistics: StatisticsType, ignoreSmallTasks?: boolean) {
+    this.statistics = statistics;
     this.ignoreSmallTasks = ignoreSmallTasks;
   }
 }

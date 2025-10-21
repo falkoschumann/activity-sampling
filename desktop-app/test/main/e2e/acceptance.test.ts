@@ -2,6 +2,7 @@
 
 import { describe, it } from "vitest";
 import { startActivitySampling } from "./activity_sampling";
+import { Statistics } from "../../../src/shared/domain/activities";
 
 describe("Activity Sampling", () => {
   describe("Start Timer", () => {
@@ -308,12 +309,45 @@ describe("Activity Sampling", () => {
           duration: "PT40H",
         });
 
-        await statistics.queryStatistics();
+        await statistics.queryStatistics({
+          statistics: Statistics.WORKING_HOURS,
+        });
 
         statistics.assertStatistics({
           histogram: {
             binEdges: ["0", "0.5", "1", "2", "3", "5"],
             frequencies: [0, 0, 0, 1, 2],
+          },
+        });
+      });
+    });
+
+    describe("Create histogram for lead times", () => {
+      it("should return frequency per lead time", async () => {
+        const { statistics } = await startActivitySampling();
+        await statistics.activityLogged({
+          timestamp: "2025-08-13T12:00:00Z",
+          task: "Task A",
+        });
+        await statistics.activityLogged({
+          timestamp: "2025-08-13T12:00:00Z",
+          task: "Task B",
+        });
+        await statistics.activityLogged({
+          timestamp: "2025-08-16T12:00:00Z",
+          task: "Task A",
+        });
+        await statistics.activityLogged({
+          timestamp: "2025-08-18T12:00:00Z",
+          task: "Task B",
+        });
+
+        await statistics.queryStatistics({ statistics: Statistics.LEAD_TIMES });
+
+        statistics.assertStatistics({
+          histogram: {
+            binEdges: ["0", "0.5", "1", "2", "3", "5"],
+            frequencies: [0, 0, 0, 1, 1],
           },
         });
       });
@@ -338,9 +372,37 @@ describe("Activity Sampling", () => {
           duration: "PT40H",
         });
 
-        await statistics.queryStatistics();
+        await statistics.queryStatistics({
+          statistics: Statistics.WORKING_HOURS,
+        });
 
         statistics.assertStatistics({ median: 5 });
+      });
+    });
+
+    describe("Determine median for hours worked on tasks", () => {
+      it("should return median task duration", async () => {
+        const { statistics } = await startActivitySampling();
+        await statistics.activityLogged({
+          timestamp: "2025-08-13T12:00:00Z",
+          task: "Task A",
+        });
+        await statistics.activityLogged({
+          timestamp: "2025-08-13T12:00:00Z",
+          task: "Task B",
+        });
+        await statistics.activityLogged({
+          timestamp: "2025-08-16T12:00:00Z",
+          task: "Task A",
+        });
+        await statistics.activityLogged({
+          timestamp: "2025-08-18T12:00:00Z",
+          task: "Task B",
+        });
+
+        await statistics.queryStatistics({ statistics: Statistics.LEAD_TIMES });
+
+        statistics.assertStatistics({ median: 4 });
       });
     });
   });
