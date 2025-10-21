@@ -604,8 +604,8 @@ export class Capacity {
 
   static empty(): Capacity {
     return Capacity.create({
-      hours: Temporal.Duration.from("PT40M"),
-      offset: Temporal.Duration.from("-PT40M"),
+      hours: Temporal.Duration.from("PT40H"),
+      offset: Temporal.Duration.from("-PT40H"),
     });
   }
 
