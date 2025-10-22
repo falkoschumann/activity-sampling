@@ -1,7 +1,7 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
 import { Temporal } from "@js-temporal/polyfill";
-import { Success } from "@muspellheim/shared";
+import { type CommandStatus, Success } from "@muspellheim/shared";
 import { describe, expect, it } from "vitest";
 
 import { Clock } from "../../../src/shared/common/temporal";
@@ -9,11 +9,14 @@ import { ActivitiesService } from "../../../src/main/application/activities_serv
 import {
   Activity,
   LogActivityCommand,
+  RecentActivitiesQueryResult,
   ReportEntry,
+  ReportQueryResult,
   Scope,
   Statistics,
   StatisticsQueryResult,
   TimesheetEntry,
+  TimesheetQueryResult,
 } from "../../../src/shared/domain/activities";
 import { Settings } from "../../../src/shared/domain/settings";
 import { EventStore } from "../../../src/main/infrastructure/event_store";
@@ -37,8 +40,8 @@ describe("Activities service", () => {
         LogActivityCommand.createTestInstance(),
       );
 
-      expect(status).toEqual(new Success());
-      expect(recordEvents.data).toEqual([
+      expect(status).toEqual<CommandStatus>(new Success());
+      expect(recordEvents.data).toEqual<ActivityLoggedEventDto[]>([
         ActivityLoggedEventDto.createTestInstance(),
       ]);
     });
@@ -51,8 +54,8 @@ describe("Activities service", () => {
         LogActivityCommand.createTestInstance({ notes: "Lorem ipsum" }),
       );
 
-      expect(status).toEqual(new Success());
-      expect(recordEvents.data).toEqual([
+      expect(status).toEqual<CommandStatus>(new Success());
+      expect(recordEvents.data).toEqual<ActivityLoggedEventDto[]>([
         ActivityLoggedEventDto.createTestInstance({ notes: "Lorem ipsum" }),
       ]);
     });
@@ -71,7 +74,7 @@ describe("Activities service", () => {
 
       const result = await service.queryRecentActivities({});
 
-      expect(result).toEqual({
+      expect(result).toEqual<RecentActivitiesQueryResult>({
         workingDays: [
           {
             date: Temporal.PlainDate.from("2025-06-05"),
@@ -127,7 +130,7 @@ describe("Activities service", () => {
 
       const result = await service.queryReport({ scope: Scope.CLIENTS });
 
-      expect(result).toEqual({
+      expect(result).toEqual<ReportQueryResult>({
         entries: [
           ReportEntry.createTestInstance({
             name: "Client 1",
@@ -255,7 +258,7 @@ describe("Activities service", () => {
         to: Temporal.PlainDate.from("2025-06-15"),
       });
 
-      expect(result).toEqual({
+      expect(result).toEqual<TimesheetQueryResult>({
         entries: [
           TimesheetEntry.createTestInstance({
             date: Temporal.PlainDate.from("2025-06-10"),

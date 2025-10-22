@@ -11,7 +11,7 @@ describe("Calendar", () => {
 
     const hours = calendar.countWorkingHours("2025-06-01", "2025-07-01");
 
-    expect(hours).toEqual(Temporal.Duration.from("PT168H"));
+    expect(hours).toEqual<Temporal.Duration>(Temporal.Duration.from("PT168H"));
   });
 
   it("should count business hours with holidays", () => {
@@ -23,7 +23,7 @@ describe("Calendar", () => {
 
     const hours = calendar.countWorkingHours("2025-06-01", "2025-07-01");
 
-    expect(hours).toEqual(Temporal.Duration.from("PT160H"));
+    expect(hours).toEqual<Temporal.Duration>(Temporal.Duration.from("PT160H"));
   });
 
   it("should count business hours with half holidays", () => {
@@ -45,7 +45,7 @@ describe("Calendar", () => {
 
     const hours = calendar.countWorkingHours("2025-12-22", "2025-12-28");
 
-    expect(hours).toEqual(Temporal.Duration.from("PT20H"));
+    expect(hours).toEqual<Temporal.Duration>(Temporal.Duration.from("PT20H"));
   });
 
   it("should count business hours with vacation", () => {
@@ -55,7 +55,7 @@ describe("Calendar", () => {
 
     const hours = calendar.countWorkingHours("2025-09-08", "2025-09-14");
 
-    expect(hours).toEqual(Temporal.Duration.from("PT32H"));
+    expect(hours).toEqual<Temporal.Duration>(Temporal.Duration.from("PT32H"));
   });
 
   it("should count business hours with half vacation", () => {
@@ -87,6 +87,6 @@ describe("Calendar", () => {
 
     const hours = calendar.countWorkingHours("2025-12-22", "2025-12-28");
 
-    expect(hours).toEqual(Temporal.Duration.from("PT0S"));
+    expect(hours).toEqual<Temporal.Duration>(Temporal.Duration.from("PT0S"));
   });
 });

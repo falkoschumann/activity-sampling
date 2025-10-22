@@ -67,7 +67,7 @@ export class EventStore<T = unknown> extends EventTarget {
   }
 
   trackRecorded(): OutputTracker<T> {
-    return OutputTracker.create(this, RECORDED_EVENT);
+    return OutputTracker.create<T>(this, RECORDED_EVENT);
   }
 
   async *replay(): AsyncGenerator<T> {

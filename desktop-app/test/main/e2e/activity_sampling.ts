@@ -11,17 +11,23 @@ import { Clock } from "../../../src/shared/common/temporal";
 import { ActivitiesService } from "../../../src/main/application/activities_service";
 import { TimerService } from "../../../src/main/application/timer_service";
 import {
+  Capacity,
+  Histogram,
   type LogActivityCommand,
   type RecentActivitiesQuery,
   type RecentActivitiesQueryResult,
+  ReportEntry,
   ReportQuery,
   ReportQueryResult,
   Statistics,
   StatisticsQuery,
   StatisticsQueryResult,
   type StatisticsType,
+  TimesheetEntry,
   TimesheetQuery,
   TimesheetQueryResult,
+  TimeSummary,
+  WorkingDay,
 } from "../../../src/shared/domain/activities";
 import { Holiday, Vacation } from "../../../src/main/domain/calendar";
 import { Settings } from "../../../src/shared/domain/settings";
@@ -30,6 +36,8 @@ import {
   type CurrentIntervalQueryResult,
   type StartTimerCommand,
   StopTimerCommand,
+  TimerStartedEvent,
+  TimerStoppedEvent,
 } from "../../../src/shared/domain/timer";
 import { EventStore } from "../../../src/main/infrastructure/event_store";
 import { ActivityLoggedEventDto } from "../../../src/main/infrastructure/events";
@@ -548,14 +556,14 @@ class ActivitiesDriver {
 
   assertRecentActivities(result: Partial<RecentActivitiesQueryResult>) {
     if (result.workingDays) {
-      expect(this.#recentActivitiesQueryResult?.workingDays).toEqual(
-        result.workingDays,
-      );
+      expect(this.#recentActivitiesQueryResult?.workingDays).toEqual<
+        WorkingDay[]
+      >(result.workingDays);
     }
     if (result.timeSummary) {
-      expect(this.#recentActivitiesQueryResult?.timeSummary).toEqual(
-        result.timeSummary,
-      );
+      expect(
+        this.#recentActivitiesQueryResult?.timeSummary,
+      ).toEqual<TimeSummary>(result.timeSummary);
     }
   }
 
@@ -565,10 +573,14 @@ class ActivitiesDriver {
 
   assertReport(result: Partial<ReportQueryResult>) {
     if (result.entries) {
-      expect(this.#reportQueryResult?.entries).toEqual(result.entries);
+      expect(this.#reportQueryResult?.entries).toEqual<ReportEntry[]>(
+        result.entries,
+      );
     }
     if (result.totalHours) {
-      expect(this.#reportQueryResult?.totalHours).toEqual(result.totalHours);
+      expect(this.#reportQueryResult?.totalHours).toEqual<Temporal.Duration>(
+        result.totalHours,
+      );
     }
   }
 
@@ -579,10 +591,12 @@ class ActivitiesDriver {
 
   assertStatistics(result: Partial<StatisticsQueryResult>) {
     if (result.histogram) {
-      expect(this.#statisticsQueryResult?.histogram).toEqual(result.histogram);
+      expect(this.#statisticsQueryResult?.histogram).toEqual<Histogram>(
+        result.histogram,
+      );
     }
     if (result.median) {
-      expect(this.#statisticsQueryResult?.median.edge50).toEqual(
+      expect(this.#statisticsQueryResult?.median.edge50).toBe(
         result.median.edge50,
       );
     }
@@ -595,13 +609,19 @@ class ActivitiesDriver {
 
   assertTimesheet(result: Partial<TimesheetQueryResult>) {
     if (result.entries) {
-      expect(this.#timesheetQueryResult?.entries).toEqual(result.entries);
+      expect(this.#timesheetQueryResult?.entries).toEqual<TimesheetEntry[]>(
+        result.entries,
+      );
     }
     if (result.totalHours) {
-      expect(this.#timesheetQueryResult?.totalHours).toEqual(result.totalHours);
+      expect(this.#timesheetQueryResult?.totalHours).toEqual<Temporal.Duration>(
+        result.totalHours,
+      );
     }
     if (result.capacity) {
-      expect(this.#timesheetQueryResult?.capacity).toEqual(result.capacity);
+      expect(this.#timesheetQueryResult?.capacity).toEqual<Capacity>(
+        result.capacity,
+      );
     }
   }
 
@@ -615,7 +635,7 @@ class ActivitiesDriver {
 
   async assertActivityLogged(event: ActivityLoggedEventDto) {
     const events = await arrayFromAsync(this.#eventStore.replay());
-    expect(events.at(-1)).toEqual(event);
+    expect(events.at(-1)).toEqual<ActivityLoggedEventDto>(event);
   }
 
   async holidaysChanged({ holidays }: { holidays: Holiday[] }) {
@@ -666,7 +686,9 @@ class TimerDriver {
   }
 
   assertCurrentInterval(result: CurrentIntervalQueryResult) {
-    expect(this.#currentIntervalQueryResult).toEqual(result);
+    expect(
+      this.#currentIntervalQueryResult,
+    ).toEqual<CurrentIntervalQueryResult>(result);
   }
 
   //
@@ -680,7 +702,7 @@ class TimerDriver {
     timestamp: Temporal.Instant;
     interval: Temporal.Duration;
   }) {
-    expect(this.#timerEvents.at(-1)).toEqual(
+    expect(this.#timerEvents.at(-1)).toEqual<TimerStartedEvent>(
       expect.objectContaining({
         type: "timerStarted",
         timestamp,
@@ -690,7 +712,7 @@ class TimerDriver {
   }
 
   assertTimerStopped({ timestamp }: { timestamp: Temporal.Instant }) {
-    expect(this.#timerEvents.at(-1)).toEqual(
+    expect(this.#timerEvents.at(-1)).toEqual<TimerStoppedEvent>(
       expect.objectContaining({
         type: "timerStopped",
         timestamp,

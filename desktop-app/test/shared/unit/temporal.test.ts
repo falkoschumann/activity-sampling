@@ -14,7 +14,7 @@ describe("Clock", () => {
 
     expect(nowInstant.epochMilliseconds - Date.now()).lessThan(100);
     expect(nowMillis - Date.now()).lessThan(100);
-    expect(clock.zone).toEqual("UTC");
+    expect(clock.zone).toBe("UTC");
   });
 
   it("should return current timestamp with system default zone", () => {
@@ -25,7 +25,7 @@ describe("Clock", () => {
 
     expect(nowInstant.epochMilliseconds - Date.now()).lessThan(100);
     expect(nowMillis - Date.now()).lessThan(100);
-    expect(clock.zone).toEqual("Europe/Berlin");
+    expect(clock.zone).toBe("Europe/Berlin");
   });
 
   it("should return fixed timestamp", () => {
@@ -34,8 +34,8 @@ describe("Clock", () => {
 
     const now = clock.instant();
 
-    expect(now).toEqual(Temporal.Instant.from(fixed));
-    expect(clock.zone).toEqual("Europe/Berlin");
+    expect(now).toEqual<Temporal.Instant>(Temporal.Instant.from(fixed));
+    expect(clock.zone).toBe("Europe/Berlin");
   });
 
   it("should return a timestamp with an offset", () => {
@@ -43,7 +43,7 @@ describe("Clock", () => {
 
     const offset = Clock.offset(clock, Temporal.Duration.from("PT5M"));
 
-    expect(offset.instant()).toEqual(
+    expect(offset.instant()).toEqual<Temporal.Instant>(
       Temporal.Instant.from("2025-08-28T16:00Z"),
     );
   });
@@ -56,6 +56,6 @@ describe("Duration", () => {
 
     const normalized = normalizeDuration(duration);
 
-    expect(normalized.toString()).toEqual("PT1H1M1S");
+    expect(normalized.toString()).toBe("PT1H1M1S");
   });
 });

@@ -45,7 +45,7 @@ describe("Event store", () => {
 
       await store.record(ActivityLoggedEventDto.createTestInstance());
 
-      expect(recordEvents.data).toEqual([
+      expect(recordEvents.data).toEqual<ActivityLoggedEventDto[]>([
         ActivityLoggedEventDto.createTestInstance(),
       ]);
     });

@@ -42,12 +42,12 @@ describe("Timer", () => {
         state,
         changeText({ name: "client", text: "Test client" }),
       );
-      expect(state.form.isLogButtonDisabled).toEqual(true);
+      expect(state.form.isLogButtonDisabled).toBe(true);
       state = reducer(
         state,
         changeText({ name: "project", text: "Test project" }),
       );
-      expect(state.form.isLogButtonDisabled).toEqual(true);
+      expect(state.form.isLogButtonDisabled).toBe(true);
       state = reducer(state, changeText({ name: "task", text: "Test task" }));
 
       expect(state).toEqual<State>({

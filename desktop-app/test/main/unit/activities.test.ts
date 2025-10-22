@@ -7,13 +7,18 @@ import { Clock } from "../../../src/shared/common/temporal";
 import {
   Activity,
   ActivityLoggedEvent,
+  Capacity,
   RecentActivitiesQueryResult,
   ReportEntry,
+  ReportQueryResult,
   Scope,
   Statistics,
   StatisticsQueryResult,
   TimesheetEntry,
   TimesheetQuery,
+  TimesheetQueryResult,
+  TimeSummary,
+  WorkingDay,
 } from "../../../src/shared/domain/activities";
 import {
   projectRecentActivities,
@@ -30,7 +35,9 @@ describe("Activities", () => {
 
       const result = await projectRecentActivities({ replay, query: {} });
 
-      expect(result).toEqual(RecentActivitiesQueryResult.empty());
+      expect(result).toEqual<RecentActivitiesQueryResult>(
+        RecentActivitiesQueryResult.empty(),
+      );
     });
 
     it("should return activities grouped by working day for the last 30 days", async () => {
@@ -50,7 +57,7 @@ describe("Activities", () => {
         clock: Clock.fixed("2025-06-05T10:00:00Z", "Europe/Berlin"),
       });
 
-      expect(result.workingDays).toEqual([
+      expect(result.workingDays).toEqual<WorkingDay[]>([
         {
           date: Temporal.PlainDate.from("2025-06-05"),
           activities: [
@@ -116,7 +123,7 @@ describe("Activities", () => {
         clock: Clock.fixed("2025-06-05T10:00:00Z", "Europe/Berlin"),
       });
 
-      expect(result.timeSummary).toEqual({
+      expect(result.timeSummary).toEqual<TimeSummary>({
         hoursToday: Temporal.Duration.from("PT1H"),
         hoursYesterday: Temporal.Duration.from("PT1H30M"),
         hoursThisWeek: Temporal.Duration.from("PT4H"),
@@ -134,7 +141,7 @@ describe("Activities", () => {
         query: { scope: Scope.TASKS },
       });
 
-      expect(result).toEqual({
+      expect(result).toEqual<ReportQueryResult>({
         entries: [],
         totalHours: Temporal.Duration.from("PT0S"),
       });
@@ -164,7 +171,7 @@ describe("Activities", () => {
         query: { scope: Scope.CLIENTS },
       });
 
-      expect(result).toEqual({
+      expect(result).toEqual<ReportQueryResult>({
         entries: [
           ReportEntry.createTestInstance({
             name: "Client 1",
@@ -218,7 +225,7 @@ describe("Activities", () => {
         query: { scope: Scope.PROJECTS },
       });
 
-      expect(result).toEqual({
+      expect(result).toEqual<ReportQueryResult>({
         entries: [
           ReportEntry.createTestInstance({
             name: "Project A",
@@ -256,7 +263,7 @@ describe("Activities", () => {
         query: { scope: Scope.PROJECTS },
       });
 
-      expect(result).toEqual({
+      expect(result).toEqual<ReportQueryResult>({
         entries: [
           ReportEntry.createTestInstance({
             name: "Project A",
@@ -292,7 +299,7 @@ describe("Activities", () => {
         query: { scope: Scope.TASKS },
       });
 
-      expect(result).toEqual({
+      expect(result).toEqual<ReportQueryResult>({
         entries: [
           ReportEntry.createTestInstance({
             name: "Task 1",
@@ -327,7 +334,9 @@ describe("Activities", () => {
         },
       });
 
-      expect(result.totalHours).toEqual(Temporal.Duration.from("PT1H30M"));
+      expect(result.totalHours).toEqual<Temporal.Duration>(
+        Temporal.Duration.from("PT1H30M"),
+      );
     });
   });
 
@@ -541,7 +550,7 @@ describe("Activities", () => {
         query: TimesheetQuery.create({ from: "2025-09-15", to: "2025-09-21" }),
       });
 
-      expect(result).toEqual({
+      expect(result).toEqual<TimesheetQueryResult>({
         entries: [],
         totalHours: Temporal.Duration.from("PT0S"),
         capacity: {
@@ -591,7 +600,7 @@ describe("Activities", () => {
         query: TimesheetQuery.create({ from: "2025-06-02", to: "2025-06-08" }),
       });
 
-      expect(result.entries).toEqual([
+      expect(result.entries).toEqual<TimesheetEntry[]>([
         TimesheetEntry.createTestInstance({
           date: Temporal.PlainDate.from("2025-06-02"),
           hours: Temporal.Duration.from("PT1H"),
@@ -640,7 +649,9 @@ describe("Activities", () => {
         query: TimesheetQuery.create({ from: "2025-06-02", to: "2025-06-08" }),
       });
 
-      expect(result.totalHours).toEqual(Temporal.Duration.from("PT1H30M"));
+      expect(result.totalHours).toEqual<Temporal.Duration>(
+        Temporal.Duration.from("PT1H30M"),
+      );
     });
 
     describe("Compare with capacity", () => {
@@ -669,7 +680,7 @@ describe("Activities", () => {
           clock: Clock.fixed("2025-06-11T16:00:00Z", "Europe/Berlin"),
         });
 
-        expect(result.capacity).toEqual({
+        expect(result.capacity).toEqual<Capacity>({
           hours: Temporal.Duration.from("PT40H"),
           offset: Temporal.Duration.from("PT0H"),
         });
@@ -704,7 +715,7 @@ describe("Activities", () => {
           clock: Clock.fixed("2025-06-12T16:00:00Z", "Europe/Berlin"),
         });
 
-        expect(result.capacity).toEqual({
+        expect(result.capacity).toEqual<Capacity>({
           hours: Temporal.Duration.from("PT40H"),
           offset: Temporal.Duration.from("PT0S"),
         });
@@ -739,7 +750,7 @@ describe("Activities", () => {
           clock: Clock.fixed("2025-06-12T16:00:00Z", "Europe/Berlin"),
         });
 
-        expect(result.capacity).toEqual({
+        expect(result.capacity).toEqual<Capacity>({
           hours: Temporal.Duration.from("PT40H"),
           offset: Temporal.Duration.from("-PT6H"),
         });
@@ -774,7 +785,7 @@ describe("Activities", () => {
           clock: Clock.fixed("2025-06-12T16:00:00Z", "Europe/Berlin"),
         });
 
-        expect(result.capacity).toEqual({
+        expect(result.capacity).toEqual<Capacity>({
           hours: Temporal.Duration.from("PT40H"),
           offset: Temporal.Duration.from("PT6H"),
         });
@@ -806,7 +817,7 @@ describe("Activities", () => {
         clock: Clock.fixed("2025-06-12T16:00:00Z", "Europe/Berlin"),
       });
 
-      expect(result.capacity).toEqual({
+      expect(result.capacity).toEqual<Capacity>({
         hours: Temporal.Duration.from("PT32H"),
         offset: Temporal.Duration.from("PT0S"),
       });
@@ -835,7 +846,7 @@ describe("Activities", () => {
         clock: Clock.fixed("2025-09-11T16:00:00Z", "Europe/Berlin"),
       });
 
-      expect(result.capacity).toEqual({
+      expect(result.capacity).toEqual<Capacity>({
         hours: Temporal.Duration.from("PT32H"),
         offset: Temporal.Duration.from("PT0S"),
       });

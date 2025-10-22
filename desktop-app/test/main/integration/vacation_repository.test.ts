@@ -48,7 +48,7 @@ describe("Vacation repository", () => {
         "2025-09-14",
       );
 
-      expect(vacations).toEqual([]);
+      expect(vacations).toEqual<Vacation[]>([]);
     });
 
     it("should find all saved vacations", async () => {
@@ -59,7 +59,7 @@ describe("Vacation repository", () => {
         "2025-09-14",
       );
 
-      expect(vacations).toEqual([VACATION_DAY_1, VACATION_DAY_2]);
+      expect(vacations).toEqual<Vacation[]>([VACATION_DAY_1, VACATION_DAY_2]);
     });
 
     it("should find all by date with lower limit", async () => {
@@ -70,7 +70,7 @@ describe("Vacation repository", () => {
         "2025-09-14",
       );
 
-      expect(vacations).toEqual([VACATION_DAY_2]);
+      expect(vacations).toEqual<Vacation[]>([VACATION_DAY_2]);
     });
 
     it("should find all by date with upper limit", async () => {
@@ -81,7 +81,7 @@ describe("Vacation repository", () => {
         "2025-09-12",
       );
 
-      expect(vacations).toEqual([VACATION_DAY_1]);
+      expect(vacations).toEqual<Vacation[]>([VACATION_DAY_1]);
     });
   });
 
@@ -99,7 +99,7 @@ describe("Vacation repository", () => {
         "2025-09-14",
       );
 
-      expect(vacations).toEqual([VACATION_DAY_1, VACATION_DAY_2]);
+      expect(vacations).toEqual<Vacation[]>([VACATION_DAY_1, VACATION_DAY_2]);
     });
 
     it("should update existing vacations", async () => {
@@ -112,7 +112,7 @@ describe("Vacation repository", () => {
         "2025-09-08",
         "2025-09-14",
       );
-      expect(vacations).toEqual([VACATION_DAY_1, VACATION_DAY_2]);
+      expect(vacations).toEqual<Vacation[]>([VACATION_DAY_1, VACATION_DAY_2]);
     });
   });
 
@@ -128,7 +128,7 @@ describe("Vacation repository", () => {
           "2025-09-14",
         );
 
-        expect(vacations).toEqual([]);
+        expect(vacations).toEqual<Vacation[]>([]);
       });
 
       it("should return configurable responses", async () => {
@@ -141,7 +141,9 @@ describe("Vacation repository", () => {
           "2025-09-14",
         );
 
-        expect(vacations).toEqual([Vacation.create({ date: "2025-09-10" })]);
+        expect(vacations).toEqual<Vacation[]>([
+          Vacation.create({ date: "2025-09-10" }),
+        ]);
       });
 
       it("should throw an error when configurable response is an error", async () => {

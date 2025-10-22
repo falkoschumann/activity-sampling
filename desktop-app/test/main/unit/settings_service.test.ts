@@ -19,7 +19,7 @@ describe("Settings service", () => {
 
       const settings = await service.loadSettings();
 
-      expect(settings).toEqual(Settings.createDefault());
+      expect(settings).toEqual<Settings>(Settings.createDefault());
     });
 
     it("should return stored settings", async () => {
@@ -31,7 +31,7 @@ describe("Settings service", () => {
 
       const settings = await service.loadSettings();
 
-      expect(settings).toEqual(
+      expect(settings).toEqual<Settings>(
         Settings.create({ dataDir: "test-data", capacity: "PT35H" }),
       );
     });
@@ -46,7 +46,7 @@ describe("Settings service", () => {
         Settings.create({ dataDir: "test-data", capacity: "PT35H" }),
       );
 
-      expect(storedSettings.data).toEqual([
+      expect(storedSettings.data).toEqual<Settings[]>([
         Settings.create({ dataDir: "test-data", capacity: "PT35H" }),
       ]);
     });

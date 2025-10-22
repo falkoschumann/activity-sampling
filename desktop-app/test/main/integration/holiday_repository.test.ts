@@ -55,7 +55,7 @@ describe("Holiday repository", () => {
         "2025-12-31",
       );
 
-      expect(holidays).toEqual([]);
+      expect(holidays).toEqual<Holiday[]>([]);
     });
 
     it("should find all saved holidays", async () => {
@@ -66,7 +66,11 @@ describe("Holiday repository", () => {
         "2025-12-31",
       );
 
-      expect(holidays).toEqual([KARFREITAG, OSTERSONNTAG, OSTERMONTAG]);
+      expect(holidays).toEqual<Holiday[]>([
+        KARFREITAG,
+        OSTERSONNTAG,
+        OSTERMONTAG,
+      ]);
     });
 
     it("should find all by date with lower limit", async () => {
@@ -77,7 +81,7 @@ describe("Holiday repository", () => {
         "2025-04-28",
       );
 
-      expect(holidays).toEqual([OSTERMONTAG]);
+      expect(holidays).toEqual<Holiday[]>([OSTERMONTAG]);
     });
 
     it("should find all by date with upper limit", async () => {
@@ -88,7 +92,7 @@ describe("Holiday repository", () => {
         "2025-04-21",
       );
 
-      expect(holidays).toEqual([KARFREITAG, OSTERSONNTAG]);
+      expect(holidays).toEqual<Holiday[]>([KARFREITAG, OSTERSONNTAG]);
     });
   });
 
@@ -106,7 +110,7 @@ describe("Holiday repository", () => {
         "2025-04-21",
       );
 
-      expect(holidays).toEqual([KARFREITAG, OSTERSONNTAG]);
+      expect(holidays).toEqual<Holiday[]>([KARFREITAG, OSTERSONNTAG]);
     });
 
     it("should update existing holidays", async () => {
@@ -124,7 +128,7 @@ describe("Holiday repository", () => {
         "2025-10-06",
         "2025-10-12",
       );
-      expect(holidays).toEqual([
+      expect(holidays).toEqual<Holiday[]>([
         Holiday.create({ date: "2025-10-08", title: "Changed" }),
         Holiday.create({ date: "2025-10-10", title: "Bar" }),
       ]);
@@ -143,7 +147,7 @@ describe("Holiday repository", () => {
           "2025-12-31",
         );
 
-        expect(holidays).toEqual([]);
+        expect(holidays).toEqual<Holiday[]>([]);
       });
 
       it("should return configurable responses", async () => {
@@ -158,7 +162,7 @@ describe("Holiday repository", () => {
           "2025-12-31",
         );
 
-        expect(holidays).toEqual([
+        expect(holidays).toEqual<Holiday[]>([
           Holiday.create({ date: "2025-06-09", title: "Pfingstmontag" }),
         ]);
       });
