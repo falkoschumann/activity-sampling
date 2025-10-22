@@ -22,7 +22,7 @@
   "devDependencies": {
     "@eslint/js": "9.38.0",
     "@js-temporal/polyfill": "0.5.1",
-    "@muspellheim/shared": "0.11.0",
+    "@muspellheim/shared": "0.12.5",
     "@softarc/sheriff-core": "0.19.6",
     "@types/node": "22.18.11",
     "@types/react": "19.2.2",
