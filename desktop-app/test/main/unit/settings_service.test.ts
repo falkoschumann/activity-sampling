@@ -9,6 +9,7 @@ import { Settings } from "../../../src/shared/domain/settings";
 import { SettingsGateway } from "../../../src/main/infrastructure/settings_gateway";
 import { SettingsDto } from "../../../src/shared/infrastructure/settings";
 import { Temporal } from "@js-temporal/polyfill";
+import { EventTracker } from "@muspellheim/shared";
 
 describe("Settings service", () => {
   describe("Load settings", () => {
@@ -53,16 +54,16 @@ describe("Settings service", () => {
 
     it("should emit event", async () => {
       const { service } = configure();
-      const events: SettingsChangedEvent[] = [];
-      service.addEventListener(SettingsChangedEvent.TYPE, (event) =>
-        events.push(event as SettingsChangedEvent),
+      const trackedEvents = EventTracker.create(
+        service,
+        SettingsChangedEvent.TYPE,
       );
 
       await service.storeSettings(
         Settings.create({ dataDir: "test-data", capacity: "PT35H" }),
       );
 
-      expect(events).toEqual([
+      expect(trackedEvents.events).toEqual<SettingsChangedEvent[]>([
         expect.objectContaining({
           type: SettingsChangedEvent.TYPE,
           dataDir: "test-data",

@@ -25,7 +25,7 @@ describe("Event store", () => {
 
     const events = await arrayFromAsync(store.replay());
 
-    expect(events).toEqual([]);
+    expect(events).toEqual<ActivityLoggedEventDto[]>([]);
   });
 
   it("should record and replay events", async () => {
@@ -35,7 +35,9 @@ describe("Event store", () => {
     await store.record(ActivityLoggedEventDto.createTestInstance());
     const events = await arrayFromAsync(store.replay());
 
-    expect(events).toEqual([ActivityLoggedEventDto.createTestInstance()]);
+    expect(events).toEqual<ActivityLoggedEventDto[]>([
+      ActivityLoggedEventDto.createTestInstance(),
+    ]);
   });
 
   describe("Nullable", () => {
@@ -57,7 +59,9 @@ describe("Event store", () => {
 
       const events = await arrayFromAsync(store.replay());
 
-      expect(events).toEqual([ActivityLoggedEventDto.createTestInstance()]);
+      expect(events).toEqual<ActivityLoggedEventDto[]>([
+        ActivityLoggedEventDto.createTestInstance(),
+      ]);
     });
   });
 });

@@ -7,9 +7,13 @@ import { TimerService } from "../../../src/main/application/timer_service";
 import {
   CurrentIntervalQuery,
   CurrentIntervalQueryResult,
+  IntervalElapsedEvent,
   StartTimerCommand,
   StopTimerCommand,
+  TimerStartedEvent,
+  TimerStoppedEvent,
 } from "../../../src/shared/domain/timer";
+import { EventTracker } from "@muspellheim/shared";
 
 describe("Timer service", () => {
   describe("Start timer", () => {
@@ -17,13 +21,14 @@ describe("Timer service", () => {
       const service = TimerService.createNull({
         fixedInstant: "2025-08-28T19:41:00Z",
       });
-      // TODO use event tracker
-      const events: Event[] = [];
-      service.addEventListener("timerStarted", (event) => events.push(event));
+      const trackedEvents = EventTracker.create(
+        service,
+        TimerStartedEvent.TYPE,
+      );
 
       service.startTimer(StartTimerCommand.create({ interval: "PT30M" }));
 
-      expect(events).toEqual([
+      expect(trackedEvents.events).toEqual<TimerStartedEvent[]>([
         expect.objectContaining({
           type: "timerStarted",
           timestamp: Temporal.Instant.from("2025-08-28T19:41:00Z"),
@@ -38,14 +43,17 @@ describe("Timer service", () => {
       const service = TimerService.createNull({
         fixedInstant: "2025-08-28T19:41:00Z",
       });
-      const events: Event[] = [];
-      service.addEventListener("timerStopped", (event) => events.push(event));
+      const trackedEvents = EventTracker.create(
+        service,
+        TimerStoppedEvent.TYPE,
+      );
+
       service.startTimer(StartTimerCommand.create({ interval: "PT30M" }));
 
       service.simulateTimePassing("PT2M");
       service.stopTimer(StopTimerCommand.create());
 
-      expect(events).toEqual([
+      expect(trackedEvents.events).toEqual<TimerStoppedEvent[]>([
         expect.objectContaining({
           type: "timerStopped",
           timestamp: Temporal.Instant.from("2025-08-28T19:43:00Z"),
@@ -59,10 +67,11 @@ describe("Timer service", () => {
       const service = TimerService.createNull({
         fixedInstant: "2025-08-28T19:41:00Z",
       });
-      const events: Event[] = [];
-      service.addEventListener("intervalElapsed", (event) =>
-        events.push(event),
+      const trackedEvents = EventTracker.create(
+        service,
+        IntervalElapsedEvent.TYPE,
       );
+
       await service.startTimer(StartTimerCommand.create({ interval: "PT30M" }));
 
       await service.simulateIntervalElapsed();
@@ -70,7 +79,7 @@ describe("Timer service", () => {
         CurrentIntervalQuery.create(),
       );
 
-      expect(events).toEqual([
+      expect(trackedEvents.events).toEqual<IntervalElapsedEvent[]>([
         expect.objectContaining({
           type: "intervalElapsed",
           timestamp: Temporal.Instant.from("2025-08-28T20:11:00Z"),
@@ -89,9 +98,9 @@ describe("Timer service", () => {
       const service = TimerService.createNull({
         fixedInstant: "2025-08-28T19:41:00Z",
       });
-      const events: Event[] = [];
-      service.addEventListener("intervalElapsed", (event) =>
-        events.push(event),
+      const trackedEvents = EventTracker.create(
+        service,
+        IntervalElapsedEvent.TYPE,
       );
       await service.startTimer(StartTimerCommand.create({ interval: "PT20M" }));
 
@@ -102,7 +111,7 @@ describe("Timer service", () => {
         timestamp: Temporal.Instant.from("2025-08-28T20:01:00Z"),
         duration: Temporal.Duration.from("PT20M"),
       });
-      expect(events).toEqual([
+      expect(trackedEvents.events).toEqual<IntervalElapsedEvent[]>([
         expect.objectContaining({
           type: "intervalElapsed",
           timestamp: Temporal.Instant.from("2025-08-28T20:01:00Z"),
