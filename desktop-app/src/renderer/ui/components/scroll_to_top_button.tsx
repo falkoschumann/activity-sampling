@@ -2,8 +2,7 @@
 
 import { useEffect, useRef } from "react";
 
-const HIDE_CLASSES =
-  "btn btn-secondary position-fixed bottom-0 end-0 me-3 fade";
+const HIDE_CLASSES = "btn btn-secondary position-fixed bottom-0 end-0 me-3 fade";
 const SHOW_CLASSES = HIDE_CLASSES + " show";
 
 export default function ScrollToTopButton() {
@@ -15,10 +14,7 @@ export default function ScrollToTopButton() {
         return;
       }
 
-      if (
-        document.body.scrollTop > 300 ||
-        document.documentElement.scrollTop > 300
-      ) {
+      if (document.body.scrollTop > 300 || document.documentElement.scrollTop > 300) {
         ref.current.className = SHOW_CLASSES;
       } else {
         ref.current.className = HIDE_CLASSES;

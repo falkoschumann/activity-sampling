@@ -63,11 +63,7 @@ function ActivityFormComponent({
         isDisabled={isDisabled}
         onTextChange={(text) => onTextChange("notes", text)}
       />
-      <button
-        type="submit"
-        disabled={isDisabled}
-        className="btn btn-primary btn-sm w-100"
-      >
+      <button type="submit" disabled={isDisabled} className="btn btn-primary btn-sm w-100">
         Log
       </button>
     </form>

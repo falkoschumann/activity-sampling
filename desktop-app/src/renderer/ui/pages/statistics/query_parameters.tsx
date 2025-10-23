@@ -1,20 +1,10 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
-import {
-  Statistics,
-  type StatisticsQuery,
-  type StatisticsType,
-} from "../../../../shared/domain/activities";
+import { Statistics, type StatisticsQuery, type StatisticsType } from "../../../../shared/domain/activities";
 import { useEffect, useState } from "react";
 
-export default function QueryParametersComponent({
-  onChange,
-}: {
-  onChange: (query: StatisticsQuery) => void;
-}) {
-  const [statistics, setStatistics] = useState<StatisticsType>(
-    Statistics.WORKING_HOURS,
-  );
+export default function QueryParametersComponent({ onChange }: { onChange: (query: StatisticsQuery) => void }) {
+  const [statistics, setStatistics] = useState<StatisticsType>(Statistics.WORKING_HOURS);
   const [ignoreSmallTasks, setIgnoreSmallTasks] = useState(false);
 
   useEffect(() => {
@@ -23,16 +13,8 @@ export default function QueryParametersComponent({
 
   return (
     <div className="container">
-      <div
-        className="btn-toolbar py-2 gap-2"
-        role="toolbar"
-        aria-label="Toolbar with query parameters"
-      >
-        <div
-          className="btn-group btn-group-sm"
-          role="group"
-          aria-label="Option buttons"
-        >
+      <div className="btn-toolbar py-2 gap-2" role="toolbar" aria-label="Toolbar with query parameters">
+        <div className="btn-group btn-group-sm" role="group" aria-label="Option buttons">
           <button
             className="btn btn-outline-secondary dropdown-toggle"
             type="button"
@@ -44,10 +26,7 @@ export default function QueryParametersComponent({
           <ul className="dropdown-menu">
             {Object.values(Statistics).map((s) => (
               <li key={s}>
-                <button
-                  className="dropdown-item"
-                  onClick={() => setStatistics(s)}
-                >
+                <button className="dropdown-item" onClick={() => setStatistics(s)}>
                   {s}
                 </button>
               </li>

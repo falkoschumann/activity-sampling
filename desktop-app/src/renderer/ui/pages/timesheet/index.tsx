@@ -3,24 +3,13 @@
 import { useReducer } from "react";
 
 import { useTimesheet } from "../../../application/activities_service";
-import {
-  changePeriod,
-  goToNextPeriod,
-  goToPreviousPeriod,
-  init,
-  PeriodUnit,
-  reducer,
-} from "../../../domain/period";
+import { changePeriod, goToNextPeriod, goToPreviousPeriod, init, PeriodUnit, reducer } from "../../../domain/period";
 import { PeriodComponent } from "../../components/period_component";
 import CapacityComponent from "./capacity";
 import TimesheetComponent from "./timesheet";
 
 export default function TimesheetPage() {
-  const [state, dispatch] = useReducer(
-    reducer,
-    { unit: PeriodUnit.WEEK },
-    init,
-  );
+  const [state, dispatch] = useReducer(reducer, { unit: PeriodUnit.WEEK }, init);
 
   const timesheet = useTimesheet(state);
 
@@ -38,10 +27,7 @@ export default function TimesheetPage() {
           onChangePeriod={(unit) => dispatch(changePeriod({ unit }))}
         />
       </aside>
-      <main
-        className="container my-4"
-        style={{ paddingTop: "3rem", paddingBottom: "3rem" }}
-      >
+      <main className="container my-4" style={{ paddingTop: "3rem", paddingBottom: "3rem" }}>
         <TimesheetComponent entries={timesheet.entries} />
       </main>
       <footer className="fixed-bottom bg-body">

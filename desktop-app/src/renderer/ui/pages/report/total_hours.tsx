@@ -4,11 +4,7 @@ import { Temporal } from "@js-temporal/polyfill";
 
 import { formatDuration } from "../../../../shared/common/temporal";
 
-export default function TotalHoursComponent({
-  totalHours,
-}: {
-  totalHours: Temporal.Duration;
-}) {
+export default function TotalHoursComponent({ totalHours }: { totalHours: Temporal.Duration }) {
   return (
     <div className="text-end">
       <strong>Total hours:</strong> {formatDuration(totalHours)}

@@ -5,11 +5,7 @@ import { useEffect, useRef } from "react";
 
 import type { Histogram } from "../../../../shared/domain/activities";
 
-export default function HistogramComponent({
-  histogram,
-}: {
-  histogram: Histogram;
-}) {
+export default function HistogramComponent({ histogram }: { histogram: Histogram }) {
   const histogramRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {

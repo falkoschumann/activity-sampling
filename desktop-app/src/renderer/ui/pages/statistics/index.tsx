@@ -6,10 +6,7 @@ import { useStatistics } from "../../../application/activities_service";
 import HistogramComponent from "./histogram";
 import MedianComponent from "./median";
 import QueryParametersComponent from "./query_parameters";
-import {
-  Statistics,
-  type StatisticsQuery,
-} from "../../../../shared/domain/activities";
+import { Statistics, type StatisticsQuery } from "../../../../shared/domain/activities";
 
 export default function StatisticsPage() {
   const [query, setQuery] = useState<StatisticsQuery>({

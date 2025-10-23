@@ -4,10 +4,7 @@ import { Temporal } from "@js-temporal/polyfill";
 import { memo } from "react";
 
 import { FormatStyle, formatTime } from "../../../../shared/common/temporal";
-import type {
-  Activity,
-  WorkingDay,
-} from "../../../../shared/domain/activities";
+import type { Activity, WorkingDay } from "../../../../shared/domain/activities";
 import type { ActivityTemplate } from "../../../domain/log";
 
 const MemoizedWorkingDaysComponent = memo(WorkingDaysComponent);
@@ -22,11 +19,7 @@ function WorkingDaysComponent({
   onSelect: (activity: ActivityTemplate) => void;
 }) {
   return workingDays.map((workingDay) => (
-    <WorkingDayComponent
-      key={workingDay.date.toString()}
-      {...workingDay}
-      onSelect={onSelect}
-    />
+    <WorkingDayComponent key={workingDay.date.toString()} {...workingDay} onSelect={onSelect} />
   ));
 }
 
@@ -48,11 +41,7 @@ function WorkingDayComponent({
       </h6>
       <ul className="list-group list-group-flush">
         {activities.map((activity) => (
-          <ActivityComponent
-            key={activity.dateTime.toString()}
-            {...activity}
-            onSelect={onSelect}
-          />
+          <ActivityComponent key={activity.dateTime.toString()} {...activity} onSelect={onSelect} />
         ))}
       </ul>
     </div>
@@ -76,9 +65,7 @@ function ActivityComponent({
 }) {
   return (
     <li className="list-group-item list-group-item-action py-1 d-flex justify-content-start align-items-start">
-      <div style={{ width: "3em" }}>
-        {formatTime(dateTime, FormatStyle.SHORT)}
-      </div>
+      <div style={{ width: "3em" }}>{formatTime(dateTime, FormatStyle.SHORT)}</div>
       <div>
         <div className="ms-2 me-auto">
           <div>
@@ -88,16 +75,10 @@ function ActivityComponent({
               title="Use this activity as current activity."
               onClick={() => onSelect({ client, project, task, notes })}
             >
-              <span className="visually-hidden">
-                Use this activity as current activity.
-              </span>
+              <span className="visually-hidden">Use this activity as current activity.</span>
               <i className="bi bi-arrow-repeat"></i>
             </button>
-            <button
-              className="btn btn-sm"
-              title="Copy task name."
-              onClick={() => navigator.clipboard.writeText(task)}
-            >
+            <button className="btn btn-sm" title="Copy task name." onClick={() => navigator.clipboard.writeText(task)}>
               <span className="visually-hidden">Copy task name.</span>
               <i className="bi bi-copy"></i>
             </button>

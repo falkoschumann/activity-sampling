@@ -24,29 +24,18 @@ export default function LogPage() {
     <>
       <ScrollToTopButton />
       <aside className="container my-4">
-        <ActivityFormComponent
-          {...state.form}
-          onTextChange={handleTextChange}
-          onSubmit={handleSubmitActivity}
-        />
+        <ActivityFormComponent {...state.form} onTextChange={handleTextChange} onSubmit={handleSubmitActivity} />
         <CountdownComponent {...state.countdown} />
       </aside>
       <main className="container my-4">
         <h5>
           Logged activities of the last 30 days
-          <button
-            className="btn"
-            title="Refresh logged activities."
-            onClick={() => handleQueryRecentActivities()}
-          >
+          <button className="btn" title="Refresh logged activities." onClick={() => handleQueryRecentActivities()}>
             <span className="visually-hidden">Refresh logged activities.</span>
             <i className="bi bi-arrow-clockwise"></i>
           </button>
         </h5>
-        <WorkingDaysComponent
-          workingDays={recentActivities.workingDays}
-          onSelect={handleActivitySelected}
-        />
+        <WorkingDaysComponent workingDays={recentActivities.workingDays} onSelect={handleActivitySelected} />
       </main>
       <footer className="fixed-bottom bg-body-secondary">
         <div className="container">

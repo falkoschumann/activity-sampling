@@ -63,5 +63,3 @@ declare global {
     activitySampling: ActivitySampling;
   }
 }
-
-export {};

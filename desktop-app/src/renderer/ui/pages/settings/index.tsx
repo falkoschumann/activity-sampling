@@ -49,11 +49,7 @@ export default function StatisticsPage() {
               value={settings.current.dataDir}
               onChange={(e) => changeDataDir(e.target.value)}
             />
-            <button
-              className="btn btn-primary"
-              type="button"
-              onClick={handleOpenDataDir}
-            >
+            <button className="btn btn-primary" type="button" onClick={handleOpenDataDir}>
               Choose...
             </button>
           </div>

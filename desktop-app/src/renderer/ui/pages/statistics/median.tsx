@@ -17,10 +17,7 @@ export default function MedianComponent({ median }: { median: Median }) {
             aria-valuemax={100}
             style={{ width: "25%" }}
           >
-            <div
-              className="progress-bar bg-secondary"
-              style={{ height: "1.5rem" }}
-            >
+            <div className="progress-bar bg-secondary" style={{ height: "1.5rem" }}>
               &lt; {median.edge25} days
             </div>
           </div>
@@ -33,10 +30,7 @@ export default function MedianComponent({ median }: { median: Median }) {
             aria-valuemax={100}
             style={{ width: "50%" }}
           >
-            <div
-              className="progress-bar bg-primary"
-              style={{ height: "1.5rem" }}
-            >
+            <div className="progress-bar bg-primary" style={{ height: "1.5rem" }}>
               {median.edge50} days
             </div>
           </div>
@@ -49,23 +43,18 @@ export default function MedianComponent({ median }: { median: Median }) {
             aria-valuemax={100}
             style={{ width: "25%" }}
           >
-            <div
-              className="progress-bar bg-secondary"
-              style={{ height: "1.5rem" }}
-            >
+            <div className="progress-bar bg-secondary" style={{ height: "1.5rem" }}>
               &gt; {median.edge75} days
             </div>
           </div>
         </div>
       </div>
       <p className="small">
-        {median.edge50} person days (median): 50% of the records are above this
-        value and 50% are below.
+        {median.edge50} person days (median): 50% of the records are above this value and 50% are below.
       </p>
       <p className="small">
-        {median.edge25} person days (lower quartile) and {median.edge75} person
-        days (upper quartile): 25% of the records are below or above these
-        values, respectively.
+        {median.edge25} person days (lower quartile) and {median.edge75} person days (upper quartile): 25% of the
+        records are below or above these values, respectively.
       </p>
     </>
   );

@@ -2,10 +2,7 @@
 
 import { Temporal } from "@js-temporal/polyfill";
 
-import {
-  formatDuration,
-  FormatStyle,
-} from "../../../../shared/common/temporal";
+import { formatDuration, FormatStyle } from "../../../../shared/common/temporal";
 
 export default function CountdownComponent({
   remaining,

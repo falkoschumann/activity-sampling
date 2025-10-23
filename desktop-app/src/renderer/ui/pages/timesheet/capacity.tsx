@@ -24,14 +24,8 @@ export default function CapacityComponent({
   return (
     <div className="small text-secondary">
       <div className="d-flex justify-content-end gap-2">
-        {isBehind && (
-          <div className="text-warning">
-            {formatDuration(Temporal.Duration.from(offset).abs())} Behind
-          </div>
-        )}
-        {isAhead && (
-          <div className="text-success">{formatDuration(offset)} Ahead</div>
-        )}
+        {isBehind && <div className="text-warning">{formatDuration(Temporal.Duration.from(offset).abs())} Behind</div>}
+        {isAhead && <div className="text-success">{formatDuration(offset)} Ahead</div>}
         <div>
           {formatDuration(totalHours)} / {formatDuration(capacity)}
         </div>
@@ -44,10 +38,7 @@ export default function CapacityComponent({
         aria-valuemin={0}
         aria-valuemax={capacityInSeconds}
       >
-        <div
-          className={`progress-bar ${color}`}
-          style={{ width: `${progress}%` }}
-        ></div>
+        <div className={`progress-bar ${color}`} style={{ width: `${progress}%` }}></div>
       </div>
     </div>
   );

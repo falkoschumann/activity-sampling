@@ -3,11 +3,7 @@
 import { formatDate, formatDuration } from "../../../../shared/common/temporal";
 import type { TimesheetEntry } from "../../../../shared/domain/activities";
 
-export default function TimesheetComponent({
-  entries,
-}: {
-  entries: TimesheetEntry[];
-}) {
+export default function TimesheetComponent({ entries }: { entries: TimesheetEntry[] }) {
   return (
     <table className="table">
       <thead className="sticky-top" style={{ top: "2.9375rem" }}>
