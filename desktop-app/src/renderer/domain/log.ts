@@ -1,8 +1,8 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
 import { Temporal } from "@js-temporal/polyfill";
+import type { FluxStandardActionAuto } from "flux-standard-action";
 
-import type { FluxStandardAction } from "../common/reducer";
 import { normalizeDuration } from "../../shared/common/temporal";
 
 export interface ActivityTemplate {
@@ -25,13 +25,13 @@ interface ChangeTextPayload {
 
 export function changeText(
   payload: ChangeTextPayload,
-): FluxStandardAction<typeof CHANGE_TEXT_ACTION, ChangeTextPayload> {
+): FluxStandardActionAuto<typeof CHANGE_TEXT_ACTION, ChangeTextPayload> {
   return { type: CHANGE_TEXT_ACTION, payload };
 }
 
 const ACTIVITY_LOGGED_ACTION = "activityLogged";
 
-export function activityLogged(): FluxStandardAction<
+export function activityLogged(): FluxStandardActionAuto<
   typeof ACTIVITY_LOGGED_ACTION
 > {
   return { type: ACTIVITY_LOGGED_ACTION, payload: undefined };
@@ -48,7 +48,7 @@ interface ActivitySelectedPayload {
 
 export function activitySelected(
   payload: ActivitySelectedPayload,
-): FluxStandardAction<typeof ACTIVITY_SELECTED, ActivitySelectedPayload> {
+): FluxStandardActionAuto<typeof ACTIVITY_SELECTED, ActivitySelectedPayload> {
   return { type: ACTIVITY_SELECTED, payload };
 }
 
@@ -61,7 +61,7 @@ interface TimerStartedPayload {
 
 export function timerStarted(
   payload: TimerStartedPayload,
-): FluxStandardAction<typeof TIMER_STARTED_ACTION, TimerStartedPayload> {
+): FluxStandardActionAuto<typeof TIMER_STARTED_ACTION, TimerStartedPayload> {
   return { type: TIMER_STARTED_ACTION, payload };
 }
 
@@ -73,7 +73,7 @@ interface TimerTickedPayload {
 
 export function timerTicked(
   payload: TimerTickedPayload,
-): FluxStandardAction<typeof TIMER_TICKED_ACTION, TimerTickedPayload> {
+): FluxStandardActionAuto<typeof TIMER_TICKED_ACTION, TimerTickedPayload> {
   return { type: TIMER_TICKED_ACTION, payload };
 }
 
@@ -85,7 +85,7 @@ interface TimerStoppedPayload {
 
 export function timerStopped(
   payload: TimerStoppedPayload,
-): FluxStandardAction<typeof TIMER_STOPPED_ACTION, TimerStoppedPayload> {
+): FluxStandardActionAuto<typeof TIMER_STOPPED_ACTION, TimerStoppedPayload> {
   return { type: TIMER_STOPPED_ACTION, payload };
 }
 
@@ -98,7 +98,10 @@ interface IntervalElapsedPayload {
 
 export function intervalElapsed(
   payload: IntervalElapsedPayload,
-): FluxStandardAction<typeof INTERVAL_ELAPSED_ACTION, IntervalElapsedPayload> {
+): FluxStandardActionAuto<
+  typeof INTERVAL_ELAPSED_ACTION,
+  IntervalElapsedPayload
+> {
   return { type: INTERVAL_ELAPSED_ACTION, payload };
 }
 

@@ -1,8 +1,7 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
 import { Temporal } from "@js-temporal/polyfill";
-
-import type { FluxStandardAction } from "../common/reducer";
+import type { FluxStandardActionAuto } from "flux-standard-action";
 
 export const PeriodUnit = Object.freeze({
   DAY: "Day",
@@ -28,7 +27,10 @@ interface GoToNextPeriodPayload {
 
 export function goToNextPeriod(
   payload: GoToNextPeriodPayload,
-): FluxStandardAction<typeof GO_TO_NEXT_PERIOD_ACTION, GoToNextPeriodPayload> {
+): FluxStandardActionAuto<
+  typeof GO_TO_NEXT_PERIOD_ACTION,
+  GoToNextPeriodPayload
+> {
   return { type: GO_TO_NEXT_PERIOD_ACTION, payload };
 }
 
@@ -40,7 +42,7 @@ interface GoToPreviousPeriodPayload {
 
 export function goToPreviousPeriod(
   payload: GoToPreviousPeriodPayload,
-): FluxStandardAction<
+): FluxStandardActionAuto<
   typeof GO_TO_PREVIOUS_PERIOD_ACTION,
   GoToPreviousPeriodPayload
 > {
@@ -56,7 +58,7 @@ interface ChangePeriodPayload {
 
 export function changePeriod(
   payload: ChangePeriodPayload,
-): FluxStandardAction<typeof CHANGE_PERIOD_ACTION, ChangePeriodPayload> {
+): FluxStandardActionAuto<typeof CHANGE_PERIOD_ACTION, ChangePeriodPayload> {
   return { type: CHANGE_PERIOD_ACTION, payload };
 }
 
