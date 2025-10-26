@@ -8,9 +8,9 @@ distclean: clean
 	rm -rf node_modules
 
 dist: build
-#	npm run build:electron
-	npm run build:mac
-	npm run build:win
+	npm run build:electron
+#	npm run build:mac
+#	npm run build:win
 
 start:
 	npm start
