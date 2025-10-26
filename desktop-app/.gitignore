@@ -1,14 +1,40 @@
+# see also https://gitignore.io
+
 /coverage/
 /data/
+dist/
+out/
 /testdata/
+tmp/
+vendor/
+.env.local
 
-!build/
+# Node
+.vite/
+coverage/
+node_modules/
+junit.xml
+
+# Python
+__pycache__/
+
+# Eclipse
+.settings/
+bin/
+.project
+.classpath
+*.launch
+
+# IntelliJ IDEA
+.idea/
+out/
+*.iml
+
+# VS Code
 .vscode/
-package-lock.json
 
-node_modules
-dist
-out
+# Mac OS
 .DS_Store
-.eslintcache
-*.log*
+
+# Windows
+Thumbs.db
