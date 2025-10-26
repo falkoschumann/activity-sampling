@@ -12,12 +12,12 @@
     "start": "electron-vite preview",
     "dev": "electron-vite dev --watch",
     "build": "tsc --build && electron-vite build",
-    "postinstall": "electron-builder install-app-deps",
-    "build:unpack": "npm run build && electron-builder --dir",
-    "build:electron": "npm run build && electron-builder build",
-    "build:win": "npm run build && electron-builder --win --x64",
-    "build:mac": "npm run build && electron-builder --mac --arm64",
-    "build:linux": "npm run build && electron-builder --linux --x64"
+    "build:unpack": "electron-builder --dir",
+    "build:electron": "electron-builder",
+    "build:win": "electron-builder --win --x64",
+    "build:mac": "electron-builder --mac --arm64",
+    "build:linux": "electron-builder --linux --x64",
+    "postinstall": "electron-builder install-app-deps"
   },
   "devDependencies": {
     "@eslint/js": "9.38.0",

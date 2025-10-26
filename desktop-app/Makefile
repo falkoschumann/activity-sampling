@@ -7,11 +7,10 @@ distclean: clean
 	rm -rf dist
 	rm -rf node_modules
 
-# TODO Build only one platform and configure platform, arch and target via environment variable
 dist: build
-	npm run build:electron
-#	npm run build:mac
-#	npm run build:win
+#	npm run build:electron
+	npm run build:mac
+	npm run build:win
 
 start:
 	npm start

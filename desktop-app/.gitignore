@@ -3,7 +3,6 @@
 /coverage/
 /data/
 dist/
-out/
 /testdata/
 tmp/
 vendor/
