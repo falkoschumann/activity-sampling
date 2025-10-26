@@ -8,14 +8,12 @@ import {
 } from "electron-devtools-installer";
 
 import { ActivitiesService } from "./application/activities_service";
-import { TimerService } from "./application/timer_service";
 import {
-  IntervalElapsedEvent,
-  TimerStartedEvent,
-  TimerStoppedEvent,
-} from "../shared/domain/timer";
+  SettingsChangedEvent,
+  SettingsService,
+} from "./application/settings_service";
+import { TimerService } from "./application/timer_service";
 import { Settings } from "../shared/domain/settings";
-import { SettingsDto } from "../shared/infrastructure/settings";
 import {
   CommandStatusDto,
   LogActivityCommandDto,
@@ -29,13 +27,6 @@ import {
   TimesheetQueryResultDto,
 } from "../shared/infrastructure/activities";
 import {
-  IntervalElapsedEventDto,
-  TimerStartedEventDto,
-  TimerStoppedEventDto,
-} from "../shared/infrastructure/timer";
-import { chooseDataDirectory, openWindow } from "./ui/actions";
-import { createMenu } from "./ui/menu";
-import {
   INTERVAL_ELAPSED_CHANNEL,
   LOAD_SETTINGS_CHANNEL,
   LOG_ACTIVITY_CHANNEL,
@@ -48,10 +39,19 @@ import {
   TIMER_STARTED_CHANNEL,
   TIMER_STOPPED_CHANNEL,
 } from "../shared/infrastructure/channels";
+import { SettingsDto } from "../shared/infrastructure/settings";
+import { chooseDataDirectory, openWindow } from "./ui/actions";
+import { createMenu } from "./ui/menu";
 import {
-  SettingsChangedEvent,
-  SettingsService,
-} from "./application/settings_service";
+  IntervalElapsedEvent,
+  TimerStartedEvent,
+  TimerStoppedEvent,
+} from "../shared/domain/timer";
+import {
+  IntervalElapsedEventDto,
+  TimerStartedEventDto,
+  TimerStoppedEventDto,
+} from "../shared/infrastructure/timer";
 
 const settingsService = SettingsService.create();
 const activitiesService = ActivitiesService.create();
@@ -67,7 +67,7 @@ app.whenReady().then(async () => {
   await initializeApplication();
   await installDevTools();
   createRendererToMainChannels();
-  await createWindow();
+  createWindow();
 });
 
 app.on("web-contents-created", (_event, contents) => {
@@ -126,13 +126,14 @@ async function installDevTools() {
     return;
   }
 
-  await installExtension([REACT_DEVELOPER_TOOLS])
-    .then((extensions) =>
-      console.info(
-        `Added Extensions:  ${extensions.map((e) => e.name).join(", ")}`,
-      ),
-    )
-    .catch((err) => console.error("An error occurred: ", err));
+  try {
+    const extensions = await installExtension([REACT_DEVELOPER_TOOLS]);
+    console.info(
+      `Added Extensions:  ${extensions.map((e) => e.name).join(", ")}`,
+    );
+  } catch (error) {
+    console.error("An error occurred: ", error);
+  }
 }
 
 function createRendererToMainChannels() {
@@ -195,7 +196,7 @@ function createRendererToMainChannels() {
   );
 }
 
-async function createWindow() {
+function createWindow() {
   const mainWindow = openWindow({
     rendererFile: "log.html",
     width: 600,
