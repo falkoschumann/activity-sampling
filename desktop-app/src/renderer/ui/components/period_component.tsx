@@ -3,7 +3,7 @@
 import { Temporal } from "@js-temporal/polyfill";
 
 import { formatDate } from "../../../shared/common/temporal";
-import { PeriodUnit } from "../../domain/period";
+import { PeriodUnit, type PeriodUnitType } from "../../domain/period";
 
 export function PeriodComponent({
   from,
@@ -17,12 +17,12 @@ export function PeriodComponent({
 }: {
   from: Temporal.PlainDate;
   to: Temporal.PlainDate;
-  unit: PeriodUnit;
+  unit: PeriodUnitType;
   isCurrent: boolean;
-  units: PeriodUnit[];
+  units: PeriodUnitType[];
   onPreviousPeriod: () => void;
   onNextPeriod: () => void;
-  onChangePeriod: (unit: PeriodUnit) => void;
+  onChangePeriod: (unit: PeriodUnitType) => void;
 }) {
   return (
     <div className="container">

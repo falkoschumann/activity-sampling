@@ -13,7 +13,7 @@ export const PeriodUnit = Object.freeze({
   ALL_TIME: "All time",
 });
 
-export type PeriodUnit = (typeof PeriodUnit)[keyof typeof PeriodUnit];
+export type PeriodUnitType = (typeof PeriodUnit)[keyof typeof PeriodUnit];
 
 //
 // Actions and Action Creators
@@ -52,7 +52,7 @@ export function goToPreviousPeriod(
 const CHANGE_PERIOD_ACTION = "changePeriod";
 
 interface ChangePeriodPayload {
-  unit: PeriodUnit;
+  unit: PeriodUnitType;
   today?: Temporal.PlainDateLike | string;
 }
 
@@ -74,7 +74,7 @@ export type Action =
 export interface State {
   from: Temporal.PlainDate;
   to: Temporal.PlainDate;
-  unit: PeriodUnit;
+  unit: PeriodUnitType;
   isCurrent: boolean;
 }
 
@@ -83,7 +83,7 @@ export function init({
   unit,
 }: {
   today?: Temporal.PlainDateLike | string;
-  unit: PeriodUnit;
+  unit: PeriodUnitType;
 }): State {
   const todayDate = parseToday(today);
   let from: Temporal.PlainDate;
