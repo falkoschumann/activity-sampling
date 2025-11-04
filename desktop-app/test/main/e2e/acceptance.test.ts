@@ -608,7 +608,7 @@ describe("Activity Sampling", () => {
         });
         await timesheet.holidaysChanged({
           holidays: [
-            { date: "2025-12-23", duration: "PT4H" },
+            { date: "2025-12-24", duration: "PT4H" },
             "2025-12-25",
             "2025-12-26",
           ],
