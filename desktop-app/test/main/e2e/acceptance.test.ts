@@ -322,8 +322,8 @@ describe("Activity Sampling", () => {
       });
     });
 
-    describe("Create histogram for lead times", () => {
-      it("should return frequency per lead time", async () => {
+    describe("Create histogram for cycle times", () => {
+      it("should return frequency per cycle time", async () => {
         const { statistics } = await startActivitySampling();
         await statistics.activityLogged({
           timestamp: "2025-08-13T12:00:00Z",
@@ -342,7 +342,9 @@ describe("Activity Sampling", () => {
           task: "Task B",
         });
 
-        await statistics.queryStatistics({ statistics: Statistics.LEAD_TIMES });
+        await statistics.queryStatistics({
+          statistics: Statistics.CYCLE_TIMES,
+        });
 
         statistics.assertStatistics({
           histogram: {
@@ -400,7 +402,9 @@ describe("Activity Sampling", () => {
           task: "Task B",
         });
 
-        await statistics.queryStatistics({ statistics: Statistics.LEAD_TIMES });
+        await statistics.queryStatistics({
+          statistics: Statistics.CYCLE_TIMES,
+        });
 
         statistics.assertStatistics({ median: 4 });
       });

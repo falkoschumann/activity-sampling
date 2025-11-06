@@ -258,31 +258,31 @@ export async function projectStatistics({
       .map((hours) => hours / 8)
       .filter((days) => (query.ignoreSmallTasks ? days > 0.5 : true))
       .sort((a, b) => a - b);
-  } else if (query.statistics === Statistics.LEAD_TIMES) {
-    xAxisLabel = "Lead time (days)";
+  } else if (query.statistics === Statistics.CYCLE_TIMES) {
+    xAxisLabel = "Cycle time (days)";
 
-    const leadTimes: Record<
+    const cycleTimes: Record<
       string,
       { from: Temporal.Instant; to: Temporal.Instant }
     > = {};
     for await (const event of replay) {
-      if (leadTimes[event.task]) {
+      if (cycleTimes[event.task]) {
         if (
           Temporal.Instant.compare(
             event.timestamp,
-            leadTimes[event.task].from,
+            cycleTimes[event.task].from,
           ) < 0
         ) {
-          leadTimes[event.task].from = event.timestamp;
+          cycleTimes[event.task].from = event.timestamp;
         }
         if (
-          Temporal.Instant.compare(event.timestamp, leadTimes[event.task].to) >
+          Temporal.Instant.compare(event.timestamp, cycleTimes[event.task].to) >
           0
         ) {
-          leadTimes[event.task].to = event.timestamp;
+          cycleTimes[event.task].to = event.timestamp;
         }
       } else {
-        leadTimes[event.task] = {
+        cycleTimes[event.task] = {
           from: event.timestamp,
           to: event.timestamp,
         };
@@ -290,8 +290,8 @@ export async function projectStatistics({
     }
 
     const tasks: Record<string, Temporal.Duration> = {};
-    for (const [task, leadTime] of Object.entries(leadTimes)) {
-      tasks[task] = normalizeDuration(leadTime.to.since(leadTime.from));
+    for (const [task, cycleTime] of Object.entries(cycleTimes)) {
+      tasks[task] = normalizeDuration(cycleTime.to.since(cycleTime.from));
     }
 
     days = Object.values(tasks)

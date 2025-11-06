@@ -189,7 +189,7 @@ describe("Activities service", () => {
       });
     });
 
-    it("should return statistics for lead time", async () => {
+    it("should return statistics for cycle time", async () => {
       const { service } = configure({
         events: [
           ActivityLoggedEventDto.createTestInstance({
@@ -212,14 +212,14 @@ describe("Activities service", () => {
       });
 
       const result = await service.queryStatistics({
-        statistics: Statistics.LEAD_TIMES,
+        statistics: Statistics.CYCLE_TIMES,
       });
 
       expect(result).toEqual<StatisticsQueryResult>({
         histogram: {
           binEdges: ["0", "0.5", "1", "2", "3", "5"],
           frequencies: [0, 0, 0, 1, 1],
-          xAxisLabel: "Lead time (days)",
+          xAxisLabel: "Cycle time (days)",
           yAxisLabel: "Number of Tasks",
         },
         median: {

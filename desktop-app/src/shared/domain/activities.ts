@@ -371,7 +371,7 @@ export class ReportEntry {
 
 export const Statistics = Object.freeze({
   WORKING_HOURS: "Working hours",
-  LEAD_TIMES: "Lead times",
+  CYCLE_TIMES: "Cycle times",
 });
 
 export type StatisticsType = (typeof Statistics)[keyof typeof Statistics];

@@ -496,8 +496,8 @@ describe("Activities", () => {
       });
     });
 
-    describe("Lead times", () => {
-      it("should return statistics for lead time", async () => {
+    describe("Cycle times", () => {
+      it("should return statistics for cycle time", async () => {
         const replay = createAsyncGenerator([
           ActivityLoggedEvent.createTestInstance({
             timestamp: "2025-08-13T12:00:00Z",
@@ -519,14 +519,14 @@ describe("Activities", () => {
 
         const result = await projectStatistics({
           replay,
-          query: { statistics: Statistics.LEAD_TIMES },
+          query: { statistics: Statistics.CYCLE_TIMES },
         });
 
         expect(result).toEqual<StatisticsQueryResult>({
           histogram: {
             binEdges: ["0", "0.5", "1", "2", "3", "5"],
             frequencies: [0, 0, 0, 1, 1],
-            xAxisLabel: "Lead time (days)",
+            xAxisLabel: "Cycle time (days)",
             yAxisLabel: "Number of Tasks",
           },
           median: {
