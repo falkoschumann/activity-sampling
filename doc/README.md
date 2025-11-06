@@ -24,6 +24,7 @@ analysis.
 
 - [x] Log the activity with a client, a project, a task and optional notes
 - [ ] Log optional category like feature, rework, meeting, training, etc.
+- [ ] Log activity with first and last name of team member
 
 ### Recent Activities
 
@@ -35,21 +36,22 @@ analysis.
 - [x] Summarize hours worked for clients
 - [x] Summarize hours worked on projects
 - [x] Summarize hours worked on tasks
+- [ ] Summarize hours worked for team members
 - [x] Summarize the total hours worked
 - [x] Summarize in a period
-- [ ] Determine lead time for clients
-- [ ] Determine lead time for projects
-- [ ] Determine lead time for tasks
 - [ ] Determine throughput in a period
 
 ### Statistics
 
 - [x] Create histogram for hours worked on tasks
-- [x] Create histogram for lead times
+- [x] Create histogram for cycle times
+- [ ] Create histogram for lead times
 - [ ] Create histogram for throughput
 - [x] Determine median for hours worked on tasks
-- [x] Determine median for lead times
+- [x] Determine median for cycle times
+- [ ] Determine median for lead times
 - [ ] Determine median for throughput
+- [ ] Exclude tasks not suitable for statistics
 
 ### Timesheet
 
@@ -59,6 +61,12 @@ analysis.
 - [x] Compare with capacity
 - [x] Take holidays into account
 - [x] Take vacation into account
+
+### Estimate
+
+- [ ] Estimate remaining tasks with hours worked
+- [ ] Estimate remaining tasks with cycle times
+- [ ] Estimate remaining tasks with lead times
 
 ## Architecture
 
