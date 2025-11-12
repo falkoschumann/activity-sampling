@@ -101,11 +101,11 @@ export class ActivitiesService {
     const replay = replayTyped(this.#eventStore.replay());
     const holidays = await this.#holidayRepository.findAllByDate(
       query.from,
-      query.to,
+      query.to.add("P1D"),
     );
     const vacations = await this.#vacationRepository.findAllByDate(
       query.from,
-      query.to,
+      query.to.add("P1D"),
     );
     return projectTimesheet({
       replay,
