@@ -16,7 +16,7 @@ jobs:
         with:
           # Use Java LTS
           distribution: temurin
-          java-version: "latest"
+          java-version: "25"
       - name: Use Node.js LTS
         uses: actions/setup-node@v6
         with:
