@@ -6,7 +6,7 @@
   "author": "Falko Schumann",
   "homepage": "https://muspellheim.de",
   "engines": {
-    "node": ">=22.0.0"
+    "node": ">=24.0.0"
   },
   "scripts": {
     "start": "electron-vite preview",
@@ -24,7 +24,7 @@
     "@js-temporal/polyfill": "0.5.1",
     "@muspellheim/shared": "0.12.6",
     "@softarc/sheriff-core": "0.19.6",
-    "@types/node": "22.19.0",
+    "@types/node": "24.10.1",
     "@types/react": "19.2.2",
     "@types/react-dom": "19.2.2",
     "@vitejs/plugin-react": "5.1.0",
