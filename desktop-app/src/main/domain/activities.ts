@@ -6,6 +6,7 @@ import { Clock, normalizeDuration } from "../../shared/common/temporal";
 import {
   Activity,
   ActivityLoggedEvent,
+  ActivityNew,
   RecentActivitiesQuery,
   RecentActivitiesQueryResult,
   ReportEntry,
@@ -21,6 +22,55 @@ import {
   type WorkingDay,
 } from "../../shared/domain/activities";
 import { Calendar, type Holiday, Vacation } from "./calendar";
+
+export async function projectActivities(
+  replay: AsyncGenerator<ActivityLoggedEvent>,
+  timeZone: Temporal.TimeZoneLike = Clock.systemDefaultZone().zone,
+): Promise<ActivityNew[]> {
+  const activities: ActivityNew[] = [];
+  for await (const event of replay) {
+    const index = activities.findIndex(
+      (activity) =>
+        activity.client === event.client &&
+        activity.project === event.project &&
+        activity.task === event.task,
+    );
+    if (index === -1) {
+      const date = event.timestamp.toZonedDateTimeISO(timeZone).toPlainDate();
+      const activity = ActivityNew.create({
+        start: date,
+        finish: date,
+        client: event.client,
+        project: event.project,
+        task: event.task,
+        notes: event.notes,
+        hours: event.duration,
+      });
+      activities.push(activity);
+    } else {
+      const activity = activities[index];
+      const date = event.timestamp.toZonedDateTimeISO(timeZone).toPlainDate();
+      let start = Temporal.PlainDate.from(activity.start);
+      let finish = Temporal.PlainDate.from(activity.finish);
+      if (Temporal.PlainDate.compare(date, start) < 0) {
+        start = date;
+      }
+      if (Temporal.PlainDate.compare(date, finish) > 0) {
+        finish = date;
+      }
+      const accumulatedHours = Temporal.Duration.from(activity.hours).add(
+        Temporal.Duration.from(event.duration),
+      );
+      activities[index] = {
+        ...activity,
+        start,
+        finish,
+        hours: normalizeDuration(accumulatedHours),
+      };
+    }
+  }
+  return activities;
+}
 
 export async function projectRecentActivities({
   replay,

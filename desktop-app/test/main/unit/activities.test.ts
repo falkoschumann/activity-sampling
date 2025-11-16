@@ -7,6 +7,7 @@ import { Clock } from "../../../src/shared/common/temporal";
 import {
   Activity,
   ActivityLoggedEvent,
+  ActivityNew,
   Capacity,
   RecentActivitiesQueryResult,
   ReportEntry,
@@ -21,6 +22,7 @@ import {
   WorkingDay,
 } from "../../../src/shared/domain/activities";
 import {
+  projectActivities,
   projectRecentActivities,
   projectReport,
   projectStatistics,
@@ -29,6 +31,79 @@ import {
 import { Holiday, Vacation } from "../../../src/main/domain/calendar";
 
 describe("Activities", () => {
+  describe("Project activities", () => {
+    it("should return no activities when no events are logged", async () => {
+      const replay = createAsyncGenerator([]);
+
+      const activities = await projectActivities(replay);
+
+      expect(activities).toEqual<ActivityNew[]>([]);
+    });
+
+    it("should map an event to an activity", async () => {
+      const replay = createAsyncGenerator([
+        ActivityLoggedEvent.createTestInstance(),
+      ]);
+
+      const activities = await projectActivities(replay);
+
+      expect(activities).toEqual<ActivityNew[]>([
+        ActivityNew.createTestInstance(),
+      ]);
+    });
+
+    it("should aggregate events to activities for the same task", async () => {
+      const replay = createAsyncGenerator([
+        ActivityLoggedEvent.createTestInstance({
+          timestamp: "2025-11-13T10:00:00Z",
+        }),
+        ActivityLoggedEvent.createTestInstance({
+          timestamp: "2025-11-14T10:00:00Z",
+        }),
+      ]);
+
+      const activities = await projectActivities(replay);
+
+      expect(activities).toEqual<ActivityNew[]>([
+        ActivityNew.createTestInstance({
+          start: "2025-11-13",
+          finish: "2025-11-14",
+          hours: "PT1H",
+        }),
+      ]);
+    });
+
+    it("should aggregate events to activities for different tasks", async () => {
+      const replay = createAsyncGenerator([
+        ActivityLoggedEvent.createTestInstance({
+          timestamp: "2025-11-13T10:00:00Z",
+          task: "Task A",
+        }),
+        ActivityLoggedEvent.createTestInstance({
+          timestamp: "2025-11-14T10:00:00Z",
+          task: "Task B",
+        }),
+      ]);
+
+      const activities = await projectActivities(replay);
+
+      expect(activities).toEqual<ActivityNew[]>([
+        ActivityNew.createTestInstance({
+          start: "2025-11-13",
+          finish: "2025-11-13",
+          task: "Task A",
+          hours: "PT30M",
+        }),
+        ActivityNew.createTestInstance({
+          start: "2025-11-14",
+          finish: "2025-11-14",
+          task: "Task B",
+          hours: "PT30M",
+        }),
+      ]);
+    });
+  });
+
   describe("Project recent activities", () => {
     it("should return an empty result when no activity is logged", async () => {
       const replay = createAsyncGenerator([]);
