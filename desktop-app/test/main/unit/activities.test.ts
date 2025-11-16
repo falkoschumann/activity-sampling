@@ -58,6 +58,9 @@ describe("Activities", () => {
           timestamp: "2025-11-13T10:00:00Z",
         }),
         ActivityLoggedEvent.createTestInstance({
+          timestamp: "2025-11-12T10:00:00Z",
+        }),
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2025-11-14T10:00:00Z",
         }),
       ]);
@@ -66,9 +69,9 @@ describe("Activities", () => {
 
       expect(activities).toEqual<ActivityNew[]>([
         ActivityNew.createTestInstance({
-          start: "2025-11-13",
+          start: "2025-11-12",
           finish: "2025-11-14",
-          hours: "PT1H",
+          hours: "PT1H30M",
         }),
       ]);
     });
