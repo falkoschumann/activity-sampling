@@ -67,6 +67,7 @@ analysis.
 - [ ] Estimate remaining tasks with hours worked
 - [ ] Estimate remaining tasks with cycle times
 - [ ] Estimate remaining tasks with lead times
+- [ ] Estimate remaining tasks with throughput
 
 ## Architecture
 
