@@ -105,6 +105,41 @@ describe("Activities", () => {
         }),
       ]);
     });
+
+    it("should filter by date range", async () => {
+      const replay = createAsyncGenerator([
+        ActivityLoggedEvent.createTestInstance({
+          timestamp: "2025-11-10T10:00:00Z",
+        }),
+        ActivityLoggedEvent.createTestInstance({
+          timestamp: "2025-11-11T10:00:00Z",
+        }),
+        ActivityLoggedEvent.createTestInstance({
+          timestamp: "2025-11-12T10:00:00Z",
+        }),
+        ActivityLoggedEvent.createTestInstance({
+          timestamp: "2025-11-13T10:00:00Z",
+        }),
+        ActivityLoggedEvent.createTestInstance({
+          timestamp: "2025-11-14T10:00:00Z",
+        }),
+      ]);
+
+      const activities = await projectActivities(
+        replay,
+        undefined,
+        "2025-11-11",
+        "2025-11-14",
+      );
+
+      expect(activities).toEqual<ActivityNew[]>([
+        ActivityNew.createTestInstance({
+          start: "2025-11-11",
+          finish: "2025-11-13",
+          hours: "PT1H30M",
+        }),
+      ]);
+    });
   });
 
   describe("Project recent activities", () => {

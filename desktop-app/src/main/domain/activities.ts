@@ -26,9 +26,22 @@ import { Calendar, type Holiday, Vacation } from "./calendar";
 export async function projectActivities(
   replay: AsyncGenerator<ActivityLoggedEvent>,
   timeZone: Temporal.TimeZoneLike = Clock.systemDefaultZone().zone,
+  startInclusive?: Temporal.PlainDateLike | string,
+  endExclusive?: Temporal.PlainDateLike | string,
 ): Promise<ActivityNew[]> {
   const activities: ActivityNew[] = [];
   for await (const event of replay) {
+    const date = event.timestamp.toZonedDateTimeISO(timeZone).toPlainDate();
+    if (
+      startInclusive &&
+      Temporal.PlainDate.compare(date, startInclusive) < 0
+    ) {
+      continue;
+    }
+    if (endExclusive && Temporal.PlainDate.compare(date, endExclusive) >= 0) {
+      continue;
+    }
+
     const index = activities.findIndex(
       (activity) =>
         activity.client === event.client &&
@@ -36,7 +49,6 @@ export async function projectActivities(
         activity.task === event.task,
     );
     if (index === -1) {
-      const date = event.timestamp.toZonedDateTimeISO(timeZone).toPlainDate();
       const activity = ActivityNew.create({
         start: date,
         finish: date,
