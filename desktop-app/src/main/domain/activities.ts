@@ -115,14 +115,14 @@ export async function projectRecentActivities({
   let hoursYesterday = Temporal.Duration.from("PT0S");
   let hoursThisWeek = Temporal.Duration.from("PT0S");
   let hoursThisMonth = Temporal.Duration.from("PT0S");
-  for await (const activity of mapEvents(
+  for await (const event of filterEvents(
     replay,
     timeZone,
     startInclusive,
     endExclusive,
   )) {
-    updateWorkingDays(activity);
-    updateTimeSummary(activity);
+    updateWorkingDays(event);
+    updateTimeSummary(event);
   }
   createWorkingDay();
 
@@ -146,14 +146,25 @@ export async function projectRecentActivities({
     },
   };
 
-  function updateWorkingDays(activity: Activity) {
-    const activityDate = Temporal.PlainDate.from(activity.dateTime);
+  function updateWorkingDays(event: ActivityLoggedEvent) {
+    const activityDate = event.timestamp
+      .toZonedDateTimeISO(timeZone)
+      .toPlainDate();
     if (date == null || !activityDate.equals(date)) {
       createWorkingDay();
       date = activityDate;
       activities = [];
     }
-    activities.push(activity);
+    activities.push(
+      Activity.create({
+        dateTime: event.timestamp.toZonedDateTimeISO(timeZone),
+        duration: event.duration,
+        client: event.client,
+        project: event.project,
+        task: event.task,
+        notes: event.notes,
+      }),
+    );
   }
 
   function createWorkingDay() {
@@ -171,26 +182,26 @@ export async function projectRecentActivities({
     workingDays.push(day);
   }
 
-  function updateTimeSummary(activity: Activity) {
-    const date = Temporal.PlainDate.from(activity.dateTime);
-    const duration = Temporal.Duration.from(activity.duration);
+  function updateTimeSummary(event: ActivityLoggedEvent) {
+    const date = event.timestamp.toZonedDateTimeISO(timeZone).toPlainDate();
+    const hours = event.duration;
     if (date.equals(today)) {
-      hoursToday = hoursToday.add(duration);
+      hoursToday = hoursToday.add(hours);
     }
     if (date.equals(yesterday)) {
-      hoursYesterday = hoursYesterday.add(duration);
+      hoursYesterday = hoursYesterday.add(hours);
     }
     if (
       Temporal.PlainDate.compare(date, thisWeekStart) >= 0 &&
       Temporal.PlainDate.compare(date, thisWeekEnd) <= 0
     ) {
-      hoursThisWeek = hoursThisWeek.add(duration);
+      hoursThisWeek = hoursThisWeek.add(hours);
     }
     if (
       Temporal.PlainDate.compare(date, thisMonthStart) >= 0 &&
       Temporal.PlainDate.compare(date, nextMonthStart) < 0
     ) {
-      hoursThisMonth = hoursThisMonth.add(duration);
+      hoursThisMonth = hoursThisMonth.add(hours);
     }
   }
 }
@@ -211,12 +222,13 @@ export async function projectReport({
 
   let entries: ReportEntry[] = [];
   let totalHours = Temporal.Duration.from("PT0S");
-  for await (const activity of mapEvents(
+  const activities = await projectActivities(
     replay,
     timeZone,
     startInclusive,
     endExclusive,
-  )) {
+  );
+  for (const activity of activities) {
     updateEntries(activity);
     updateTotalHours(activity);
   }
@@ -227,16 +239,16 @@ export async function projectReport({
     totalHours,
   };
 
-  function updateEntries(activity: Activity) {
+  function updateEntries(activity: ActivityNew) {
     switch (scope) {
       case Scope.CLIENTS:
-        updateEntry(activity.client, activity.duration);
+        updateEntry(activity.client, activity.hours);
         break;
       case Scope.PROJECTS:
-        updateProject(activity.project, activity.client, activity.duration);
+        updateProject(activity.project, activity.client, activity.hours);
         break;
       case Scope.TASKS:
-        updateEntry(activity.task, activity.duration);
+        updateEntry(activity.task, activity.hours);
         break;
       default:
         throw new Error(`Unknown scope: ${scope}`);
@@ -286,9 +298,9 @@ export async function projectReport({
     }
   }
 
-  function updateTotalHours(activity: Activity) {
-    const duration = Temporal.Duration.from(activity.duration);
-    totalHours = normalizeDuration(totalHours.add(duration));
+  function updateTotalHours(activity: ActivityNew) {
+    const hours = Temporal.Duration.from(activity.hours);
+    totalHours = normalizeDuration(totalHours.add(hours));
   }
 }
 
@@ -301,63 +313,41 @@ export async function projectStatistics({
   clock?: Clock;
 }): Promise<StatisticsQueryResult> {
   let xAxisLabel: string;
-  let days: number[];
+  let days: number[] = [];
+  let activities = await projectActivities(replay);
+  if (query.ignoreSmallTasks) {
+    activities = activities.filter(
+      (activity) => Temporal.Duration.compare("PT4H", activity.hours) < 0,
+    );
+  }
   if (query.statistics === Statistics.WORKING_HOURS) {
     xAxisLabel = "Duration (days)";
 
     const tasks: Record<string, Temporal.Duration> = {};
-    for await (const event of replay) {
-      const duration = Temporal.Duration.from(event.duration);
-      if (tasks[event.task]) {
-        tasks[event.task] = normalizeDuration(tasks[event.task].add(duration));
+    for await (const activity of activities) {
+      const hours = activity.hours;
+      if (tasks[activity.task]) {
+        tasks[activity.task] = normalizeDuration(
+          tasks[activity.task].add(hours),
+        );
       } else {
-        tasks[event.task] = normalizeDuration(duration);
+        tasks[activity.task] = normalizeDuration(hours);
       }
     }
 
     days = Object.values(tasks)
       .map((duration) => duration.total("hours"))
       .map((hours) => hours / 8)
-      .filter((days) => (query.ignoreSmallTasks ? days > 0.5 : true))
       .sort((a, b) => a - b);
   } else if (query.statistics === Statistics.CYCLE_TIMES) {
     xAxisLabel = "Cycle time (days)";
-
-    const cycleTimes: Record<
-      string,
-      { from: Temporal.Instant; to: Temporal.Instant }
-    > = {};
-    for await (const event of replay) {
-      if (cycleTimes[event.task]) {
-        if (
-          Temporal.Instant.compare(
-            event.timestamp,
-            cycleTimes[event.task].from,
-          ) < 0
-        ) {
-          cycleTimes[event.task].from = event.timestamp;
-        }
-        if (
-          Temporal.Instant.compare(event.timestamp, cycleTimes[event.task].to) >
-          0
-        ) {
-          cycleTimes[event.task].to = event.timestamp;
-        }
-      } else {
-        cycleTimes[event.task] = {
-          from: event.timestamp,
-          to: event.timestamp,
-        };
-      }
+    for (const activity of activities) {
+      const cycleTime =
+        normalizeDuration(activity.finish.since(activity.start)).total("days") +
+        1;
+      days.push(cycleTime);
     }
-
-    const tasks: Record<string, Temporal.Duration> = {};
-    for (const [task, cycleTime] of Object.entries(cycleTimes)) {
-      tasks[task] = normalizeDuration(cycleTime.to.since(cycleTime.from));
-    }
-
-    days = Object.values(tasks)
-      .map((duration) => duration.total("days"))
+    days = Object.values(days)
       .filter((days) => (query.ignoreSmallTasks ? days > 0.5 : true))
       .sort((a, b) => a - b);
   } else {
@@ -373,8 +363,10 @@ export async function projectStatistics({
     if (i === 0) {
       binEdges.push(0);
       frequencies.push(0);
-      binEdges.push(0.5);
-      frequencies.push(0);
+      if (query.statistics === Statistics.WORKING_HOURS) {
+        binEdges.push(0.5);
+        frequencies.push(0);
+      }
       binEdges.push(1);
       frequencies.push(0);
       binEdges.push(2);
@@ -461,14 +453,14 @@ export async function projectTimesheet({
 
   let entries: TimesheetEntry[] = [];
   let totalHours = Temporal.Duration.from("PT0S");
-  for await (const activity of mapEvents(
+  for await (const event of filterEvents(
     replay,
     timeZone,
     startInclusive,
     endExclusive,
   )) {
-    updateEntries(activity);
-    updateTotalHours(activity);
+    updateEntries(event);
+    updateTotalHours(event);
   }
 
   const capacityHours = determineCapacity();
@@ -496,28 +488,28 @@ export async function projectTimesheet({
     },
   };
 
-  function updateEntries(activity: Activity) {
-    const date = Temporal.PlainDate.from(activity.dateTime);
+  function updateEntries(event: ActivityLoggedEvent) {
+    const date = event.timestamp.toZonedDateTimeISO(timeZone).toPlainDate();
     const index = entries.findIndex(
       (entry) =>
         Temporal.PlainDate.compare(entry.date, date.toString()) === 0 &&
-        entry.client === activity.client &&
-        entry.project === activity.project &&
-        entry.task === activity.task,
+        entry.client === event.client &&
+        entry.project === event.project &&
+        entry.task === event.task,
     );
     if (index === -1) {
       const newEntry: TimesheetEntry = {
         date,
-        client: activity.client,
-        project: activity.project,
-        task: activity.task,
-        hours: activity.duration,
+        client: event.client,
+        project: event.project,
+        task: event.task,
+        hours: event.duration,
       };
       entries.push(newEntry);
     } else {
       const existingEntry = entries[index];
       const accumulatedHours = Temporal.Duration.from(existingEntry.hours).add(
-        Temporal.Duration.from(activity.duration),
+        Temporal.Duration.from(event.duration),
       );
       entries[index] = {
         ...existingEntry,
@@ -526,9 +518,9 @@ export async function projectTimesheet({
     }
   }
 
-  function updateTotalHours(activity: Activity) {
-    const duration = Temporal.Duration.from(activity.duration);
-    totalHours = totalHours.add(duration);
+  function updateTotalHours(event: ActivityLoggedEvent) {
+    const hours = Temporal.Duration.from(event.duration);
+    totalHours = totalHours.add(hours);
   }
 
   function determineCapacity(): Temporal.Duration {
@@ -550,12 +542,12 @@ export async function projectTimesheet({
   }
 }
 
-async function* mapEvents(
+async function* filterEvents(
   replay: AsyncGenerator<ActivityLoggedEvent>,
   timeZone: Temporal.TimeZoneLike,
   startInclusive?: Temporal.PlainDate | Temporal.PlainDateLike | string,
   endExclusive?: Temporal.PlainDate | Temporal.PlainDateLike | string,
-): AsyncGenerator<Activity> {
+): AsyncGenerator<ActivityLoggedEvent> {
   for await (const event of replay) {
     const date = event.timestamp.toZonedDateTimeISO(timeZone).toPlainDate();
     if (
@@ -568,17 +560,6 @@ async function* mapEvents(
       continue;
     }
 
-    const dateTime = event.timestamp
-      .toZonedDateTimeISO(timeZone)
-      .toPlainDateTime();
-    const activity = Activity.create({
-      dateTime,
-      duration: event.duration,
-      client: event.client,
-      project: event.project,
-      task: event.task,
-      notes: event.notes,
-    });
-    yield activity;
+    yield event;
   }
 }

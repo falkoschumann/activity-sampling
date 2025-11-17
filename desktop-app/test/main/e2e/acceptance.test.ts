@@ -348,7 +348,7 @@ describe("Activity Sampling", () => {
 
         statistics.assertStatistics({
           histogram: {
-            binEdges: ["0", "0.5", "1", "2", "3", "5"],
+            binEdges: ["0", "1", "2", "3", "5", "8"],
             frequencies: [0, 0, 0, 1, 1],
           },
         });
@@ -406,7 +406,7 @@ describe("Activity Sampling", () => {
           statistics: Statistics.CYCLE_TIMES,
         });
 
-        statistics.assertStatistics({ median: 4 });
+        statistics.assertStatistics({ median: 5 });
       });
     });
   });

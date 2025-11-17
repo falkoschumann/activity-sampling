@@ -621,6 +621,10 @@ describe("Activities", () => {
             task: "Task B",
           }),
           ActivityLoggedEvent.createTestInstance({
+            timestamp: "2025-08-15T12:00:00Z",
+            task: "Task C",
+          }),
+          ActivityLoggedEvent.createTestInstance({
             timestamp: "2025-08-16T12:00:00Z",
             task: "Task A",
           }),
@@ -637,17 +641,17 @@ describe("Activities", () => {
 
         expect(result).toEqual<StatisticsQueryResult>({
           histogram: {
-            binEdges: ["0", "0.5", "1", "2", "3", "5"],
-            frequencies: [0, 0, 0, 1, 1],
+            binEdges: ["0", "1", "2", "3", "5", "8"],
+            frequencies: [1, 0, 0, 1, 1],
             xAxisLabel: "Cycle time (days)",
             yAxisLabel: "Number of Tasks",
           },
           median: {
             edge0: 0,
-            edge25: 3,
+            edge25: 1,
             edge50: 4,
-            edge75: 4,
-            edge100: 5,
+            edge75: 5,
+            edge100: 6,
           },
         });
       });
