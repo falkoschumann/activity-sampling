@@ -81,24 +81,24 @@ export class ActivitiesService {
   async queryRecentActivities(
     query: RecentActivitiesQuery,
   ): Promise<RecentActivitiesQueryResult> {
-    const replay = replayTyped(this.#eventStore.replay());
+    const replay = this.#replayTyped(this.#eventStore.replay(), query.timeZone);
     return await projectRecentActivities({ replay, query, clock: this.#clock });
   }
 
   async queryReport(query: ReportQuery): Promise<ReportQueryResult> {
-    const replay = replayTyped(this.#eventStore.replay());
-    return projectReport({ replay, query, clock: this.#clock });
+    const replay = this.#replayTyped(this.#eventStore.replay(), query.timeZone);
+    return projectReport({ replay, query });
   }
 
   async queryStatistics(
     query: StatisticsQuery,
   ): Promise<StatisticsQueryResult> {
-    const replay = replayTyped(this.#eventStore.replay());
+    const replay = this.#replayTyped(this.#eventStore.replay());
     return await projectStatistics({ replay, query });
   }
 
   async queryTimesheet(query: TimesheetQuery): Promise<TimesheetQueryResult> {
-    const replay = replayTyped(this.#eventStore.replay());
+    const replay = this.#replayTyped(this.#eventStore.replay(), query.timeZone);
     const holidays = await this.#holidayRepository.findAllByDate(
       query.from,
       query.to.add("P1D"),
@@ -116,10 +116,15 @@ export class ActivitiesService {
       clock: this.#clock,
     });
   }
-}
 
-async function* replayTyped(events: AsyncGenerator) {
-  for await (const e of events) {
-    yield ActivityLoggedEventDto.fromJson(e).validate();
+  async *#replayTyped(
+    events: AsyncGenerator,
+    timeZone?: Temporal.TimeZoneLike,
+  ) {
+    for await (const e of events) {
+      yield ActivityLoggedEventDto.fromJson(e).validate(
+        timeZone || this.#clock.zone,
+      );
+    }
   }
 }

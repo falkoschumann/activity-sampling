@@ -55,13 +55,13 @@ describe("Activities", () => {
     it("should aggregate events to activities for the same task", async () => {
       const replay = createAsyncGenerator([
         ActivityLoggedEvent.createTestInstance({
-          timestamp: "2025-11-13T10:00:00Z",
+          dateTime: "2025-11-13T11:00:00",
         }),
         ActivityLoggedEvent.createTestInstance({
-          timestamp: "2025-11-12T10:00:00Z",
+          dateTime: "2025-11-12T11:00:00",
         }),
         ActivityLoggedEvent.createTestInstance({
-          timestamp: "2025-11-14T10:00:00Z",
+          dateTime: "2025-11-14T11:00:00",
         }),
       ]);
 
@@ -79,11 +79,11 @@ describe("Activities", () => {
     it("should aggregate events to activities for different tasks", async () => {
       const replay = createAsyncGenerator([
         ActivityLoggedEvent.createTestInstance({
-          timestamp: "2025-11-13T10:00:00Z",
+          dateTime: "2025-11-13T11:00:00",
           task: "Task A",
         }),
         ActivityLoggedEvent.createTestInstance({
-          timestamp: "2025-11-14T10:00:00Z",
+          dateTime: "2025-11-14T11:00:00",
           task: "Task B",
         }),
       ]);
@@ -109,25 +109,24 @@ describe("Activities", () => {
     it("should filter by date range", async () => {
       const replay = createAsyncGenerator([
         ActivityLoggedEvent.createTestInstance({
-          timestamp: "2025-11-10T10:00:00Z",
+          dateTime: "2025-11-10T11:00:00",
         }),
         ActivityLoggedEvent.createTestInstance({
-          timestamp: "2025-11-11T10:00:00Z",
+          dateTime: "2025-11-11T11:00:00",
         }),
         ActivityLoggedEvent.createTestInstance({
-          timestamp: "2025-11-12T10:00:00Z",
+          dateTime: "2025-11-12T11:00:00",
         }),
         ActivityLoggedEvent.createTestInstance({
-          timestamp: "2025-11-13T10:00:00Z",
+          dateTime: "2025-11-13T11:00:00",
         }),
         ActivityLoggedEvent.createTestInstance({
-          timestamp: "2025-11-14T10:00:00Z",
+          dateTime: "2025-11-14T11:00:00",
         }),
       ]);
 
       const activities = await projectActivities(
         replay,
-        undefined,
         "2025-11-11",
         "2025-11-14",
       );
@@ -156,11 +155,11 @@ describe("Activities", () => {
     it("should return activities grouped by working day for the last 30 days", async () => {
       const replay = createAsyncGenerator(
         mapTimestamps([
-          "2025-05-05T14:00:00Z", // is not included
-          "2025-05-06T14:00:00Z",
-          "2025-06-04T14:00:00Z",
-          "2025-06-05T08:30:00Z",
-          "2025-06-05T09:00:00Z",
+          "2025-05-05T16:00:00", // is not included
+          "2025-05-06T16:00:00",
+          "2025-06-04T16:00:00",
+          "2025-06-05T10:30:00",
+          "2025-06-05T11:00:00",
         ]),
       );
 
@@ -205,28 +204,28 @@ describe("Activities", () => {
       const replay = createAsyncGenerator(
         mapTimestamps([
           // the end of last month
-          "2025-05-31T14:00:00Z", // is not included
+          "2025-05-31T16:00:00", // is not included
           // start of this month
-          "2025-06-01T14:00:00Z",
+          "2025-06-01T16:00:00",
           // end of last week
-          "2025-06-01T10:00:00Z",
+          "2025-06-01T12:00:00",
           // start of this week
-          "2025-06-02T10:00:00Z",
+          "2025-06-02T12:00:00",
           // the day before yesterday
-          "2025-06-03T10:00:00Z",
+          "2025-06-03T12:00:00",
           // yesterday
-          "2025-06-04T10:00:00Z",
-          "2025-06-04T10:30:00Z",
-          "2025-06-04T11:00:00Z",
+          "2025-06-04T12:00:00",
+          "2025-06-04T12:30:00",
+          "2025-06-04T13:00:00",
           // today
-          "2025-06-05T09:00:00Z",
-          "2025-06-05T09:30:00Z",
+          "2025-06-05T11:00:00",
+          "2025-06-05T11:30:00",
           // tomorrow
-          "2025-06-06T08:30:00Z",
+          "2025-06-06T10:30:00",
           // last day of this month
-          "2025-06-30T08:30:00Z",
+          "2025-06-30T10:30:00",
           // the first day of next month
-          "2025-07-01T10:30:00Z", // is not included
+          "2025-07-01T12:30:00", // is not included
         ]),
       );
 
@@ -263,17 +262,17 @@ describe("Activities", () => {
     it("should summarize hours worked on clients", async () => {
       const replay = createAsyncGenerator([
         ActivityLoggedEvent.createTestInstance({
-          timestamp: "2025-06-25T15:00:00Z",
+          dateTime: "2025-06-25T17:00:00",
           client: "Client 2",
           duration: "PT7H",
         }),
         ActivityLoggedEvent.createTestInstance({
-          timestamp: "2025-06-26T15:00:00Z",
+          dateTime: "2025-06-26T17:00:00",
           client: "Client 1",
           duration: "PT5H",
         }),
         ActivityLoggedEvent.createTestInstance({
-          timestamp: "2025-06-27T15:00:00Z",
+          dateTime: "2025-06-27T17:00:00",
           client: "Client 1",
           duration: "PT3H",
         }),
@@ -302,31 +301,31 @@ describe("Activities", () => {
     it("should summarize hours worked on projects", async () => {
       const replay = createAsyncGenerator([
         ActivityLoggedEvent.createTestInstance({
-          timestamp: "2025-06-02T15:00:00Z",
+          dateTime: "2025-06-02T17:00:00",
           client: "Client 2",
           project: "Project B",
           duration: "PT8H",
         }),
         ActivityLoggedEvent.createTestInstance({
-          timestamp: "2025-06-03T15:00:00Z",
+          dateTime: "2025-06-03T17:00:00",
           client: "Client 1",
           project: "Project A",
           duration: "PT9H",
         }),
         ActivityLoggedEvent.createTestInstance({
-          timestamp: "2025-06-04T15:00:00Z",
+          dateTime: "2025-06-04T17:00:00",
           client: "Client 2",
           project: "Project B",
           duration: "PT8H",
         }),
         ActivityLoggedEvent.createTestInstance({
-          timestamp: "2025-06-05T15:00:00Z",
+          dateTime: "2025-06-05T17:00:00",
           client: "Client 1",
           project: "Project A",
           duration: "PT9H",
         }),
         ActivityLoggedEvent.createTestInstance({
-          timestamp: "2025-06-06T15:00:00Z",
+          dateTime: "2025-06-06T17:00:00",
           client: "Client 2",
           project: "Project B",
           duration: "PT8H",
@@ -358,13 +357,13 @@ describe("Activities", () => {
     it("should summarize hours worked on projects and combines projects with multiple clients", async () => {
       const replay = createAsyncGenerator([
         ActivityLoggedEvent.createTestInstance({
-          timestamp: "2025-06-02T15:00:00Z",
+          dateTime: "2025-06-02T17:00:00",
           client: "Client 2",
           project: "Project A",
           duration: "PT8H",
         }),
         ActivityLoggedEvent.createTestInstance({
-          timestamp: "2025-06-03T15:00:00Z",
+          dateTime: "2025-06-03T17:00:00",
           client: "Client 1",
           project: "Project A",
           duration: "PT9H",
@@ -391,17 +390,17 @@ describe("Activities", () => {
     it("should summarize hours worked on tasks", async () => {
       const replay = createAsyncGenerator([
         ActivityLoggedEvent.createTestInstance({
-          timestamp: "2025-06-25T15:00:00Z",
+          dateTime: "2025-06-25T17:00:00",
           task: "Task 2",
           duration: "PT7H",
         }),
         ActivityLoggedEvent.createTestInstance({
-          timestamp: "2025-06-26T15:00:00Z",
+          dateTime: "2025-06-26T17:00:00",
           task: "Task 1",
           duration: "PT5H",
         }),
         ActivityLoggedEvent.createTestInstance({
-          timestamp: "2025-06-27T15:00:00Z",
+          dateTime: "2025-06-27T17:00:00",
           task: "Task 1",
           duration: "PT3H",
         }),
@@ -430,11 +429,11 @@ describe("Activities", () => {
     it("Summarize hours worked in a custom period", async () => {
       const replay = createAsyncGenerator(
         mapTimestamps([
-          "2025-09-14T15:00:00Z", // before
-          "2025-09-15T15:00:00Z", // start
-          "2025-09-17T15:00:00Z", // middle
-          "2025-09-21T15:00:00Z", // end
-          "2025-09-22T15:00:00Z", // after
+          "2025-09-14T17:00:00", // before
+          "2025-09-15T17:00:00", // start
+          "2025-09-17T17:00:00", // middle
+          "2025-09-21T17:00:00", // end
+          "2025-09-22T17:00:00", // after
         ]),
       );
 
@@ -613,23 +612,23 @@ describe("Activities", () => {
       it("should return statistics for cycle time", async () => {
         const replay = createAsyncGenerator([
           ActivityLoggedEvent.createTestInstance({
-            timestamp: "2025-08-13T12:00:00Z",
+            dateTime: "2025-08-13T14:00:00",
             task: "Task A",
           }),
           ActivityLoggedEvent.createTestInstance({
-            timestamp: "2025-08-13T12:00:00Z",
+            dateTime: "2025-08-13T14:00:00",
             task: "Task B",
           }),
           ActivityLoggedEvent.createTestInstance({
-            timestamp: "2025-08-15T12:00:00Z",
+            dateTime: "2025-08-15T14:00:00",
             task: "Task C",
           }),
           ActivityLoggedEvent.createTestInstance({
-            timestamp: "2025-08-16T12:00:00Z",
+            dateTime: "2025-08-16T14:00:00",
             task: "Task A",
           }),
           ActivityLoggedEvent.createTestInstance({
-            timestamp: "2025-08-18T12:00:00Z",
+            dateTime: "2025-08-18T14:00:00",
             task: "Task B",
           }),
         ]);
@@ -681,33 +680,33 @@ describe("Activities", () => {
       const replay = createAsyncGenerator([
         // monday, only same tasks
         ActivityLoggedEvent.createTestInstance({
-          timestamp: "2025-06-02T10:00:00Z",
+          dateTime: "2025-06-02T12:00:00",
         }),
         ActivityLoggedEvent.createTestInstance({
-          timestamp: "2025-06-02T10:30:00Z",
+          dateTime: "2025-06-02T12:30:00",
         }),
         // tuesday, different tasks
         ActivityLoggedEvent.createTestInstance({
-          timestamp: "2025-06-03T10:00:00Z",
+          dateTime: "2025-06-03T12:00:00",
         }),
         ActivityLoggedEvent.createTestInstance({
-          timestamp: "2025-06-03T10:30:00Z",
+          dateTime: "2025-06-03T12:30:00",
           task: "Other task",
         }),
         // wednesday, different projects
         ActivityLoggedEvent.createTestInstance({
-          timestamp: "2025-06-04T10:00:00Z",
+          dateTime: "2025-06-04T12:00:00",
         }),
         ActivityLoggedEvent.createTestInstance({
-          timestamp: "2025-06-04T10:30:00Z",
+          dateTime: "2025-06-04T12:30:00",
           project: "Other project",
         }),
         // thursday, different clients
         ActivityLoggedEvent.createTestInstance({
-          timestamp: "2025-06-05T10:00:00Z",
+          dateTime: "2025-06-05T12:00:00",
         }),
         ActivityLoggedEvent.createTestInstance({
-          timestamp: "2025-06-05T10:30:00Z",
+          dateTime: "2025-06-05T12:30:00",
           client: "Other client",
         }),
       ]);
@@ -755,9 +754,9 @@ describe("Activities", () => {
     it("should summarize the total hours worked", async () => {
       const replay = createAsyncGenerator(
         mapTimestamps([
-          "2025-06-02T10:00:00Z",
-          "2025-06-02T10:30:00Z",
-          "2025-06-02T11:00:00Z",
+          "2025-06-02T12:00:00",
+          "2025-06-02T12:30:00",
+          "2025-06-02T13:00:00",
         ]),
       );
 
@@ -775,15 +774,15 @@ describe("Activities", () => {
       it("should compare with capacity", async () => {
         const replay = createAsyncGenerator([
           ActivityLoggedEvent.createTestInstance({
-            timestamp: "2025-06-09T14:00:00Z",
+            dateTime: "2025-06-09T16:00:00",
             duration: "PT8H",
           }),
           ActivityLoggedEvent.createTestInstance({
-            timestamp: "2025-06-10T14:00:00Z",
+            dateTime: "2025-06-10T16:00:00",
             duration: "PT8H",
           }),
           ActivityLoggedEvent.createTestInstance({
-            timestamp: "2025-06-11T14:00:00Z",
+            dateTime: "2025-06-11T16:00:00",
             duration: "PT8H",
           }),
         ]);
@@ -806,19 +805,19 @@ describe("Activities", () => {
       it("should return the offset 0 when capacity is reached", async () => {
         const replay = createAsyncGenerator([
           ActivityLoggedEvent.createTestInstance({
-            timestamp: "2025-06-09T14:00:00Z",
+            dateTime: "2025-06-09T16:00:00",
             duration: "PT8H",
           }),
           ActivityLoggedEvent.createTestInstance({
-            timestamp: "2025-06-10T14:00:00Z",
+            dateTime: "2025-06-10T16:00:00",
             duration: "PT8H",
           }),
           ActivityLoggedEvent.createTestInstance({
-            timestamp: "2025-06-11T14:00:00Z",
+            dateTime: "2025-06-11T16:00:00",
             duration: "PT8H",
           }),
           ActivityLoggedEvent.createTestInstance({
-            timestamp: "2025-06-12T14:00:00Z",
+            dateTime: "2025-06-12T16:00:00",
             duration: "PT8H",
           }),
         ]);
@@ -841,19 +840,19 @@ describe("Activities", () => {
       it("should return a negative offset when hours is behind of the capacity", async () => {
         const replay = createAsyncGenerator([
           ActivityLoggedEvent.createTestInstance({
-            timestamp: "2025-06-09T14:00:00Z",
+            dateTime: "2025-06-09T16:00:00",
             duration: "PT8H",
           }),
           ActivityLoggedEvent.createTestInstance({
-            timestamp: "2025-06-10T14:00:00Z",
+            dateTime: "2025-06-10T16:00:00",
             duration: "PT6H",
           }),
           ActivityLoggedEvent.createTestInstance({
-            timestamp: "2025-06-11T14:00:00Z",
+            dateTime: "2025-06-11T16:00:00",
             duration: "PT6H",
           }),
           ActivityLoggedEvent.createTestInstance({
-            timestamp: "2025-06-12T14:00:00Z",
+            dateTime: "2025-06-12T16:00:00",
             duration: "PT6H",
           }),
         ]);
@@ -876,19 +875,19 @@ describe("Activities", () => {
       it("should return a positive offset when hours is ahead of the capacity", async () => {
         const replay = createAsyncGenerator([
           ActivityLoggedEvent.createTestInstance({
-            timestamp: "2025-06-09T14:00:00Z",
+            dateTime: "2025-06-09T16:00:00",
             duration: "PT8H",
           }),
           ActivityLoggedEvent.createTestInstance({
-            timestamp: "2025-06-10T14:00:00Z",
+            dateTime: "2025-06-10T16:00:00",
             duration: "PT10H",
           }),
           ActivityLoggedEvent.createTestInstance({
-            timestamp: "2025-06-11T14:00:00Z",
+            dateTime: "2025-06-11T16:00:00",
             duration: "PT10H",
           }),
           ActivityLoggedEvent.createTestInstance({
-            timestamp: "2025-06-12T14:00:00Z",
+            dateTime: "2025-06-12T16:00:00",
             duration: "PT10H",
           }),
         ]);
@@ -912,15 +911,15 @@ describe("Activities", () => {
     it("should take holidays into account", async () => {
       const replay = createAsyncGenerator([
         ActivityLoggedEvent.createTestInstance({
-          timestamp: "2025-06-10T14:00:00Z",
+          dateTime: "2025-06-10T16:00:00",
           duration: "PT8H",
         }),
         ActivityLoggedEvent.createTestInstance({
-          timestamp: "2025-06-11T14:00:00Z",
+          dateTime: "2025-06-11T16:00:00",
           duration: "PT8H",
         }),
         ActivityLoggedEvent.createTestInstance({
-          timestamp: "2025-06-12T14:00:00Z",
+          dateTime: "2025-06-12T16:00:00",
           duration: "PT8H",
         }),
       ]);
@@ -943,15 +942,15 @@ describe("Activities", () => {
     it("should take vacation into account", async () => {
       const replay = createAsyncGenerator([
         ActivityLoggedEvent.createTestInstance({
-          timestamp: "2025-09-08T14:00:00Z",
+          dateTime: "2025-09-08T16:00:00",
           duration: "PT8H",
         }),
         ActivityLoggedEvent.createTestInstance({
-          timestamp: "2025-09-09T14:00:00Z",
+          dateTime: "2025-09-09T16:00:00",
           duration: "PT8H",
         }),
         ActivityLoggedEvent.createTestInstance({
-          timestamp: "2025-09-11T14:00:00Z",
+          dateTime: "2025-09-11T16:00:00",
           duration: "PT8H",
         }),
       ]);
@@ -971,9 +970,9 @@ describe("Activities", () => {
   });
 });
 
-function mapTimestamps(timestamps: string[]) {
-  return timestamps.map((timestamp) =>
-    ActivityLoggedEvent.createTestInstance({ timestamp }),
+function mapTimestamps(dateTimes: string[]) {
+  return dateTimes.map((dateTime) =>
+    ActivityLoggedEvent.createTestInstance({ dateTime }),
   );
 }
 

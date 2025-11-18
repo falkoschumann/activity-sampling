@@ -716,14 +716,14 @@ export class Capacity {
 
 export class ActivityLoggedEvent {
   static create({
-    timestamp,
+    dateTime,
     duration,
     client,
     project,
     task,
     notes,
   }: {
-    timestamp: Temporal.Instant | string;
+    dateTime: Temporal.PlainDateTimeLike | string;
     duration: Temporal.DurationLike | string;
     client: string;
     project: string;
@@ -731,7 +731,7 @@ export class ActivityLoggedEvent {
     notes?: string;
   }): ActivityLoggedEvent {
     return new ActivityLoggedEvent(
-      timestamp,
+      dateTime,
       duration,
       client,
       project,
@@ -741,14 +741,14 @@ export class ActivityLoggedEvent {
   }
 
   static createTestInstance({
-    timestamp = "2025-08-14T11:00:00Z",
+    dateTime = "2025-08-14T13:00:00",
     duration = "PT30M",
     client = "Test client",
     project = "Test project",
     task = "Test task",
     notes,
   }: {
-    timestamp?: Temporal.Instant | string;
+    dateTime?: Temporal.PlainDateTimeLike | string;
     duration?: Temporal.DurationLike | string;
     client?: string;
     project?: string;
@@ -756,7 +756,7 @@ export class ActivityLoggedEvent {
     notes?: string;
   } = {}): ActivityLoggedEvent {
     return ActivityLoggedEvent.create({
-      timestamp,
+      dateTime,
       duration,
       client,
       project,
@@ -765,7 +765,7 @@ export class ActivityLoggedEvent {
     });
   }
 
-  readonly timestamp: Temporal.Instant;
+  readonly dateTime: Temporal.PlainDateTime;
   readonly duration: Temporal.Duration;
   readonly client: string;
   readonly project: string;
@@ -773,14 +773,14 @@ export class ActivityLoggedEvent {
   readonly notes?: string;
 
   private constructor(
-    timestamp: Temporal.Instant | string,
+    dateTime: Temporal.PlainDateTimeLike | string,
     duration: Temporal.DurationLike | string,
     client: string,
     project: string,
     task: string,
     notes?: string,
   ) {
-    this.timestamp = Temporal.Instant.from(timestamp);
+    this.dateTime = Temporal.PlainDateTime.from(dateTime);
     this.duration = Temporal.Duration.from(duration);
     this.client = client;
     this.project = project;

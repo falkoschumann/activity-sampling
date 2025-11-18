@@ -25,13 +25,12 @@ import { Calendar, type Holiday, Vacation } from "./calendar";
 
 export async function projectActivities(
   replay: AsyncGenerator<ActivityLoggedEvent>,
-  timeZone: Temporal.TimeZoneLike = Clock.systemDefaultZone().zone,
   startInclusive?: Temporal.PlainDateLike | string,
   endExclusive?: Temporal.PlainDateLike | string,
 ): Promise<ActivityNew[]> {
   const activities: ActivityNew[] = [];
   for await (const event of replay) {
-    const date = event.timestamp.toZonedDateTimeISO(timeZone).toPlainDate();
+    const date = event.dateTime.toPlainDate();
     if (
       startInclusive &&
       Temporal.PlainDate.compare(date, startInclusive) < 0
@@ -61,7 +60,6 @@ export async function projectActivities(
       activities.push(activity);
     } else {
       const activity = activities[index];
-      const date = event.timestamp.toZonedDateTimeISO(timeZone).toPlainDate();
       let start = Temporal.PlainDate.from(activity.start);
       let finish = Temporal.PlainDate.from(activity.finish);
       if (Temporal.PlainDate.compare(date, start) < 0) {
@@ -117,7 +115,6 @@ export async function projectRecentActivities({
   let hoursThisMonth = Temporal.Duration.from("PT0S");
   for await (const event of filterEvents(
     replay,
-    timeZone,
     startInclusive,
     endExclusive,
   )) {
@@ -147,9 +144,7 @@ export async function projectRecentActivities({
   };
 
   function updateWorkingDays(event: ActivityLoggedEvent) {
-    const activityDate = event.timestamp
-      .toZonedDateTimeISO(timeZone)
-      .toPlainDate();
+    const activityDate = event.dateTime.toPlainDate();
     if (date == null || !activityDate.equals(date)) {
       createWorkingDay();
       date = activityDate;
@@ -157,7 +152,7 @@ export async function projectRecentActivities({
     }
     activities.push(
       Activity.create({
-        dateTime: event.timestamp.toZonedDateTimeISO(timeZone),
+        dateTime: event.dateTime,
         duration: event.duration,
         client: event.client,
         project: event.project,
@@ -183,7 +178,7 @@ export async function projectRecentActivities({
   }
 
   function updateTimeSummary(event: ActivityLoggedEvent) {
-    const date = event.timestamp.toZonedDateTimeISO(timeZone).toPlainDate();
+    const date = event.dateTime.toPlainDate();
     const hours = event.duration;
     if (date.equals(today)) {
       hoursToday = hoursToday.add(hours);
@@ -209,22 +204,18 @@ export async function projectRecentActivities({
 export async function projectReport({
   replay,
   query,
-  clock = Clock.systemDefaultZone(),
 }: {
   replay: AsyncGenerator<ActivityLoggedEvent>;
   query: ReportQuery;
-  clock?: Clock;
 }): Promise<ReportQueryResult> {
   const startInclusive = query.from;
   const endExclusive = query.to ? query.to.add("P1D") : undefined;
   const scope = query.scope;
-  const timeZone = query.timeZone ?? clock.zone;
 
   let entries: ReportEntry[] = [];
   let totalHours = Temporal.Duration.from("PT0S");
   const activities = await projectActivities(
     replay,
-    timeZone,
     startInclusive,
     endExclusive,
   );
@@ -310,7 +301,6 @@ export async function projectStatistics({
 }: {
   replay: AsyncGenerator<ActivityLoggedEvent>;
   query: StatisticsQuery;
-  clock?: Clock;
 }): Promise<StatisticsQueryResult> {
   let xAxisLabel: string;
   let days: number[] = [];
@@ -455,7 +445,6 @@ export async function projectTimesheet({
   let totalHours = Temporal.Duration.from("PT0S");
   for await (const event of filterEvents(
     replay,
-    timeZone,
     startInclusive,
     endExclusive,
   )) {
@@ -489,7 +478,7 @@ export async function projectTimesheet({
   };
 
   function updateEntries(event: ActivityLoggedEvent) {
-    const date = event.timestamp.toZonedDateTimeISO(timeZone).toPlainDate();
+    const date = event.dateTime.toPlainDate();
     const index = entries.findIndex(
       (entry) =>
         Temporal.PlainDate.compare(entry.date, date.toString()) === 0 &&
@@ -544,12 +533,11 @@ export async function projectTimesheet({
 
 async function* filterEvents(
   replay: AsyncGenerator<ActivityLoggedEvent>,
-  timeZone: Temporal.TimeZoneLike,
   startInclusive?: Temporal.PlainDate | Temporal.PlainDateLike | string,
   endExclusive?: Temporal.PlainDate | Temporal.PlainDateLike | string,
 ): AsyncGenerator<ActivityLoggedEvent> {
   for await (const event of replay) {
-    const date = event.timestamp.toZonedDateTimeISO(timeZone).toPlainDate();
+    const date = event.dateTime.toPlainDate();
     if (
       startInclusive &&
       Temporal.PlainDate.compare(date, startInclusive) < 0
