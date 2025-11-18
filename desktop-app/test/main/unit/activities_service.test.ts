@@ -7,7 +7,7 @@ import { describe, expect, it } from "vitest";
 import { Clock } from "../../../src/shared/common/temporal";
 import { ActivitiesService } from "../../../src/main/application/activities_service";
 import {
-  Activity,
+  ActivityLoggedEvent,
   LogActivityCommand,
   RecentActivitiesQueryResult,
   ReportEntry,
@@ -79,10 +79,10 @@ describe("Activities service", () => {
           {
             date: Temporal.PlainDate.from("2025-06-05"),
             activities: [
-              Activity.createTestInstance({
+              ActivityLoggedEvent.createTestInstance({
                 dateTime: Temporal.PlainDateTime.from("2025-06-05T11:00"),
               }),
-              Activity.createTestInstance({
+              ActivityLoggedEvent.createTestInstance({
                 dateTime: Temporal.PlainDateTime.from("2025-06-05T10:30"),
               }),
             ],
@@ -90,7 +90,7 @@ describe("Activities service", () => {
           {
             date: Temporal.PlainDate.from("2025-06-04"),
             activities: [
-              Activity.createTestInstance({
+              ActivityLoggedEvent.createTestInstance({
                 dateTime: Temporal.PlainDateTime.from("2025-06-04T16:00"),
               }),
             ],

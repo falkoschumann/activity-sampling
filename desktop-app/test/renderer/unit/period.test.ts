@@ -1,5 +1,6 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
+import { Temporal } from "@js-temporal/polyfill";
 import { describe, expect, it } from "vitest";
 
 import {
@@ -11,7 +12,6 @@ import {
   reducer,
   type State,
 } from "../../../src/renderer/domain/period";
-import { Temporal } from "@js-temporal/polyfill";
 
 describe("Period", () => {
   describe("Initialize period", () => {

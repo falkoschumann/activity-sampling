@@ -1,5 +1,6 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
+import { Temporal } from "@js-temporal/polyfill";
 import { describe, expect, it } from "vitest";
 
 import {
@@ -14,7 +15,6 @@ import {
   timerStopped,
   timerTicked,
 } from "../../../src/renderer/domain/log";
-import { Temporal } from "@js-temporal/polyfill";
 
 describe("Timer", () => {
   describe("Change text", () => {

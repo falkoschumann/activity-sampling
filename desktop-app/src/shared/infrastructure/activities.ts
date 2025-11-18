@@ -4,7 +4,7 @@ import { Temporal } from "@js-temporal/polyfill";
 import { type CommandStatus, Failure, Success } from "@muspellheim/shared";
 
 import {
-  Activity,
+  ActivityLoggedEvent,
   Capacity,
   Histogram,
   LogActivityCommand,
@@ -204,7 +204,7 @@ export class WorkingDayDto {
     activities,
   }: {
     date: string;
-    activities: ActivityDto[];
+    activities: ActivityLoggedEventDto[];
   }): WorkingDayDto {
     return new WorkingDayDto(date, activities);
   }
@@ -213,15 +213,15 @@ export class WorkingDayDto {
     return WorkingDayDto.create({
       date: model.date.toString(),
       activities: model.activities.map(
-        (activity) => ActivityDto.from(activity)!,
+        (activity) => ActivityLoggedEventDto.from(activity)!,
       ),
     });
   }
 
   readonly date: string;
-  readonly activities: ActivityDto[];
+  readonly activities: ActivityLoggedEventDto[];
 
-  private constructor(date: string, activities: ActivityDto[]) {
+  private constructor(date: string, activities: ActivityLoggedEventDto[]) {
     this.date = date;
     this.activities = activities;
   }
@@ -230,13 +230,13 @@ export class WorkingDayDto {
     return WorkingDay.create({
       date: Temporal.PlainDate.from(this.date),
       activities: this.activities.map((dto) =>
-        ActivityDto.create(dto)!.validate(),
+        ActivityLoggedEventDto.create(dto)!.validate(),
       ),
     });
   }
 }
 
-export class ActivityDto {
+export class ActivityLoggedEventDto {
   static create(dto: {
     dateTime: string;
     duration: string;
@@ -244,8 +244,8 @@ export class ActivityDto {
     project: string;
     task: string;
     notes?: string;
-  }): ActivityDto {
-    return new ActivityDto(
+  }): ActivityLoggedEventDto {
+    return new ActivityLoggedEventDto(
       dto.dateTime,
       dto.duration,
       dto.client,
@@ -255,8 +255,8 @@ export class ActivityDto {
     );
   }
 
-  static from(model: Activity): ActivityDto {
-    return ActivityDto.create({
+  static from(model: ActivityLoggedEvent): ActivityLoggedEventDto {
+    return ActivityLoggedEventDto.create({
       dateTime: model.dateTime.toString(),
       duration: model.duration.toString(),
       client: model.client,
@@ -289,8 +289,8 @@ export class ActivityDto {
     this.notes = notes;
   }
 
-  validate(): Activity {
-    return Activity.create({
+  validate(): ActivityLoggedEvent {
+    return ActivityLoggedEvent.create({
       dateTime: Temporal.PlainDateTime.from(this.dateTime),
       duration: Temporal.Duration.from(this.duration),
       client: this.client,

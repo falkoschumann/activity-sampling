@@ -6,7 +6,6 @@ import { Clock, normalizeDuration } from "../../shared/common/temporal";
 import {
   Activity,
   ActivityLoggedEvent,
-  ActivityNew,
   RecentActivitiesQuery,
   RecentActivitiesQueryResult,
   ReportEntry,
@@ -27,8 +26,8 @@ export async function projectActivities(
   replay: AsyncGenerator<ActivityLoggedEvent>,
   startInclusive?: Temporal.PlainDateLike | string,
   endExclusive?: Temporal.PlainDateLike | string,
-): Promise<ActivityNew[]> {
-  const activities: ActivityNew[] = [];
+): Promise<Activity[]> {
+  const activities: Activity[] = [];
   for await (const event of replay) {
     const date = event.dateTime.toPlainDate();
     if (
@@ -48,7 +47,7 @@ export async function projectActivities(
         activity.task === event.task,
     );
     if (index === -1) {
-      const activity = ActivityNew.create({
+      const activity = Activity.create({
         start: date,
         finish: date,
         client: event.client,
@@ -108,7 +107,7 @@ export async function projectRecentActivities({
 
   let workingDays: WorkingDay[] = [];
   let date: Temporal.PlainDate;
-  let activities: Activity[] = [];
+  let activities: ActivityLoggedEvent[] = [];
   let hoursToday = Temporal.Duration.from("PT0S");
   let hoursYesterday = Temporal.Duration.from("PT0S");
   let hoursThisWeek = Temporal.Duration.from("PT0S");
@@ -151,7 +150,7 @@ export async function projectRecentActivities({
       activities = [];
     }
     activities.push(
-      Activity.create({
+      ActivityLoggedEvent.create({
         dateTime: event.dateTime,
         duration: event.duration,
         client: event.client,
@@ -230,7 +229,7 @@ export async function projectReport({
     totalHours,
   };
 
-  function updateEntries(activity: ActivityNew) {
+  function updateEntries(activity: Activity) {
     switch (scope) {
       case Scope.CLIENTS:
         updateEntry(activity.client, activity.hours);
@@ -289,7 +288,7 @@ export async function projectReport({
     }
   }
 
-  function updateTotalHours(activity: ActivityNew) {
+  function updateTotalHours(activity: Activity) {
     const hours = Temporal.Duration.from(activity.hours);
     totalHours = normalizeDuration(totalHours.add(hours));
   }

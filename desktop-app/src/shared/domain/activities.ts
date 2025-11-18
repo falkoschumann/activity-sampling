@@ -139,17 +139,17 @@ export class WorkingDay {
     activities,
   }: {
     date: Temporal.PlainDateLike | string;
-    activities: Activity[];
+    activities: ActivityLoggedEvent[];
   }): WorkingDay {
     return new WorkingDay(date, activities);
   }
 
   readonly date: Temporal.PlainDate;
-  readonly activities: Activity[];
+  readonly activities: ActivityLoggedEvent[];
 
   private constructor(
     date: Temporal.PlainDateLike | string,
-    activities: Activity[],
+    activities: ActivityLoggedEvent[],
   ) {
     this.date = Temporal.PlainDate.from(date);
     this.activities = activities;
@@ -157,74 +157,6 @@ export class WorkingDay {
 }
 
 export class Activity {
-  static create({
-    dateTime,
-    duration,
-    client,
-    project,
-    task,
-    notes,
-  }: {
-    dateTime: Temporal.PlainDateTimeLike | string;
-    duration: Temporal.DurationLike | string;
-    client: string;
-    project: string;
-    task: string;
-    notes?: string;
-  }): Activity {
-    return new Activity(dateTime, duration, client, project, task, notes);
-  }
-
-  static createTestInstance({
-    dateTime = "2025-08-14T13:00",
-    duration = "PT30M",
-    client = "Test client",
-    project = "Test project",
-    task = "Test task",
-    notes,
-  }: {
-    dateTime?: Temporal.PlainDateTimeLike | string;
-    duration?: Temporal.DurationLike | string;
-    client?: string;
-    project?: string;
-    task?: string;
-    notes?: string;
-  } = {}): Activity {
-    return Activity.create({
-      dateTime,
-      duration,
-      client,
-      project,
-      task,
-      notes,
-    });
-  }
-
-  readonly dateTime: Temporal.PlainDateTime;
-  readonly duration: Temporal.Duration;
-  readonly client: string;
-  readonly project: string;
-  readonly task: string;
-  readonly notes?: string;
-
-  private constructor(
-    dateTime: Temporal.PlainDateTimeLike | string,
-    duration: Temporal.DurationLike | string,
-    client: string,
-    project: string,
-    task: string,
-    notes?: string,
-  ) {
-    this.dateTime = Temporal.PlainDateTime.from(dateTime);
-    this.duration = Temporal.Duration.from(duration);
-    this.client = client;
-    this.project = project;
-    this.task = task;
-    this.notes = notes;
-  }
-}
-
-export class ActivityNew {
   static create({
     start,
     finish,
@@ -241,8 +173,8 @@ export class ActivityNew {
     task: string;
     notes?: string;
     hours: Temporal.DurationLike | string;
-  }): ActivityNew {
-    return new ActivityNew(start, finish, client, project, task, hours, notes);
+  }): Activity {
+    return new Activity(start, finish, client, project, task, hours, notes);
   }
 
   static createTestInstance({
@@ -261,8 +193,8 @@ export class ActivityNew {
     task?: string;
     notes?: string;
     hours?: Temporal.DurationLike | string;
-  } = {}): ActivityNew {
-    return ActivityNew.create({
+  } = {}): Activity {
+    return Activity.create({
       start,
       finish,
       client,
@@ -741,7 +673,7 @@ export class ActivityLoggedEvent {
   }
 
   static createTestInstance({
-    dateTime = "2025-08-14T13:00:00",
+    dateTime = "2025-08-14T13:00",
     duration = "PT30M",
     client = "Test client",
     project = "Test project",
