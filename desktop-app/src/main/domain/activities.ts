@@ -99,10 +99,7 @@ export async function projectRecentActivities({
   const thisWeekEnd = thisWeekStart.add("P6D");
   const thisMonthStart = today.with({ day: 1 });
   const nextMonthStart = thisMonthStart.add("P1M");
-  const startInclusive = today
-    .subtract({ days: 30 })
-    .toZonedDateTime({ timeZone })
-    .toPlainDate();
+  const startInclusive = today.subtract({ days: 30 });
   const endExclusive = today.with({ day: today.daysInMonth }).add("P1D");
 
   let workingDays: WorkingDay[] = [];
