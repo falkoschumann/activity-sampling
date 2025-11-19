@@ -2,8 +2,6 @@
 
 import { Temporal } from "@js-temporal/polyfill";
 import { describe, expect, it } from "vitest";
-
-import { Clock } from "../../../src/shared/common/temporal";
 import {
   ActivityLoggedEvent,
   Capacity,
@@ -144,7 +142,10 @@ describe("Activities", () => {
     it("should return an empty result when no activity is logged", async () => {
       const replay = createAsyncGenerator([]);
 
-      const result = await projectRecentActivities({ replay, query: {} });
+      const result = await projectRecentActivities({
+        replay,
+        today: Temporal.PlainDate.from("2025-11-19"),
+      });
 
       expect(result).toEqual<RecentActivitiesQueryResult>(
         RecentActivitiesQueryResult.empty(),
@@ -164,8 +165,7 @@ describe("Activities", () => {
 
       const result = await projectRecentActivities({
         replay,
-        query: {},
-        clock: Clock.fixed("2025-06-05T10:00:00Z", "Europe/Berlin"),
+        today: Temporal.PlainDate.from("2025-06-05"),
       });
 
       expect(result.workingDays).toEqual<WorkingDay[]>([
@@ -230,8 +230,7 @@ describe("Activities", () => {
 
       const result = await projectRecentActivities({
         replay,
-        query: {},
-        clock: Clock.fixed("2025-06-05T10:00:00Z", "Europe/Berlin"),
+        today: Temporal.PlainDate.from("2025-06-05"),
       });
 
       expect(result.timeSummary).toEqual<TimeSummary>({
@@ -688,6 +687,7 @@ describe("Activities", () => {
       const result = await projectTimesheet({
         replay,
         query: TimesheetQuery.create({ from: "2025-09-15", to: "2025-09-21" }),
+        today: Temporal.PlainDate.from("2025-11-19"),
       });
 
       expect(result).toEqual<TimesheetQueryResult>({
@@ -738,6 +738,7 @@ describe("Activities", () => {
       const result = await projectTimesheet({
         replay,
         query: TimesheetQuery.create({ from: "2025-06-02", to: "2025-06-08" }),
+        today: Temporal.PlainDate.from("2025-11-19"),
       });
 
       expect(result.entries).toEqual<TimesheetEntry[]>([
@@ -787,6 +788,7 @@ describe("Activities", () => {
       const result = await projectTimesheet({
         replay,
         query: TimesheetQuery.create({ from: "2025-06-02", to: "2025-06-08" }),
+        today: Temporal.PlainDate.from("2025-11-19"),
       });
 
       expect(result.totalHours).toEqual<Temporal.Duration>(
@@ -817,7 +819,7 @@ describe("Activities", () => {
             from: "2025-06-09",
             to: "2025-06-15",
           }),
-          clock: Clock.fixed("2025-06-11T16:00:00Z", "Europe/Berlin"),
+          today: Temporal.PlainDate.from("2025-06-11"),
         });
 
         expect(result.capacity).toEqual<Capacity>({
@@ -852,7 +854,7 @@ describe("Activities", () => {
             from: "2025-06-09",
             to: "2025-06-15",
           }),
-          clock: Clock.fixed("2025-06-12T16:00:00Z", "Europe/Berlin"),
+          today: Temporal.PlainDate.from("2025-06-12"),
         });
 
         expect(result.capacity).toEqual<Capacity>({
@@ -887,7 +889,7 @@ describe("Activities", () => {
             from: "2025-06-09",
             to: "2025-06-15",
           }),
-          clock: Clock.fixed("2025-06-12T16:00:00Z", "Europe/Berlin"),
+          today: Temporal.PlainDate.from("2025-06-12"),
         });
 
         expect(result.capacity).toEqual<Capacity>({
@@ -922,7 +924,7 @@ describe("Activities", () => {
             from: "2025-06-09",
             to: "2025-06-15",
           }),
-          clock: Clock.fixed("2025-06-12T16:00:00Z", "Europe/Berlin"),
+          today: Temporal.PlainDate.from("2025-06-12"),
         });
 
         expect(result.capacity).toEqual<Capacity>({
@@ -954,7 +956,7 @@ describe("Activities", () => {
           Holiday.create({ date: "2025-06-09", title: "Pfingstmontag" }),
         ],
         query: TimesheetQuery.create({ from: "2025-06-09", to: "2025-06-15" }),
-        clock: Clock.fixed("2025-06-12T16:00:00Z", "Europe/Berlin"),
+        today: Temporal.PlainDate.from("2025-06-12"),
       });
 
       expect(result.capacity).toEqual<Capacity>({
@@ -983,7 +985,7 @@ describe("Activities", () => {
         replay,
         query: TimesheetQuery.create({ from: "2025-09-08", to: "2025-09-14" }),
         vacations: [Vacation.create({ date: "2025-09-10" })],
-        clock: Clock.fixed("2025-09-11T16:00:00Z", "Europe/Berlin"),
+        today: Temporal.PlainDate.from("2025-09-11"),
       });
 
       expect(result.capacity).toEqual<Capacity>({

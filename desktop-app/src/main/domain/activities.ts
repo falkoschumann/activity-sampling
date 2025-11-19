@@ -2,11 +2,10 @@
 
 import { Temporal } from "@js-temporal/polyfill";
 
-import { Clock, normalizeDuration } from "../../shared/common/temporal";
+import { normalizeDuration } from "../../shared/common/temporal";
 import {
   ActivityLoggedEvent,
   EstimateQueryResult,
-  RecentActivitiesQuery,
   RecentActivitiesQueryResult,
   ReportEntry,
   ReportQuery,
@@ -159,15 +158,11 @@ export async function projectActivities(
 
 export async function projectRecentActivities({
   replay,
-  query,
-  clock = Clock.systemDefaultZone(),
+  today,
 }: {
   replay: AsyncGenerator<ActivityLoggedEvent>;
-  query: RecentActivitiesQuery;
-  clock?: Clock;
+  today: Temporal.PlainDate;
 }): Promise<RecentActivitiesQueryResult> {
-  const timeZone = query.timeZone ?? clock.zone;
-  const today = clock.instant().toZonedDateTimeISO(timeZone).toPlainDate();
   const yesterday = today.subtract({ days: 1 });
   const thisWeekStart = today.subtract({
     days: today.dayOfWeek - 1,
@@ -495,22 +490,20 @@ export async function projectStatistics({
 export async function projectTimesheet({
   replay,
   query,
+  today,
   holidays = [],
   vacations = [],
   capacity = "PT40H",
-  clock = Clock.systemDefaultZone(),
 }: {
   replay: AsyncGenerator<ActivityLoggedEvent>;
   query: TimesheetQuery;
+  today: Temporal.PlainDate;
   holidays?: Holiday[];
   vacations?: Vacation[];
   capacity?: Temporal.DurationLike | string;
-  clock?: Clock;
 }): Promise<TimesheetQueryResult> {
   const startInclusive = Temporal.PlainDate.from(query.from);
   const endExclusive = Temporal.PlainDate.from(query.to).add("P1D");
-  const timeZone = query.timeZone ?? clock.zone;
-  const today = clock.instant().toZonedDateTimeISO(timeZone).toPlainDate();
   const calendar = Calendar.create({ holidays, vacations, capacity });
 
   let entries: TimesheetEntry[] = [];

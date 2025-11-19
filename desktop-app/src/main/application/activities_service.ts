@@ -85,7 +85,8 @@ export class ActivitiesService {
     query: RecentActivitiesQuery,
   ): Promise<RecentActivitiesQueryResult> {
     const replay = this.#replayTyped(this.#eventStore.replay(), query.timeZone);
-    return await projectRecentActivities({ replay, query, clock: this.#clock });
+    const today = this.#today(query.timeZone);
+    return await projectRecentActivities({ replay, today });
   }
 
   async queryReport(query: ReportQuery): Promise<ReportQueryResult> {
@@ -102,6 +103,7 @@ export class ActivitiesService {
 
   async queryTimesheet(query: TimesheetQuery): Promise<TimesheetQueryResult> {
     const replay = this.#replayTyped(this.#eventStore.replay(), query.timeZone);
+    const today = this.#today(query.timeZone);
     const holidays = await this.#holidayRepository.findAllByDate(
       query.from,
       query.to.add("P1D"),
@@ -113,16 +115,23 @@ export class ActivitiesService {
     return projectTimesheet({
       replay,
       query,
+      today,
       holidays,
       vacations,
       capacity: this.#capacity,
-      clock: this.#clock,
     });
   }
 
   async queryEstimate(query: EstimateQuery): Promise<EstimateQueryResult> {
     const replay = this.#replayTyped(this.#eventStore.replay(), query.timeZone);
     return projectEstimate({ replay });
+  }
+
+  #today(timeZone?: Temporal.TimeZoneLike) {
+    return this.#clock
+      .instant()
+      .toZonedDateTimeISO(timeZone ?? this.#clock.zone)
+      .toPlainDate();
   }
 
   async *#replayTyped(
