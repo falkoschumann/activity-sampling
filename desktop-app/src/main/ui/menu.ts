@@ -177,6 +177,16 @@ export function createMenu({
             }),
         },
         {
+          label: "Estimate",
+          accelerator: "Alt+CmdOrCtrl+E",
+          click: () =>
+            openWindow({
+              rendererFile: "estimate.html",
+              width: 1000,
+              height: 800,
+            }),
+        },
+        {
           label: "Timesheet",
           accelerator: "Alt+CmdOrCtrl+T",
           click: () =>
