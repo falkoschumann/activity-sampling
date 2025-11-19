@@ -387,20 +387,28 @@ export type StatisticsType = (typeof Statistics)[keyof typeof Statistics];
 export class StatisticsQuery {
   static create({
     statistics,
+    timeZone,
     ignoreSmallTasks,
   }: {
     statistics: StatisticsType;
+    timeZone?: Temporal.TimeZoneLike;
     ignoreSmallTasks?: boolean;
   }): StatisticsQuery {
-    return new StatisticsQuery(statistics, ignoreSmallTasks);
+    return new StatisticsQuery(statistics, timeZone, ignoreSmallTasks);
   }
 
   readonly statistics: StatisticsType;
+  readonly timeZone?: Temporal.TimeZoneLike;
   // WORKAROUND: Temporary ignore small tasks until task have categories
   readonly ignoreSmallTasks?: boolean;
 
-  private constructor(statistics: StatisticsType, ignoreSmallTasks?: boolean) {
+  private constructor(
+    statistics: StatisticsType,
+    timeZone?: Temporal.TimeZoneLike,
+    ignoreSmallTasks?: boolean,
+  ) {
     this.statistics = statistics;
+    this.timeZone = timeZone;
     this.ignoreSmallTasks = ignoreSmallTasks;
   }
 }
@@ -441,13 +449,18 @@ export class StatisticsQueryResult {
 }
 
 export class Histogram {
-  static create(other: Histogram) {
-    return new Histogram(
-      other.binEdges,
-      other.frequencies,
-      other.xAxisLabel,
-      other.yAxisLabel,
-    );
+  static create({
+    binEdges,
+    frequencies,
+    xAxisLabel,
+    yAxisLabel,
+  }: {
+    binEdges: string[];
+    frequencies: number[];
+    xAxisLabel: string;
+    yAxisLabel: string;
+  }) {
+    return new Histogram(binEdges, frequencies, xAxisLabel, yAxisLabel);
   }
 
   readonly binEdges: string[];
@@ -469,14 +482,20 @@ export class Histogram {
 }
 
 export class Median {
-  static create(other: Median) {
-    return new Median(
-      other.edge0,
-      other.edge25,
-      other.edge50,
-      other.edge75,
-      other.edge100,
-    );
+  static create({
+    edge0,
+    edge25,
+    edge50,
+    edge75,
+    edge100,
+  }: {
+    edge0: number;
+    edge25: number;
+    edge50: number;
+    edge75: number;
+    edge100: number;
+  }) {
+    return new Median(edge0, edge25, edge50, edge75, edge100);
   }
 
   readonly edge0: number;
@@ -643,17 +662,21 @@ export class Capacity {
 }
 
 export class EstimateQuery {
-  static create() {
-    return new EstimateQuery();
+  static create({ timeZone }: { timeZone?: Temporal.TimeZoneLike }) {
+    return new EstimateQuery(timeZone);
   }
 
-  private constructor() {}
+  readonly timeZone?: Temporal.TimeZoneLike;
+
+  private constructor(timeZone?: Temporal.TimeZoneLike) {
+    this.timeZone = timeZone;
+  }
 }
 
 export class EstimateQueryResult {
-  static create(other: EstimateQueryResult) {
+  static create({ cycleTimes }: { cycleTimes: EstimateEntry[] }) {
     return new EstimateQueryResult(
-      other.cycleTimes.map((entry) => EstimateEntry.create(entry)),
+      cycleTimes.map((entry) => EstimateEntry.create(entry)),
     );
   }
 
@@ -671,12 +694,22 @@ export class EstimateQueryResult {
 }
 
 export class EstimateEntry {
-  static create(other: EstimateEntry) {
+  static create({
+    cycleTime,
+    frequency,
+    probability,
+    cumulativeProbability,
+  }: {
+    cycleTime: number;
+    frequency: number;
+    probability: number;
+    cumulativeProbability: number;
+  }): EstimateEntry {
     return new EstimateEntry(
-      other.cycleTime,
-      other.frequency,
-      other.probability,
-      other.cumulativeProbability,
+      cycleTime,
+      frequency,
+      probability,
+      cumulativeProbability,
     );
   }
 

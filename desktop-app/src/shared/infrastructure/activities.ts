@@ -420,26 +420,35 @@ export class ReportEntryDto {
 export class StatisticsQueryDto {
   static create({
     statistics,
+    timeZone,
     ignoreSmallTasks,
   }: {
     statistics: StatisticsType;
+    timeZone?: string;
     ignoreSmallTasks?: boolean;
   }): StatisticsQueryDto {
-    return new StatisticsQueryDto(statistics, ignoreSmallTasks);
+    return new StatisticsQueryDto(statistics, timeZone, ignoreSmallTasks);
   }
 
   static from(model: StatisticsQuery): StatisticsQueryDto {
     return StatisticsQueryDto.create({
       statistics: model.statistics,
+      timeZone: model.timeZone?.toString(),
       ignoreSmallTasks: model.ignoreSmallTasks,
     });
   }
 
   readonly statistics: StatisticsType;
+  readonly timeZone?: string;
   readonly ignoreSmallTasks?: boolean;
 
-  private constructor(statistics: StatisticsType, ignoreSmallTasks?: boolean) {
+  private constructor(
+    statistics: StatisticsType,
+    timeZone?: string,
+    ignoreSmallTasks?: boolean,
+  ) {
     this.statistics = statistics;
+    this.timeZone = timeZone;
     this.ignoreSmallTasks = ignoreSmallTasks;
   }
 
@@ -776,18 +785,22 @@ export class CapacityDto {
 }
 
 export class EstimateQueryDto {
-  static create(_other: object): EstimateQueryDto {
-    return new EstimateQueryDto();
+  static create({ timeZone }: { timeZone?: string }): EstimateQueryDto {
+    return new EstimateQueryDto(timeZone);
   }
 
-  static from(_model: EstimateQuery): EstimateQueryDto {
-    return EstimateQueryDto.create({});
+  static from(model: EstimateQuery): EstimateQueryDto {
+    return EstimateQueryDto.create({ timeZone: model.timeZone?.toString() });
   }
 
-  private constructor() {}
+  readonly timeZone?: string;
+
+  private constructor(timeZone?: string) {
+    this.timeZone = timeZone;
+  }
 
   validate(): EstimateQuery {
-    return EstimateQuery.create();
+    return EstimateQuery.create(this);
   }
 }
 

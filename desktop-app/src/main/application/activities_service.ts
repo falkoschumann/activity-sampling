@@ -96,7 +96,7 @@ export class ActivitiesService {
   async queryStatistics(
     query: StatisticsQuery,
   ): Promise<StatisticsQueryResult> {
-    const replay = this.#replayTyped(this.#eventStore.replay());
+    const replay = this.#replayTyped(this.#eventStore.replay(), query.timeZone);
     return await projectStatistics({ replay, query });
   }
 
@@ -120,8 +120,8 @@ export class ActivitiesService {
     });
   }
 
-  async queryEstimate(_query: EstimateQuery): Promise<EstimateQueryResult> {
-    const replay = this.#replayTyped(this.#eventStore.replay());
+  async queryEstimate(query: EstimateQuery): Promise<EstimateQueryResult> {
+    const replay = this.#replayTyped(this.#eventStore.replay(), query.timeZone);
     return projectEstimate({ replay });
   }
 
