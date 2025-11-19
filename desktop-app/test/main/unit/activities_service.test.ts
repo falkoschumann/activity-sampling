@@ -277,6 +277,46 @@ describe("Activities service", () => {
       });
     });
   });
+
+  describe("Query estimate", () => {
+    it("should return estimate", async () => {
+      const { service } = configure({
+        events: [
+          ActivityLoggedEventDto.createTestInstance({
+            timestamp: "2025-11-17T15:00:00Z",
+            task: "Task A",
+          }),
+          ActivityLoggedEventDto.createTestInstance({
+            timestamp: "2025-11-17T15:00:00Z",
+            task: "Task B",
+          }),
+          ActivityLoggedEventDto.createTestInstance({
+            timestamp: "2025-11-18T15:00:00Z",
+            task: "Task A",
+          }),
+        ],
+      });
+
+      const result = await service.queryEstimate({});
+
+      expect(result).toEqual({
+        cycleTimes: [
+          {
+            cycleTime: 1,
+            frequency: 1,
+            probability: 0.5,
+            cumulativeProbability: 0.5,
+          },
+          {
+            cycleTime: 2,
+            frequency: 1,
+            probability: 0.5,
+            cumulativeProbability: 1.0,
+          },
+        ],
+      });
+    });
+  });
 });
 
 function configure({

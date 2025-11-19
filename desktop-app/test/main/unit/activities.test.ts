@@ -8,6 +8,7 @@ import {
   Activity,
   ActivityLoggedEvent,
   Capacity,
+  EstimateQueryResult,
   RecentActivitiesQueryResult,
   ReportEntry,
   ReportQueryResult,
@@ -22,6 +23,7 @@ import {
 } from "../../../src/shared/domain/activities";
 import {
   projectActivities,
+  projectEstimate,
   projectRecentActivities,
   projectReport,
   projectStatistics,
@@ -31,7 +33,7 @@ import { Holiday, Vacation } from "../../../src/main/domain/calendar";
 
 describe("Activities", () => {
   describe("Project activities", () => {
-    it("should return no activities when no events are logged", async () => {
+    it("should return an empty result when no activity are logged", async () => {
       const replay = createAsyncGenerator([]);
 
       const activities = await projectActivities(replay);
@@ -606,6 +608,31 @@ describe("Activities", () => {
     });
 
     describe("Cycle times", () => {
+      it("should return an empty result when no activities are logged", async () => {
+        const replay = createAsyncGenerator([]);
+
+        const result = await projectStatistics({
+          replay,
+          query: { statistics: Statistics.CYCLE_TIMES },
+        });
+
+        expect(result).toEqual<StatisticsQueryResult>({
+          histogram: {
+            binEdges: [],
+            frequencies: [],
+            xAxisLabel: "Cycle time (days)",
+            yAxisLabel: "Number of Tasks",
+          },
+          median: {
+            edge0: 0,
+            edge25: 0,
+            edge50: 0,
+            edge75: 0,
+            edge100: 0,
+          },
+        });
+      });
+
       it("should return statistics for cycle time", async () => {
         const replay = createAsyncGenerator([
           ActivityLoggedEvent.createTestInstance({
@@ -962,6 +989,70 @@ describe("Activities", () => {
       expect(result.capacity).toEqual<Capacity>({
         hours: Temporal.Duration.from("PT32H"),
         offset: Temporal.Duration.from("PT0S"),
+      });
+    });
+  });
+
+  describe("Project estimate", () => {
+    it("should return an empty result when no activities are logged", async () => {
+      const replay = createAsyncGenerator([]);
+
+      const result = await projectEstimate({ replay });
+
+      expect(result).toEqual<EstimateQueryResult>({ cycleTimes: [] });
+    });
+
+    it("should calculate the probability of cycle times", async () => {
+      const replay = createAsyncGenerator([
+        ActivityLoggedEvent.createTestInstance({
+          dateTime: "2025-11-03T10:00",
+          task: "Task A",
+        }),
+        ActivityLoggedEvent.createTestInstance({
+          dateTime: "2025-11-03T10:00",
+          task: "Task B",
+        }),
+        ActivityLoggedEvent.createTestInstance({
+          dateTime: "2025-11-03T10:00",
+          task: "Task C",
+        }),
+        ActivityLoggedEvent.createTestInstance({
+          dateTime: "2025-11-03T10:00",
+          task: "Task D",
+        }),
+        ActivityLoggedEvent.createTestInstance({
+          dateTime: "2025-11-04T10:00",
+          task: "Task C",
+        }),
+        ActivityLoggedEvent.createTestInstance({
+          dateTime: "2025-11-05T10:00",
+          task: "Task D",
+        }),
+      ]);
+
+      const result = await projectEstimate({ replay });
+
+      expect(result).toEqual<EstimateQueryResult>({
+        cycleTimes: [
+          {
+            cycleTime: 1,
+            frequency: 2,
+            probability: 0.5,
+            cumulativeProbability: 0.5,
+          },
+          {
+            cycleTime: 2,
+            frequency: 1,
+            probability: 0.25,
+            cumulativeProbability: 0.75,
+          },
+          {
+            cycleTime: 3,
+            frequency: 1,
+            probability: 0.25,
+            cumulativeProbability: 1.0,
+          },
+        ],
       });
     });
   });

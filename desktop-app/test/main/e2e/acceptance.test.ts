@@ -690,4 +690,61 @@ describe("Activity Sampling", () => {
       });
     });
   });
+
+  describe("Estimate", () => {
+    describe("Estimate remaining tasks with cycle times", () => {
+      it("should calculate cycle times and their frequencies", async () => {
+        const { estimate } = await startActivitySampling();
+        await estimate.activityLogged({
+          timestamp: "2025-11-03T10:00:00Z",
+          task: "Task A",
+        });
+        await estimate.activityLogged({
+          timestamp: "2025-11-03T10:00:00Z",
+          task: "Task B",
+        });
+        await estimate.activityLogged({
+          timestamp: "2025-11-03T10:00:00Z",
+          task: "Task C",
+        });
+        await estimate.activityLogged({
+          timestamp: "2025-11-03T10:00:00Z",
+          task: "Task D",
+        });
+        await estimate.activityLogged({
+          timestamp: "2025-11-04T10:00:00Z",
+          task: "Task C",
+        });
+        await estimate.activityLogged({
+          timestamp: "2025-11-05T10:00:00Z",
+          task: "Task D",
+        });
+
+        await estimate.queryEstimate();
+
+        estimate.assertEstimate({
+          cycleTimes: [
+            {
+              cycleTime: 1,
+              frequency: 2,
+              probability: 0.5,
+              cumulativeProbability: 0.5,
+            },
+            {
+              cycleTime: 2,
+              frequency: 1,
+              probability: 0.25,
+              cumulativeProbability: 0.75,
+            },
+            {
+              cycleTime: 3,
+              frequency: 1,
+              probability: 0.25,
+              cumulativeProbability: 1.0,
+            },
+          ],
+        });
+      });
+    });
+  });
 });

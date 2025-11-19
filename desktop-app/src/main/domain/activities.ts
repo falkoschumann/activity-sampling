@@ -6,6 +6,7 @@ import { Clock, normalizeDuration } from "../../shared/common/temporal";
 import {
   Activity,
   ActivityLoggedEvent,
+  EstimateQueryResult,
   RecentActivitiesQuery,
   RecentActivitiesQueryResult,
   ReportEntry,
@@ -525,6 +526,44 @@ export async function projectTimesheet({
     const offset = totalHours.subtract(businessDays);
     return normalizeDuration(offset);
   }
+}
+
+export async function projectEstimate({
+  replay,
+}: {
+  replay: AsyncGenerator<ActivityLoggedEvent>;
+}): Promise<EstimateQueryResult> {
+  const cycleTimeCounts = new Map<number, number>();
+  const activities = await projectActivities(replay);
+  for (const activity of activities) {
+    const cycleTimeDays =
+      activity.finish.since(activity.start).total("days") + 1;
+    const frequency = cycleTimeCounts.get(cycleTimeDays) ?? 0;
+    cycleTimeCounts.set(cycleTimeDays, frequency + 1);
+  }
+
+  const sortedCycleTimes = Array.from(cycleTimeCounts.entries()).sort(
+    (a, b) => a[0] - b[0],
+  );
+  const totalFrequencies = Array.from(cycleTimeCounts.values()).reduce(
+    (sum, freq) => sum + freq,
+    0,
+  );
+  let cumulativeProbability = 0;
+  const cycleTimes = sortedCycleTimes.map(([cycleTime, frequency]) => {
+    const probability = frequency / totalFrequencies;
+    cumulativeProbability += probability;
+    return {
+      cycleTime,
+      frequency,
+      probability,
+      cumulativeProbability,
+    };
+  });
+
+  return {
+    cycleTimes,
+  };
 }
 
 async function* filterEvents(

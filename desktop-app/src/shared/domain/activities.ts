@@ -642,6 +642,50 @@ export class Capacity {
   }
 }
 
+export class EstimateQuery {}
+
+export class EstimateQueryResult {
+  static create(other: EstimateQueryResult) {
+    return new EstimateQueryResult(
+      other.cycleTimes.map((entry) => EstimateEntry.create(entry)),
+    );
+  }
+
+  readonly cycleTimes: EstimateEntry[];
+
+  constructor(cycleTimes: EstimateEntry[]) {
+    this.cycleTimes = cycleTimes;
+  }
+}
+
+export class EstimateEntry {
+  static create(other: EstimateEntry) {
+    return new EstimateEntry(
+      other.cycleTime,
+      other.frequency,
+      other.probability,
+      other.cumulativeProbability,
+    );
+  }
+
+  readonly cycleTime: number;
+  readonly frequency: number;
+  readonly probability: number;
+  readonly cumulativeProbability: number;
+
+  constructor(
+    cycleTime: number,
+    frequency: number,
+    probability: number,
+    cumulativeProbability: number,
+  ) {
+    this.cycleTime = cycleTime;
+    this.frequency = frequency;
+    this.probability = probability;
+    this.cumulativeProbability = cumulativeProbability;
+  }
+}
+
 //
 // Events
 //

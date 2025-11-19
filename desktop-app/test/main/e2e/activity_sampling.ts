@@ -12,6 +12,8 @@ import { ActivitiesService } from "../../../src/main/application/activities_serv
 import { TimerService } from "../../../src/main/application/timer_service";
 import {
   Capacity,
+  EstimateQuery,
+  EstimateQueryResult,
   Histogram,
   type LogActivityCommand,
   type RecentActivitiesQuery,
@@ -67,8 +69,8 @@ export async function startActivitySampling({
   const reports = new ReportsDsl(activitiesDriver);
   const statistics = new StatisticsDsl(activitiesDriver);
   const timesheet = new TimesheetDsl(activitiesDriver);
-
-  return { log, reports, statistics, timesheet };
+  const estimate = new EstimateDsl(activitiesDriver);
+  return { log, reports, statistics, timesheet, estimate };
 }
 
 export interface Ui {
@@ -76,6 +78,7 @@ export interface Ui {
   reports: ReportsDsl;
   statistics: StatisticsDsl;
   timesheet: TimesheetDsl;
+  estimate: EstimateDsl;
 }
 
 class LogDsl {
@@ -513,6 +516,50 @@ function parseActivityLogged(args: {
   });
 }
 
+class EstimateDsl {
+  #activitiesDriver: ActivitiesDriver;
+
+  constructor(activitiesDriver: ActivitiesDriver) {
+    this.#activitiesDriver = activitiesDriver;
+  }
+
+  //
+  // Queries
+  //
+
+  async queryEstimate() {
+    await this.#activitiesDriver.queryEstimate({});
+  }
+
+  assertEstimate(args: {
+    cycleTimes?: {
+      cycleTime: number;
+      frequency: number;
+      probability: number;
+      cumulativeProbability: number;
+    }[];
+  }) {
+    const cycleTimes = args.cycleTimes ?? [];
+    this.#activitiesDriver.assertEstimate({ cycleTimes });
+  }
+
+  //
+  // Events
+  //
+
+  async activityLogged(args: {
+    timestamp?: string;
+    duration?: string;
+    client?: string;
+    project?: string;
+    task?: string;
+    notes?: string;
+  }) {
+    const event = parseActivityLogged(args);
+    await this.#activitiesDriver.record(event);
+  }
+}
+
 class ActivitiesDriver {
   readonly #eventStore: EventStore;
   readonly #holidayRepository: HolidayRepository;
@@ -523,6 +570,7 @@ class ActivitiesDriver {
   #reportQueryResult?: ReportQueryResult;
   #statisticsQueryResult?: StatisticsQueryResult;
   #timesheetQueryResult?: TimesheetQueryResult;
+  #estimateQueryResult?: EstimateQueryResult;
 
   constructor(settings: Settings, clock: Clock) {
     this.#eventStore = EventStore.create();
@@ -623,6 +671,15 @@ class ActivitiesDriver {
         result.capacity,
       );
     }
+  }
+
+  async queryEstimate(query: EstimateQuery) {
+    this.#estimateQueryResult =
+      await this.#activitiesService.queryEstimate(query);
+  }
+
+  assertEstimate(result: EstimateQueryResult) {
+    expect(this.#estimateQueryResult).toEqual<EstimateQueryResult>(result);
   }
 
   //

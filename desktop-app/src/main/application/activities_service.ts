@@ -4,17 +4,20 @@ import { type CommandStatus, Success } from "@muspellheim/shared";
 
 import { Clock } from "../../shared/common/temporal";
 import {
+  type EstimateQuery,
+  type EstimateQueryResult,
   type LogActivityCommand,
   type RecentActivitiesQuery,
   type RecentActivitiesQueryResult,
   type ReportQuery,
   type ReportQueryResult,
-  StatisticsQuery,
-  StatisticsQueryResult,
+  type StatisticsQuery,
+  type StatisticsQueryResult,
   type TimesheetQuery,
   type TimesheetQueryResult,
 } from "../../shared/domain/activities";
 import {
+  projectEstimate,
   projectRecentActivities,
   projectReport,
   projectStatistics,
@@ -115,6 +118,11 @@ export class ActivitiesService {
       capacity: this.#capacity,
       clock: this.#clock,
     });
+  }
+
+  async queryEstimate(_query: EstimateQuery): Promise<EstimateQueryResult> {
+    const replay = this.#replayTyped(this.#eventStore.replay());
+    return projectEstimate({ replay });
   }
 
   async *#replayTyped(
