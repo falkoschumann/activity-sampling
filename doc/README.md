@@ -68,7 +68,6 @@ analysis.
 - [x] Estimate tasks with cycle times
 - [ ] Estimate tasks with lead times
 - [ ] Estimate tasks with throughput
-- [ ] Mark the threshold of 85%
 
 ## Architecture
 
