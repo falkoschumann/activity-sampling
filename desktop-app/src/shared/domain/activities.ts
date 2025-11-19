@@ -485,7 +485,7 @@ export class Median {
   readonly edge75: number;
   readonly edge100: number;
 
-  constructor(
+  private constructor(
     edge0: number,
     edge25: number,
     edge50: number,
@@ -642,7 +642,13 @@ export class Capacity {
   }
 }
 
-export class EstimateQuery {}
+export class EstimateQuery {
+  static create() {
+    return new EstimateQuery();
+  }
+
+  private constructor() {}
+}
 
 export class EstimateQueryResult {
   static create(other: EstimateQueryResult) {
@@ -651,9 +657,15 @@ export class EstimateQueryResult {
     );
   }
 
+  static empty() {
+    return EstimateQueryResult.create({
+      cycleTimes: [],
+    });
+  }
+
   readonly cycleTimes: EstimateEntry[];
 
-  constructor(cycleTimes: EstimateEntry[]) {
+  private constructor(cycleTimes: EstimateEntry[]) {
     this.cycleTimes = cycleTimes;
   }
 }
@@ -673,7 +685,7 @@ export class EstimateEntry {
   readonly probability: number;
   readonly cumulativeProbability: number;
 
-  constructor(
+  private constructor(
     cycleTime: number,
     frequency: number,
     probability: number,

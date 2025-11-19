@@ -16,6 +16,8 @@ import { TimerService } from "./application/timer_service";
 import { Settings } from "../shared/domain/settings";
 import {
   CommandStatusDto,
+  EstimateQueryDto,
+  EstimateQueryResultDto,
   LogActivityCommandDto,
   RecentActivitiesQueryDto,
   RecentActivitiesQueryResultDto,
@@ -30,6 +32,7 @@ import {
   INTERVAL_ELAPSED_CHANNEL,
   LOAD_SETTINGS_CHANNEL,
   LOG_ACTIVITY_CHANNEL,
+  QUERY_ESTIMATE_CHANNEL,
   QUERY_RECENT_ACTIVITIES_CHANNEL,
   QUERY_REPORT_CHANNEL,
   QUERY_STATISTICS_CHANNEL,
@@ -175,6 +178,14 @@ function createRendererToMainChannels() {
       const query = TimesheetQueryDto.create(queryDto).validate();
       const result = await activitiesService.queryTimesheet(query);
       return TimesheetQueryResultDto.from(result);
+    },
+  );
+  ipcMain.handle(
+    QUERY_ESTIMATE_CHANNEL,
+    async (_event, queryDto: EstimateQueryDto) => {
+      const query = EstimateQueryDto.create(queryDto).validate();
+      const result = await activitiesService.queryEstimate(query);
+      return EstimateQueryResultDto.from(result);
     },
   );
   ipcMain.handle(LOAD_SETTINGS_CHANNEL, async (_event) => {

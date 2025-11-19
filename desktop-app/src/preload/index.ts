@@ -23,6 +23,7 @@ import {
   INTERVAL_ELAPSED_CHANNEL,
   LOAD_SETTINGS_CHANNEL,
   LOG_ACTIVITY_CHANNEL,
+  QUERY_ESTIMATE_CHANNEL,
   QUERY_RECENT_ACTIVITIES_CHANNEL,
   QUERY_REPORT_CHANNEL,
   QUERY_STATISTICS_CHANNEL,
@@ -66,6 +67,12 @@ contextBridge.exposeInMainWorld("activitySampling", {
     query: TimesheetQueryDto,
   ): Promise<TimesheetQueryResultDto> => {
     return ipcRenderer.invoke(QUERY_TIMESHEET_CHANNEL, query);
+  },
+
+  queryEstimate: async (
+    query: StatisticsQueryDto,
+  ): Promise<StatisticsQueryResultDto> => {
+    return ipcRenderer.invoke(QUERY_ESTIMATE_CHANNEL, query);
   },
 
   onTimerStartedEvent: (

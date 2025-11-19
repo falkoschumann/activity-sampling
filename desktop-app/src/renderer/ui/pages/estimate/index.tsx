@@ -1,31 +1,28 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
 import Chart from "chart.js/auto";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
-const cycleTimeData = [
-  { cycleTime: 1, frequency: 3, probability: "15%", cumulative: "15%" },
-  { cycleTime: 2, frequency: 7, probability: "35%", cumulative: "50%" },
-  { cycleTime: 3, frequency: 2, probability: "10%", cumulative: "60%" },
-  { cycleTime: 4, frequency: 4, probability: "20%", cumulative: "80%" },
-  { cycleTime: 5, frequency: 1, probability: "5%", cumulative: "85%" },
-  { cycleTime: 6, frequency: 1, probability: "5%", cumulative: "90%" },
-  { cycleTime: 7, frequency: 1, probability: "5%", cumulative: "95%" },
-  { cycleTime: 8, frequency: 1, probability: "5%", cumulative: "100%" },
-];
+import { useEstimate } from "../../../application/activities_service";
+import { EstimateQuery } from "../../../../shared/domain/activities";
 
 export default function EstimatePage() {
   const chartRef = useRef<HTMLCanvasElement>(null);
+
+  const [query] = useState<EstimateQuery>({});
+  const estimate = useEstimate(query);
+
+  console.log("Estimate", estimate);
 
   useEffect(() => {
     const chart = new Chart(chartRef.current!, {
       type: "bar",
       data: {
-        labels: cycleTimeData.map((item) => String(item.cycleTime)),
+        labels: estimate.cycleTimes.map((entry) => String(entry.cycleTime)),
         datasets: [
           {
             label: "Frequencies of Cycle Times",
-            data: cycleTimeData.map((item) => item.frequency),
+            data: estimate.cycleTimes.map((entry) => entry.frequency),
           },
         ],
       },
@@ -52,11 +49,11 @@ export default function EstimatePage() {
     });
 
     return () => chart.destroy();
-  }, []);
+  }, [estimate.cycleTimes]);
 
   return (
     <main className="container my-4">
-      <h1>Estimate</h1>
+      <h2>Cycle Time</h2>
       <canvas ref={chartRef}></canvas>
       <table className="table mt-3">
         <thead className="sticky-top">
@@ -68,12 +65,12 @@ export default function EstimatePage() {
           </tr>
         </thead>
         <tbody>
-          {cycleTimeData.map((item, index) => (
+          {estimate.cycleTimes.map((item, index) => (
             <tr key={index}>
               <td>{item.cycleTime}</td>
               <td>{item.frequency}</td>
-              <td>{item.probability}</td>
-              <td>{item.cumulative}</td>
+              <td>{Math.round(item.probability * 100)}&nbsp;%</td>
+              <td>{Math.round(item.cumulativeProbability * 100)}&nbsp;%</td>
             </tr>
           ))}
         </tbody>

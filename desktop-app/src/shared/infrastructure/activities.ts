@@ -6,6 +6,9 @@ import { type CommandStatus, Failure, Success } from "@muspellheim/shared";
 import {
   ActivityLoggedEvent,
   Capacity,
+  EstimateEntry,
+  EstimateQuery,
+  EstimateQueryResult,
   Histogram,
   LogActivityCommand,
   Median,
@@ -232,71 +235,6 @@ export class WorkingDayDto {
       activities: this.activities.map((dto) =>
         ActivityLoggedEventDto.create(dto)!.validate(),
       ),
-    });
-  }
-}
-
-export class ActivityLoggedEventDto {
-  static create(dto: {
-    dateTime: string;
-    duration: string;
-    client: string;
-    project: string;
-    task: string;
-    notes?: string;
-  }): ActivityLoggedEventDto {
-    return new ActivityLoggedEventDto(
-      dto.dateTime,
-      dto.duration,
-      dto.client,
-      dto.project,
-      dto.task,
-      dto.notes,
-    );
-  }
-
-  static from(model: ActivityLoggedEvent): ActivityLoggedEventDto {
-    return ActivityLoggedEventDto.create({
-      dateTime: model.dateTime.toString(),
-      duration: model.duration.toString(),
-      client: model.client,
-      project: model.project,
-      task: model.task,
-      notes: model.notes,
-    });
-  }
-
-  readonly dateTime: string;
-  readonly duration: string;
-  readonly client: string;
-  readonly project: string;
-  readonly task: string;
-  readonly notes?: string;
-
-  private constructor(
-    dateTime: string,
-    duration: string,
-    client: string,
-    project: string,
-    task: string,
-    notes?: string,
-  ) {
-    this.dateTime = dateTime;
-    this.duration = duration;
-    this.client = client;
-    this.project = project;
-    this.task = task;
-    this.notes = notes;
-  }
-
-  validate(): ActivityLoggedEvent {
-    return ActivityLoggedEvent.create({
-      dateTime: Temporal.PlainDateTime.from(this.dateTime),
-      duration: Temporal.Duration.from(this.duration),
-      client: this.client,
-      project: this.project,
-      task: this.task,
-      notes: this.notes,
     });
   }
 }
@@ -537,8 +475,8 @@ export class StatisticsQueryResultDto {
 
   static from(model: StatisticsQueryResult): StatisticsQueryResultDto {
     return StatisticsQueryResultDto.create({
-      histogram: model.histogram,
-      median: model.median,
+      histogram: HistogramDto.from(model.histogram),
+      median: MedianDto.from(model.median),
     });
   }
 
@@ -647,7 +585,7 @@ export class MedianDto {
   readonly edge75: number;
   readonly edge100: number;
 
-  constructor(
+  private constructor(
     edge0: number,
     edge25: number,
     edge50: number,
@@ -834,5 +772,173 @@ export class CapacityDto {
 
   validate(): Capacity {
     return Capacity.create(this);
+  }
+}
+
+export class EstimateQueryDto {
+  static create(_other: object): EstimateQueryDto {
+    return new EstimateQueryDto();
+  }
+
+  static from(_model: EstimateQuery): EstimateQueryDto {
+    return EstimateQueryDto.create({});
+  }
+
+  private constructor() {}
+
+  validate(): EstimateQuery {
+    return EstimateQuery.create();
+  }
+}
+
+export class EstimateQueryResultDto {
+  static create({
+    cycleTimes,
+  }: {
+    cycleTimes: EstimateEntryDto[];
+  }): EstimateQueryResultDto {
+    return new EstimateQueryResultDto(
+      cycleTimes.map((entry) => EstimateEntryDto.create(entry)),
+    );
+  }
+
+  static from(model: EstimateQueryResult): EstimateQueryResultDto {
+    return EstimateQueryResultDto.create({
+      cycleTimes: model.cycleTimes.map((entry) => EstimateEntryDto.from(entry)),
+    });
+  }
+
+  readonly cycleTimes: EstimateEntryDto[];
+
+  private constructor(cycleTimes: EstimateEntryDto[]) {
+    this.cycleTimes = cycleTimes;
+  }
+
+  validate(): EstimateQueryResult {
+    return EstimateQueryResult.create({
+      cycleTimes: this.cycleTimes.map((entry) =>
+        EstimateEntryDto.create(entry).validate(),
+      ),
+    });
+  }
+}
+
+export class EstimateEntryDto {
+  static create({
+    cycleTime,
+    frequency,
+    probability,
+    cumulativeProbability,
+  }: {
+    cycleTime: number;
+    frequency: number;
+    probability: number;
+    cumulativeProbability: number;
+  }): EstimateEntryDto {
+    return new EstimateEntryDto(
+      cycleTime,
+      frequency,
+      probability,
+      cumulativeProbability,
+    );
+  }
+
+  static from(model: EstimateEntry): EstimateEntryDto {
+    return EstimateEntryDto.create({
+      cycleTime: model.cycleTime,
+      frequency: model.frequency,
+      probability: model.probability,
+      cumulativeProbability: model.cumulativeProbability,
+    });
+  }
+
+  readonly cycleTime: number;
+  readonly frequency: number;
+  readonly probability: number;
+  readonly cumulativeProbability: number;
+
+  private constructor(
+    cycleTime: number,
+    frequency: number,
+    probability: number,
+    cumulativeProbability: number,
+  ) {
+    this.cycleTime = cycleTime;
+    this.frequency = frequency;
+    this.probability = probability;
+    this.cumulativeProbability = cumulativeProbability;
+  }
+
+  validate(): EstimateEntry {
+    return EstimateEntry.create(this);
+  }
+}
+
+//
+// Events
+//
+
+export class ActivityLoggedEventDto {
+  static create(dto: {
+    dateTime: string;
+    duration: string;
+    client: string;
+    project: string;
+    task: string;
+    notes?: string;
+  }): ActivityLoggedEventDto {
+    return new ActivityLoggedEventDto(
+      dto.dateTime,
+      dto.duration,
+      dto.client,
+      dto.project,
+      dto.task,
+      dto.notes,
+    );
+  }
+
+  static from(model: ActivityLoggedEvent): ActivityLoggedEventDto {
+    return ActivityLoggedEventDto.create({
+      dateTime: model.dateTime.toString(),
+      duration: model.duration.toString(),
+      client: model.client,
+      project: model.project,
+      task: model.task,
+      notes: model.notes,
+    });
+  }
+
+  readonly dateTime: string;
+  readonly duration: string;
+  readonly client: string;
+  readonly project: string;
+  readonly task: string;
+  readonly notes?: string;
+
+  private constructor(
+    dateTime: string,
+    duration: string,
+    client: string,
+    project: string,
+    task: string,
+    notes?: string,
+  ) {
+    this.dateTime = dateTime;
+    this.duration = duration;
+    this.client = client;
+    this.project = project;
+    this.task = task;
+    this.notes = notes;
+  }
+
+  validate(): ActivityLoggedEvent {
+    return ActivityLoggedEvent.create({
+      dateTime: Temporal.PlainDateTime.from(this.dateTime),
+      duration: Temporal.Duration.from(this.duration),
+      client: this.client,
+      project: this.project,
+      task: this.task,
+      notes: this.notes,
+    });
   }
 }

@@ -4,6 +4,8 @@ import { Temporal } from "@js-temporal/polyfill";
 import { useCallback, useEffect, useReducer, useState } from "react";
 
 import {
+  EstimateQuery,
+  EstimateQueryResult,
   LogActivityCommand,
   RecentActivitiesQuery,
   RecentActivitiesQueryResult,
@@ -24,6 +26,8 @@ import {
 } from "../domain/log";
 import {
   CommandStatusDto,
+  EstimateQueryDto,
+  EstimateQueryResultDto,
   LogActivityCommandDto,
   RecentActivitiesQueryDto,
   RecentActivitiesQueryResultDto,
@@ -204,7 +208,7 @@ async function queryStatistics(query: StatisticsQuery) {
 }
 
 export function useTimesheet(query: TimesheetQuery) {
-  const [result, setResul] = useState(TimesheetQueryResult.empty());
+  const [result, setResult] = useState(TimesheetQueryResult.empty());
 
   useEffect(() => {
     (async function () {
@@ -212,7 +216,7 @@ export function useTimesheet(query: TimesheetQuery) {
         from: Temporal.PlainDate.from(query.from),
         to: Temporal.PlainDate.from(query.to),
       });
-      setResul(result);
+      setResult(result);
     })();
   }, [query.from, query.to]);
 
@@ -224,4 +228,24 @@ async function queryTimesheet(query: TimesheetQuery) {
     TimesheetQueryDto.from(query),
   );
   return TimesheetQueryResultDto.create(resultDto).validate();
+}
+
+export function useEstimate(query: EstimateQuery): EstimateQueryResult {
+  const [result, setResult] = useState(EstimateQueryResult.empty());
+
+  useEffect(() => {
+    (async function () {
+      const result = await queryEstimate(query);
+      setResult(result);
+    })();
+  }, [query]);
+
+  return result;
+}
+
+async function queryEstimate(query: EstimateQuery) {
+  const resultDto = await window.activitySampling.queryEstimate(
+    EstimateQueryDto.from(query),
+  );
+  return EstimateQueryResultDto.create(resultDto).validate();
 }

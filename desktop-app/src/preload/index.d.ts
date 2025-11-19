@@ -7,6 +7,8 @@ import type {
 
 import type {
   CommandStatusDto,
+  EstimateQueryDto,
+  EstimateQueryResultDto,
   LogActivityCommandDto,
   RecentActivitiesQueryDto,
   RecentActivitiesQueryResultDto,
@@ -38,6 +40,8 @@ export interface ActivitySampling {
   queryStatistics(query: StatisticsQueryDto): Promise<StatisticsQueryResultDto>;
 
   queryTimesheet(query: TimesheetQueryDto): Promise<TimesheetQueryResultDto>;
+
+  queryEstimate(query: EstimateQueryDto): Promise<EstimateQueryResultDto>;
 
   onTimerStartedEvent: (
     callback: (event: TimerStartedEventDto) => void,
