@@ -2,9 +2,7 @@
 
 import { Temporal } from "@js-temporal/polyfill";
 
-//
-// Commands
-//
+// region Commands
 
 export class LogActivityCommand {
   static create({
@@ -81,9 +79,9 @@ export class LogActivityCommand {
   }
 }
 
-//
-// Queries
-//
+// endregion
+
+// region Queries
 
 export class RecentActivitiesQuery {
   static create({
@@ -153,82 +151,6 @@ export class WorkingDay {
   ) {
     this.date = Temporal.PlainDate.from(date);
     this.activities = activities;
-  }
-}
-
-export class Activity {
-  static create({
-    start,
-    finish,
-    client,
-    project,
-    task,
-    notes,
-    hours,
-  }: {
-    start: Temporal.PlainDateLike | string;
-    finish: Temporal.PlainDateLike | string;
-    client: string;
-    project: string;
-    task: string;
-    notes?: string;
-    hours: Temporal.DurationLike | string;
-  }): Activity {
-    return new Activity(start, finish, client, project, task, hours, notes);
-  }
-
-  static createTestInstance({
-    start = "2025-08-14",
-    finish = "2025-08-14",
-    client = "Test client",
-    project = "Test project",
-    task = "Test task",
-    notes,
-    hours = "PT30M",
-  }: {
-    start?: Temporal.PlainDateLike | string;
-    finish?: Temporal.PlainDateLike | string;
-    client?: string;
-    project?: string;
-    task?: string;
-    notes?: string;
-    hours?: Temporal.DurationLike | string;
-  } = {}): Activity {
-    return Activity.create({
-      start,
-      finish,
-      client,
-      project,
-      task,
-      notes,
-      hours,
-    });
-  }
-
-  readonly start: Temporal.PlainDate;
-  readonly finish: Temporal.PlainDate;
-  readonly client: string;
-  readonly project: string;
-  readonly task: string;
-  readonly notes?: string;
-  readonly hours: Temporal.Duration;
-
-  private constructor(
-    start: Temporal.PlainDateLike | string,
-    finish: Temporal.PlainDateLike | string,
-    client: string,
-    project: string,
-    task: string,
-    hours: Temporal.DurationLike | string,
-    notes?: string,
-  ) {
-    this.start = Temporal.PlainDate.from(start);
-    this.finish = Temporal.PlainDate.from(finish);
-    this.client = client;
-    this.project = project;
-    this.task = task;
-    this.notes = notes;
-    this.hours = Temporal.Duration.from(hours);
   }
 }
 
@@ -731,9 +653,9 @@ export class EstimateEntry {
   }
 }
 
-//
-// Events
-//
+// endregion
+
+// region Events
 
 export class ActivityLoggedEvent {
   static create({

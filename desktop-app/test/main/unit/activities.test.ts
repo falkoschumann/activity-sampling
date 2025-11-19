@@ -5,7 +5,6 @@ import { describe, expect, it } from "vitest";
 
 import { Clock } from "../../../src/shared/common/temporal";
 import {
-  Activity,
   ActivityLoggedEvent,
   Capacity,
   EstimateQueryResult,
@@ -22,6 +21,7 @@ import {
   WorkingDay,
 } from "../../../src/shared/domain/activities";
 import {
+  Activity,
   projectActivities,
   projectEstimate,
   projectRecentActivities,

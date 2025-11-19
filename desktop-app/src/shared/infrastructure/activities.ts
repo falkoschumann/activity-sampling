@@ -28,9 +28,7 @@ import {
   WorkingDay,
 } from "../domain/activities";
 
-//
-// Commands
-//
+// region Commands
 
 export class LogActivityCommandDto {
   static create({
@@ -132,9 +130,9 @@ export class CommandStatusDto {
   }
 }
 
-//
-// Queries
-//
+// endregion
+
+// region Queries
 
 export class RecentActivitiesQueryDto {
   static create({ timeZone }: { timeZone?: string }): RecentActivitiesQueryDto {
@@ -887,9 +885,9 @@ export class EstimateEntryDto {
   }
 }
 
-//
-// Events
-//
+// endregion
+
+// region Events
 
 export class ActivityLoggedEventDto {
   static create(dto: {
