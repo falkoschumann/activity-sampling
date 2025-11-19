@@ -19,6 +19,7 @@ export default defineConfig({
           settings: "src/renderer/settings.html",
           statistics: "src/renderer/statistics.html",
           timesheet: "src/renderer/timesheet.html",
+          estimate: "src/renderer/estimate.html",
         },
       },
     },
