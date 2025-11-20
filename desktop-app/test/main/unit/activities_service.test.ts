@@ -118,6 +118,20 @@ describe("Activities service", () => {
         },
       });
     });
+
+    it("should throw an error when event is not parseable", async () => {
+      const { service } = configure({
+        events: [
+          ActivityLoggedEventDto.createTestInstance({
+            timestamp: "invalid-timestamp",
+          }),
+        ],
+      });
+
+      const result = service.queryRecentActivities({});
+
+      expect(result).rejects.toThrowError(TypeError);
+    });
   });
 
   describe("Query report", () => {
