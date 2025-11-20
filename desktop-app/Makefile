@@ -50,11 +50,11 @@ build: prepare
 
 prepare: version
 	@if [ -n "$(CI)" ] ; then \
-  		echo "CI detected, run npm ci"; \
-  		npm ci; \
-  	else \
-  		npm install; \
-  	fi
+		echo "CI detected, run npm ci"; \
+		npm ci; \
+	else \
+		npm install; \
+	fi
 
 version:
 	@echo "Node.js $(shell node --version)"

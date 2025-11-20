@@ -63,7 +63,9 @@ $(SUBDIRS): force
 	@$(MAKE) -C $@ $(TARGET)
 
 $(DIAGRAM_FILES): %.png: %.puml
-	plantuml $^
+	@if [ -z "$(CI)" ] ; then \
+		plantuml $^ \
+	fi
 
 force: ;
 
