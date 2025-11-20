@@ -29,6 +29,7 @@ export class Activity {
     project,
     task,
     notes,
+    category,
     hours,
   }: {
     start: Temporal.PlainDateLike | string;
@@ -37,9 +38,19 @@ export class Activity {
     project: string;
     task: string;
     notes?: string;
+    category?: string;
     hours: Temporal.DurationLike | string;
   }): Activity {
-    return new Activity(start, finish, client, project, task, hours, notes);
+    return new Activity(
+      start,
+      finish,
+      client,
+      project,
+      task,
+      hours,
+      notes,
+      category,
+    );
   }
 
   static createTestInstance({
@@ -49,6 +60,7 @@ export class Activity {
     project = "Test project",
     task = "Test task",
     notes,
+    category,
     hours = "PT30M",
   }: {
     start?: Temporal.PlainDateLike | string;
@@ -57,6 +69,7 @@ export class Activity {
     project?: string;
     task?: string;
     notes?: string;
+    category?: string;
     hours?: Temporal.DurationLike | string;
   } = {}): Activity {
     return Activity.create({
@@ -66,6 +79,7 @@ export class Activity {
       project,
       task,
       notes,
+      category,
       hours,
     });
   }
@@ -76,6 +90,7 @@ export class Activity {
   readonly project: string;
   readonly task: string;
   readonly notes?: string;
+  readonly category?: string;
   readonly hours: Temporal.Duration;
 
   private constructor(
@@ -86,6 +101,7 @@ export class Activity {
     task: string,
     hours: Temporal.DurationLike | string,
     notes?: string,
+    category?: string,
   ) {
     this.start = Temporal.PlainDate.from(start);
     this.finish = Temporal.PlainDate.from(finish);
@@ -93,6 +109,7 @@ export class Activity {
     this.project = project;
     this.task = task;
     this.notes = notes;
+    this.category = category;
     this.hours = Temporal.Duration.from(hours);
   }
 }
@@ -129,6 +146,7 @@ export async function projectActivities(
         project: event.project,
         task: event.task,
         notes: event.notes,
+        category: event.category,
         hours: event.duration,
       });
       activities.push(activity);
@@ -225,6 +243,7 @@ export async function projectRecentActivities({
         project: event.project,
         task: event.task,
         notes: event.notes,
+        category: event.category,
       }),
     );
   }

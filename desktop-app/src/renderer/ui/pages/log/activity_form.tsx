@@ -14,6 +14,7 @@ function ActivityFormComponent({
   project,
   task,
   notes,
+  category,
   onTextChange,
   onSubmit,
 }: {
@@ -22,6 +23,7 @@ function ActivityFormComponent({
   project: string;
   task: string;
   notes: string;
+  category: string;
   onTextChange: (name: keyof ActivityTemplate, text: string) => void;
   onSubmit: () => void;
 }) {
@@ -63,6 +65,13 @@ function ActivityFormComponent({
         isDisabled={isDisabled}
         onTextChange={(text) => onTextChange("notes", text)}
       />
+      <FormSelectComponent
+        name="category"
+        title="Category"
+        options={["", "Feature", "Rework", "Meeting", "Maintenance", "Training"]}
+        value={category}
+        onOptionChange={(option) => onTextChange("category", option)}
+      />
       <button type="submit" disabled={isDisabled} className="btn btn-primary btn-sm w-100">
         Log
       </button>
@@ -99,8 +108,48 @@ function FormInputComponent({
           required={isRequired}
           disabled={isDisabled}
           className="form-control form-control-sm"
-          onChange={(event) => onTextChange?.(event.target.value)}
+          onChange={(event) => onTextChange?.(event.currentTarget.value)}
         />
+      </div>
+    </div>
+  );
+}
+
+function FormSelectComponent({
+  name,
+  title,
+  options,
+  value,
+  isRequired,
+  isDisabled,
+  onOptionChange,
+}: {
+  name: string;
+  title: string;
+  options: string[];
+  value: string;
+  isRequired?: boolean;
+  isDisabled?: boolean;
+  onOptionChange: (text: string) => void;
+}) {
+  return (
+    <div className="row mb-1">
+      <label htmlFor={name} className="col-sm-2 col-form-label">
+        {title}
+      </label>
+      <div className="col-sm-10">
+        <select
+          id={name}
+          value={value}
+          required={isRequired}
+          disabled={isDisabled}
+          className="form-select form-select-sm"
+          onChange={(event) => onOptionChange(event.currentTarget.value)}
+        >
+          {options.map((option) => (
+            <option key={option}>{option}</option>
+          ))}
+        </select>
       </div>
     </div>
   );

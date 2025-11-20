@@ -12,6 +12,7 @@ export class LogActivityCommand {
     project,
     task,
     notes,
+    category,
   }: {
     timestamp: Temporal.Instant | string;
     duration: Temporal.DurationLike | string;
@@ -19,6 +20,7 @@ export class LogActivityCommand {
     project: string;
     task: string;
     notes?: string;
+    category?: string;
   }): LogActivityCommand {
     return new LogActivityCommand(
       timestamp,
@@ -27,6 +29,7 @@ export class LogActivityCommand {
       project,
       task,
       notes,
+      category,
     );
   }
 
@@ -37,6 +40,7 @@ export class LogActivityCommand {
     project = "Test project",
     task = "Test task",
     notes,
+    category,
   }: {
     timestamp?: Temporal.Instant | string;
     duration?: Temporal.DurationLike | string;
@@ -44,6 +48,7 @@ export class LogActivityCommand {
     project?: string;
     task?: string;
     notes?: string;
+    category?: string;
   } = {}): LogActivityCommand {
     return LogActivityCommand.create({
       timestamp,
@@ -52,6 +57,7 @@ export class LogActivityCommand {
       project,
       task,
       notes,
+      category,
     });
   }
 
@@ -61,6 +67,7 @@ export class LogActivityCommand {
   readonly project: string;
   readonly task: string;
   readonly notes?: string;
+  readonly category?: string;
 
   private constructor(
     timestamp: Temporal.Instant | string,
@@ -69,6 +76,7 @@ export class LogActivityCommand {
     project: string,
     task: string,
     notes?: string,
+    category?: string,
   ) {
     this.timestamp = Temporal.Instant.from(timestamp);
     this.duration = Temporal.Duration.from(duration);
@@ -76,6 +84,7 @@ export class LogActivityCommand {
     this.project = project;
     this.task = task;
     this.notes = notes;
+    this.category = category;
   }
 }
 
@@ -665,6 +674,7 @@ export class ActivityLoggedEvent {
     project,
     task,
     notes,
+    category,
   }: {
     dateTime: Temporal.PlainDateTimeLike | string;
     duration: Temporal.DurationLike | string;
@@ -672,6 +682,7 @@ export class ActivityLoggedEvent {
     project: string;
     task: string;
     notes?: string;
+    category?: string;
   }): ActivityLoggedEvent {
     return new ActivityLoggedEvent(
       dateTime,
@@ -680,6 +691,7 @@ export class ActivityLoggedEvent {
       project,
       task,
       notes,
+      category,
     );
   }
 
@@ -690,6 +702,7 @@ export class ActivityLoggedEvent {
     project = "Test project",
     task = "Test task",
     notes,
+    category,
   }: {
     dateTime?: Temporal.PlainDateTimeLike | string;
     duration?: Temporal.DurationLike | string;
@@ -697,6 +710,7 @@ export class ActivityLoggedEvent {
     project?: string;
     task?: string;
     notes?: string;
+    category?: string;
   } = {}): ActivityLoggedEvent {
     return ActivityLoggedEvent.create({
       dateTime,
@@ -705,6 +719,7 @@ export class ActivityLoggedEvent {
       project,
       task,
       notes,
+      category,
     });
   }
 
@@ -714,6 +729,7 @@ export class ActivityLoggedEvent {
   readonly project: string;
   readonly task: string;
   readonly notes?: string;
+  readonly category?: string;
 
   private constructor(
     dateTime: Temporal.PlainDateTimeLike | string,
@@ -722,6 +738,7 @@ export class ActivityLoggedEvent {
     project: string,
     task: string,
     notes?: string,
+    category?: string,
   ) {
     this.dateTime = Temporal.PlainDateTime.from(dateTime);
     this.duration = Temporal.Duration.from(duration);
@@ -729,5 +746,6 @@ export class ActivityLoggedEvent {
     this.project = project;
     this.task = task;
     this.notes = notes;
+    this.category = category;
   }
 }

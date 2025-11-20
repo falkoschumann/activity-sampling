@@ -55,6 +55,7 @@ export class EventStore<T = unknown> extends EventTarget {
         { key: "project", header: "Project" },
         { key: "task", header: "Task" },
         { key: "notes", header: "Notes" },
+        { key: "category", header: "Category" },
       ],
     });
     const file = await this.#fs.open(this.fileName, "a");
@@ -92,6 +93,8 @@ export class EventStore<T = unknown> extends EventTarget {
                   return "task";
                 case "Notes":
                   return "notes";
+                case "Category":
+                  return "category";
                 default:
                   return column;
               }

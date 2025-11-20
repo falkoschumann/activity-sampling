@@ -54,6 +54,7 @@ function ActivityComponent({
   project,
   task,
   notes,
+  category,
   onSelect,
 }: {
   dateTime: Temporal.PlainDateTime;
@@ -61,6 +62,7 @@ function ActivityComponent({
   project: string;
   task: string;
   notes?: string;
+  category?: string;
   onSelect: (activity: ActivityTemplate) => void;
 }) {
   return (
@@ -69,11 +71,12 @@ function ActivityComponent({
       <div>
         <div className="ms-2 me-auto">
           <div>
-            <strong>{project}</strong> ({client}) {task}
+            {category && <span className="badge text-bg-secondary">{category}</span>} <strong>{project}</strong> (
+            {client}) {task}
             <button
               className="btn btn-sm"
               title="Use this activity as current activity."
-              onClick={() => onSelect({ client, project, task, notes })}
+              onClick={() => onSelect({ client, project, task, notes, category })}
             >
               <span className="visually-hidden">Use this activity as current activity.</span>
               <i className="bi bi-arrow-repeat"></i>

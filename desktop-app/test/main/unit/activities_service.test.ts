@@ -32,7 +32,7 @@ import {
 
 describe("Activities service", () => {
   describe("Log activity", () => {
-    it("should log without an optional notes", async () => {
+    it("should log with all required fields", async () => {
       const { service, eventStore } = configure();
       const recordEvents = eventStore.trackRecorded();
 
@@ -57,6 +57,20 @@ describe("Activities service", () => {
       expect(status).toEqual<CommandStatus>(new Success());
       expect(recordEvents.data).toEqual<ActivityLoggedEventDto[]>([
         ActivityLoggedEventDto.createTestInstance({ notes: "Lorem ipsum" }),
+      ]);
+    });
+
+    it("should log with an optional category", async () => {
+      const { service, eventStore } = configure();
+      const recordEvents = eventStore.trackRecorded();
+
+      const status = await service.logActivity(
+        LogActivityCommand.createTestInstance({ category: "Lorem ipsum" }),
+      );
+
+      expect(status).toEqual<CommandStatus>(new Success());
+      expect(recordEvents.data).toEqual<ActivityLoggedEventDto[]>([
+        ActivityLoggedEventDto.createTestInstance({ category: "Lorem ipsum" }),
       ]);
     });
   });

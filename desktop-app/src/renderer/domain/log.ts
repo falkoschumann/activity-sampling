@@ -10,6 +10,7 @@ export interface ActivityTemplate {
   project: string;
   task: string;
   notes?: string;
+  category?: string;
 }
 
 //
@@ -19,7 +20,7 @@ export interface ActivityTemplate {
 const CHANGE_TEXT_ACTION = "changeText";
 
 interface ChangeTextPayload {
-  name: "client" | "project" | "task" | "notes";
+  name: keyof ActivityTemplate;
   text: string;
 }
 
@@ -44,6 +45,7 @@ interface ActivitySelectedPayload {
   project: string;
   task: string;
   notes?: string;
+  category?: string;
 }
 
 export function activitySelected(
@@ -125,6 +127,7 @@ export interface State {
     project: string;
     task: string;
     notes: string;
+    category: string;
     isLogButtonDisabled: boolean;
   };
   countdown: {
@@ -144,6 +147,7 @@ export const initialState: State = {
     project: "",
     task: "",
     notes: "",
+    category: "",
     isLogButtonDisabled: true,
   },
   countdown: {

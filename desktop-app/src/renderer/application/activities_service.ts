@@ -63,6 +63,7 @@ export function useLog() {
         project: state.form.project,
         task: state.form.task,
         notes: state.form.notes,
+        category: state.form.category,
       }),
     );
     dispatch(activityLogged());
@@ -70,6 +71,7 @@ export function useLog() {
   }, [
     handleQueryRecentActivities,
     state.countdown.interval,
+    state.form.category,
     state.form.client,
     state.form.notes,
     state.form.project,
@@ -114,6 +116,7 @@ export function useLog() {
           project: event.activity.project,
           task: event.activity.task,
           notes: event.activity.notes,
+          category: event.activity.category,
         }),
       );
       dispatch(activityLogged());

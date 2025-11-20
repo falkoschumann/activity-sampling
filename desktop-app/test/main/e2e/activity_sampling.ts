@@ -111,6 +111,7 @@ class LogDsl {
       project?: string;
       task?: string;
       notes?: string;
+      category?: string;
     } = {},
   ) {
     const timestamp = Temporal.Instant.from(
@@ -121,6 +122,7 @@ class LogDsl {
     const project = args.project ?? "Test project";
     const task = args.task ?? "Test task";
     const notes = args.notes;
+    const category = args.category;
     await this.#activitiesDriver.logActivity({
       timestamp,
       duration,
@@ -128,6 +130,7 @@ class LogDsl {
       project,
       task,
       notes,
+      category,
     });
   }
 
@@ -161,6 +164,7 @@ class LogDsl {
         project?: string;
         task?: string;
         notes?: string;
+        category?: string;
       }[];
     }[];
     timeSummary?: {
@@ -181,6 +185,7 @@ class LogDsl {
         project: activity.project ?? "Test project",
         task: activity.task ?? "Test task",
         notes: activity.notes,
+        category: activity.category,
       })),
     }));
     const timeSummary = args.timeSummary && {
@@ -232,6 +237,7 @@ class LogDsl {
     project?: string;
     task?: string;
     notes?: string;
+    category?: string;
   }) {
     const event = parseActivityLogged(args);
     await this.#activitiesDriver.record(event);
@@ -244,6 +250,7 @@ class LogDsl {
     project?: string;
     task?: string;
     notes?: string;
+    category?: string;
   }) {
     const timestamp = args.timestamp ?? "2025-08-14T11:00:00Z";
     const duration = args.duration ?? "PT30M";
@@ -251,6 +258,7 @@ class LogDsl {
     const project = args.project ?? "Test project";
     const task = args.task ?? "Test task";
     const notes = args.notes;
+    const category = args.category;
 
     await this.#activitiesDriver.assertActivityLogged(
       ActivityLoggedEventDto.create({
@@ -260,6 +268,7 @@ class LogDsl {
         project,
         task,
         notes,
+        category,
       }),
     );
   }
@@ -328,6 +337,7 @@ class ReportsDsl {
     project?: string;
     task?: string;
     notes?: string;
+    category?: string;
   }) {
     const event = parseActivityLogged(args);
     await this.#activitiesDriver.record(event);
@@ -388,6 +398,7 @@ class StatisticsDsl {
     project?: string;
     task?: string;
     notes?: string;
+    category?: string;
   }) {
     const event = parseActivityLogged(args);
     await this.#activitiesDriver.record(event);
@@ -462,6 +473,7 @@ class TimesheetDsl {
     project?: string;
     task?: string;
     notes?: string;
+    category?: string;
   }) {
     const event = parseActivityLogged(args);
     await this.#activitiesDriver.record(event);
@@ -499,6 +511,7 @@ function parseActivityLogged(args: {
   project?: string;
   task?: string;
   notes?: string;
+  category?: string;
 }) {
   const timestamp = args.timestamp ?? "2025-08-14T11:00:00Z";
   const duration = args.duration ?? "PT30M";
@@ -506,6 +519,7 @@ function parseActivityLogged(args: {
   const project = args.project ?? "Test project";
   const task = args.task ?? "Test task";
   const notes = args.notes;
+  const category = args.category;
   return ActivityLoggedEventDto.create({
     timestamp,
     duration,
@@ -513,6 +527,7 @@ function parseActivityLogged(args: {
     project,
     task,
     notes,
+    category,
   });
 }
 
@@ -554,6 +569,7 @@ class EstimateDsl {
     project?: string;
     task?: string;
     notes?: string;
+    category?: string;
   }) {
     const event = parseActivityLogged(args);
     await this.#activitiesDriver.record(event);

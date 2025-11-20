@@ -53,7 +53,7 @@ describe("Activity Sampling", () => {
   });
 
   describe("Log Activity", () => {
-    describe("Log the activity with a client, a project, a task and optional notes", () => {
+    describe("Log the activity with a client, a project, a task", () => {
       it("should log without an optional notes", async () => {
         const { log } = await startActivitySampling({
           now: "2025-08-29T09:42:00Z",
@@ -77,6 +77,22 @@ describe("Activity Sampling", () => {
         await log.assertActivityLogged({
           timestamp: "2025-08-29T08:47:00Z",
           notes: "Test notes",
+        });
+      });
+
+      it("should log with an optional category", async () => {
+        const { log } = await startActivitySampling({
+          now: "2025-08-29T09:42:00Z",
+        });
+
+        await log.logActivity({
+          timestamp: "2025-08-29T08:47:00Z",
+          category: "Test category",
+        });
+
+        await log.assertActivityLogged({
+          timestamp: "2025-08-29T08:47:00Z",
+          category: "Test category",
         });
       });
     });

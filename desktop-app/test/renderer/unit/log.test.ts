@@ -163,6 +163,7 @@ describe("Timer", () => {
           project: "Test project",
           task: "Test task",
           notes: "Test notes",
+          category: "Test category",
         }),
       );
 
@@ -174,6 +175,7 @@ describe("Timer", () => {
           project: "Test project",
           task: "Test task",
           notes: "Test notes",
+          category: "Test category",
         },
       });
     });

@@ -38,6 +38,7 @@ export class LogActivityCommandDto {
     project,
     task,
     notes,
+    category,
   }: {
     timestamp: string;
     duration: string;
@@ -45,6 +46,7 @@ export class LogActivityCommandDto {
     project: string;
     task: string;
     notes?: string;
+    category?: string;
   }): LogActivityCommandDto {
     return new LogActivityCommandDto(
       timestamp,
@@ -53,6 +55,7 @@ export class LogActivityCommandDto {
       project,
       task,
       notes,
+      category,
     );
   }
 
@@ -64,6 +67,7 @@ export class LogActivityCommandDto {
       project: model.project,
       task: model.task,
       notes: model.notes,
+      category: model.category,
     });
   }
 
@@ -73,6 +77,7 @@ export class LogActivityCommandDto {
   readonly project: string;
   readonly task: string;
   readonly notes?: string;
+  readonly category?: string;
 
   private constructor(
     timestamp: string,
@@ -81,6 +86,7 @@ export class LogActivityCommandDto {
     project: string,
     task: string,
     notes?: string,
+    category?: string,
   ) {
     this.timestamp = timestamp;
     this.duration = duration;
@@ -88,6 +94,7 @@ export class LogActivityCommandDto {
     this.project = project;
     this.task = task;
     this.notes = notes;
+    this.category = category;
   }
 
   validate(): LogActivityCommand {
@@ -897,6 +904,7 @@ export class ActivityLoggedEventDto {
     project: string;
     task: string;
     notes?: string;
+    category?: string;
   }): ActivityLoggedEventDto {
     return new ActivityLoggedEventDto(
       dto.dateTime,
@@ -905,6 +913,7 @@ export class ActivityLoggedEventDto {
       dto.project,
       dto.task,
       dto.notes,
+      dto.category,
     );
   }
 
@@ -916,6 +925,7 @@ export class ActivityLoggedEventDto {
       project: model.project,
       task: model.task,
       notes: model.notes,
+      category: model.category,
     });
   }
 
@@ -925,6 +935,7 @@ export class ActivityLoggedEventDto {
   readonly project: string;
   readonly task: string;
   readonly notes?: string;
+  readonly category?: string;
 
   private constructor(
     dateTime: string,
@@ -933,6 +944,7 @@ export class ActivityLoggedEventDto {
     project: string,
     task: string,
     notes?: string,
+    category?: string,
   ) {
     this.dateTime = dateTime;
     this.duration = duration;
@@ -940,6 +952,7 @@ export class ActivityLoggedEventDto {
     this.project = project;
     this.task = task;
     this.notes = notes;
+    this.category = category;
   }
 
   validate(): ActivityLoggedEvent {
@@ -950,6 +963,7 @@ export class ActivityLoggedEventDto {
       project: this.project,
       task: this.task,
       notes: this.notes,
+      category: this.category,
     });
   }
 }

@@ -15,6 +15,7 @@ const ACTIVITY_LOGGED_EVENT_SCHEMA = {
     project: { type: "string" },
     task: { type: "string" },
     notes: { type: "string" },
+    category: { type: "string" },
   },
   required: ["timestamp", "duration", "client", "project", "task"],
   additionalProperties: false,
@@ -31,6 +32,7 @@ export class ActivityLoggedEventDto {
     project,
     task,
     notes,
+    category,
   }: {
     timestamp: string;
     duration: string;
@@ -38,6 +40,7 @@ export class ActivityLoggedEventDto {
     project: string;
     task: string;
     notes?: string;
+    category?: string;
   }): ActivityLoggedEventDto {
     return new ActivityLoggedEventDto(
       timestamp,
@@ -46,6 +49,7 @@ export class ActivityLoggedEventDto {
       project,
       task,
       notes,
+      category,
     );
   }
 
@@ -56,6 +60,7 @@ export class ActivityLoggedEventDto {
     project = "Test project",
     task = "Test task",
     notes,
+    category,
   }: Partial<ActivityLoggedEventDto> = {}): ActivityLoggedEventDto {
     return new ActivityLoggedEventDto(
       timestamp,
@@ -64,6 +69,7 @@ export class ActivityLoggedEventDto {
       project,
       task,
       notes,
+      category,
     );
   }
 
@@ -84,6 +90,7 @@ export class ActivityLoggedEventDto {
   readonly project: string;
   readonly task: string;
   readonly notes?: string;
+  readonly category?: string;
 
   private constructor(
     timestamp: string,
@@ -92,6 +99,7 @@ export class ActivityLoggedEventDto {
     project: string,
     task: string,
     notes?: string,
+    category?: string,
   ) {
     this.timestamp = timestamp;
     this.duration = duration;
@@ -99,6 +107,7 @@ export class ActivityLoggedEventDto {
     this.project = project;
     this.task = task;
     this.notes = notes;
+    this.category = category;
   }
 
   validate(timeZone: Temporal.TimeZoneLike): ActivityLoggedEvent {

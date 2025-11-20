@@ -27,7 +27,7 @@ export default function LogPage() {
         <ActivityFormComponent {...state.form} onTextChange={handleTextChange} onSubmit={handleSubmitActivity} />
         <CountdownComponent {...state.countdown} />
       </aside>
-      <main className="container my-4">
+      <main className="container mt-4" style={{ paddingBottom: 80 }}>
         <h5>
           Logged activities of the last 30 days
           <button className="btn" title="Refresh logged activities." onClick={() => handleQueryRecentActivities()}>
