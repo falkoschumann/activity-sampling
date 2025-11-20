@@ -62,10 +62,10 @@ version: TARGET=version
 $(SUBDIRS): force
 	@$(MAKE) -C $@ $(TARGET)
 
+ifneq ($(CI),true)
 $(DIAGRAM_FILES): %.png: %.puml
-	@if [ -z "$(CI)" ] ; then \
-		plantuml $^ \
-	fi
+	plantuml $^
+endif
 
 force: ;
 
