@@ -36,22 +36,25 @@ analysis.
 - [x] Summarize hours worked for clients
 - [x] Summarize hours worked on projects
 - [x] Summarize hours worked on tasks
+- [ ] Summarize hours worked on categories
 - [ ] Summarize hours worked for team members
 - [x] Summarize the total hours worked
 - [x] Summarize in a period
 - [ ] Determine throughput in a period
+- [ ] Create cumulative flow diagram with cycle time, throughput and WIP
 
 ### Statistics
 
 - [x] Create histogram for hours worked on tasks
 - [x] Create histogram for cycle times
-- [ ] Create histogram for lead times
-- [ ] Create histogram for throughput
+- [ ] Create histogram for throughput per period
+- [ ] Create histogram for WIP per period
 - [x] Determine median for hours worked on tasks
 - [x] Determine median for cycle times
-- [ ] Determine median for lead times
-- [ ] Determine median for throughput
+- [ ] Determine median for throughput per period
+- [ ] Determine median for WIP per period
 - [ ] Exclude tasks not suitable for statistics
+- [ ] Filter statistic data by category
 
 ### Timesheet
 
@@ -61,13 +64,13 @@ analysis.
 - [x] Compare with capacity
 - [x] Take holidays into account
 - [x] Take vacation into account
+- [ ] Export timesheet in Harvest format
 
 ### Estimate
 
-- [ ] Estimate tasks with hours worked
 - [x] Estimate tasks with cycle times
-- [ ] Estimate tasks with lead times
 - [ ] Estimate tasks with throughput
+- [ ] Filter tasks by category
 
 ## Architecture
 
