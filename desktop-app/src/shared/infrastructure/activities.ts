@@ -426,35 +426,26 @@ export class StatisticsQueryDto {
   static create({
     statistics,
     timeZone,
-    ignoreSmallTasks,
   }: {
     statistics: StatisticsType;
     timeZone?: string;
-    ignoreSmallTasks?: boolean;
   }): StatisticsQueryDto {
-    return new StatisticsQueryDto(statistics, timeZone, ignoreSmallTasks);
+    return new StatisticsQueryDto(statistics, timeZone);
   }
 
   static from(model: StatisticsQuery): StatisticsQueryDto {
     return StatisticsQueryDto.create({
       statistics: model.statistics,
       timeZone: model.timeZone?.toString(),
-      ignoreSmallTasks: model.ignoreSmallTasks,
     });
   }
 
   readonly statistics: StatisticsType;
   readonly timeZone?: string;
-  readonly ignoreSmallTasks?: boolean;
 
-  private constructor(
-    statistics: StatisticsType,
-    timeZone?: string,
-    ignoreSmallTasks?: boolean,
-  ) {
+  private constructor(statistics: StatisticsType, timeZone?: string) {
     this.statistics = statistics;
     this.timeZone = timeZone;
-    this.ignoreSmallTasks = ignoreSmallTasks;
   }
 
   validate(): StatisticsQuery {

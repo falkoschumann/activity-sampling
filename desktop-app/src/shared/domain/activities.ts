@@ -319,28 +319,22 @@ export class StatisticsQuery {
   static create({
     statistics,
     timeZone,
-    ignoreSmallTasks,
   }: {
     statistics: StatisticsType;
     timeZone?: Temporal.TimeZoneLike;
-    ignoreSmallTasks?: boolean;
   }): StatisticsQuery {
-    return new StatisticsQuery(statistics, timeZone, ignoreSmallTasks);
+    return new StatisticsQuery(statistics, timeZone);
   }
 
   readonly statistics: StatisticsType;
   readonly timeZone?: Temporal.TimeZoneLike;
-  // WORKAROUND: Temporary ignore small tasks until task have categories
-  readonly ignoreSmallTasks?: boolean;
 
   private constructor(
     statistics: StatisticsType,
     timeZone?: Temporal.TimeZoneLike,
-    ignoreSmallTasks?: boolean,
   ) {
     this.statistics = statistics;
     this.timeZone = timeZone;
-    this.ignoreSmallTasks = ignoreSmallTasks;
   }
 }
 

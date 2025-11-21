@@ -5,11 +5,10 @@ import { useEffect, useState } from "react";
 
 export default function QueryParametersComponent({ onChange }: { onChange: (query: StatisticsQuery) => void }) {
   const [statistics, setStatistics] = useState<StatisticsType>(Statistics.WORKING_HOURS);
-  const [ignoreSmallTasks, setIgnoreSmallTasks] = useState(false);
 
   useEffect(() => {
-    onChange({ statistics, ignoreSmallTasks });
-  }, [statistics, ignoreSmallTasks, onChange]);
+    onChange({ statistics });
+  }, [statistics, onChange]);
 
   return (
     <div className="container">
@@ -32,18 +31,6 @@ export default function QueryParametersComponent({ onChange }: { onChange: (quer
               </li>
             ))}
           </ul>
-        </div>
-        <div className="form-check">
-          <input
-            id="ignoreSmallTasks"
-            className="form-check-input"
-            type="checkbox"
-            checked={ignoreSmallTasks}
-            onChange={(event) => setIgnoreSmallTasks(event.target.checked)}
-          />
-          <label className="form-check-label" htmlFor="ignoreSmallTasks">
-            Ignore small tasks
-          </label>
         </div>
       </div>
     </div>

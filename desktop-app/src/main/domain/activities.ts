@@ -390,12 +390,7 @@ export async function projectStatistics({
 }): Promise<StatisticsQueryResult> {
   let xAxisLabel: string;
   let days: number[] = [];
-  let activities = await projectActivities(replay);
-  if (query.ignoreSmallTasks) {
-    activities = activities.filter(
-      (activity) => Temporal.Duration.compare("PT4H", activity.hours) < 0,
-    );
-  }
+  const activities = await projectActivities(replay);
   if (query.statistics === Statistics.WORKING_HOURS) {
     xAxisLabel = "Duration (days)";
 
@@ -423,9 +418,7 @@ export async function projectStatistics({
         1;
       days.push(cycleTime);
     }
-    days = Object.values(days)
-      .filter((days) => (query.ignoreSmallTasks ? days > 0.5 : true))
-      .sort((a, b) => a - b);
+    days = Object.values(days).sort((a, b) => a - b);
   } else {
     throw new Error(`Unknown statistics for ${query.statistics}.`);
   }
