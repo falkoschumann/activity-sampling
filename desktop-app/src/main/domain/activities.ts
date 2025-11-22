@@ -136,7 +136,8 @@ export async function projectActivities(
       (activity) =>
         activity.client === event.client &&
         activity.project === event.project &&
-        activity.task === event.task,
+        activity.task === event.task &&
+        activity.category === event.category,
     );
     if (index === -1) {
       const activity = Activity.create({
@@ -152,17 +153,15 @@ export async function projectActivities(
       activities.push(activity);
     } else {
       const activity = activities[index];
-      let start = Temporal.PlainDate.from(activity.start);
-      let finish = Temporal.PlainDate.from(activity.finish);
+      let start = activity.start;
+      let finish = activity.finish;
       if (Temporal.PlainDate.compare(date, start) < 0) {
         start = date;
       }
       if (Temporal.PlainDate.compare(date, finish) > 0) {
         finish = date;
       }
-      const accumulatedHours = Temporal.Duration.from(activity.hours).add(
-        Temporal.Duration.from(event.duration),
-      );
+      const accumulatedHours = activity.hours.add(event.duration);
       activities[index] = {
         ...activity,
         start,
@@ -209,10 +208,7 @@ export async function projectRecentActivities({
   createWorkingDay();
 
   workingDays = workingDays.sort((d1, d2) =>
-    Temporal.PlainDate.compare(
-      Temporal.PlainDate.from(d2.date),
-      Temporal.PlainDate.from(d1.date),
-    ),
+    Temporal.PlainDate.compare(d2.date, d1.date),
   );
   hoursToday = normalizeDuration(hoursToday);
   hoursYesterday = normalizeDuration(hoursYesterday);
@@ -254,10 +250,7 @@ export async function projectRecentActivities({
     }
 
     activities = activities.sort((a1, a2) =>
-      Temporal.PlainDateTime.compare(
-        Temporal.PlainDateTime.from(a2.dateTime),
-        Temporal.PlainDateTime.from(a1.dateTime),
-      ),
+      Temporal.PlainDateTime.compare(a2.dateTime, a1.dateTime),
     );
     const day = { date, activities };
     workingDays.push(day);
@@ -297,87 +290,186 @@ export async function projectReport({
   const startInclusive = query.from;
   const endExclusive = query.to ? query.to.add("P1D") : undefined;
   const scope = query.scope;
-
-  let entries: ReportEntry[] = [];
-  let totalHours = Temporal.Duration.from("PT0S");
   const activities = await projectActivities(
     replay,
     startInclusive,
     endExclusive,
   );
-  for (const activity of activities) {
-    updateEntries(activity);
-    updateTotalHours(activity);
-  }
-
-  entries = entries.sort((e1, e2) => e1.name.localeCompare(e2.name));
+  const entries = createEntries();
+  const totalHours = calculateTotalHours();
   return {
     entries,
     totalHours,
   };
 
-  function updateEntries(activity: Activity) {
+  function createEntries() {
     switch (scope) {
       case Scope.CLIENTS:
-        updateEntry(activity.client, activity.hours);
-        break;
+        return createClientEntries();
       case Scope.PROJECTS:
-        updateProject(activity.project, activity.client, activity.hours);
-        break;
+        return createProjectEntries();
       case Scope.TASKS:
-        updateEntry(activity.task, activity.hours);
-        break;
-      default:
-        throw new Error(`Unknown scope: ${scope}`);
+        return createTaskEntries();
+      case Scope.CATEGORIES:
+        return createCategoriesEntries();
     }
+
+    throw new Error(`Unknown scope: ${scope}`);
   }
 
-  function updateEntry(name: string, hours: Temporal.DurationLike) {
-    const index = entries.findIndex((entry) => entry.name === name);
-    if (index == -1) {
-      entries.push(ReportEntry.create({ name, hours }));
-    } else {
-      const existingEntry = entries[index];
-      const accumulatedHours = Temporal.Duration.from(existingEntry.hours).add(
-        Temporal.Duration.from(hours),
+  function createClientEntries() {
+    const entries: ReportEntry[] = [];
+    for (const activity of activities) {
+      const index = entries.findIndex(
+        (entry) => entry.client === activity.client,
       );
-      entries[index] = {
-        ...existingEntry,
-        hours: normalizeDuration(accumulatedHours),
-      };
-    }
-  }
-
-  function updateProject(
-    name: string,
-    client: string,
-    hours: Temporal.DurationLike,
-  ) {
-    const index = entries.findIndex((entry) => entry.name === name);
-    if (index == -1) {
-      entries.push(ReportEntry.create({ name, hours, client }));
-    } else {
-      const existingEntry = entries[index];
-      let existingClient = existingEntry.client;
-      if (!existingClient!.includes(client)) {
-        existingClient = existingClient
-          ? `${existingClient}, ${client}`
-          : client;
+      if (index == -1) {
+        const cycleTime =
+          activity.finish.since(activity.start).total("days") + 1;
+        entries.push(
+          ReportEntry.create({
+            start: activity.start,
+            finish: activity.finish,
+            client: activity.client,
+            hours: activity.hours,
+            cycleTime,
+          }),
+        );
+      } else {
+        entries[index] = updateEntry(entries[index], activity);
       }
-      const accumulatedHours = Temporal.Duration.from(existingEntry.hours).add(
-        Temporal.Duration.from(hours),
-      );
-      entries[index] = {
-        ...existingEntry,
-        client: existingClient,
-        hours: normalizeDuration(accumulatedHours),
-      };
     }
+    return entries.sort((a, b) => a.client.localeCompare(b.client));
   }
 
-  function updateTotalHours(activity: Activity) {
-    const hours = Temporal.Duration.from(activity.hours);
-    totalHours = normalizeDuration(totalHours.add(hours));
+  function createProjectEntries() {
+    const entries: ReportEntry[] = [];
+    for (const activity of activities) {
+      const index = entries.findIndex(
+        (entry) =>
+          entry.client === activity.client &&
+          entry.project === activity.project,
+      );
+      if (index == -1) {
+        const cycleTime =
+          activity.finish.since(activity.start).total("days") + 1;
+        entries.push(
+          ReportEntry.create({
+            start: activity.start,
+            finish: activity.finish,
+            client: activity.client,
+            project: activity.project,
+            hours: activity.hours,
+            cycleTime,
+          }),
+        );
+      } else {
+        entries[index] = updateEntry(entries[index], activity);
+      }
+    }
+    return entries.sort((a, b) => {
+      const projectComparison = a.project.localeCompare(b.project);
+      if (projectComparison !== 0) {
+        return projectComparison;
+      }
+
+      return a.client.localeCompare(b.client);
+    });
+  }
+
+  function createTaskEntries() {
+    const entries: ReportEntry[] = [];
+    for (const activity of activities) {
+      const index = entries.findIndex(
+        (entry) =>
+          entry.client === activity.client &&
+          entry.project === activity.project &&
+          entry.task === activity.task,
+      );
+      if (index == -1) {
+        const cycleTime =
+          activity.finish.since(activity.start).total("days") + 1;
+        entries.push(
+          ReportEntry.create({
+            start: activity.start,
+            finish: activity.finish,
+            client: activity.client,
+            project: activity.project,
+            task: activity.task,
+            hours: activity.hours,
+            cycleTime,
+          }),
+        );
+      } else {
+        entries[index] = updateEntry(entries[index], activity);
+      }
+    }
+    return entries.sort((a, b) => {
+      const taskComparison = a.task.localeCompare(b.task);
+      if (taskComparison !== 0) {
+        return taskComparison;
+      }
+
+      const projectComparison = a.project.localeCompare(b.project);
+      if (projectComparison !== 0) {
+        return projectComparison;
+      }
+
+      return a.client.localeCompare(b.client);
+    });
+  }
+
+  function createCategoriesEntries() {
+    const entries: ReportEntry[] = [];
+    for (const activity of activities) {
+      const index = entries.findIndex(
+        (entry) => entry.category === (activity.category ?? ""),
+      );
+      if (index == -1) {
+        const cycleTime =
+          activity.finish.since(activity.start).total("days") + 1;
+        entries.push(
+          ReportEntry.create({
+            start: activity.start,
+            finish: activity.finish,
+            category: activity.category,
+            hours: activity.hours,
+            cycleTime,
+          }),
+        );
+      } else {
+        entries[index] = updateEntry(entries[index], activity);
+      }
+    }
+    return entries.sort((a, b) => a.category.localeCompare(b.category));
+  }
+
+  function updateEntry(entry: ReportEntry, activity: Activity): ReportEntry {
+    let start = entry.start;
+    let finish = entry.finish;
+    if (Temporal.PlainDate.compare(activity.start, start) < 0) {
+      start = activity.start;
+    }
+    if (Temporal.PlainDate.compare(activity.finish, finish) > 0) {
+      finish = activity.finish;
+    }
+    const cycleTime = finish.since(start).total("days") + 1;
+    const accumulatedHours = entry.hours.add(activity.hours);
+    return {
+      ...entry,
+      start,
+      finish,
+      hours: normalizeDuration(accumulatedHours),
+      cycleTime,
+    };
+  }
+
+  function calculateTotalHours() {
+    let hours = Temporal.Duration.from("PT0S");
+    for (const activity of activities) {
+      hours = hours.add(activity.hours);
+    }
+    return normalizeDuration(hours);
   }
 }
 
@@ -413,9 +505,7 @@ export async function projectStatistics({
   } else if (query.statistics === Statistics.CYCLE_TIMES) {
     xAxisLabel = "Cycle time (days)";
     for (const activity of activities) {
-      const cycleTime =
-        normalizeDuration(activity.finish.since(activity.start)).total("days") +
-        1;
+      const cycleTime = activity.finish.since(activity.start).total("days") + 1;
       days.push(cycleTime);
     }
     days = Object.values(days).sort((a, b) => a - b);
@@ -514,8 +604,8 @@ export async function projectTimesheet({
   vacations?: Vacation[];
   capacity?: Temporal.DurationLike | string;
 }): Promise<TimesheetQueryResult> {
-  const startInclusive = Temporal.PlainDate.from(query.from);
-  const endExclusive = Temporal.PlainDate.from(query.to).add("P1D");
+  const startInclusive = query.from;
+  const endExclusive = query.to.add("P1D");
   const calendar = Calendar.create({ holidays, vacations, capacity });
 
   let entries: TimesheetEntry[] = [];
@@ -574,9 +664,7 @@ export async function projectTimesheet({
       entries.push(newEntry);
     } else {
       const existingEntry = entries[index];
-      const accumulatedHours = Temporal.Duration.from(existingEntry.hours).add(
-        Temporal.Duration.from(event.duration),
-      );
+      const accumulatedHours = existingEntry.hours.add(event.duration);
       entries[index] = {
         ...existingEntry,
         hours: normalizeDuration(accumulatedHours),
@@ -585,7 +673,7 @@ export async function projectTimesheet({
   }
 
   function updateTotalHours(event: ActivityLoggedEvent) {
-    const hours = Temporal.Duration.from(event.duration);
+    const hours = event.duration;
     totalHours = totalHours.add(hours);
   }
 

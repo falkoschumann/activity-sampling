@@ -68,7 +68,7 @@ function ActivityFormComponent({
       <FormSelectComponent
         name="category"
         title="Category"
-        options={["", "Feature", "Rework", "Meeting", "Maintenance", "Training"]}
+        options={["", "Feature", "Rework", "Meeting", "Training"]}
         value={category}
         onOptionChange={(option) => onTextChange("category", option)}
       />

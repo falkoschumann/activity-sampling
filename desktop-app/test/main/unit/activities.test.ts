@@ -248,7 +248,7 @@ describe("Activities", () => {
 
       const result = await projectReport({
         replay,
-        query: { scope: Scope.TASKS },
+        query: { scope: Scope.CLIENTS },
       });
 
       expect(result).toEqual<ReportQueryResult>({
@@ -283,13 +283,19 @@ describe("Activities", () => {
 
       expect(result).toEqual<ReportQueryResult>({
         entries: [
-          ReportEntry.createTestInstance({
-            name: "Client 1",
+          ReportEntry.create({
+            start: "2025-06-26",
+            finish: "2025-06-27",
+            client: "Client 1",
             hours: Temporal.Duration.from("PT8H"),
+            cycleTime: 2,
           }),
-          ReportEntry.createTestInstance({
-            name: "Client 2",
+          ReportEntry.create({
+            start: "2025-06-25",
+            finish: "2025-06-25",
+            client: "Client 2",
             hours: Temporal.Duration.from("PT7H"),
+            cycleTime: 1,
           }),
         ],
         totalHours: Temporal.Duration.from("PT15H"),
@@ -337,51 +343,24 @@ describe("Activities", () => {
 
       expect(result).toEqual<ReportQueryResult>({
         entries: [
-          ReportEntry.createTestInstance({
-            name: "Project A",
+          ReportEntry.create({
+            start: "2025-06-03",
+            finish: "2025-06-05",
+            project: "Project A",
             client: "Client 1",
             hours: Temporal.Duration.from("PT18H"),
+            cycleTime: 3,
           }),
-          ReportEntry.createTestInstance({
-            name: "Project B",
+          ReportEntry.create({
+            start: "2025-06-02",
+            finish: "2025-06-06",
+            project: "Project B",
             client: "Client 2",
             hours: Temporal.Duration.from("PT24H"),
+            cycleTime: 5,
           }),
         ],
         totalHours: Temporal.Duration.from("PT42H"),
-      });
-    });
-
-    it("should summarize hours worked on projects and combines projects with multiple clients", async () => {
-      const replay = createAsyncGenerator([
-        ActivityLoggedEvent.createTestInstance({
-          dateTime: "2025-06-02T17:00",
-          client: "Client 2",
-          project: "Project A",
-          duration: "PT8H",
-        }),
-        ActivityLoggedEvent.createTestInstance({
-          dateTime: "2025-06-03T17:00",
-          client: "Client 1",
-          project: "Project A",
-          duration: "PT9H",
-        }),
-      ]);
-
-      const result = await projectReport({
-        replay,
-        query: { scope: Scope.PROJECTS },
-      });
-
-      expect(result).toEqual<ReportQueryResult>({
-        entries: [
-          ReportEntry.createTestInstance({
-            name: "Project A",
-            client: "Client 2, Client 1",
-            hours: Temporal.Duration.from("PT17H"),
-          }),
-        ],
-        totalHours: Temporal.Duration.from("PT17H"),
       });
     });
 
@@ -411,20 +390,75 @@ describe("Activities", () => {
 
       expect(result).toEqual<ReportQueryResult>({
         entries: [
-          ReportEntry.createTestInstance({
-            name: "Task 1",
+          ReportEntry.create({
+            start: "2025-06-26",
+            finish: "2025-06-27",
+            client: "Test client",
+            project: "Test project",
+            task: "Task 1",
             hours: Temporal.Duration.from("PT8H"),
+            cycleTime: 2,
           }),
-          ReportEntry.createTestInstance({
-            name: "Task 2",
+          ReportEntry.create({
+            start: "2025-06-25",
+            finish: "2025-06-25",
+            client: "Test client",
+            project: "Test project",
+            task: "Task 2",
             hours: Temporal.Duration.from("PT7H"),
+            cycleTime: 1,
           }),
         ],
         totalHours: Temporal.Duration.from("PT15H"),
       });
     });
 
-    it("Summarize hours worked in a custom period", async () => {
+    it("should summarize hours worked on categories", async () => {
+      const replay = createAsyncGenerator([
+        ActivityLoggedEvent.createTestInstance({
+          dateTime: "2025-06-25T17:00",
+          category: "Rework",
+          duration: "PT7H",
+        }),
+        ActivityLoggedEvent.createTestInstance({
+          dateTime: "2025-06-26T17:00",
+          category: "Feature",
+          duration: "PT5H",
+        }),
+        ActivityLoggedEvent.createTestInstance({
+          dateTime: "2025-06-27T17:00",
+          category: "Feature",
+          duration: "PT3H",
+        }),
+      ]);
+
+      const result = await projectReport({
+        replay,
+        query: { scope: Scope.CATEGORIES },
+      });
+
+      expect(result).toEqual<ReportQueryResult>({
+        entries: [
+          ReportEntry.create({
+            start: "2025-06-26",
+            finish: "2025-06-27",
+            category: "Feature",
+            hours: Temporal.Duration.from("PT8H"),
+            cycleTime: 2,
+          }),
+          ReportEntry.create({
+            start: "2025-06-25",
+            finish: "2025-06-25",
+            category: "Rework",
+            hours: Temporal.Duration.from("PT7H"),
+            cycleTime: 1,
+          }),
+        ],
+        totalHours: Temporal.Duration.from("PT15H"),
+      });
+    });
+
+    it("should summarize hours worked in a custom period", async () => {
       const replay = createAsyncGenerator(
         mapTimestamps([
           "2025-09-14T17:00", // before

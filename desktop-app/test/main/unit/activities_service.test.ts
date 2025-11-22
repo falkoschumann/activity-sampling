@@ -160,13 +160,19 @@ describe("Activities service", () => {
 
       expect(result).toEqual<ReportQueryResult>({
         entries: [
-          ReportEntry.createTestInstance({
-            name: "Client 1",
+          ReportEntry.create({
+            start: "2025-06-26",
+            finish: "2025-06-27",
+            client: "Client 1",
             hours: Temporal.Duration.from("PT8H"),
+            cycleTime: 2,
           }),
-          ReportEntry.createTestInstance({
-            name: "Client 2",
+          ReportEntry.create({
+            start: "2025-06-25",
+            finish: "2025-06-25",
+            client: "Client 2",
             hours: Temporal.Duration.from("PT7H"),
+            cycleTime: 1,
           }),
         ],
         totalHours: Temporal.Duration.from("PT15H"),

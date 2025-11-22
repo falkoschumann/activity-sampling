@@ -238,6 +238,7 @@ export const Scope = Object.freeze({
   CLIENTS: "Clients",
   PROJECTS: "Projects",
   TASKS: "Tasks",
+  CATEGORIES: "Categories",
 });
 
 export type ScopeType = (typeof Scope)[keyof typeof Scope];
@@ -274,37 +275,85 @@ export class ReportQueryResult {
 
 export class ReportEntry {
   static create({
-    name,
+    start,
+    finish,
+    client = "",
+    project = "",
+    task = "",
+    category = "",
     hours,
-    client,
+    cycleTime,
   }: {
-    name: string;
-    hours: Temporal.DurationLike | string;
+    start: Temporal.PlainDateLike | string;
+    finish: Temporal.PlainDateLike | string;
     client?: string;
+    project?: string;
+    task?: string;
+    category?: string;
+    hours: Temporal.DurationLike | string;
+    cycleTime: number;
   }): ReportEntry {
-    return new ReportEntry(name, hours, client);
+    return new ReportEntry(
+      start,
+      finish,
+      client,
+      project,
+      task,
+      category,
+      hours,
+      cycleTime,
+    );
   }
 
   static createTestInstance({
-    name = "Test client",
-    hours = Temporal.Duration.from("PT42H"),
-    client,
+    start = Temporal.PlainDate.from("2025-11-19"),
+    finish = Temporal.PlainDate.from("2025-11-19"),
+    client = "Test client",
+    project,
+    task,
+    category,
+    hours = Temporal.Duration.from("PT8H"),
+    cycleTime = 1,
   }: Partial<ReportEntry> = {}): ReportEntry {
-    return ReportEntry.create({ name, hours, client });
+    return ReportEntry.create({
+      start,
+      finish,
+      client,
+      project,
+      task,
+      category,
+      hours,
+      cycleTime,
+    });
   }
 
-  readonly name: string;
+  readonly start: Temporal.PlainDate;
+  readonly finish: Temporal.PlainDate;
+  readonly client: string;
+  readonly project: string;
+  readonly task: string;
+  readonly category: string;
   readonly hours: Temporal.Duration;
-  readonly client?: string;
+  readonly cycleTime: number;
 
   private constructor(
-    name: string,
+    start: Temporal.PlainDateLike | string,
+    finish: Temporal.PlainDateLike | string,
+    client: string,
+    project: string,
+    task: string,
+    category: string,
     hours: Temporal.DurationLike | string,
-    client?: string,
+    cycleTime: number,
   ) {
-    this.name = name;
-    this.hours = Temporal.Duration.from(hours);
+    this.start = Temporal.PlainDate.from(start);
+    this.finish = Temporal.PlainDate.from(finish);
     this.client = client;
+    this.project = project;
+    this.task = task;
+    this.category = category;
+    this.hours = Temporal.Duration.from(hours);
+    this.cycleTime = cycleTime;
   }
 }
 

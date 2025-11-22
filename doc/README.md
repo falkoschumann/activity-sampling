@@ -22,9 +22,8 @@ analysis.
 
 ### Log Activity
 
-- [x] Log the activity with a client, a project, a task
-- [x] Log the activity with optional notes
-- [x] Log the activity with optional category like feature or rework
+- [x] Log the activity with a client, a project, a task and with optional notes
+      or category
 - [ ] Log activity with first and last name of team member
 
 ### Recent Activities
@@ -37,7 +36,7 @@ analysis.
 - [x] Summarize hours worked for clients
 - [x] Summarize hours worked on projects
 - [x] Summarize hours worked on tasks
-- [ ] Summarize hours worked on categories
+- [x] Summarize hours worked on categories
 - [ ] Summarize hours worked for team members
 - [x] Summarize the total hours worked
 - [x] Summarize in a period

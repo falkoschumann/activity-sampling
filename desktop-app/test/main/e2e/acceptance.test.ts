@@ -53,7 +53,7 @@ describe("Activity Sampling", () => {
   });
 
   describe("Log Activity", () => {
-    describe("Log the activity with a client, a project, a task", () => {
+    describe("Log the activity with a client, a project, a task and with optional notes or category", () => {
       it("should log without an optional notes", async () => {
         const { log } = await startActivitySampling({
           now: "2025-08-29T09:42:00Z",
@@ -161,7 +161,7 @@ describe("Activity Sampling", () => {
           client: "Client A",
         });
         await reports.activityLogged({
-          timestamp: "2025-08-29T09:17:00Z",
+          timestamp: "2025-08-30T09:17:00Z",
           client: "Client A",
         });
         await reports.activityLogged({
@@ -173,8 +173,20 @@ describe("Activity Sampling", () => {
 
         reports.assertReport({
           entries: [
-            { name: "Client A", hours: "PT1H" },
-            { name: "Client B", hours: "PT30M" },
+            {
+              start: "2025-08-29",
+              finish: "2025-08-30",
+              client: "Client A",
+              hours: "PT1H",
+              cycleTime: 2,
+            },
+            {
+              start: "2025-08-29",
+              finish: "2025-08-29",
+              client: "Client B",
+              hours: "PT30M",
+              cycleTime: 1,
+            },
           ],
         });
       });
@@ -189,7 +201,7 @@ describe("Activity Sampling", () => {
           project: "Project A",
         });
         await reports.activityLogged({
-          timestamp: "2025-08-29T09:17:00Z",
+          timestamp: "2025-08-30T09:17:00Z",
           client: "Client A",
           project: "Project A",
         });
@@ -213,9 +225,38 @@ describe("Activity Sampling", () => {
 
         reports.assertReport({
           entries: [
-            { name: "Project A", client: "Client A", hours: "PT1H" },
-            { name: "Project B", client: "Client B", hours: "PT30M" },
-            { name: "Project C", client: "Client A, Client B", hours: "PT1H" },
+            {
+              start: "2025-08-29",
+              finish: "2025-08-30",
+              project: "Project A",
+              client: "Client A",
+              hours: "PT1H",
+              cycleTime: 2,
+            },
+            {
+              start: "2025-08-29",
+              finish: "2025-08-29",
+              project: "Project B",
+              client: "Client B",
+              hours: "PT30M",
+              cycleTime: 1,
+            },
+            {
+              start: "2025-08-29",
+              finish: "2025-08-29",
+              project: "Project C",
+              client: "Client A",
+              hours: "PT30M",
+              cycleTime: 1,
+            },
+            {
+              start: "2025-08-29",
+              finish: "2025-08-29",
+              project: "Project C",
+              client: "Client B",
+              hours: "PT30M",
+              cycleTime: 1,
+            },
           ],
         });
       });
@@ -229,7 +270,7 @@ describe("Activity Sampling", () => {
           task: "Task A",
         });
         await reports.activityLogged({
-          timestamp: "2025-08-29T09:17:00Z",
+          timestamp: "2025-08-30T09:17:00Z",
           task: "Task A",
         });
         await reports.activityLogged({
@@ -241,8 +282,63 @@ describe("Activity Sampling", () => {
 
         reports.assertReport({
           entries: [
-            { name: "Task A", hours: "PT1H" },
-            { name: "Task B", hours: "PT30M" },
+            {
+              start: "2025-08-29",
+              finish: "2025-08-30",
+              client: "Test client",
+              project: "Test project",
+              task: "Task A",
+              hours: "PT1H",
+              cycleTime: 2,
+            },
+            {
+              start: "2025-08-29",
+              finish: "2025-08-29",
+              client: "Test client",
+              project: "Test project",
+              task: "Task B",
+              hours: "PT30M",
+              cycleTime: 1,
+            },
+          ],
+        });
+      });
+    });
+
+    describe("Summarize hours worked on categories", () => {
+      it("should return summary", async () => {
+        const { reports } = await startActivitySampling();
+        await reports.activityLogged({
+          timestamp: "2025-08-29T08:47:00Z",
+          category: "Category A",
+        });
+        await reports.activityLogged({
+          timestamp: "2025-08-30T09:17:00Z",
+          category: "Category A",
+        });
+        await reports.activityLogged({
+          timestamp: "2025-08-29T09:47:00Z",
+          category: "Category B",
+        });
+
+        await reports.queryReport({ scope: "Categories" });
+
+        reports.assertReport({
+          entries: [
+            {
+              start: "2025-08-29",
+              finish: "2025-08-30",
+              category: "Category A",
+              hours: "PT1H",
+              cycleTime: 2,
+            },
+            {
+              start: "2025-08-29",
+              finish: "2025-08-29",
+              category: "Category B",
+              hours: "PT30M",
+              cycleTime: 1,
+            },
           ],
         });
       });

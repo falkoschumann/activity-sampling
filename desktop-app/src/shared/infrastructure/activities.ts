@@ -384,41 +384,80 @@ export class ReportQueryResultDto {
 
 export class ReportEntryDto {
   static create({
-    name,
-    hours,
+    start,
+    finish,
     client,
+    project,
+    task,
+    category,
+    hours,
+    cycleTime,
   }: {
-    name: string;
+    start: string;
+    finish: string;
+    client: string;
+    project: string;
+    task: string;
+    category: string;
     hours: string;
-    client?: string;
+    cycleTime: number;
   }): ReportEntryDto {
-    return new ReportEntryDto(name, hours, client);
+    return new ReportEntryDto(
+      start,
+      finish,
+      client,
+      project,
+      task,
+      category,
+      hours,
+      cycleTime,
+    );
   }
 
   static from(model: ReportEntry): ReportEntryDto {
     return ReportEntryDto.create({
-      name: model.name,
-      hours: model.hours.toString(),
+      start: model.start.toString(),
+      finish: model.finish.toString(),
       client: model.client,
+      project: model.project,
+      task: model.task,
+      category: model.category,
+      hours: model.hours.toString(),
+      cycleTime: model.cycleTime,
     });
   }
 
-  readonly name: string;
+  readonly start: string;
+  readonly finish: string;
+  readonly client: string;
+  readonly project: string;
+  readonly task: string;
+  readonly category: string;
   readonly hours: string;
-  readonly client?: string;
+  readonly cycleTime: number;
 
-  private constructor(name: string, hours: string, client?: string) {
-    this.name = name;
-    this.hours = hours;
+  private constructor(
+    start: string,
+    finish: string,
+    client: string,
+    project: string,
+    task: string,
+    category: string,
+    hours: string,
+    cycleTime: number,
+  ) {
+    this.start = start;
+    this.finish = finish;
     this.client = client;
+    this.project = project;
+    this.task = task;
+    this.category = category;
+    this.hours = hours;
+    this.cycleTime = cycleTime;
   }
 
   validate(): ReportEntry {
-    return ReportEntry.create({
-      name: this.name,
-      hours: Temporal.Duration.from(this.hours),
-      client: this.client,
-    });
+    return ReportEntry.create(this);
   }
 }
 

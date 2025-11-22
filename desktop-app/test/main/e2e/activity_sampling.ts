@@ -296,7 +296,7 @@ class ReportsDsl {
 
   async queryReport(
     args: {
-      scope?: "Clients" | "Projects" | "Tasks";
+      scope?: "Clients" | "Projects" | "Tasks" | "Categories";
       from?: string;
       to?: string;
     } = {},
@@ -309,19 +309,29 @@ class ReportsDsl {
 
   assertReport(args: {
     entries?: {
-      name?: string;
-      hours?: string;
+      start?: string;
+      finish?: string;
       client?: string;
+      project?: string;
+      task?: string;
+      category?: string;
+      hours?: string;
+      cycleTime?: number;
     }[];
     totalHours?: string;
   }) {
     const entries = args.entries?.map((entry) => ({
-      name: entry.name ?? "Test client",
-      hours: Temporal.Duration.from(entry.hours ?? "PT30M"),
-      client: entry.client,
+      start: Temporal.PlainDate.from(entry.start ?? "2025-08-14"),
+      finish: Temporal.PlainDate.from(entry.finish ?? "2025-08-14"),
+      client: entry.client ?? "",
+      project: entry.project ?? "",
+      task: entry.task ?? "",
+      category: entry.category ?? "",
+      hours: Temporal.Duration.from(entry.hours ?? "PT6H"),
+      cycleTime: entry.cycleTime ?? 1,
     }));
     const totalHours = args.totalHours
-      ? Temporal.Duration.from(args.totalHours ?? "PT0S")
+      ? Temporal.Duration.from(args.totalHours ?? "PT6H")
       : undefined;
     this.#activitiesDriver.assertReport({ entries, totalHours });
   }
