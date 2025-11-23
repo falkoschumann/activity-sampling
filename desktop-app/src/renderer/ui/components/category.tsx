@@ -17,7 +17,7 @@ export default function CategoryComponent({
         data-bs-toggle="dropdown"
         aria-expanded="false"
       >
-        {value ?? "No category"}
+        {value ?? "All categories"}
       </button>
       <ul className="dropdown-menu">
         <li>

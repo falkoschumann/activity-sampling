@@ -642,13 +642,21 @@ export class Capacity {
 }
 
 export class EstimateQuery {
-  static create({ timeZone }: { timeZone?: Temporal.TimeZoneLike }) {
-    return new EstimateQuery(timeZone);
+  static create({
+    category,
+    timeZone,
+  }: {
+    category?: string;
+    timeZone?: Temporal.TimeZoneLike;
+  }) {
+    return new EstimateQuery(category, timeZone);
   }
 
+  readonly category?: string;
   readonly timeZone?: Temporal.TimeZoneLike;
 
-  private constructor(timeZone?: Temporal.TimeZoneLike) {
+  private constructor(category?: string, timeZone?: Temporal.TimeZoneLike) {
+    this.category = category;
     this.timeZone = timeZone;
   }
 }

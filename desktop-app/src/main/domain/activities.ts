@@ -5,6 +5,7 @@ import { Temporal } from "@js-temporal/polyfill";
 import { normalizeDuration } from "../../shared/common/temporal";
 import {
   ActivityLoggedEvent,
+  EstimateQuery,
   EstimateQueryResult,
   RecentActivitiesQueryResult,
   ReportEntry,
@@ -725,12 +726,18 @@ export async function projectTimesheet({
 
 export async function projectEstimate({
   replay,
+  query,
 }: {
   replay: AsyncGenerator<ActivityLoggedEvent>;
+  query: EstimateQuery;
 }): Promise<EstimateQueryResult> {
   const cycleTimeCounts = new Map<number, number>();
   const activities = await projectActivities(replay);
   for (const activity of activities) {
+    if (query.category != null && activity.category !== query.category) {
+      continue;
+    }
+
     const cycleTimeDays =
       activity.finish.since(activity.start).total("days") + 1;
     const frequency = cycleTimeCounts.get(cycleTimeDays) ?? 0;

@@ -124,7 +124,7 @@ export class ActivitiesService {
 
   async queryEstimate(query: EstimateQuery): Promise<EstimateQueryResult> {
     const replay = this.#replayTyped(this.#eventStore.replay(), query.timeZone);
-    return projectEstimate({ replay });
+    return projectEstimate({ query, replay });
   }
 
   #today(timeZone?: Temporal.TimeZoneLike) {

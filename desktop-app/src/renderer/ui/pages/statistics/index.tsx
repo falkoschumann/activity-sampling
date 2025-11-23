@@ -3,11 +3,11 @@
 import { useState } from "react";
 
 import { useStatistics } from "../../../application/activities_service";
+import { type StatisticsQuery, StatisticsScope } from "../../../../shared/domain/activities";
+import CategoryComponent from "../../components/category";
 import HistogramComponent from "./histogram";
 import MedianComponent from "./median";
 import ScopeComponent from "./scope";
-import { type StatisticsQuery, StatisticsScope } from "../../../../shared/domain/activities";
-import CategoryComponent from "./category";
 
 export default function StatisticsPage() {
   const [query, setQuery] = useState<StatisticsQuery>({

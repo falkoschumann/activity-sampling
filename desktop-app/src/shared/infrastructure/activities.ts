@@ -829,17 +829,28 @@ export class CapacityDto {
 }
 
 export class EstimateQueryDto {
-  static create({ timeZone }: { timeZone?: string }): EstimateQueryDto {
-    return new EstimateQueryDto(timeZone);
+  static create({
+    category,
+    timeZone,
+  }: {
+    category?: string;
+    timeZone?: string;
+  }): EstimateQueryDto {
+    return new EstimateQueryDto(category, timeZone);
   }
 
   static from(model: EstimateQuery): EstimateQueryDto {
-    return EstimateQueryDto.create({ timeZone: model.timeZone?.toString() });
+    return EstimateQueryDto.create({
+      category: model.category,
+      timeZone: model.timeZone?.toString(),
+    });
   }
 
+  readonly category?: string;
   readonly timeZone?: string;
 
-  private constructor(timeZone?: string) {
+  private constructor(category?: string, timeZone?: string) {
+    this.category = category;
     this.timeZone = timeZone;
   }
 
