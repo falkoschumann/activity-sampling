@@ -382,9 +382,10 @@ export async function projectReport({
     for (const activity of activities) {
       const index = entries.findIndex(
         (entry) =>
-          entry.client === activity.client &&
+          entry.task === activity.task &&
           entry.project === activity.project &&
-          entry.task === activity.task,
+          entry.client === activity.client &&
+          entry.category === activity.category,
       );
       if (index == -1) {
         const cycleTime =
@@ -396,6 +397,7 @@ export async function projectReport({
             client: activity.client,
             project: activity.project,
             task: activity.task,
+            category: activity.category,
             hours: activity.hours,
             cycleTime,
           }),
