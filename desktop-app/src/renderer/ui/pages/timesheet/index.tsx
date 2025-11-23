@@ -16,16 +16,18 @@ export default function TimesheetPage() {
   return (
     <>
       <aside className="fixed-top bg-body-secondary">
-        <PeriodComponent
-          from={state.from}
-          to={state.to}
-          unit={state.unit}
-          isCurrent={state.isCurrent}
-          units={[PeriodUnit.DAY, PeriodUnit.WEEK, PeriodUnit.MONTH]}
-          onPreviousPeriod={() => dispatch(goToPreviousPeriod({}))}
-          onNextPeriod={() => dispatch(goToNextPeriod({}))}
-          onChangePeriod={(unit) => dispatch(changePeriod({ unit }))}
-        />
+        <div className="container">
+          <PeriodComponent
+            from={state.from}
+            to={state.to}
+            unit={state.unit}
+            isCurrent={state.isCurrent}
+            units={[PeriodUnit.DAY, PeriodUnit.WEEK, PeriodUnit.MONTH]}
+            onPreviousPeriod={() => dispatch(goToPreviousPeriod({}))}
+            onNextPeriod={() => dispatch(goToNextPeriod({}))}
+            onChangePeriod={(unit) => dispatch(changePeriod({ unit }))}
+          />
+        </div>
       </aside>
       <main className="container my-4" style={{ paddingTop: "3rem", paddingBottom: "3rem" }}>
         <TimesheetComponent entries={timesheet.entries} />

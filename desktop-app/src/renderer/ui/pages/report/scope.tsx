@@ -10,20 +10,18 @@ export default function ScopeComponent({
   onChangeScope: (scope: ScopeType) => void;
 }) {
   return (
-    <div className="container">
-      <div className="btn-toolbar py-2 gap-2" role="toolbar" aria-label="Toolbar with scope buttons">
-        <div className="btn-group btn-group-sm">
-          {Object.values(Scope).map((it) => (
-            <button
-              key={it}
-              className={`btn btn-outline-secondary${scope === it ? " active" : ""}`}
-              aria-current={scope === it ? "page" : undefined}
-              onClick={() => onChangeScope(it)}
-            >
-              {it}
-            </button>
-          ))}
-        </div>
+    <div className="btn-toolbar py-2 gap-2" role="toolbar" aria-label="Toolbar with scope buttons">
+      <div className="btn-group btn-group-sm">
+        {Object.values(Scope).map((it) => (
+          <button
+            key={it}
+            className={`btn btn-outline-secondary${scope === it ? " active" : ""}`}
+            aria-current={scope === it ? "page" : undefined}
+            onClick={() => onChangeScope(it)}
+          >
+            {it}
+          </button>
+        ))}
       </div>
     </div>
   );

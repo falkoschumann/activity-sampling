@@ -19,30 +19,32 @@ export default function ReportPage() {
   return (
     <>
       <aside className="fixed-top bg-body-secondary">
-        <PeriodComponent
-          from={state.from}
-          to={state.to}
-          unit={state.unit}
-          isCurrent={state.isCurrent}
-          units={[
-            PeriodUnit.WEEK,
-            PeriodUnit.MONTH,
-            PeriodUnit.QUARTER,
-            PeriodUnit.HALF_YEAR,
-            PeriodUnit.YEAR,
-            PeriodUnit.ALL_TIME,
-          ]}
-          onPreviousPeriod={() => dispatch(goToPreviousPeriod({}))}
-          onNextPeriod={() => dispatch(goToNextPeriod({}))}
-          onChangePeriod={(unit) => dispatch(changePeriod({ unit }))}
-        />
-        <ScopeComponent scope={scope} onChangeScope={(scope) => setScope(scope)} />
+        <div className="container-fluid">
+          <PeriodComponent
+            from={state.from}
+            to={state.to}
+            unit={state.unit}
+            isCurrent={state.isCurrent}
+            units={[
+              PeriodUnit.WEEK,
+              PeriodUnit.MONTH,
+              PeriodUnit.QUARTER,
+              PeriodUnit.HALF_YEAR,
+              PeriodUnit.YEAR,
+              PeriodUnit.ALL_TIME,
+            ]}
+            onPreviousPeriod={() => dispatch(goToPreviousPeriod({}))}
+            onNextPeriod={() => dispatch(goToNextPeriod({}))}
+            onChangePeriod={(unit) => dispatch(changePeriod({ unit }))}
+          />
+          <ScopeComponent scope={scope} onChangeScope={(scope) => setScope(scope)} />
+        </div>
       </aside>
-      <main className="container my-4" style={{ paddingTop: "6rem", paddingBottom: "2.5rem" }}>
+      <main className="container-fluid my-4" style={{ paddingTop: "6rem", paddingBottom: "2.5rem" }}>
         <TimeReportComponent scope={scope} entries={report.entries} />
       </main>
       <footer className="fixed-bottom bg-body-secondary">
-        <div className="container py-2">
+        <div className="container-fluid py-2">
           <TotalHoursComponent totalHours={report.totalHours} />
         </div>
       </footer>
