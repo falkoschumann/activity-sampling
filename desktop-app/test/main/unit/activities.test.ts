@@ -5,6 +5,7 @@ import { describe, expect, it } from "vitest";
 import {
   ActivityLoggedEvent,
   Capacity,
+  EstimateQuery,
   EstimateQueryResult,
   RecentActivitiesQueryResult,
   ReportEntry,
@@ -16,7 +17,7 @@ import {
   TimesheetQuery,
   TimesheetQueryResult,
   TimeSummary,
-  WorkingDay
+  WorkingDay,
 } from "../../../src/shared/domain/activities";
 import {
   Activity,
@@ -25,7 +26,7 @@ import {
   projectRecentActivities,
   projectReport,
   projectStatistics,
-  projectTimesheet
+  projectTimesheet,
 } from "../../../src/main/domain/activities";
 import { Holiday, Vacation } from "../../../src/main/domain/calendar";
 
@@ -1042,7 +1043,10 @@ describe("Activities", () => {
     it("should return an empty result when no activities are logged", async () => {
       const replay = createAsyncGenerator([]);
 
-      const result = await projectEstimate({ replay });
+      const result = await projectEstimate({
+        replay,
+        query: EstimateQuery.create({}),
+      });
 
       expect(result).toEqual<EstimateQueryResult>({ cycleTimes: [] });
     });
@@ -1075,7 +1079,10 @@ describe("Activities", () => {
         }),
       ]);
 
-      const result = await projectEstimate({ replay });
+      const result = await projectEstimate({
+        replay,
+        query: EstimateQuery.create({}),
+      });
 
       expect(result).toEqual<EstimateQueryResult>({
         cycleTimes: [

@@ -854,5 +854,9 @@ describe("Activity Sampling", () => {
         });
       });
     });
+
+    describe("Filter tasks by category", () => {
+      it.todo("should return filtered data");
+    });
   });
 });
