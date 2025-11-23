@@ -346,9 +346,7 @@ export async function projectReport({
     const entries: ReportEntry[] = [];
     for (const activity of activities) {
       const index = entries.findIndex(
-        (entry) =>
-          entry.client === activity.client &&
-          entry.project === activity.project,
+        (entry) => entry.project === activity.project,
       );
       if (index == -1) {
         const cycleTime =
@@ -364,7 +362,7 @@ export async function projectReport({
           }),
         );
       } else {
-        entries[index] = updateEntry(entries[index], activity);
+        entries[index] = updateEntry(entries[index], activity, "client");
       }
     }
     return entries.sort((a, b) => {
@@ -384,8 +382,7 @@ export async function projectReport({
         (entry) =>
           entry.task === activity.task &&
           entry.project === activity.project &&
-          entry.client === activity.client &&
-          entry.category === activity.category,
+          entry.client === activity.client,
       );
       if (index == -1) {
         const cycleTime =
@@ -403,7 +400,7 @@ export async function projectReport({
           }),
         );
       } else {
-        entries[index] = updateEntry(entries[index], activity);
+        entries[index] = updateEntry(entries[index], activity, "category");
       }
     }
     return entries.sort((a, b) => {
@@ -417,7 +414,12 @@ export async function projectReport({
         return projectComparison;
       }
 
-      return a.client.localeCompare(b.client);
+      const clientComparison = a.client.localeCompare(b.client);
+      if (clientComparison !== 0) {
+        return clientComparison;
+      }
+
+      return a.category.localeCompare(b.category);
     });
   }
 
@@ -446,7 +448,11 @@ export async function projectReport({
     return entries.sort((a, b) => a.category.localeCompare(b.category));
   }
 
-  function updateEntry(entry: ReportEntry, activity: Activity): ReportEntry {
+  function updateEntry(
+    entry: ReportEntry,
+    activity: Activity,
+    groupBy?: "client" | "category",
+  ): ReportEntry {
     let start = entry.start;
     let finish = entry.finish;
     if (Temporal.PlainDate.compare(activity.start, start) < 0) {
@@ -457,13 +463,24 @@ export async function projectReport({
     }
     const cycleTime = finish.since(start).total("days") + 1;
     const accumulatedHours = entry.hours.add(activity.hours);
-    return {
+    const newEntry = {
       ...entry,
       start,
       finish,
       hours: normalizeDuration(accumulatedHours),
       cycleTime,
     };
+    if (
+      groupBy != null &&
+      activity[groupBy] != null &&
+      !entry[groupBy].includes(activity[groupBy])
+    ) {
+      let groups = entry[groupBy].split(", ");
+      groups.push(activity[groupBy]);
+      groups = groups.sort();
+      newEntry[groupBy] = groups.join(", ");
+    }
+    return newEntry;
   }
 
   function calculateTotalHours() {

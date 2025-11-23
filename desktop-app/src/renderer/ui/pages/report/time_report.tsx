@@ -40,7 +40,7 @@ export default function TimeReportComponent({ scope, entries }: { scope: ScopeTy
               <>
                 {" "}
                 <td className="text-nowrap">{entry.project}</td>
-                <td className="text-nowrap">{entry.client}</td>
+                <td>{entry.client}</td>
               </>
             )}
             {scope === Scope.TASKS && (
@@ -48,7 +48,7 @@ export default function TimeReportComponent({ scope, entries }: { scope: ScopeTy
                 <td>{entry.task}</td>
                 <td className="text-nowrap">{entry.project}</td>
                 <td className="text-nowrap">{entry.client}</td>
-                <td className="text-nowrap">{entry.category}</td>
+                <td>{entry.category}</td>
               </>
             )}
             {scope === Scope.CATEGORIES && (

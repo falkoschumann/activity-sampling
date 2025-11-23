@@ -267,11 +267,13 @@ describe("Activities", () => {
         ActivityLoggedEvent.createTestInstance({
           dateTime: "2025-06-26T17:00",
           client: "Client 1",
+          task: "Task 1",
           duration: "PT5H",
         }),
         ActivityLoggedEvent.createTestInstance({
           dateTime: "2025-06-27T17:00",
           client: "Client 1",
+          task: "Task 2",
           duration: "PT3H",
         }),
       ]);
@@ -307,31 +309,31 @@ describe("Activities", () => {
         ActivityLoggedEvent.createTestInstance({
           dateTime: "2025-06-02T17:00",
           client: "Client 2",
-          project: "Project B",
+          project: "Project 2",
           duration: "PT8H",
         }),
         ActivityLoggedEvent.createTestInstance({
           dateTime: "2025-06-03T17:00",
           client: "Client 1",
-          project: "Project A",
+          project: "Project 1",
           duration: "PT9H",
         }),
         ActivityLoggedEvent.createTestInstance({
           dateTime: "2025-06-04T17:00",
           client: "Client 2",
-          project: "Project B",
+          project: "Project 2",
           duration: "PT8H",
         }),
         ActivityLoggedEvent.createTestInstance({
           dateTime: "2025-06-05T17:00",
           client: "Client 1",
-          project: "Project A",
+          project: "Project 1",
           duration: "PT9H",
         }),
         ActivityLoggedEvent.createTestInstance({
           dateTime: "2025-06-06T17:00",
-          client: "Client 2",
-          project: "Project B",
+          client: "Client 1",
+          project: "Project 2",
           duration: "PT8H",
         }),
       ]);
@@ -346,7 +348,7 @@ describe("Activities", () => {
           ReportEntry.create({
             start: "2025-06-03",
             finish: "2025-06-05",
-            project: "Project A",
+            project: "Project 1",
             client: "Client 1",
             hours: Temporal.Duration.from("PT18H"),
             cycleTime: 3,
@@ -354,8 +356,8 @@ describe("Activities", () => {
           ReportEntry.create({
             start: "2025-06-02",
             finish: "2025-06-06",
-            project: "Project B",
-            client: "Client 2",
+            project: "Project 2",
+            client: "Client 1, Client 2",
             hours: Temporal.Duration.from("PT24H"),
             cycleTime: 5,
           }),
@@ -374,11 +376,13 @@ describe("Activities", () => {
         ActivityLoggedEvent.createTestInstance({
           dateTime: "2025-06-26T17:00",
           task: "Task 1",
+          category: "Feature",
           duration: "PT5H",
         }),
         ActivityLoggedEvent.createTestInstance({
           dateTime: "2025-06-27T17:00",
           task: "Task 1",
+          category: "Rework",
           duration: "PT3H",
         }),
       ]);
@@ -396,6 +400,7 @@ describe("Activities", () => {
             client: "Test client",
             project: "Test project",
             task: "Task 1",
+            category: "Feature, Rework",
             hours: Temporal.Duration.from("PT8H"),
             cycleTime: 2,
           }),
