@@ -42,6 +42,10 @@ analysis.
 - [x] Summarize in a period
 - [ ] Determine throughput in a period
 - [ ] Create cumulative flow diagram with cycle time, throughput and WIP
+- [ ] Optionally aggregate clients of same project
+- [ ] Filter projects by client
+- [ ] Optionally aggregate categories of same task
+- [ ] Filter tasks by client, project or category
 
 ### Statistics
 
