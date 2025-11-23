@@ -10,10 +10,10 @@ import {
   ReportEntry,
   ReportQuery,
   ReportQueryResult,
-  Scope,
-  Statistics,
+  ReportScope,
   StatisticsQuery,
   StatisticsQueryResult,
+  StatisticsScope,
   type TimesheetEntry,
   TimesheetQuery,
   TimesheetQueryResult,
@@ -304,13 +304,13 @@ export async function projectReport({
 
   function createEntries() {
     switch (scope) {
-      case Scope.CLIENTS:
+      case ReportScope.CLIENTS:
         return createClientEntries();
-      case Scope.PROJECTS:
+      case ReportScope.PROJECTS:
         return createProjectEntries();
-      case Scope.TASKS:
+      case ReportScope.TASKS:
         return createTaskEntries();
-      case Scope.CATEGORIES:
+      case ReportScope.CATEGORIES:
         return createCategoriesEntries();
     }
 
@@ -502,11 +502,15 @@ export async function projectStatistics({
   let xAxisLabel: string;
   let days: number[] = [];
   const activities = await projectActivities(replay);
-  if (query.statistics === Statistics.WORKING_HOURS) {
+  if (query.scope === StatisticsScope.WORKING_HOURS) {
     xAxisLabel = "Duration (days)";
 
     const tasks: Record<string, Temporal.Duration> = {};
     for await (const activity of activities) {
+      if (query.category != null && activity.category !== query.category) {
+        continue;
+      }
+
       const hours = activity.hours;
       if (tasks[activity.task]) {
         tasks[activity.task] = normalizeDuration(
@@ -521,15 +525,19 @@ export async function projectStatistics({
       .map((duration) => duration.total("hours"))
       .map((hours) => hours / 8)
       .sort((a, b) => a - b);
-  } else if (query.statistics === Statistics.CYCLE_TIMES) {
+  } else if (query.scope === StatisticsScope.CYCLE_TIMES) {
     xAxisLabel = "Cycle time (days)";
     for (const activity of activities) {
+      if (query.category != null && activity.category !== query.category) {
+        continue;
+      }
+
       const cycleTime = activity.finish.since(activity.start).total("days") + 1;
       days.push(cycleTime);
     }
     days = Object.values(days).sort((a, b) => a - b);
   } else {
-    throw new Error(`Unknown statistics for ${query.statistics}.`);
+    throw new Error(`Unknown statistics for ${query.scope}.`);
   }
 
   const maxDay = days.at(-1) ?? 0;
@@ -541,7 +549,7 @@ export async function projectStatistics({
     if (i === 0) {
       binEdges.push(0);
       frequencies.push(0);
-      if (query.statistics === Statistics.WORKING_HOURS) {
+      if (query.scope === StatisticsScope.WORKING_HOURS) {
         binEdges.push(0.5);
         frequencies.push(0);
       }

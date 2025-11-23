@@ -12,9 +12,9 @@ import {
   RecentActivitiesQueryResult,
   ReportEntry,
   ReportQueryResult,
-  Scope,
-  Statistics,
+  ReportScope,
   StatisticsQueryResult,
+  StatisticsScope,
   TimesheetEntry,
   TimesheetQueryResult,
 } from "../../../src/shared/domain/activities";
@@ -156,7 +156,7 @@ describe("Activities service", () => {
         ],
       });
 
-      const result = await service.queryReport({ scope: Scope.CLIENTS });
+      const result = await service.queryReport({ scope: ReportScope.CLIENTS });
 
       expect(result).toEqual<ReportQueryResult>({
         entries: [
@@ -203,7 +203,7 @@ describe("Activities service", () => {
       });
 
       const result = await service.queryStatistics({
-        statistics: Statistics.WORKING_HOURS,
+        scope: StatisticsScope.WORKING_HOURS,
       });
 
       expect(result).toEqual<StatisticsQueryResult>({
@@ -246,7 +246,7 @@ describe("Activities service", () => {
       });
 
       const result = await service.queryStatistics({
-        statistics: Statistics.CYCLE_TIMES,
+        scope: StatisticsScope.CYCLE_TIMES,
       });
 
       expect(result).toEqual<StatisticsQueryResult>({

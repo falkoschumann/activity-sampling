@@ -17,10 +17,10 @@ import {
   ReportEntry,
   ReportQuery,
   ReportQueryResult,
-  type ScopeType,
+  type ReportScopeType,
   StatisticsQuery,
   StatisticsQueryResult,
-  type StatisticsType,
+  type StatisticsScopeType,
   TimesheetEntry,
   TimesheetQuery,
   TimesheetQueryResult,
@@ -307,7 +307,7 @@ export class ReportQueryDto {
     to,
     timeZone,
   }: {
-    scope: ScopeType;
+    scope: ReportScopeType;
     from?: string;
     to?: string;
     timeZone?: string;
@@ -324,13 +324,13 @@ export class ReportQueryDto {
     });
   }
 
-  readonly scope: ScopeType;
+  readonly scope: ReportScopeType;
   readonly from?: string;
   readonly to?: string;
   readonly timeZone?: string;
 
   private constructor(
-    scope: ScopeType,
+    scope: ReportScopeType,
     from?: string,
     to?: string,
     timeZone?: string,
@@ -463,27 +463,36 @@ export class ReportEntryDto {
 
 export class StatisticsQueryDto {
   static create({
-    statistics,
+    scope,
+    category,
     timeZone,
   }: {
-    statistics: StatisticsType;
+    scope: StatisticsScopeType;
+    category?: string;
     timeZone?: string;
   }): StatisticsQueryDto {
-    return new StatisticsQueryDto(statistics, timeZone);
+    return new StatisticsQueryDto(scope, category, timeZone);
   }
 
   static from(model: StatisticsQuery): StatisticsQueryDto {
     return StatisticsQueryDto.create({
-      statistics: model.statistics,
+      scope: model.scope,
+      category: model.category,
       timeZone: model.timeZone?.toString(),
     });
   }
 
-  readonly statistics: StatisticsType;
+  readonly scope: StatisticsScopeType;
+  readonly category?: string;
   readonly timeZone?: string;
 
-  private constructor(statistics: StatisticsType, timeZone?: string) {
-    this.statistics = statistics;
+  private constructor(
+    scope: StatisticsScopeType,
+    category?: string,
+    timeZone?: string,
+  ) {
+    this.scope = scope;
+    this.category = category;
     this.timeZone = timeZone;
   }
 

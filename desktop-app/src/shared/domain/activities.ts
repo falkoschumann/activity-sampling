@@ -208,7 +208,7 @@ export class ReportQuery {
     to,
     timeZone,
   }: {
-    scope: ScopeType;
+    scope: ReportScopeType;
     from?: Temporal.PlainDateLike | string;
     to?: Temporal.PlainDateLike | string;
     timeZone?: Temporal.TimeZoneLike;
@@ -216,13 +216,13 @@ export class ReportQuery {
     return new ReportQuery(scope, from, to, timeZone);
   }
 
-  readonly scope: ScopeType;
+  readonly scope: ReportScopeType;
   readonly from?: Temporal.PlainDate;
   readonly to?: Temporal.PlainDate;
   readonly timeZone?: Temporal.TimeZoneLike;
 
   private constructor(
-    scope: ScopeType,
+    scope: ReportScopeType,
     from?: Temporal.PlainDateLike | string,
     to?: Temporal.PlainDateLike | string,
     timeZone?: Temporal.TimeZoneLike,
@@ -234,14 +234,14 @@ export class ReportQuery {
   }
 }
 
-export const Scope = Object.freeze({
+export const ReportScope = Object.freeze({
   CLIENTS: "Clients",
   PROJECTS: "Projects",
   TASKS: "Tasks",
   CATEGORIES: "Categories",
 });
 
-export type ScopeType = (typeof Scope)[keyof typeof Scope];
+export type ReportScopeType = (typeof ReportScope)[keyof typeof ReportScope];
 
 export class ReportQueryResult {
   static create({
@@ -357,32 +357,38 @@ export class ReportEntry {
   }
 }
 
-export const Statistics = Object.freeze({
+export const StatisticsScope = Object.freeze({
   WORKING_HOURS: "Working hours",
   CYCLE_TIMES: "Cycle times",
 });
 
-export type StatisticsType = (typeof Statistics)[keyof typeof Statistics];
+export type StatisticsScopeType =
+  (typeof StatisticsScope)[keyof typeof StatisticsScope];
 
 export class StatisticsQuery {
   static create({
-    statistics,
+    scope,
+    category,
     timeZone,
   }: {
-    statistics: StatisticsType;
+    scope: StatisticsScopeType;
+    category?: string;
     timeZone?: Temporal.TimeZoneLike;
   }): StatisticsQuery {
-    return new StatisticsQuery(statistics, timeZone);
+    return new StatisticsQuery(scope, category, timeZone);
   }
 
-  readonly statistics: StatisticsType;
+  readonly scope: StatisticsScopeType;
+  readonly category?: string;
   readonly timeZone?: Temporal.TimeZoneLike;
 
   private constructor(
-    statistics: StatisticsType,
+    scope: StatisticsScopeType,
+    category?: string,
     timeZone?: Temporal.TimeZoneLike,
   ) {
-    this.statistics = statistics;
+    this.scope = scope;
+    this.category = category;
     this.timeZone = timeZone;
   }
 }

@@ -21,10 +21,10 @@ import {
   ReportEntry,
   ReportQuery,
   ReportQueryResult,
-  Statistics,
   StatisticsQuery,
   StatisticsQueryResult,
-  type StatisticsType,
+  StatisticsScope,
+  type StatisticsScopeType,
   TimesheetEntry,
   TimesheetQuery,
   TimesheetQueryResult,
@@ -365,9 +365,9 @@ class StatisticsDsl {
   // Queries
   //
 
-  async queryStatistics(args: { statistics?: StatisticsType } = {}) {
-    const statistics = args.statistics ?? Statistics.WORKING_HOURS;
-    await this.#activitiesDriver.queryStatistics({ statistics });
+  async queryStatistics(args: { statistics?: StatisticsScopeType } = {}) {
+    const statistics = args.statistics ?? StatisticsScope.WORKING_HOURS;
+    await this.#activitiesDriver.queryStatistics({ scope: statistics });
   }
 
   assertStatistics(args: {

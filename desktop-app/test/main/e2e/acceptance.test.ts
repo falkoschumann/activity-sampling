@@ -2,7 +2,7 @@
 
 import { describe, it } from "vitest";
 import { startActivitySampling } from "./activity_sampling";
-import { Statistics } from "../../../src/shared/domain/activities";
+import { StatisticsScope } from "../../../src/shared/domain/activities";
 
 describe("Activity Sampling", () => {
   describe("Start Timer", () => {
@@ -414,7 +414,7 @@ describe("Activity Sampling", () => {
         });
 
         await statistics.queryStatistics({
-          statistics: Statistics.WORKING_HOURS,
+          statistics: StatisticsScope.WORKING_HOURS,
         });
 
         statistics.assertStatistics({
@@ -447,7 +447,7 @@ describe("Activity Sampling", () => {
         });
 
         await statistics.queryStatistics({
-          statistics: Statistics.CYCLE_TIMES,
+          statistics: StatisticsScope.CYCLE_TIMES,
         });
 
         statistics.assertStatistics({
@@ -479,7 +479,7 @@ describe("Activity Sampling", () => {
         });
 
         await statistics.queryStatistics({
-          statistics: Statistics.WORKING_HOURS,
+          statistics: StatisticsScope.WORKING_HOURS,
         });
 
         statistics.assertStatistics({ median: 5 });
@@ -507,11 +507,15 @@ describe("Activity Sampling", () => {
         });
 
         await statistics.queryStatistics({
-          statistics: Statistics.CYCLE_TIMES,
+          statistics: StatisticsScope.CYCLE_TIMES,
         });
 
         statistics.assertStatistics({ median: 5 });
       });
+    });
+
+    describe("Filter statistic data by category", () => {
+      it.todo("should return filtered data");
     });
   });
 

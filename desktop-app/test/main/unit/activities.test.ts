@@ -9,14 +9,14 @@ import {
   RecentActivitiesQueryResult,
   ReportEntry,
   ReportQueryResult,
-  Scope,
-  Statistics,
+  ReportScope,
   StatisticsQueryResult,
+  StatisticsScope,
   TimesheetEntry,
   TimesheetQuery,
   TimesheetQueryResult,
   TimeSummary,
-  WorkingDay,
+  WorkingDay
 } from "../../../src/shared/domain/activities";
 import {
   Activity,
@@ -25,7 +25,7 @@ import {
   projectRecentActivities,
   projectReport,
   projectStatistics,
-  projectTimesheet,
+  projectTimesheet
 } from "../../../src/main/domain/activities";
 import { Holiday, Vacation } from "../../../src/main/domain/calendar";
 
@@ -248,7 +248,7 @@ describe("Activities", () => {
 
       const result = await projectReport({
         replay,
-        query: { scope: Scope.CLIENTS },
+        query: { scope: ReportScope.CLIENTS },
       });
 
       expect(result).toEqual<ReportQueryResult>({
@@ -280,7 +280,7 @@ describe("Activities", () => {
 
       const result = await projectReport({
         replay,
-        query: { scope: Scope.CLIENTS },
+        query: { scope: ReportScope.CLIENTS },
       });
 
       expect(result).toEqual<ReportQueryResult>({
@@ -340,7 +340,7 @@ describe("Activities", () => {
 
       const result = await projectReport({
         replay,
-        query: { scope: Scope.PROJECTS },
+        query: { scope: ReportScope.PROJECTS },
       });
 
       expect(result).toEqual<ReportQueryResult>({
@@ -389,7 +389,7 @@ describe("Activities", () => {
 
       const result = await projectReport({
         replay,
-        query: { scope: Scope.TASKS },
+        query: { scope: ReportScope.TASKS },
       });
 
       expect(result).toEqual<ReportQueryResult>({
@@ -439,7 +439,7 @@ describe("Activities", () => {
 
       const result = await projectReport({
         replay,
-        query: { scope: Scope.CATEGORIES },
+        query: { scope: ReportScope.CATEGORIES },
       });
 
       expect(result).toEqual<ReportQueryResult>({
@@ -477,7 +477,7 @@ describe("Activities", () => {
       const result = await projectReport({
         replay,
         query: {
-          scope: Scope.TASKS,
+          scope: ReportScope.TASKS,
           from: Temporal.PlainDate.from("2025-09-15"),
           to: Temporal.PlainDate.from("2025-09-21"),
         },
@@ -497,7 +497,7 @@ describe("Activities", () => {
         const result = await projectStatistics({
           replay,
           query: {
-            statistics: Statistics.WORKING_HOURS,
+            scope: StatisticsScope.WORKING_HOURS,
           },
         });
 
@@ -536,7 +536,7 @@ describe("Activities", () => {
 
         const result = await projectStatistics({
           replay,
-          query: { statistics: Statistics.WORKING_HOURS },
+          query: { scope: StatisticsScope.WORKING_HOURS },
         });
 
         expect(result).toEqual<StatisticsQueryResult>({
@@ -578,7 +578,7 @@ describe("Activities", () => {
 
         const result = await projectStatistics({
           replay,
-          query: { statistics: Statistics.WORKING_HOURS },
+          query: { scope: StatisticsScope.WORKING_HOURS },
         });
 
         expect(result).toEqual<StatisticsQueryResult>({
@@ -624,7 +624,7 @@ describe("Activities", () => {
 
         const result = await projectStatistics({
           replay,
-          query: { statistics: Statistics.WORKING_HOURS },
+          query: { scope: StatisticsScope.WORKING_HOURS },
         });
 
         expect(result).toEqual<StatisticsQueryResult>({
@@ -643,6 +643,8 @@ describe("Activities", () => {
           },
         });
       });
+
+      it.todo("should filter by category when category is provided");
     });
 
     describe("Cycle times", () => {
@@ -651,7 +653,7 @@ describe("Activities", () => {
 
         const result = await projectStatistics({
           replay,
-          query: { statistics: Statistics.CYCLE_TIMES },
+          query: { scope: StatisticsScope.CYCLE_TIMES },
         });
 
         expect(result).toEqual<StatisticsQueryResult>({
@@ -697,7 +699,7 @@ describe("Activities", () => {
 
         const result = await projectStatistics({
           replay,
-          query: { statistics: Statistics.CYCLE_TIMES },
+          query: { scope: StatisticsScope.CYCLE_TIMES },
         });
 
         expect(result).toEqual<StatisticsQueryResult>({
@@ -716,6 +718,8 @@ describe("Activities", () => {
           },
         });
       });
+
+      it.todo("should filter by category when category is provided");
     });
   });
 
@@ -1096,6 +1100,8 @@ describe("Activities", () => {
         ],
       });
     });
+
+    it.todo("should filter by category when category is provided");
   });
 });
 

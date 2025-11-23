@@ -5,19 +5,25 @@ import { useState } from "react";
 import { useStatistics } from "../../../application/activities_service";
 import HistogramComponent from "./histogram";
 import MedianComponent from "./median";
-import QueryParametersComponent from "./query_parameters";
-import { Statistics, type StatisticsQuery } from "../../../../shared/domain/activities";
+import ScopeComponent from "./scope";
+import { type StatisticsQuery, StatisticsScope } from "../../../../shared/domain/activities";
+import CategoryComponent from "./category";
 
 export default function StatisticsPage() {
   const [query, setQuery] = useState<StatisticsQuery>({
-    statistics: Statistics.WORKING_HOURS,
+    scope: StatisticsScope.WORKING_HOURS,
   });
   const statistics = useStatistics(query);
 
   return (
     <>
       <aside className="fixed-top bg-body-secondary">
-        <QueryParametersComponent onChange={setQuery} />
+        <div className="container">
+          <div className="btn-toolbar py-2 gap-2" role="toolbar" aria-label="Toolbar with query parameters">
+            <ScopeComponent value={query.scope} onChange={(scope) => setQuery({ ...query, scope })} />
+            <CategoryComponent value={query.category} onChange={(category) => setQuery({ ...query, category })} />
+          </div>
+        </div>
       </aside>
       <main className="container my-4" style={{ paddingTop: "3rem" }}>
         <HistogramComponent histogram={statistics.histogram} />
