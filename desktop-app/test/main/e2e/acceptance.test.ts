@@ -414,7 +414,7 @@ describe("Activity Sampling", () => {
         });
 
         await statistics.queryStatistics({
-          statistics: StatisticsScope.WORKING_HOURS,
+          scope: StatisticsScope.WORKING_HOURS,
         });
 
         statistics.assertStatistics({
@@ -447,7 +447,7 @@ describe("Activity Sampling", () => {
         });
 
         await statistics.queryStatistics({
-          statistics: StatisticsScope.CYCLE_TIMES,
+          scope: StatisticsScope.CYCLE_TIMES,
         });
 
         statistics.assertStatistics({
@@ -479,7 +479,7 @@ describe("Activity Sampling", () => {
         });
 
         await statistics.queryStatistics({
-          statistics: StatisticsScope.WORKING_HOURS,
+          scope: StatisticsScope.WORKING_HOURS,
         });
 
         statistics.assertStatistics({ median: 5 });
@@ -507,7 +507,7 @@ describe("Activity Sampling", () => {
         });
 
         await statistics.queryStatistics({
-          statistics: StatisticsScope.CYCLE_TIMES,
+          scope: StatisticsScope.CYCLE_TIMES,
         });
 
         statistics.assertStatistics({ median: 5 });
@@ -515,7 +515,52 @@ describe("Activity Sampling", () => {
     });
 
     describe("Filter statistic data by category", () => {
-      it.todo("should return filtered data");
+      it("should return filtered data", async () => {
+        const { statistics } = await startActivitySampling();
+        await statistics.activityLogged({
+          timestamp: "2025-08-13T12:00:00Z",
+          task: "Task A",
+          category: "Category A",
+        });
+        await statistics.activityLogged({
+          timestamp: "2025-08-13T14:00:00Z",
+          task: "Task B",
+          category: "Category B",
+        });
+        await statistics.activityLogged({
+          timestamp: "2025-08-13T12:00:00Z",
+          task: "Task B",
+          category: "Category A",
+        });
+        await statistics.activityLogged({
+          timestamp: "2025-08-16T12:00:00Z",
+          task: "Task A",
+          category: "Category A",
+        });
+        await statistics.activityLogged({
+          timestamp: "2025-08-16T14:00:00Z",
+          task: "Task A",
+          category: "Category B",
+        });
+        await statistics.activityLogged({
+          timestamp: "2025-08-18T12:00:00Z",
+          task: "Task B",
+          category: "Category A",
+        });
+
+        await statistics.queryStatistics({
+          scope: StatisticsScope.CYCLE_TIMES,
+          category: "Category A",
+        });
+
+        statistics.assertStatistics({
+          histogram: {
+            binEdges: ["0", "1", "2", "3", "5", "8"],
+            frequencies: [0, 0, 0, 1, 1],
+          },
+          median: 5,
+        });
+      });
     });
   });
 
@@ -856,7 +901,76 @@ describe("Activity Sampling", () => {
     });
 
     describe("Filter tasks by category", () => {
-      it.todo("should return filtered data");
+      it("should return filtered data", async () => {
+        const { estimate } = await startActivitySampling();
+        await estimate.activityLogged({
+          timestamp: "2025-11-03T10:00:00Z",
+          task: "Task A",
+          category: "Category A",
+        });
+        await estimate.activityLogged({
+          timestamp: "2025-11-03T10:00:00Z",
+          task: "Task B",
+          category: "Category A",
+        });
+        await estimate.activityLogged({
+          timestamp: "2025-11-03T12:00:00Z",
+          task: "Task B",
+          category: "Category B",
+        });
+        await estimate.activityLogged({
+          timestamp: "2025-11-03T10:00:00Z",
+          task: "Task C",
+          category: "Category A",
+        });
+        await estimate.activityLogged({
+          timestamp: "2025-11-03T10:00:00Z",
+          task: "Task D",
+          category: "Category A",
+        });
+        await estimate.activityLogged({
+          timestamp: "2025-11-04T10:00:00Z",
+          task: "Task C",
+          category: "Category A",
+        });
+        await estimate.activityLogged({
+          timestamp: "2025-11-04T12:00:00Z",
+          task: "Task C",
+          category: "Category B",
+        });
+        await estimate.activityLogged({
+          timestamp: "2025-11-05T10:00:00Z",
+          task: "Task D",
+          category: "Category A",
+        });
+
+        await estimate.queryEstimate({
+          category: "Category A",
+        });
+
+        estimate.assertEstimate({
+          cycleTimes: [
+            {
+              cycleTime: 1,
+              frequency: 2,
+              probability: 0.5,
+              cumulativeProbability: 0.5,
+            },
+            {
+              cycleTime: 2,
+              frequency: 1,
+              probability: 0.25,
+              cumulativeProbability: 0.75,
+            },
+            {
+              cycleTime: 3,
+              frequency: 1,
+              probability: 0.25,
+              cumulativeProbability: 1.0,
+            },
+          ],
+        });
+      });
     });
   });
 });

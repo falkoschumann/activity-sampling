@@ -365,9 +365,12 @@ class StatisticsDsl {
   // Queries
   //
 
-  async queryStatistics(args: { statistics?: StatisticsScopeType } = {}) {
-    const statistics = args.statistics ?? StatisticsScope.WORKING_HOURS;
-    await this.#activitiesDriver.queryStatistics({ scope: statistics });
+  async queryStatistics(
+    args: { scope?: StatisticsScopeType; category?: string } = {},
+  ) {
+    const scope = args.scope ?? StatisticsScope.WORKING_HOURS;
+    const category = args.category;
+    await this.#activitiesDriver.queryStatistics({ scope, category });
   }
 
   assertStatistics(args: {
@@ -552,8 +555,9 @@ class EstimateDsl {
   // Queries
   //
 
-  async queryEstimate() {
-    await this.#activitiesDriver.queryEstimate({});
+  async queryEstimate(args: { category?: string } = {}) {
+    const category = args.category;
+    await this.#activitiesDriver.queryEstimate({ category });
   }
 
   assertEstimate(args: {

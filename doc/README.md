@@ -58,7 +58,7 @@ analysis.
 - [ ] Determine median for throughput per period
 - [ ] Determine median for WIP per period
 - [ ] Exclude tasks not suitable for statistics
-- [ ] Filter statistic data by category
+- [x] Filter statistic data by category
 
 ### Timesheet
 
@@ -74,7 +74,7 @@ analysis.
 
 - [x] Estimate tasks with cycle times
 - [ ] Estimate tasks with throughput
-- [ ] Filter tasks by category
+- [x] Filter tasks by category
 
 ## Architecture
 

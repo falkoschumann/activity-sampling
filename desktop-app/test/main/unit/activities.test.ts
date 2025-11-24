@@ -645,7 +645,54 @@ describe("Activities", () => {
         });
       });
 
-      it.todo("should filter by category when category is provided");
+      it("should filter by category when category is provided", async () => {
+        const replay = createAsyncGenerator([
+          ActivityLoggedEvent.createTestInstance({
+            task: "Task A",
+            duration: "PT24H", // 3 person days
+            category: "Category A",
+          }),
+          ActivityLoggedEvent.createTestInstance({
+            task: "Task A",
+            duration: "PT16H", // 2 person days
+            category: "Category B",
+          }),
+          ActivityLoggedEvent.createTestInstance({
+            task: "Task B",
+            duration: "PT40H", // 5 person days
+            category: "Category A",
+          }),
+          ActivityLoggedEvent.createTestInstance({
+            task: "Task C",
+            duration: "PT16H", // 2 person days
+            category: "Category A",
+          }),
+        ]);
+
+        const result = await projectStatistics({
+          replay,
+          query: {
+            scope: StatisticsScope.WORKING_HOURS,
+            category: "Category A",
+          },
+        });
+
+        expect(result).toEqual<StatisticsQueryResult>({
+          histogram: {
+            binEdges: ["0", "0.5", "1", "2", "3", "5"],
+            frequencies: [0, 0, 1, 1, 1],
+            xAxisLabel: "Duration (days)",
+            yAxisLabel: "Number of Tasks",
+          },
+          median: {
+            edge0: 0,
+            edge25: 2,
+            edge50: 3,
+            edge75: 4,
+            edge100: 5,
+          },
+        });
+      });
     });
 
     describe("Cycle times", () => {
@@ -720,7 +767,66 @@ describe("Activities", () => {
         });
       });
 
-      it.todo("should filter by category when category is provided");
+      it("should filter by category when category is provided", async () => {
+        const replay = createAsyncGenerator([
+          ActivityLoggedEvent.createTestInstance({
+            dateTime: "2025-08-13T14:00",
+            task: "Task A",
+            category: "Category A",
+          }),
+          ActivityLoggedEvent.createTestInstance({
+            dateTime: "2025-08-13T14:00",
+            task: "Task B",
+            category: "Category A",
+          }),
+          ActivityLoggedEvent.createTestInstance({
+            dateTime: "2025-08-13T16:00",
+            task: "Task B",
+            category: "Category B",
+          }),
+          ActivityLoggedEvent.createTestInstance({
+            dateTime: "2025-08-15T14:00",
+            task: "Task C",
+            category: "Category A",
+          }),
+          ActivityLoggedEvent.createTestInstance({
+            dateTime: "2025-08-15T16:00",
+            task: "Task C",
+            category: "Category B",
+          }),
+          ActivityLoggedEvent.createTestInstance({
+            dateTime: "2025-08-16T14:00",
+            task: "Task A",
+            category: "Category A",
+          }),
+          ActivityLoggedEvent.createTestInstance({
+            dateTime: "2025-08-18T14:00",
+            task: "Task B",
+            category: "Category A",
+          }),
+        ]);
+
+        const result = await projectStatistics({
+          replay,
+          query: { scope: StatisticsScope.CYCLE_TIMES, category: "Category A" },
+        });
+
+        expect(result).toEqual<StatisticsQueryResult>({
+          histogram: {
+            binEdges: ["0", "1", "2", "3", "5", "8"],
+            frequencies: [1, 0, 0, 1, 1],
+            xAxisLabel: "Cycle time (days)",
+            yAxisLabel: "Number of Tasks",
+          },
+          median: {
+            edge0: 0,
+            edge25: 1,
+            edge50: 4,
+            edge75: 5,
+            edge100: 6,
+          },
+        });
+      });
     });
   });
 
@@ -1108,7 +1214,73 @@ describe("Activities", () => {
       });
     });
 
-    it.todo("should filter by category when category is provided");
+    it("should filter by category when category is provided", async () => {
+      const replay = createAsyncGenerator([
+        ActivityLoggedEvent.createTestInstance({
+          dateTime: "2025-11-03T10:00",
+          task: "Task A",
+          category: "Category A",
+        }),
+        ActivityLoggedEvent.createTestInstance({
+          dateTime: "2025-11-03T10:00",
+          task: "Task B",
+          category: "Category A",
+        }),
+        ActivityLoggedEvent.createTestInstance({
+          dateTime: "2025-11-03T10:00",
+          task: "Task C",
+          category: "Category A",
+        }),
+        ActivityLoggedEvent.createTestInstance({
+          dateTime: "2025-11-03T12:00",
+          task: "Task C",
+          category: "Category B",
+        }),
+        ActivityLoggedEvent.createTestInstance({
+          dateTime: "2025-11-03T10:00",
+          task: "Task D",
+          category: "Category A",
+        }),
+        ActivityLoggedEvent.createTestInstance({
+          dateTime: "2025-11-04T10:00",
+          task: "Task C",
+          category: "Category A",
+        }),
+        ActivityLoggedEvent.createTestInstance({
+          dateTime: "2025-11-05T10:00",
+          task: "Task D",
+          category: "Category A",
+        }),
+      ]);
+
+      const result = await projectEstimate({
+        replay,
+        query: EstimateQuery.create({ category: "Category A" }),
+      });
+
+      expect(result).toEqual<EstimateQueryResult>({
+        cycleTimes: [
+          {
+            cycleTime: 1,
+            frequency: 2,
+            probability: 0.5,
+            cumulativeProbability: 0.5,
+          },
+          {
+            cycleTime: 2,
+            frequency: 1,
+            probability: 0.25,
+            cumulativeProbability: 0.75,
+          },
+          {
+            cycleTime: 3,
+            frequency: 1,
+            probability: 0.25,
+            cumulativeProbability: 1.0,
+          },
+        ],
+      });
+    });
   });
 });
 
