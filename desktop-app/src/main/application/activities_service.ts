@@ -31,11 +31,9 @@ import { VacationRepository } from "../infrastructure/vacation_repository";
 import { Temporal } from "@js-temporal/polyfill";
 
 export class ActivitiesService {
-  static create({
-    settings = Settings.createDefault(),
-  } = {}): ActivitiesService {
+  static create(): ActivitiesService {
     return new ActivitiesService(
-      settings,
+      Settings.createDefault(),
       EventStore.create(),
       HolidayRepository.create(),
       VacationRepository.create(),

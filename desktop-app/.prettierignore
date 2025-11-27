@@ -1,0 +1,10 @@
+# Project
+/data/
+
+# Build and test
+coverage/
+dist/
+out/
+testdata/
+vendor/
+corrupt.*

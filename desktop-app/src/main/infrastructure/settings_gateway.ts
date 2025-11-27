@@ -62,6 +62,7 @@ export class SettingsGateway extends EventTarget {
   async store(settings: Settings) {
     const dir = path.dirname(this.#fileName);
     await this.#fs.mkdir(dir, { recursive: true });
+
     const json = JSON.stringify(settings, null, 2);
     await this.#fs.writeFile(this.#fileName, json, "utf-8");
     this.dispatchEvent(new CustomEvent(STORED_EVENT, { detail: settings }));

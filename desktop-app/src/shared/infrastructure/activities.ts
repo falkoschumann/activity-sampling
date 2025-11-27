@@ -174,7 +174,7 @@ export class RecentActivitiesQueryResultDto {
     return new RecentActivitiesQueryResultDto(workingDays, timeSummary);
   }
 
-  static from(
+  static fromModel(
     model: RecentActivitiesQueryResult,
   ): RecentActivitiesQueryResultDto {
     return RecentActivitiesQueryResultDto.create({
@@ -357,7 +357,7 @@ export class ReportQueryResultDto {
     return new ReportQueryResultDto(entries, totalHours);
   }
 
-  static from(model: ReportQueryResult): ReportQueryResultDto {
+  static fromModel(model: ReportQueryResult): ReportQueryResultDto {
     return ReportQueryResultDto.create({
       entries: model.entries.map((entry) => ReportEntryDto.from(entry)),
       totalHours: model.totalHours.toString(),
@@ -526,7 +526,7 @@ export class StatisticsQueryResultDto {
     );
   }
 
-  static from(model: StatisticsQueryResult): StatisticsQueryResultDto {
+  static fromModel(model: StatisticsQueryResult): StatisticsQueryResultDto {
     return StatisticsQueryResultDto.create({
       histogram: HistogramDto.from(model.histogram),
       median: MedianDto.from(model.median),
@@ -712,7 +712,7 @@ export class TimesheetQueryResultDto {
     return new TimesheetQueryResultDto(entries, totalHours, capacity);
   }
 
-  static from(model: TimesheetQueryResult): TimesheetQueryResultDto {
+  static fromModel(model: TimesheetQueryResult): TimesheetQueryResultDto {
     return TimesheetQueryResultDto.create({
       entries: model.entries.map((entry) => TimesheetEntryDto.from(entry)),
       totalHours: model.totalHours.toString(),
@@ -870,7 +870,7 @@ export class EstimateQueryResultDto {
     );
   }
 
-  static from(model: EstimateQueryResult): EstimateQueryResultDto {
+  static fromModel(model: EstimateQueryResult): EstimateQueryResultDto {
     return EstimateQueryResultDto.create({
       cycleTimes: model.cycleTimes.map((entry) => EstimateEntryDto.from(entry)),
     });

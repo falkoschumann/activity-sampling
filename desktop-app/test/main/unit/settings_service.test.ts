@@ -1,6 +1,9 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
+import { Temporal } from "@js-temporal/polyfill";
+import { EventTracker } from "@muspellheim/shared";
 import { describe, expect, it } from "vitest";
+
 import {
   SettingsChangedEvent,
   SettingsService,
@@ -8,8 +11,6 @@ import {
 import { Settings } from "../../../src/shared/domain/settings";
 import { SettingsGateway } from "../../../src/main/infrastructure/settings_gateway";
 import { SettingsDto } from "../../../src/shared/infrastructure/settings";
-import { Temporal } from "@js-temporal/polyfill";
-import { EventTracker } from "@muspellheim/shared";
 
 describe("Settings service", () => {
   describe("Load settings", () => {

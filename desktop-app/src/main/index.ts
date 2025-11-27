@@ -153,7 +153,7 @@ function createRendererToMainChannels() {
     async (_event, queryDto: RecentActivitiesQueryDto) => {
       const query = RecentActivitiesQueryDto.create(queryDto).validate();
       const result = await activitiesService.queryRecentActivities(query);
-      return RecentActivitiesQueryResultDto.from(result);
+      return RecentActivitiesQueryResultDto.fromModel(result);
     },
   );
   ipcMain.handle(
@@ -161,7 +161,7 @@ function createRendererToMainChannels() {
     async (_event, queryDto: ReportQueryDto) => {
       const query = ReportQueryDto.create(queryDto).validate();
       const result = await activitiesService.queryReport(query);
-      return ReportQueryResultDto.from(result);
+      return ReportQueryResultDto.fromModel(result);
     },
   );
   ipcMain.handle(
@@ -169,7 +169,7 @@ function createRendererToMainChannels() {
     async (_event, queryDto: StatisticsQueryDto) => {
       const query = StatisticsQueryDto.create(queryDto).validate();
       const result = await activitiesService.queryStatistics(query);
-      return StatisticsQueryResultDto.from(result);
+      return StatisticsQueryResultDto.fromModel(result);
     },
   );
   ipcMain.handle(
@@ -177,7 +177,7 @@ function createRendererToMainChannels() {
     async (_event, queryDto: TimesheetQueryDto) => {
       const query = TimesheetQueryDto.create(queryDto).validate();
       const result = await activitiesService.queryTimesheet(query);
-      return TimesheetQueryResultDto.from(result);
+      return TimesheetQueryResultDto.fromModel(result);
     },
   );
   ipcMain.handle(
@@ -185,7 +185,7 @@ function createRendererToMainChannels() {
     async (_event, queryDto: EstimateQueryDto) => {
       const query = EstimateQueryDto.create(queryDto).validate();
       const result = await activitiesService.queryEstimate(query);
-      return EstimateQueryResultDto.from(result);
+      return EstimateQueryResultDto.fromModel(result);
     },
   );
   ipcMain.handle(LOAD_SETTINGS_CHANNEL, async (_event) => {

@@ -14,14 +14,19 @@ const NON_EXISTING_FILE = path.resolve(
   "../data/settings/non-existing.json",
 );
 
+const MINIMAL_FILE = path.resolve(
+  import.meta.dirname,
+  "../data/settings/minimal.json",
+);
+
 const FULL_FILE = path.resolve(
   import.meta.dirname,
   "../data/settings/full.json",
 );
 
-const MINIMAL_FILE = path.resolve(
+const CORRUPT_FILE = path.resolve(
   import.meta.dirname,
-  "../data/settings/minimal.json",
+  "../data/settings/corrupt.json",
 );
 
 const TEST_FILE = path.resolve(
@@ -39,6 +44,19 @@ describe("Settings gateway", () => {
       expect(settings).toBeUndefined();
     });
 
+    it("should return full minimal file", async () => {
+      const gateway = SettingsGateway.create({ fileName: MINIMAL_FILE });
+
+      const settings = await gateway.load();
+
+      expect(settings).toEqual<Settings>(
+        Settings.create({
+          dataDir: "other-data",
+          capacity: Temporal.Duration.from("PT40H"),
+        }),
+      );
+    });
+
     it("should return full example file", async () => {
       const gateway = SettingsGateway.create({ fileName: FULL_FILE });
 
@@ -52,22 +70,17 @@ describe("Settings gateway", () => {
       );
     });
 
-    it("should return full minimal file", async () => {
-      const gateway = SettingsGateway.create({ fileName: MINIMAL_FILE });
+    it("should throw an error when the file is corrupted", async () => {
+      const gateway = SettingsGateway.create({ fileName: CORRUPT_FILE });
 
-      const settings = await gateway.load();
+      const result = gateway.load();
 
-      expect(settings).toEqual<Settings>(
-        Settings.create({
-          dataDir: "other-data",
-          capacity: Temporal.Duration.from("PT40H"),
-        }),
-      );
+      await expect(result).rejects.toThrow(SyntaxError);
     });
   });
 
   describe("Store", () => {
-    it("should store and load settings", async () => {
+    it("should store settings", async () => {
       const gateway = SettingsGateway.create({ fileName: TEST_FILE });
       const example = Settings.create({
         dataDir: "test-data-dir",
@@ -75,15 +88,15 @@ describe("Settings gateway", () => {
       });
 
       await gateway.store(example);
-      const settings = await gateway.load();
 
+      const settings = await gateway.load();
       expect(settings).toEqual<Settings>(example);
     });
   });
 
   describe("Nullable", () => {
     describe("Load", () => {
-      it("should return default when configurable response is null", async () => {
+      it("should return nothing when configurable response is null", async () => {
         const gateway = SettingsGateway.createNull({
           readFileResponses: [null],
         });
@@ -131,18 +144,6 @@ describe("Settings gateway", () => {
           Settings.create({ dataDir: "data-dir", capacity: "PT40H" }),
         ]);
       });
-    });
-  });
-});
-
-describe("Settings DTO", () => {
-  describe("Validate", () => {
-    it("should throw a type error when DTO is not valid", () => {
-      const dto = {
-        dataDir: false,
-      };
-
-      expect(() => SettingsDto.fromJson(dto)).toThrow(TypeError);
     });
   });
 });

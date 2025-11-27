@@ -5,6 +5,9 @@ import addFormats from "ajv-formats";
 
 import { Settings } from "../domain/settings";
 
+const ajv = new Ajv();
+addFormats(ajv);
+
 const schema = {
   type: "object",
   properties: {
@@ -32,15 +35,12 @@ export class SettingsDto {
   }
 
   static fromJson(json: unknown): SettingsDto {
-    const ajv = new Ajv();
-    addFormats(ajv);
     const valid = ajv.validate(schema, json);
     if (valid) {
       return SettingsDto.create(json as SettingsDto);
     }
 
-    const errors = JSON.stringify(ajv.errors, null, 2);
-    throw new TypeError(`Invalid settings data:\n${errors}`);
+    throw new TypeError("Invalid settings data.", { cause: ajv.errors });
   }
 
   readonly dataDir: string;

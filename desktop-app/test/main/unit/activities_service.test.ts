@@ -130,7 +130,7 @@ describe("Activities service", () => {
 
       const result = service.queryRecentActivities({});
 
-      expect(result).rejects.toThrowError(TypeError);
+      await expect(result).rejects.toThrowError(TypeError);
     });
   });
 
