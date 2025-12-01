@@ -108,17 +108,16 @@ export function useLog() {
         return;
       }
 
-      await logActivity(
-        LogActivityCommand.create({
-          timestamp: Temporal.Now.instant(),
-          duration: Temporal.Duration.from(state.countdown.interval),
-          client: event.activity.client,
-          project: event.activity.project,
-          task: event.activity.task,
-          notes: event.activity.notes,
-          category: event.activity.category,
-        }),
-      );
+      const command = LogActivityCommand.create({
+        timestamp: Temporal.Now.instant(),
+        duration: Temporal.Duration.from(state.countdown.interval),
+        client: event.activity.client,
+        project: event.activity.project,
+        task: event.activity.task,
+        notes: event.activity.notes,
+        category: event.activity.category,
+      });
+      await logActivity(command);
       dispatch(activityLogged());
       await handleQueryRecentActivities();
     }
@@ -185,7 +184,7 @@ export function useReport(query: ReportQuery) {
 
 async function queryReport(query: ReportQuery) {
   const resultDto = await window.activitySampling.queryReport(
-    ReportQueryDto.from(query),
+    ReportQueryDto.fromModel(query),
   );
   return ReportQueryResultDto.create(resultDto).validate();
 }
@@ -205,7 +204,7 @@ export function useStatistics(query: StatisticsQuery) {
 
 async function queryStatistics(query: StatisticsQuery) {
   const resultDto = await window.activitySampling.queryStatistics(
-    StatisticsQueryDto.from(query),
+    StatisticsQueryDto.fromModel(query),
   );
   return StatisticsQueryResultDto.create(resultDto).validate();
 }
@@ -228,7 +227,7 @@ export function useTimesheet(query: TimesheetQuery) {
 
 async function queryTimesheet(query: TimesheetQuery) {
   const resultDto = await window.activitySampling.queryTimesheet(
-    TimesheetQueryDto.from(query),
+    TimesheetQueryDto.fromModel(query),
   );
   return TimesheetQueryResultDto.create(resultDto).validate();
 }
@@ -248,7 +247,7 @@ export function useEstimate(query: EstimateQuery): EstimateQueryResult {
 
 async function queryEstimate(query: EstimateQuery) {
   const resultDto = await window.activitySampling.queryEstimate(
-    EstimateQueryDto.from(query),
+    EstimateQueryDto.fromModel(query),
   );
   return EstimateQueryResultDto.create(resultDto).validate();
 }

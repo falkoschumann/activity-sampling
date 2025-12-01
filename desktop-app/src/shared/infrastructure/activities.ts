@@ -315,7 +315,7 @@ export class ReportQueryDto {
     return new ReportQueryDto(scope, from, to, timeZone);
   }
 
-  static from(model: ReportQuery): ReportQueryDto {
+  static fromModel(model: ReportQuery): ReportQueryDto {
     return ReportQueryDto.create({
       scope: model.scope,
       from: model.from?.toString(),
@@ -474,7 +474,7 @@ export class StatisticsQueryDto {
     return new StatisticsQueryDto(scope, category, timeZone);
   }
 
-  static from(model: StatisticsQuery): StatisticsQueryDto {
+  static fromModel(model: StatisticsQuery): StatisticsQueryDto {
     return StatisticsQueryDto.create({
       scope: model.scope,
       category: model.category,
@@ -676,7 +676,7 @@ export class TimesheetQueryDto {
     return new TimesheetQueryDto(from, to, timeZone);
   }
 
-  static from(model: TimesheetQuery): TimesheetQueryDto {
+  static fromModel(model: TimesheetQuery): TimesheetQueryDto {
     return TimesheetQueryDto.create({
       from: model.from.toString(),
       to: model.to.toString(),
@@ -839,7 +839,7 @@ export class EstimateQueryDto {
     return new EstimateQueryDto(category, timeZone);
   }
 
-  static from(model: EstimateQuery): EstimateQueryDto {
+  static fromModel(model: EstimateQuery): EstimateQueryDto {
     return EstimateQueryDto.create({
       category: model.category,
       timeZone: model.timeZone?.toString(),
