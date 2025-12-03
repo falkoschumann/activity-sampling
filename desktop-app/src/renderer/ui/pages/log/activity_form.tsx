@@ -70,6 +70,7 @@ function ActivityFormComponent({
         title="Category"
         options={["", "Feature", "Rework", "Meeting", "Training"]}
         value={category}
+        isDisabled={isDisabled}
         onOptionChange={(option) => onTextChange("category", option)}
       />
       <button type="submit" disabled={isDisabled} className="btn btn-primary btn-sm w-100">
