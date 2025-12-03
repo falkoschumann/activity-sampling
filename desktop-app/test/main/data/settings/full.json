@@ -1,4 +1,5 @@
 {
   "dataDir": "other-data",
-  "capacity": "PT20H"
+  "capacity": "PT20H",
+  "categories": ["Category 1", "Category 2"]
 }

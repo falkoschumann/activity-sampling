@@ -505,6 +505,7 @@ export class StatisticsQueryResultDto {
   static create({
     histogram,
     median,
+    categories,
   }: {
     histogram: {
       binEdges: string[];
@@ -519,10 +520,12 @@ export class StatisticsQueryResultDto {
       edge75: number;
       edge100: number;
     };
+    categories: string[];
   }): StatisticsQueryResultDto {
     return new StatisticsQueryResultDto(
       HistogramDto.create(histogram),
       MedianDto.create(median),
+      categories,
     );
   }
 
@@ -530,21 +533,29 @@ export class StatisticsQueryResultDto {
     return StatisticsQueryResultDto.create({
       histogram: HistogramDto.from(model.histogram),
       median: MedianDto.from(model.median),
+      categories: model.categories,
     });
   }
 
   readonly histogram: HistogramDto;
   readonly median: MedianDto;
+  readonly categories: string[];
 
-  private constructor(histogram: HistogramDto, median: MedianDto) {
+  private constructor(
+    histogram: HistogramDto,
+    median: MedianDto,
+    categories: string[],
+  ) {
     this.histogram = histogram;
     this.median = median;
+    this.categories = categories;
   }
 
   validate(): StatisticsQueryResult {
     return StatisticsQueryResult.create({
       histogram: this.histogram.validate(),
       median: this.median.validate(),
+      categories: this.categories,
     });
   }
 }

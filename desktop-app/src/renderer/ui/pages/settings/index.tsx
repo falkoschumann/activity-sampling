@@ -66,6 +66,12 @@ export default function StatisticsPage() {
             onChange={(e) => changeCapacity(Number(e.target.value))}
           />
         </div>
+        <div className="mb-3">
+          <label htmlFor="capacity" className="form-label">
+            Capacity in hours per week
+          </label>
+          <input id="capacity" type="text" className="form-control" value="Feature, Rework, Meeting,Training" />
+        </div>
         <button type="submit" className="btn btn-primary">
           Apply
         </button>

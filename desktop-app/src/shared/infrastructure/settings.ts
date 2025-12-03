@@ -20,17 +20,20 @@ export class SettingsDto {
   static create({
     dataDir,
     capacity,
+    categories,
   }: {
     dataDir: string;
     capacity: string;
+    categories: string[];
   }): SettingsDto {
-    return new SettingsDto(dataDir, capacity);
+    return new SettingsDto(dataDir, capacity, categories);
   }
 
   static fromModel(model: Settings): SettingsDto {
     return SettingsDto.create({
       dataDir: model.dataDir,
       capacity: model.capacity.toString(),
+      categories: model.categories,
     });
   }
 
@@ -45,10 +48,12 @@ export class SettingsDto {
 
   readonly dataDir: string;
   readonly capacity: string;
+  readonly categories: string[];
 
-  private constructor(dataDir: string, capacity: string) {
+  private constructor(dataDir: string, capacity: string, categories: string[]) {
     this.dataDir = dataDir;
     this.capacity = capacity;
+    this.categories = categories;
   }
 
   validate(): Settings {

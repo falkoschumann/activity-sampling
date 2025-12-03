@@ -502,12 +502,20 @@ export async function projectStatistics({
 }): Promise<StatisticsQueryResult> {
   let xAxisLabel: string;
   let days: number[] = [];
+  const categories: string[] = [];
   const activities = await projectActivities(replay);
   if (query.scope === StatisticsScope.WORKING_HOURS) {
     xAxisLabel = "Duration (days)";
 
     const tasks: Record<string, Temporal.Duration> = {};
     for await (const activity of activities) {
+      if (
+        activity.category != null &&
+        !categories.includes(activity.category)
+      ) {
+        categories.push(activity.category);
+      }
+
       if (query.category != null && activity.category !== query.category) {
         continue;
       }
@@ -529,6 +537,13 @@ export async function projectStatistics({
   } else if (query.scope === StatisticsScope.CYCLE_TIMES) {
     xAxisLabel = "Cycle time (days)";
     for (const activity of activities) {
+      if (
+        activity.category != null &&
+        !categories.includes(activity.category)
+      ) {
+        categories.push(activity.category);
+      }
+
       if (query.category != null && activity.category !== query.category) {
         continue;
       }
@@ -606,6 +621,7 @@ export async function projectStatistics({
     edge100 = maxDay;
   }
 
+  categories.sort();
   return {
     histogram: {
       binEdges: binEdges.map((edge) => String(edge)),
@@ -614,6 +630,7 @@ export async function projectStatistics({
       yAxisLabel: "Number of Tasks",
     },
     median: { edge0, edge25, edge50, edge75, edge100 },
+    categories,
   };
 }
 

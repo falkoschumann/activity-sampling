@@ -379,6 +379,7 @@ class StatisticsDsl {
       frequencies: number[];
     };
     median?: number;
+    categories?: string[];
   }) {
     const histogram = args.histogram && {
       binEdges: args.histogram.binEdges,
@@ -396,8 +397,8 @@ class StatisticsDsl {
             edge100: 0,
           }
         : undefined;
-
-    this.#activitiesDriver.assertStatistics({ histogram, median });
+    const categories = args.categories ?? [];
+    this.#activitiesDriver.assertStatistics({ histogram, median, categories });
   }
 
   //
@@ -676,6 +677,11 @@ class ActivitiesDriver {
     if (result.median) {
       expect(this.#statisticsQueryResult?.median.edge50).toBe(
         result.median.edge50,
+      );
+    }
+    if (result.categories) {
+      expect(this.#statisticsQueryResult?.categories).toEqual<string[]>(
+        result.categories,
       );
     }
   }

@@ -397,13 +397,16 @@ export class StatisticsQueryResult {
   static create({
     histogram,
     median,
+    categories,
   }: {
     histogram: Histogram;
     median: Median;
+    categories: string[];
   }): StatisticsQueryResult {
     return new StatisticsQueryResult(
       Histogram.create(histogram),
       Median.create(median),
+      categories,
     );
   }
 
@@ -416,15 +419,22 @@ export class StatisticsQueryResult {
         yAxisLabel: "",
       }),
       median: { edge0: 0, edge25: 0, edge50: 0, edge75: 0, edge100: 0 },
+      categories: [],
     });
   }
 
   readonly histogram: Histogram;
   readonly median: Median;
+  readonly categories: string[];
 
-  private constructor(histogram: Histogram, median: Median) {
+  private constructor(
+    histogram: Histogram,
+    median: Median,
+    categories: string[],
+  ) {
     this.histogram = histogram;
     this.median = median;
+    this.categories = categories;
   }
 }
 

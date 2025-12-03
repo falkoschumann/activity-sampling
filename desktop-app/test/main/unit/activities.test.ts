@@ -516,6 +516,7 @@ describe("Activities", () => {
             edge75: 0,
             edge100: 0,
           },
+          categories: [],
         });
       });
 
@@ -524,14 +525,17 @@ describe("Activities", () => {
           ActivityLoggedEvent.createTestInstance({
             task: "Task A",
             duration: "PT24H", // 3 person days
+            category: "Category 2",
           }),
           ActivityLoggedEvent.createTestInstance({
             task: "Task B",
             duration: "PT40H", // 5 person days
+            category: "Category 2",
           }),
           ActivityLoggedEvent.createTestInstance({
             task: "Task C",
             duration: "PT16H", // 2 person days
+            category: "Category 1",
           }),
         ]);
 
@@ -554,6 +558,7 @@ describe("Activities", () => {
             edge75: 4,
             edge100: 5,
           },
+          categories: ["Category 1", "Category 2"],
         });
       });
 
@@ -562,18 +567,22 @@ describe("Activities", () => {
           ActivityLoggedEvent.createTestInstance({
             task: "Task A",
             duration: "PT24H", // 3 person days
+            category: "Category 2",
           }),
           ActivityLoggedEvent.createTestInstance({
             task: "Task B",
             duration: "PT40H", // 5 person days
+            category: "Category 1",
           }),
           ActivityLoggedEvent.createTestInstance({
             task: "Task C",
             duration: "PT32H", // 4 person days
+            category: "Category 1",
           }),
           ActivityLoggedEvent.createTestInstance({
             task: "Task D",
             duration: "PT4H", // 0.5 person days
+            category: "Category 2",
           }),
         ]);
 
@@ -596,6 +605,7 @@ describe("Activities", () => {
             edge75: 4,
             edge100: 5,
           },
+          categories: ["Category 1", "Category 2"],
         });
       });
 
@@ -604,22 +614,27 @@ describe("Activities", () => {
           ActivityLoggedEvent.createTestInstance({
             task: "Task A",
             duration: "PT24H", // 3 person days
+            category: "Category 3",
           }),
           ActivityLoggedEvent.createTestInstance({
             task: "Task B",
             duration: "PT40H", // 5 person days
+            category: "Category 2",
           }),
           ActivityLoggedEvent.createTestInstance({
             task: "Task C",
             duration: "PT32H", // 4 person days
+            category: "Category 1",
           }),
           ActivityLoggedEvent.createTestInstance({
             task: "Task D",
             duration: "PT8H", // 1 person days
+            category: "Category 3",
           }),
           ActivityLoggedEvent.createTestInstance({
             task: "Task E",
             duration: "PT16H", // 2 person days
+            category: "Category 2",
           }),
         ]);
 
@@ -642,6 +657,7 @@ describe("Activities", () => {
             edge75: 3.5,
             edge100: 5,
           },
+          categories: ["Category 1", "Category 2", "Category 3"],
         });
       });
 
@@ -691,6 +707,7 @@ describe("Activities", () => {
             edge75: 4,
             edge100: 5,
           },
+          categories: ["Category A", "Category B"],
         });
       });
     });
@@ -718,6 +735,7 @@ describe("Activities", () => {
             edge75: 0,
             edge100: 0,
           },
+          categories: [],
         });
       });
 
@@ -726,22 +744,27 @@ describe("Activities", () => {
           ActivityLoggedEvent.createTestInstance({
             dateTime: "2025-08-13T14:00",
             task: "Task A",
+            category: "Category 1",
           }),
           ActivityLoggedEvent.createTestInstance({
             dateTime: "2025-08-13T14:00",
             task: "Task B",
+            category: "Category 2",
           }),
           ActivityLoggedEvent.createTestInstance({
             dateTime: "2025-08-15T14:00",
             task: "Task C",
+            category: "Category 1",
           }),
           ActivityLoggedEvent.createTestInstance({
             dateTime: "2025-08-16T14:00",
             task: "Task A",
+            category: "Category 1",
           }),
           ActivityLoggedEvent.createTestInstance({
             dateTime: "2025-08-18T14:00",
             task: "Task B",
+            category: "Category 2",
           }),
         ]);
 
@@ -764,6 +787,7 @@ describe("Activities", () => {
             edge75: 5,
             edge100: 6,
           },
+          categories: ["Category 1", "Category 2"],
         });
       });
 
@@ -825,6 +849,7 @@ describe("Activities", () => {
             edge75: 5,
             edge100: 6,
           },
+          categories: ["Category A", "Category B"],
         });
       });
     });

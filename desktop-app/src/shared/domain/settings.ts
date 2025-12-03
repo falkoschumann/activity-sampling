@@ -6,11 +6,13 @@ export class Settings {
   static create({
     dataDir,
     capacity = "PT40H",
+    categories = ["", "Feature", "Rework"],
   }: {
     dataDir: string;
     capacity?: Temporal.DurationLike | string;
+    categories?: string[];
   }): Settings {
-    return new Settings(dataDir, capacity);
+    return new Settings(dataDir, capacity, categories);
   }
 
   static createDefault(): Settings {
@@ -19,12 +21,15 @@ export class Settings {
 
   readonly dataDir: string;
   readonly capacity: Temporal.Duration;
+  readonly categories: string[];
 
   private constructor(
     dataDir: string,
     capacity: Temporal.DurationLike | string,
+    categories: string[],
   ) {
     this.dataDir = dataDir;
     this.capacity = Temporal.Duration.from(capacity);
+    this.categories = categories;
   }
 }

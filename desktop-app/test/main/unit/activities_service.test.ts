@@ -188,16 +188,19 @@ describe("Activities service", () => {
             timestamp: "2025-10-13T11:00:00Z",
             task: "Task A",
             duration: "PT24H",
+            category: "Category 2",
           }),
           ActivityLoggedEventDto.createTestInstance({
             timestamp: "2025-10-14T13:00:00Z",
             task: "Task B",
             duration: "PT40H",
+            category: "Category 1",
           }),
           ActivityLoggedEventDto.createTestInstance({
             timestamp: "2025-10-15T13:00:00Z",
             task: "Task C",
             duration: "PT40H",
+            category: "Category 2",
           }),
         ],
       });
@@ -220,6 +223,7 @@ describe("Activities service", () => {
           edge75: 5,
           edge100: 5,
         },
+        categories: ["Category 1", "Category 2"],
       });
     });
 
@@ -229,18 +233,22 @@ describe("Activities service", () => {
           ActivityLoggedEventDto.createTestInstance({
             timestamp: "2025-08-13T12:00:00Z",
             task: "Task A",
+            category: "Category A",
           }),
           ActivityLoggedEventDto.createTestInstance({
             timestamp: "2025-08-13T12:00:00Z",
             task: "Task B",
+            category: "Category B",
           }),
           ActivityLoggedEventDto.createTestInstance({
             timestamp: "2025-08-16T12:00:00Z",
             task: "Task A",
+            category: "Category A",
           }),
           ActivityLoggedEventDto.createTestInstance({
             timestamp: "2025-08-18T12:00:00Z",
             task: "Task B",
+            category: "Category B",
           }),
         ],
       });
@@ -263,6 +271,7 @@ describe("Activities service", () => {
           edge75: 5,
           edge100: 6,
         },
+        categories: ["Category A", "Category B"],
       });
     });
   });

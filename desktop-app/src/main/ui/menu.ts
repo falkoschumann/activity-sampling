@@ -32,7 +32,7 @@ export function createMenu({
                   openWindow({
                     rendererFile: "settings.html",
                     width: 800,
-                    height: 300,
+                    height: 390,
                   }),
               },
               { type: "separator" },

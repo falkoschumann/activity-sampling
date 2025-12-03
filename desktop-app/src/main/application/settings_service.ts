@@ -7,6 +7,7 @@ import { Temporal } from "@js-temporal/polyfill";
 export interface SettingsChangedEventInit {
   readonly dataDir: string;
   readonly capacity: Temporal.Duration;
+  readonly categories: string[];
 }
 
 export class SettingsChangedEvent extends Event {
@@ -18,11 +19,13 @@ export class SettingsChangedEvent extends Event {
 
   readonly dataDir: string;
   readonly capacity: Temporal.Duration;
+  readonly categories: string[];
 
   constructor(type: string, eventInitDict: SettingsChangedEventInit) {
     super(type);
     this.dataDir = eventInitDict.dataDir;
     this.capacity = eventInitDict.capacity;
+    this.categories = eventInitDict.categories;
   }
 }
 

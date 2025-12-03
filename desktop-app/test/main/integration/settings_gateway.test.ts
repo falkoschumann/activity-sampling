@@ -66,6 +66,7 @@ describe("Settings gateway", () => {
         Settings.create({
           dataDir: "other-data",
           capacity: Temporal.Duration.from("PT20H"),
+          categories: ["Category 1", "Category 2"],
         }),
       );
     });
@@ -109,14 +110,22 @@ describe("Settings gateway", () => {
       it("should return configurable responses", async () => {
         const gateway = SettingsGateway.createNull({
           readFileResponses: [
-            SettingsDto.create({ dataDir: "data-dir", capacity: "PT40H" }),
+            SettingsDto.create({
+              dataDir: "data-dir",
+              capacity: "PT20H",
+              categories: ["category 1", "category 2"],
+            }),
           ],
         });
 
         const settings = await gateway.load();
 
         expect(settings).toEqual<Settings>(
-          Settings.create({ dataDir: "data-dir", capacity: "PT40H" }),
+          Settings.create({
+            dataDir: "data-dir",
+            capacity: "PT20H",
+            categories: ["category 1", "category 2"],
+          }),
         );
       });
 

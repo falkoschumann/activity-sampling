@@ -27,14 +27,22 @@ describe("Settings service", () => {
     it("should return stored settings", async () => {
       const { service } = configure({
         readFileResponses: [
-          SettingsDto.create({ dataDir: "test-data", capacity: "PT35H" }),
+          SettingsDto.create({
+            dataDir: "test-data",
+            capacity: "PT35H",
+            categories: ["test-category"],
+          }),
         ],
       });
 
       const settings = await service.loadSettings();
 
       expect(settings).toEqual<Settings>(
-        Settings.create({ dataDir: "test-data", capacity: "PT35H" }),
+        Settings.create({
+          dataDir: "test-data",
+          capacity: "PT35H",
+          categories: ["test-category"],
+        }),
       );
     });
   });

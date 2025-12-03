@@ -559,6 +559,7 @@ describe("Activity Sampling", () => {
             frequencies: [0, 0, 0, 1, 1],
           },
           median: 5,
+          categories: ["Category A", "Category B"],
         });
       });
     });
