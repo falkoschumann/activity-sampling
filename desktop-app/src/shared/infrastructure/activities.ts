@@ -881,24 +881,40 @@ export class EstimateQueryDto {
 export class EstimateQueryResultDto {
   static create({
     cycleTimes,
+    categories,
+    totalCount,
   }: {
     cycleTimes: EstimateEntryDto[];
+    categories: string[];
+    totalCount: number;
   }): EstimateQueryResultDto {
     return new EstimateQueryResultDto(
       cycleTimes.map((entry) => EstimateEntryDto.create(entry)),
+      categories,
+      totalCount,
     );
   }
 
   static fromModel(model: EstimateQueryResult): EstimateQueryResultDto {
     return EstimateQueryResultDto.create({
       cycleTimes: model.cycleTimes.map((entry) => EstimateEntryDto.from(entry)),
+      categories: model.categories,
+      totalCount: model.totalCount,
     });
   }
 
   readonly cycleTimes: EstimateEntryDto[];
+  readonly categories: string[];
+  readonly totalCount: number;
 
-  private constructor(cycleTimes: EstimateEntryDto[]) {
+  private constructor(
+    cycleTimes: EstimateEntryDto[],
+    categories: string[],
+    totalCount: number,
+  ) {
     this.cycleTimes = cycleTimes;
+    this.categories = categories;
+    this.totalCount = totalCount;
   }
 
   validate(): EstimateQueryResult {
@@ -906,6 +922,8 @@ export class EstimateQueryResultDto {
       cycleTimes: this.cycleTimes.map((entry) =>
         EstimateEntryDto.create(entry).validate(),
       ),
+      categories: this.categories,
+      totalCount: this.totalCount,
     });
   }
 }

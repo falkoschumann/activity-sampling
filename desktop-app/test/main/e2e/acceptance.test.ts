@@ -422,6 +422,7 @@ describe("Activity Sampling", () => {
             binEdges: ["0", "0.5", "1", "2", "3", "5"],
             frequencies: [0, 0, 0, 1, 2],
           },
+          totalCount: 3,
         });
       });
     });
@@ -455,6 +456,7 @@ describe("Activity Sampling", () => {
             binEdges: ["0", "1", "2", "3", "5", "8"],
             frequencies: [0, 0, 0, 1, 1],
           },
+          totalCount: 2,
         });
       });
     });
@@ -560,6 +562,7 @@ describe("Activity Sampling", () => {
           },
           median: 5,
           categories: ["Category A", "Category B"],
+          totalCount: 2,
         });
       });
     });
@@ -897,6 +900,7 @@ describe("Activity Sampling", () => {
               cumulativeProbability: 1.0,
             },
           ],
+          totalCount: 4,
         });
       });
     });
@@ -970,6 +974,8 @@ describe("Activity Sampling", () => {
               cumulativeProbability: 1.0,
             },
           ],
+          categories: ["Category A", "Category B"],
+          totalCount: 4,
         });
       });
     });

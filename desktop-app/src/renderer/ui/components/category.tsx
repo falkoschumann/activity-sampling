@@ -1,11 +1,11 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
-const categories = ["Feature", "Rework", "Meeting", "Training"];
-
 export default function CategoryComponent({
+  categories,
   value,
   onChange,
 }: {
+  categories: string[];
   value?: string;
   onChange: (category?: string) => void;
 }) {

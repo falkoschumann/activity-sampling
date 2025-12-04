@@ -8,6 +8,7 @@ import { Clock } from "../../../src/shared/common/temporal";
 import { ActivitiesService } from "../../../src/main/application/activities_service";
 import {
   ActivityLoggedEvent,
+  EstimateQueryResult,
   LogActivityCommand,
   RecentActivitiesQueryResult,
   ReportEntry,
@@ -324,29 +325,30 @@ describe("Activities service", () => {
   });
 
   describe("Query estimate", () => {
-    // TODO return known categories
-    // TODO add total count of tasks
     it("should return estimate", async () => {
       const { service } = configure({
         events: [
           ActivityLoggedEventDto.createTestInstance({
             timestamp: "2025-11-17T15:00:00Z",
             task: "Task A",
+            category: "Category A",
           }),
           ActivityLoggedEventDto.createTestInstance({
             timestamp: "2025-11-17T15:00:00Z",
             task: "Task B",
+            category: "Category B",
           }),
           ActivityLoggedEventDto.createTestInstance({
             timestamp: "2025-11-18T15:00:00Z",
             task: "Task A",
+            category: "Category A",
           }),
         ],
       });
 
       const result = await service.queryEstimate({});
 
-      expect(result).toEqual({
+      expect(result).toEqual<EstimateQueryResult>({
         cycleTimes: [
           {
             cycleTime: 1,
@@ -361,6 +363,8 @@ describe("Activities service", () => {
             cumulativeProbability: 1.0,
           },
         ],
+        categories: ["Category A", "Category B"],
+        totalCount: 2,
       });
     });
   });

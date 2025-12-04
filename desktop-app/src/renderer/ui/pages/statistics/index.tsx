@@ -5,10 +5,10 @@ import { useState } from "react";
 import { useStatistics } from "../../../application/activities_service";
 import { type StatisticsQuery, StatisticsScope } from "../../../../shared/domain/activities";
 import CategoryComponent from "../../components/category";
+import TotalCountComponent from "../../components/total_count_component";
 import HistogramComponent from "./histogram";
 import MedianComponent from "./median";
 import ScopeComponent from "./scope";
-import TotalCountComponent from "./total_count_component";
 
 export default function StatisticsPage() {
   const [query, setQuery] = useState<StatisticsQuery>({
@@ -22,7 +22,11 @@ export default function StatisticsPage() {
         <div className="container">
           <div className="btn-toolbar py-2 gap-2" role="toolbar" aria-label="Toolbar with query parameters">
             <ScopeComponent value={query.scope} onChange={(scope) => setQuery({ ...query, scope })} />
-            <CategoryComponent value={query.category} onChange={(category) => setQuery({ ...query, category })} />
+            <CategoryComponent
+              categories={statistics.categories}
+              value={query.category}
+              onChange={(category) => setQuery({ ...query, category })}
+            />
           </div>
         </div>
       </aside>

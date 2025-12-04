@@ -679,22 +679,42 @@ export class EstimateQuery {
 }
 
 export class EstimateQueryResult {
-  static create({ cycleTimes }: { cycleTimes: EstimateEntry[] }) {
+  static create({
+    cycleTimes,
+    categories,
+    totalCount,
+  }: {
+    cycleTimes: EstimateEntry[];
+    categories: string[];
+    totalCount: number;
+  }) {
     return new EstimateQueryResult(
       cycleTimes.map((entry) => EstimateEntry.create(entry)),
+      categories,
+      totalCount,
     );
   }
 
   static empty() {
     return EstimateQueryResult.create({
       cycleTimes: [],
+      categories: [],
+      totalCount: 0,
     });
   }
 
   readonly cycleTimes: EstimateEntry[];
+  readonly categories: string[];
+  readonly totalCount: number;
 
-  private constructor(cycleTimes: EstimateEntry[]) {
+  private constructor(
+    cycleTimes: EstimateEntry[],
+    categories: string[],
+    totalCount: number,
+  ) {
     this.cycleTimes = cycleTimes;
+    this.categories = categories;
+    this.totalCount = totalCount;
   }
 }
 

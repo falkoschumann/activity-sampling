@@ -12,6 +12,7 @@ import { ActivitiesService } from "../../../src/main/application/activities_serv
 import { TimerService } from "../../../src/main/application/timer_service";
 import {
   Capacity,
+  EstimateEntry,
   EstimateQuery,
   EstimateQueryResult,
   Histogram,
@@ -380,6 +381,7 @@ class StatisticsDsl {
     };
     median?: number;
     categories?: string[];
+    totalCount?: number;
   }) {
     const histogram = args.histogram && {
       binEdges: args.histogram.binEdges,
@@ -398,7 +400,13 @@ class StatisticsDsl {
           }
         : undefined;
     const categories = args.categories ?? [];
-    this.#activitiesDriver.assertStatistics({ histogram, median, categories });
+    const totalCount = args.totalCount;
+    this.#activitiesDriver.assertStatistics({
+      histogram,
+      median,
+      categories,
+      totalCount,
+    });
   }
 
   //
@@ -568,9 +576,17 @@ class EstimateDsl {
       probability: number;
       cumulativeProbability: number;
     }[];
+    categories?: string[];
+    totalCount?: number;
   }) {
     const cycleTimes = args.cycleTimes ?? [];
-    this.#activitiesDriver.assertEstimate({ cycleTimes });
+    const categories = args.categories ?? [];
+    const totalCount = args.totalCount;
+    this.#activitiesDriver.assertEstimate({
+      cycleTimes,
+      categories,
+      totalCount,
+    });
   }
 
   //
@@ -684,6 +700,9 @@ class ActivitiesDriver {
         result.categories,
       );
     }
+    if (result.totalCount) {
+      expect(this.#statisticsQueryResult?.totalCount).toBe(result.totalCount);
+    }
   }
 
   async queryTimesheet(query: TimesheetQuery) {
@@ -714,8 +733,20 @@ class ActivitiesDriver {
       await this.#activitiesService.queryEstimate(query);
   }
 
-  assertEstimate(result: EstimateQueryResult) {
-    expect(this.#estimateQueryResult).toEqual<EstimateQueryResult>(result);
+  assertEstimate(result: Partial<EstimateQueryResult>) {
+    if (result.cycleTimes) {
+      expect(this.#estimateQueryResult?.cycleTimes).toEqual<EstimateEntry[]>(
+        result.cycleTimes,
+      );
+    }
+    if (result.categories) {
+      expect(this.#estimateQueryResult?.categories).toEqual<string[]>(
+        result.categories,
+      );
+    }
+    if (result.totalCount != null) {
+      expect(this.#estimateQueryResult?.totalCount).toBe(result.totalCount);
+    }
   }
 
   //

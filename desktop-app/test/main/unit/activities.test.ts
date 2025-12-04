@@ -1187,7 +1187,11 @@ describe("Activities", () => {
         query: EstimateQuery.create({}),
       });
 
-      expect(result).toEqual<EstimateQueryResult>({ cycleTimes: [] });
+      expect(result).toEqual<EstimateQueryResult>({
+        cycleTimes: [],
+        categories: [],
+        totalCount: 0,
+      });
     });
 
     it("should calculate the probability of cycle times", async () => {
@@ -1195,26 +1199,32 @@ describe("Activities", () => {
         ActivityLoggedEvent.createTestInstance({
           dateTime: "2025-11-03T10:00",
           task: "Task A",
+          category: "Category 3",
         }),
         ActivityLoggedEvent.createTestInstance({
           dateTime: "2025-11-03T10:00",
           task: "Task B",
+          category: "Category 2",
         }),
         ActivityLoggedEvent.createTestInstance({
           dateTime: "2025-11-03T10:00",
           task: "Task C",
+          category: "Category 1",
         }),
         ActivityLoggedEvent.createTestInstance({
           dateTime: "2025-11-03T10:00",
           task: "Task D",
+          category: "Category 3",
         }),
         ActivityLoggedEvent.createTestInstance({
           dateTime: "2025-11-04T10:00",
           task: "Task C",
+          category: "Category 1",
         }),
         ActivityLoggedEvent.createTestInstance({
           dateTime: "2025-11-05T10:00",
           task: "Task D",
+          category: "Category 3",
         }),
       ]);
 
@@ -1244,6 +1254,8 @@ describe("Activities", () => {
             cumulativeProbability: 1.0,
           },
         ],
+        categories: ["Category 1", "Category 2", "Category 3"],
+        totalCount: 4,
       });
     });
 
@@ -1312,6 +1324,8 @@ describe("Activities", () => {
             cumulativeProbability: 1.0,
           },
         ],
+        categories: ["Category A", "Category B"],
+        totalCount: 4,
       });
     });
   });

@@ -756,12 +756,19 @@ export async function projectEstimate({
   query: EstimateQuery;
 }): Promise<EstimateQueryResult> {
   const cycleTimeCounts = new Map<number, number>();
+  const categories: string[] = [];
+  let totalCount = 0;
   const activities = await projectActivities(replay);
   for (const activity of activities) {
+    if (activity.category != null && !categories.includes(activity.category)) {
+      categories.push(activity.category);
+    }
+
     if (query.category != null && activity.category !== query.category) {
       continue;
     }
 
+    totalCount++;
     const cycleTimeDays =
       activity.finish.since(activity.start).total("days") + 1;
     const frequency = cycleTimeCounts.get(cycleTimeDays) ?? 0;
@@ -787,8 +794,11 @@ export async function projectEstimate({
     };
   });
 
+  categories.sort();
   return {
     cycleTimes,
+    categories,
+    totalCount,
   };
 }
 
