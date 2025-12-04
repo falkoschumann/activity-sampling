@@ -4,7 +4,7 @@ import { Temporal } from "@js-temporal/polyfill";
 
 import { useSettings } from "../../../application/settings_service";
 
-export default function StatisticsPage() {
+export default function SettingsPage() {
   const settings = useSettings();
 
   async function handleOpenDataDir() {
