@@ -8,6 +8,7 @@ import CategoryComponent from "../../components/category";
 import HistogramComponent from "./histogram";
 import MedianComponent from "./median";
 import ScopeComponent from "./scope";
+import TotalCountComponent from "./total_count_component";
 
 export default function StatisticsPage() {
   const [query, setQuery] = useState<StatisticsQuery>({
@@ -27,6 +28,7 @@ export default function StatisticsPage() {
       </aside>
       <main className="container my-4" style={{ paddingTop: "3rem" }}>
         <HistogramComponent histogram={statistics.histogram} />
+        <TotalCountComponent totalCount={statistics.totalCount} />
         <MedianComponent median={statistics.median} />
       </main>
     </>
