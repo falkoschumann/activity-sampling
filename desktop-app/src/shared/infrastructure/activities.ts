@@ -506,6 +506,7 @@ export class StatisticsQueryResultDto {
     histogram,
     median,
     categories,
+    totalCount,
   }: {
     histogram: {
       binEdges: string[];
@@ -521,11 +522,13 @@ export class StatisticsQueryResultDto {
       edge100: number;
     };
     categories: string[];
+    totalCount: number;
   }): StatisticsQueryResultDto {
     return new StatisticsQueryResultDto(
       HistogramDto.create(histogram),
       MedianDto.create(median),
       categories,
+      totalCount,
     );
   }
 
@@ -534,21 +537,25 @@ export class StatisticsQueryResultDto {
       histogram: HistogramDto.from(model.histogram),
       median: MedianDto.from(model.median),
       categories: model.categories,
+      totalCount: model.totalCount,
     });
   }
 
   readonly histogram: HistogramDto;
   readonly median: MedianDto;
   readonly categories: string[];
+  readonly totalCount: number;
 
   private constructor(
     histogram: HistogramDto,
     median: MedianDto,
     categories: string[],
+    totalCount: number,
   ) {
     this.histogram = histogram;
     this.median = median;
     this.categories = categories;
+    this.totalCount = totalCount;
   }
 
   validate(): StatisticsQueryResult {
@@ -556,6 +563,7 @@ export class StatisticsQueryResultDto {
       histogram: this.histogram.validate(),
       median: this.median.validate(),
       categories: this.categories,
+      totalCount: this.totalCount,
     });
   }
 }

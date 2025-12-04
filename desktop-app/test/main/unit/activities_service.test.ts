@@ -224,6 +224,7 @@ describe("Activities service", () => {
           edge100: 5,
         },
         categories: ["Category 1", "Category 2"],
+        totalCount: 3,
       });
     });
 
@@ -272,6 +273,7 @@ describe("Activities service", () => {
           edge100: 6,
         },
         categories: ["Category A", "Category B"],
+        totalCount: 2,
       });
     });
   });
@@ -322,6 +324,8 @@ describe("Activities service", () => {
   });
 
   describe("Query estimate", () => {
+    // TODO return known categories
+    // TODO add total count of tasks
     it("should return estimate", async () => {
       const { service } = configure({
         events: [

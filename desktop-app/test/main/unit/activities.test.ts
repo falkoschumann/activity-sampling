@@ -517,6 +517,7 @@ describe("Activities", () => {
             edge100: 0,
           },
           categories: [],
+          totalCount: 0,
         });
       });
 
@@ -559,6 +560,7 @@ describe("Activities", () => {
             edge100: 5,
           },
           categories: ["Category 1", "Category 2"],
+          totalCount: 3,
         });
       });
 
@@ -606,6 +608,7 @@ describe("Activities", () => {
             edge100: 5,
           },
           categories: ["Category 1", "Category 2"],
+          totalCount: 4,
         });
       });
 
@@ -658,6 +661,7 @@ describe("Activities", () => {
             edge100: 5,
           },
           categories: ["Category 1", "Category 2", "Category 3"],
+          totalCount: 5,
         });
       });
 
@@ -708,6 +712,7 @@ describe("Activities", () => {
             edge100: 5,
           },
           categories: ["Category A", "Category B"],
+          totalCount: 3,
         });
       });
     });
@@ -736,6 +741,7 @@ describe("Activities", () => {
             edge100: 0,
           },
           categories: [],
+          totalCount: 0,
         });
       });
 
@@ -788,6 +794,7 @@ describe("Activities", () => {
             edge100: 6,
           },
           categories: ["Category 1", "Category 2"],
+          totalCount: 3,
         });
       });
 
@@ -850,6 +857,7 @@ describe("Activities", () => {
             edge100: 6,
           },
           categories: ["Category A", "Category B"],
+          totalCount: 3,
         });
       });
     });

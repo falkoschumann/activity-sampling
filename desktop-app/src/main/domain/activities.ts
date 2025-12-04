@@ -22,6 +22,8 @@ import {
 } from "../../shared/domain/activities";
 import { Calendar, type Holiday, Vacation } from "./calendar";
 
+// TODO improve code coverage with unit tests
+
 export class Activity {
   static create({
     start,
@@ -503,7 +505,9 @@ export async function projectStatistics({
   let xAxisLabel: string;
   let days: number[] = [];
   const categories: string[] = [];
+  let totalCount = 0;
   const activities = await projectActivities(replay);
+  // TODO extract functions
   if (query.scope === StatisticsScope.WORKING_HOURS) {
     xAxisLabel = "Duration (days)";
 
@@ -520,6 +524,7 @@ export async function projectStatistics({
         continue;
       }
 
+      totalCount++;
       const hours = activity.hours;
       if (tasks[activity.task]) {
         tasks[activity.task] = normalizeDuration(
@@ -548,6 +553,7 @@ export async function projectStatistics({
         continue;
       }
 
+      totalCount++;
       const cycleTime = activity.finish.since(activity.start).total("days") + 1;
       days.push(cycleTime);
     }
@@ -631,6 +637,7 @@ export async function projectStatistics({
     },
     median: { edge0, edge25, edge50, edge75, edge100 },
     categories,
+    totalCount,
   };
 }
 
