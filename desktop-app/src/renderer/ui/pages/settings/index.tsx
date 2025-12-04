@@ -1,6 +1,6 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
-import { Temporal } from "@js-temporal/polyfill";
+import type { FormEvent } from "react";
 
 import { useSettings } from "../../../application/settings_service";
 
@@ -17,37 +17,28 @@ export default function SettingsPage() {
       return;
     }
 
-    changeDataDir(result.filePaths[0]);
+    settings.setDataDir(result.filePaths[0]);
   }
 
-  function changeDataDir(dataDir: string) {
-    settings.setCurrent((prevState) => ({ ...prevState, dataDir }));
-  }
-
-  function changeCapacity(hours: number) {
-    settings.setCurrent((prevState) => ({
-      ...prevState,
-      capacity: Temporal.Duration.from({
-        hours,
-      }),
-    }));
+  async function handleSubmit(event: FormEvent) {
+    event.preventDefault();
+    await settings.store();
   }
 
   return (
     <main className="container my-4">
-      <form onSubmit={() => settings.store()}>
+      <form onSubmit={handleSubmit}>
         <div className="mb-3">
-          <label htmlFor="dataDirectory" className="form-label">
+          <label htmlFor="dataDir" className="form-label">
             Data directory
           </label>
           <div className="d-flex gap-2">
             <input
-              id="dataDirectory"
+              id="dataDir"
               type="string"
               className="form-control"
-              aria-describedby="dataDirectoryHelp"
-              value={settings.current.dataDir}
-              onChange={(e) => changeDataDir(e.target.value)}
+              value={settings.dataDir}
+              onChange={(e) => settings.setDataDir(e.target.value)}
             />
             <button className="btn btn-primary" type="button" onClick={handleOpenDataDir}>
               Choose...
@@ -62,15 +53,21 @@ export default function SettingsPage() {
             id="capacity"
             type="number"
             className="form-control"
-            value={settings.current.capacity.total("hours")}
-            onChange={(e) => changeCapacity(Number(e.target.value))}
+            value={settings.capacity}
+            onChange={(e) => settings.setCapacity(Number(e.target.value))}
           />
         </div>
         <div className="mb-3">
-          <label htmlFor="capacity" className="form-label">
-            Capacity in hours per week
+          <label htmlFor="categories" className="form-label">
+            Categories
           </label>
-          <input id="capacity" type="text" className="form-control" value="Feature, Rework, Meeting,Training" />
+          <input
+            id="categories"
+            type="text"
+            className="form-control"
+            value={settings.categories}
+            onChange={(e) => settings.setCategories(e.target.value)}
+          />
         </div>
         <button type="submit" className="btn btn-primary">
           Apply

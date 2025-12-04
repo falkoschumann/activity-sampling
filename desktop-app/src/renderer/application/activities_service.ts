@@ -42,12 +42,14 @@ import {
   NotificationClickedEvent,
   NotificationGateway,
 } from "../infrastructure/notification_gateway";
+import { SettingsDto } from "../../shared/infrastructure/settings";
 
 export function useLog() {
   const [state, dispatch] = useReducer(reducer, initialState);
   const [recentActivities, setRecentActivities] = useState(
     RecentActivitiesQueryResult.empty(),
   );
+  const [categories, setCategories] = useState<string[]>([]);
 
   const handleQueryRecentActivities = useCallback(async () => {
     const result = await queryRecentActivities({});
@@ -87,6 +89,14 @@ export function useLog() {
 
   const handleActivitySelected = useCallback((activity: ActivityTemplate) => {
     dispatch(activitySelected(activity));
+  }, []);
+
+  useEffect(() => {
+    (async () => {
+      const dto = await window.activitySampling.loadSettings();
+      const settings = SettingsDto.create(dto).validate();
+      setCategories(settings.categories);
+    })();
   }, []);
 
   useEffect(() => {
@@ -135,6 +145,7 @@ export function useLog() {
   }, [handleQueryRecentActivities, state.countdown.interval]);
 
   return {
+    categories,
     state,
     dispatch,
     recentActivities,

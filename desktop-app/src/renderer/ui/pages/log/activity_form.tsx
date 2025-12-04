@@ -14,6 +14,7 @@ function ActivityFormComponent({
   project,
   task,
   notes,
+  categories,
   category,
   onTextChange,
   onSubmit,
@@ -23,6 +24,7 @@ function ActivityFormComponent({
   project: string;
   task: string;
   notes: string;
+  categories: string[];
   category: string;
   onTextChange: (name: keyof ActivityTemplate, text: string) => void;
   onSubmit: () => void;
@@ -68,7 +70,7 @@ function ActivityFormComponent({
       <FormSelectComponent
         name="category"
         title="Category"
-        options={["", "Feature", "Rework", "Meeting", "Training"]}
+        options={categories}
         value={category}
         isDisabled={isDisabled}
         onOptionChange={(option) => onTextChange("category", option)}

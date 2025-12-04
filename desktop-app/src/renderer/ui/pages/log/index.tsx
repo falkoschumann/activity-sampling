@@ -10,6 +10,7 @@ import WorkingDaysComponent from "./working_days";
 
 export default function LogPage() {
   const {
+    categories,
     state,
     dispatch,
     recentActivities,
@@ -24,7 +25,12 @@ export default function LogPage() {
     <>
       <ScrollToTopButton />
       <aside className="container my-4">
-        <ActivityFormComponent {...state.form} onTextChange={handleTextChange} onSubmit={handleSubmitActivity} />
+        <ActivityFormComponent
+          categories={categories}
+          {...state.form}
+          onTextChange={handleTextChange}
+          onSubmit={handleSubmitActivity}
+        />
         <CountdownComponent {...state.countdown} />
       </aside>
       <main className="container mt-4" style={{ paddingBottom: 80 }}>
