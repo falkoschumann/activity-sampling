@@ -99,6 +99,11 @@ export class ActivitiesService {
     return await projectStatistics({ replay, query });
   }
 
+  async queryEstimate(query: EstimateQuery): Promise<EstimateQueryResult> {
+    const replay = this.#replayTyped(this.#eventStore.replay(), query.timeZone);
+    return projectEstimate({ query, replay });
+  }
+
   async queryTimesheet(query: TimesheetQuery): Promise<TimesheetQueryResult> {
     const replay = this.#replayTyped(this.#eventStore.replay(), query.timeZone);
     const today = this.#today(query.timeZone);
@@ -118,11 +123,6 @@ export class ActivitiesService {
       vacations,
       capacity: this.#capacity,
     });
-  }
-
-  async queryEstimate(query: EstimateQuery): Promise<EstimateQueryResult> {
-    const replay = this.#replayTyped(this.#eventStore.replay(), query.timeZone);
-    return projectEstimate({ query, replay });
   }
 
   #today(timeZone?: Temporal.TimeZoneLike) {
