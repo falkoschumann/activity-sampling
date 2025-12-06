@@ -5,6 +5,10 @@ analysis.
 
 ## Domain
 
+Activities are grouped as tasks by client and project. A Task can have multiple
+categories. The time between start and finish of a task is called the cycle
+time.
+
 ![Domain](domain.png)
 
 ### Start Timer
