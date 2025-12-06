@@ -279,51 +279,6 @@ describe("Activities service", () => {
     });
   });
 
-  describe("Query timesheet", () => {
-    it("should return timesheet", async () => {
-      const { service } = configure({
-        events: [
-          ActivityLoggedEventDto.createTestInstance({
-            timestamp: "2025-06-10T15:00:00Z",
-            duration: "PT8H",
-          }),
-          ActivityLoggedEventDto.createTestInstance({
-            timestamp: "2025-06-11T15:00:00Z",
-            duration: "PT8H",
-          }),
-        ],
-        holidays: [
-          HolidayDto.create({ date: "2025-06-10", title: "Pfingstmontag" }),
-        ],
-        vacations: [],
-        fixedInstant: "2025-06-11T15:00:00Z",
-      });
-
-      const result = await service.queryTimesheet({
-        from: Temporal.PlainDate.from("2025-06-09"),
-        to: Temporal.PlainDate.from("2025-06-15"),
-      });
-
-      expect(result).toEqual<TimesheetQueryResult>({
-        entries: [
-          TimesheetEntry.createTestInstance({
-            date: Temporal.PlainDate.from("2025-06-10"),
-            hours: Temporal.Duration.from("PT8H"),
-          }),
-          TimesheetEntry.createTestInstance({
-            date: Temporal.PlainDate.from("2025-06-11"),
-            hours: Temporal.Duration.from("PT8H"),
-          }),
-        ],
-        totalHours: Temporal.Duration.from("PT16H"),
-        capacity: {
-          hours: Temporal.Duration.from("PT32H"),
-          offset: Temporal.Duration.from("PT0H"),
-        },
-      });
-    });
-  });
-
   describe("Query estimate", () => {
     it("should return estimate", async () => {
       const { service } = configure({
@@ -365,6 +320,51 @@ describe("Activities service", () => {
         ],
         categories: ["Category A", "Category B"],
         totalCount: 2,
+      });
+    });
+  });
+
+  describe("Query timesheet", () => {
+    it("should return timesheet", async () => {
+      const { service } = configure({
+        events: [
+          ActivityLoggedEventDto.createTestInstance({
+            timestamp: "2025-06-10T15:00:00Z",
+            duration: "PT8H",
+          }),
+          ActivityLoggedEventDto.createTestInstance({
+            timestamp: "2025-06-11T15:00:00Z",
+            duration: "PT8H",
+          }),
+        ],
+        holidays: [
+          HolidayDto.create({ date: "2025-06-10", title: "Pfingstmontag" }),
+        ],
+        vacations: [],
+        fixedInstant: "2025-06-11T15:00:00Z",
+      });
+
+      const result = await service.queryTimesheet({
+        from: Temporal.PlainDate.from("2025-06-09"),
+        to: Temporal.PlainDate.from("2025-06-15"),
+      });
+
+      expect(result).toEqual<TimesheetQueryResult>({
+        entries: [
+          TimesheetEntry.createTestInstance({
+            date: Temporal.PlainDate.from("2025-06-10"),
+            hours: Temporal.Duration.from("PT8H"),
+          }),
+          TimesheetEntry.createTestInstance({
+            date: Temporal.PlainDate.from("2025-06-11"),
+            hours: Temporal.Duration.from("PT8H"),
+          }),
+        ],
+        totalHours: Temporal.Duration.from("PT16H"),
+        capacity: {
+          hours: Temporal.Duration.from("PT32H"),
+          offset: Temporal.Duration.from("PT0H"),
+        },
       });
     });
   });
