@@ -137,7 +137,6 @@ export async function projectActivities(
         client: event.client,
         project: event.project,
         task: event.task,
-        notes: event.notes,
         category: event.category,
         hours: event.duration,
       });
@@ -480,11 +479,16 @@ export async function projectStatistics({
   replay: AsyncGenerator<ActivityLoggedEvent>;
   query: StatisticsQuery;
 }): Promise<StatisticsQueryResult> {
-  const activities = await projectActivities(replay);
+  let activities = await projectActivities(replay);
+  const categories = collectCategories();
+  activities = activities.filter(
+    (activity) =>
+      query.category == null || activity.category === query.category,
+  );
+
   let result: {
     xAxisLabel: string;
     days: number[];
-    categories: string[];
     totalCount: number;
   };
   if (query.scope === StatisticsScope.WORKING_HOURS) {
@@ -497,11 +501,23 @@ export async function projectStatistics({
 
   const histogram = createHistogram(result.xAxisLabel, result.days);
   const median = createMedian(result.days);
-  const categories = result.categories;
   const totalCount = result.totalCount;
 
-  categories.sort();
   return { histogram, median, categories, totalCount };
+
+  function collectCategories() {
+    const categories: string[] = [];
+    activities.forEach((activity) => {
+      if (
+        activity.category != null &&
+        !categories.includes(activity.category)
+      ) {
+        categories.push(activity.category);
+      }
+    });
+    categories.sort();
+    return categories;
+  }
 
   async function createWorkingHoursStatistics() {
     const xAxisLabel = "Duration (days)";
@@ -509,17 +525,6 @@ export async function projectStatistics({
     const tasks: Record<string, Temporal.Duration> = {};
     let totalCount = 0;
     for await (const activity of activities) {
-      if (
-        activity.category != null &&
-        !categories.includes(activity.category)
-      ) {
-        categories.push(activity.category);
-      }
-
-      if (query.category != null && activity.category !== query.category) {
-        continue;
-      }
-
       const hours = activity.hours;
       if (tasks[activity.task]) {
         tasks[activity.task] = normalizeDuration(
@@ -545,17 +550,6 @@ export async function projectStatistics({
     let totalCount = 0;
     let days: number[] = [];
     for (const activity of activities) {
-      if (
-        activity.category != null &&
-        !categories.includes(activity.category)
-      ) {
-        categories.push(activity.category);
-      }
-
-      if (query.category != null && activity.category !== query.category) {
-        continue;
-      }
-
       const cycleTime = activity.finish.since(activity.start).total("days") + 1;
       totalCount++;
       days.push(cycleTime);
