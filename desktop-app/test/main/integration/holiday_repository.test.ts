@@ -78,7 +78,7 @@ describe("Holiday repository", () => {
 
       const holidays = await repository.findAllByDate(
         "2025-04-21",
-        "2025-04-28",
+        "2025-04-27",
       );
 
       expect(holidays).toEqual<Holiday[]>([OSTERMONTAG]);
@@ -89,7 +89,7 @@ describe("Holiday repository", () => {
 
       const holidays = await repository.findAllByDate(
         "2025-04-14",
-        "2025-04-21",
+        "2025-04-20",
       );
 
       expect(holidays).toEqual<Holiday[]>([KARFREITAG, OSTERSONNTAG]);
@@ -107,7 +107,7 @@ describe("Holiday repository", () => {
       await repository.saveAll([KARFREITAG, OSTERSONNTAG]);
       const holidays = await repository.findAllByDate(
         "2025-04-14",
-        "2025-04-21",
+        "2025-04-20",
       );
 
       expect(holidays).toEqual<Holiday[]>([KARFREITAG, OSTERSONNTAG]);

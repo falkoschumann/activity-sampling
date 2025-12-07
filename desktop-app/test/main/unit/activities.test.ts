@@ -126,7 +126,7 @@ describe("Activities", () => {
       const activities = await projectActivities(
         replay,
         "2025-11-11",
-        "2025-11-14",
+        "2025-11-13",
       );
 
       expect(activities).toEqual<Activity[]>([

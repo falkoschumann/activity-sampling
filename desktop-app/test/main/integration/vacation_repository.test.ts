@@ -78,7 +78,7 @@ describe("Vacation repository", () => {
 
       const vacations = await repository.findAllByDate(
         "2025-09-08",
-        "2025-09-12",
+        "2025-09-11",
       );
 
       expect(vacations).toEqual<Vacation[]>([VACATION_DAY_1]);

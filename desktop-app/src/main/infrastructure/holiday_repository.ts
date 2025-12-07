@@ -82,14 +82,14 @@ export class HolidayRepository {
   }
 
   async findAllByDate(
-    startInclusive: Temporal.PlainDateLike | string,
-    endExclusive: Temporal.PlainDateLike | string,
+    from: Temporal.PlainDateLike | string,
+    to: Temporal.PlainDateLike | string,
   ): Promise<Holiday[]> {
     const holidays = await this.findAll();
     return holidays.filter(
       (holiday) =>
-        Temporal.PlainDate.compare(holiday.date, startInclusive) >= 0 &&
-        Temporal.PlainDate.compare(holiday.date, endExclusive) < 0,
+        Temporal.PlainDate.compare(holiday.date, from) >= 0 &&
+        Temporal.PlainDate.compare(holiday.date, to) <= 0,
     );
   }
 

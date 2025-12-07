@@ -22,8 +22,6 @@ import {
 } from "../../shared/domain/activities";
 import { Calendar, type Holiday, Vacation } from "./calendar";
 
-// TODO improve code coverage with unit tests
-
 export class Activity {
   static create({
     start,
@@ -119,19 +117,16 @@ export class Activity {
 
 export async function projectActivities(
   replay: AsyncGenerator<ActivityLoggedEvent>,
-  startInclusive?: Temporal.PlainDateLike | string,
-  endExclusive?: Temporal.PlainDateLike | string,
+  from?: Temporal.PlainDateLike | string,
+  to?: Temporal.PlainDateLike | string,
 ): Promise<Activity[]> {
   const activities: Activity[] = [];
   for await (const event of replay) {
     const date = event.dateTime.toPlainDate();
-    if (
-      startInclusive &&
-      Temporal.PlainDate.compare(date, startInclusive) < 0
-    ) {
+    if (from && Temporal.PlainDate.compare(date, from) < 0) {
       continue;
     }
-    if (endExclusive && Temporal.PlainDate.compare(date, endExclusive) >= 0) {
+    if (to && Temporal.PlainDate.compare(date, to) > 0) {
       continue;
     }
 
@@ -190,8 +185,8 @@ export async function projectRecentActivities({
   const thisWeekEnd = thisWeekStart.add("P6D");
   const thisMonthStart = today.with({ day: 1 });
   const nextMonthStart = thisMonthStart.add("P1M");
-  const startInclusive = today.subtract({ days: 30 });
-  const endExclusive = today.with({ day: today.daysInMonth }).add("P1D");
+  const from = today.subtract({ days: 30 });
+  const to = today.with({ day: today.daysInMonth });
 
   let workingDays: WorkingDay[] = [];
   let date: Temporal.PlainDate;
@@ -200,11 +195,7 @@ export async function projectRecentActivities({
   let hoursYesterday = Temporal.Duration.from("PT0S");
   let hoursThisWeek = Temporal.Duration.from("PT0S");
   let hoursThisMonth = Temporal.Duration.from("PT0S");
-  for await (const event of filterEvents(
-    replay,
-    startInclusive,
-    endExclusive,
-  )) {
+  for await (const event of filterEvents(replay, from, to)) {
     updateWorkingDays(event);
     updateTimeSummary(event);
   }
@@ -290,14 +281,8 @@ export async function projectReport({
   replay: AsyncGenerator<ActivityLoggedEvent>;
   query: ReportQuery;
 }): Promise<ReportQueryResult> {
-  const startInclusive = query.from;
-  const endExclusive = query.to ? query.to.add("P1D") : undefined;
   const scope = query.scope;
-  const activities = await projectActivities(
-    replay,
-    startInclusive,
-    endExclusive,
-  );
+  const activities = await projectActivities(replay, query.from, query.to);
   const entries = createEntries();
   const totalHours = calculateTotalHours();
   return {
@@ -732,17 +717,11 @@ export async function projectTimesheet({
   vacations?: Vacation[];
   capacity?: Temporal.DurationLike | string;
 }): Promise<TimesheetQueryResult> {
-  const startInclusive = query.from;
-  const endExclusive = query.to.add("P1D");
   const calendar = Calendar.create({ holidays, vacations, capacity });
 
   let entries: TimesheetEntry[] = [];
   let totalHours = Temporal.Duration.from("PT0S");
-  for await (const event of filterEvents(
-    replay,
-    startInclusive,
-    endExclusive,
-  )) {
+  for await (const event of filterEvents(replay, query.from, query.to)) {
     updateEntries(event);
     updateTotalHours(event);
   }
@@ -806,19 +785,19 @@ export async function projectTimesheet({
   }
 
   function determineCapacity(): Temporal.Duration {
-    return calendar.countWorkingHours(startInclusive, endExclusive);
+    return calendar.countWorkingHours(query.from, query.to);
   }
 
   function determineOffset(): Temporal.Duration {
     let end: Temporal.PlainDate;
-    if (Temporal.PlainDate.compare(today, startInclusive) < 0) {
-      end = startInclusive;
-    } else if (Temporal.PlainDate.compare(today, endExclusive) >= 0) {
-      end = endExclusive;
+    if (Temporal.PlainDate.compare(today, query.from) < 0) {
+      end = query.from;
+    } else if (Temporal.PlainDate.compare(today, query.to) > 0) {
+      end = query.to;
     } else {
-      end = today.add("P1D");
+      end = today;
     }
-    const businessDays = calendar.countWorkingHours(startInclusive, end);
+    const businessDays = calendar.countWorkingHours(query.from, end);
     const offset = totalHours.subtract(businessDays);
     return normalizeDuration(offset);
   }
@@ -826,18 +805,15 @@ export async function projectTimesheet({
 
 async function* filterEvents(
   replay: AsyncGenerator<ActivityLoggedEvent>,
-  startInclusive?: Temporal.PlainDate | Temporal.PlainDateLike | string,
-  endExclusive?: Temporal.PlainDate | Temporal.PlainDateLike | string,
+  from?: Temporal.PlainDate | Temporal.PlainDateLike | string,
+  to?: Temporal.PlainDate | Temporal.PlainDateLike | string,
 ): AsyncGenerator<ActivityLoggedEvent> {
   for await (const event of replay) {
     const date = event.dateTime.toPlainDate();
-    if (
-      startInclusive &&
-      Temporal.PlainDate.compare(date, startInclusive) < 0
-    ) {
+    if (from && Temporal.PlainDate.compare(date, from) < 0) {
       continue;
     }
-    if (endExclusive && Temporal.PlainDate.compare(date, endExclusive) >= 0) {
+    if (to && Temporal.PlainDate.compare(date, to) > 0) {
       continue;
     }
 

@@ -9,7 +9,7 @@ describe("Calendar", () => {
   it("should count business hours", () => {
     const calendar = Calendar.create();
 
-    const hours = calendar.countWorkingHours("2025-06-01", "2025-07-01");
+    const hours = calendar.countWorkingHours("2025-06-01", "2025-06-30");
 
     expect(hours).toEqual<Temporal.Duration>(Temporal.Duration.from("PT168H"));
   });
@@ -21,7 +21,7 @@ describe("Calendar", () => {
       ],
     });
 
-    const hours = calendar.countWorkingHours("2025-06-01", "2025-07-01");
+    const hours = calendar.countWorkingHours("2025-06-01", "2025-06-30");
 
     expect(hours).toEqual<Temporal.Duration>(Temporal.Duration.from("PT160H"));
   });

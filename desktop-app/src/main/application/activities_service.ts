@@ -109,11 +109,11 @@ export class ActivitiesService {
     const today = this.#today(query.timeZone);
     const holidays = await this.#holidayRepository.findAllByDate(
       query.from,
-      query.to.add("P1D"),
+      query.to,
     );
     const vacations = await this.#vacationRepository.findAllByDate(
       query.from,
-      query.to.add("P1D"),
+      query.to,
     );
     return projectTimesheet({
       replay,

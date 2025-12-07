@@ -80,14 +80,14 @@ export class VacationRepository {
   }
 
   async findAllByDate(
-    startInclusive: Temporal.PlainDateLike | string,
-    endExclusive: Temporal.PlainDateLike | string,
+    from: Temporal.PlainDateLike | string,
+    to: Temporal.PlainDateLike | string,
   ): Promise<Vacation[]> {
     const vacations = await this.findAll();
     return vacations.filter(
       (vacation) =>
-        Temporal.PlainDate.compare(vacation.date, startInclusive) >= 0 &&
-        Temporal.PlainDate.compare(vacation.date, endExclusive) < 0,
+        Temporal.PlainDate.compare(vacation.date, from) >= 0 &&
+        Temporal.PlainDate.compare(vacation.date, to) <= 0,
     );
   }
 

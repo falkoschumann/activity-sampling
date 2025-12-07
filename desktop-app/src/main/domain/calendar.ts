@@ -91,18 +91,18 @@ export class Calendar {
   }
 
   countWorkingHours(
-    startInclusive: Temporal.PlainDateLike | string,
-    endExclusive: Temporal.PlainDateLike | string,
+    from: Temporal.PlainDateLike | string,
+    to: Temporal.PlainDateLike | string,
   ) {
-    let date = Temporal.PlainDate.from(startInclusive);
-    const end = Temporal.PlainDate.from(endExclusive);
+    let date = Temporal.PlainDate.from(from);
+    const end = Temporal.PlainDate.from(to);
     let count = Temporal.Duration.from("PT0H");
     const hoursPerDay = Temporal.Duration.from({
       seconds: Math.round(
         this.#capacity.total("seconds") / this.#businessDays.length,
       ),
     });
-    while (Temporal.PlainDate.compare(date, end) === -1) {
+    while (Temporal.PlainDate.compare(date, end) <= 0) {
       if (this.#isBusinessDay(date)) {
         let hours = hoursPerDay;
 
