@@ -121,15 +121,8 @@ export async function projectActivities(
   to?: Temporal.PlainDateLike | string,
 ): Promise<Activity[]> {
   const activities: Activity[] = [];
-  for await (const event of replay) {
+  for await (const event of filterEvents(replay, from, to)) {
     const date = event.dateTime.toPlainDate();
-    if (from && Temporal.PlainDate.compare(date, from) < 0) {
-      continue;
-    }
-    if (to && Temporal.PlainDate.compare(date, to) > 0) {
-      continue;
-    }
-
     const index = activities.findIndex(
       (activity) =>
         activity.client === event.client &&
@@ -582,70 +575,78 @@ export async function projectStatistics({
     categories,
     totalCount,
   };
-}
 
-async function createWorkingHoursStatistics(
-  replay: AsyncGenerator<ActivityLoggedEvent>,
-  query: StatisticsQuery,
-) {
-  const xAxisLabel = "Duration (days)";
+  async function createWorkingHoursStatistics(
+    replay: AsyncGenerator<ActivityLoggedEvent>,
+    query: StatisticsQuery,
+  ) {
+    const xAxisLabel = "Duration (days)";
 
-  const activities = await projectActivities(replay);
-  const categories: string[] = [];
-  const tasks: Record<string, Temporal.Duration> = {};
-  let totalCount = 0;
-  for await (const activity of activities) {
-    if (activity.category != null && !categories.includes(activity.category)) {
-      categories.push(activity.category);
+    const activities = await projectActivities(replay);
+    const categories: string[] = [];
+    const tasks: Record<string, Temporal.Duration> = {};
+    let totalCount = 0;
+    for await (const activity of activities) {
+      if (
+        activity.category != null &&
+        !categories.includes(activity.category)
+      ) {
+        categories.push(activity.category);
+      }
+
+      if (query.category != null && activity.category !== query.category) {
+        continue;
+      }
+
+      const hours = activity.hours;
+      if (tasks[activity.task]) {
+        tasks[activity.task] = normalizeDuration(
+          tasks[activity.task].add(hours),
+        );
+      } else {
+        tasks[activity.task] = normalizeDuration(hours);
+      }
+      totalCount++;
     }
 
-    if (query.category != null && activity.category !== query.category) {
-      continue;
-    }
+    const days = Object.values(tasks)
+      .map((duration) => duration.total("hours"))
+      .map((hours) => hours / 8)
+      .sort((a, b) => a - b);
 
-    const hours = activity.hours;
-    if (tasks[activity.task]) {
-      tasks[activity.task] = normalizeDuration(tasks[activity.task].add(hours));
-    } else {
-      tasks[activity.task] = normalizeDuration(hours);
-    }
-    totalCount++;
+    return { xAxisLabel, days, categories, totalCount };
   }
 
-  const days = Object.values(tasks)
-    .map((duration) => duration.total("hours"))
-    .map((hours) => hours / 8)
-    .sort((a, b) => a - b);
+  async function createCycleTimesStatistics(
+    replay: AsyncGenerator<ActivityLoggedEvent>,
+    query: StatisticsQuery,
+  ) {
+    const xAxisLabel = "Cycle time (days)";
 
-  return { xAxisLabel, days, categories, totalCount };
-}
+    const activities = await projectActivities(replay);
+    const categories: string[] = [];
+    let totalCount = 0;
+    let days: number[] = [];
+    for (const activity of activities) {
+      if (
+        activity.category != null &&
+        !categories.includes(activity.category)
+      ) {
+        categories.push(activity.category);
+      }
 
-async function createCycleTimesStatistics(
-  replay: AsyncGenerator<ActivityLoggedEvent>,
-  query: StatisticsQuery,
-) {
-  const xAxisLabel = "Cycle time (days)";
+      if (query.category != null && activity.category !== query.category) {
+        continue;
+      }
 
-  const activities = await projectActivities(replay);
-  const categories: string[] = [];
-  let totalCount = 0;
-  let days: number[] = [];
-  for (const activity of activities) {
-    if (activity.category != null && !categories.includes(activity.category)) {
-      categories.push(activity.category);
+      const cycleTime = activity.finish.since(activity.start).total("days") + 1;
+      totalCount++;
+      days.push(cycleTime);
     }
+    days = Object.values(days).sort((a, b) => a - b);
 
-    if (query.category != null && activity.category !== query.category) {
-      continue;
-    }
-
-    const cycleTime = activity.finish.since(activity.start).total("days") + 1;
-    totalCount++;
-    days.push(cycleTime);
+    return { xAxisLabel, days, categories, totalCount };
   }
-  days = Object.values(days).sort((a, b) => a - b);
-
-  return { xAxisLabel, days, categories, totalCount };
 }
 
 export async function projectEstimate({
