@@ -480,6 +480,7 @@ export async function projectStatistics({
   replay: AsyncGenerator<ActivityLoggedEvent>;
   query: StatisticsQuery;
 }): Promise<StatisticsQueryResult> {
+  const activities = await projectActivities(replay);
   let result: {
     xAxisLabel: string;
     days: number[];
@@ -487,102 +488,23 @@ export async function projectStatistics({
     totalCount: number;
   };
   if (query.scope === StatisticsScope.WORKING_HOURS) {
-    result = await createWorkingHoursStatistics(replay, query);
+    result = await createWorkingHoursStatistics();
   } else if (query.scope === StatisticsScope.CYCLE_TIMES) {
-    result = await createCycleTimesStatistics(replay, query);
+    result = await createCycleTimesStatistics();
   } else {
     throw new Error(`Unknown statistics for ${query.scope}.`);
   }
-  const xAxisLabel = result.xAxisLabel;
-  const days = result.days;
+
+  const histogram = createHistogram(result.xAxisLabel, result.days);
+  const median = createMedian(result.days);
   const categories = result.categories;
   const totalCount = result.totalCount;
 
-  const maxDay = result.days.at(-1) ?? 0;
-
-  const binEdges: number[] = [];
-  const frequencies: number[] = [];
-  let i = 0;
-  while (i < Math.ceil(maxDay)) {
-    if (i === 0) {
-      binEdges.push(0);
-      frequencies.push(0);
-      if (query.scope === StatisticsScope.WORKING_HOURS) {
-        binEdges.push(0.5);
-        frequencies.push(0);
-      }
-      binEdges.push(1);
-      frequencies.push(0);
-      binEdges.push(2);
-      i = 2;
-    } else {
-      i = binEdges.at(-2)! + binEdges.at(-1)!;
-      frequencies.push(0);
-      binEdges.push(i);
-    }
-  }
-
-  for (const day of days) {
-    for (let i = 0; i < binEdges.length - 1; i++) {
-      if (binEdges[i] < day && day <= binEdges[i + 1]) {
-        frequencies[i]++;
-        break;
-      }
-    }
-  }
-
-  const edge0 = 0;
-  let edge25 = 0;
-  let edge50 = 0;
-  let edge75 = 0;
-  let edge100 = 0;
-  if (days.length > 0) {
-    const i25 = Math.max(0, days.length * 0.25 - 1);
-    if (Number.isInteger(i25)) {
-      edge25 = days[i25];
-    } else {
-      edge25 = (days[Math.floor(i25)] + days[Math.ceil(i25)]) / 2;
-    }
-    edge25 = Math.round(edge25 * 10) / 10;
-
-    if (days.length % 2 === 0) {
-      edge50 = (days[days.length / 2 - 1] + days[days.length / 2]) / 2;
-    } else {
-      edge50 = days[Math.floor(days.length / 2)];
-    }
-    edge50 = Math.round(edge50 * 10) / 10;
-
-    const i75 = days.length * 0.75 - 1;
-    if (Number.isInteger(i75)) {
-      edge75 = days[i75];
-    } else {
-      edge75 = (days[Math.floor(i75)] + days[Math.ceil(i75)]) / 2;
-    }
-    edge75 = Math.round(edge75 * 10) / 10;
-
-    edge100 = maxDay;
-  }
-
   categories.sort();
-  return {
-    histogram: {
-      binEdges: binEdges.map((edge) => String(edge)),
-      frequencies,
-      xAxisLabel,
-      yAxisLabel: "Number of Tasks",
-    },
-    median: { edge0, edge25, edge50, edge75, edge100 },
-    categories,
-    totalCount,
-  };
+  return { histogram, median, categories, totalCount };
 
-  async function createWorkingHoursStatistics(
-    replay: AsyncGenerator<ActivityLoggedEvent>,
-    query: StatisticsQuery,
-  ) {
+  async function createWorkingHoursStatistics() {
     const xAxisLabel = "Duration (days)";
-
-    const activities = await projectActivities(replay);
     const categories: string[] = [];
     const tasks: Record<string, Temporal.Duration> = {};
     let totalCount = 0;
@@ -617,13 +539,8 @@ export async function projectStatistics({
     return { xAxisLabel, days, categories, totalCount };
   }
 
-  async function createCycleTimesStatistics(
-    replay: AsyncGenerator<ActivityLoggedEvent>,
-    query: StatisticsQuery,
-  ) {
+  async function createCycleTimesStatistics() {
     const xAxisLabel = "Cycle time (days)";
-
-    const activities = await projectActivities(replay);
     const categories: string[] = [];
     let totalCount = 0;
     let days: number[] = [];
@@ -646,6 +563,84 @@ export async function projectStatistics({
     days = Object.values(days).sort((a, b) => a - b);
 
     return { xAxisLabel, days, categories, totalCount };
+  }
+
+  function createHistogram(xAxisLabel: string, days: number[]) {
+    const maxDay = days.at(-1) ?? 0;
+    const binEdges: number[] = [];
+    const frequencies: number[] = [];
+    let i = 0;
+    while (i < Math.ceil(maxDay)) {
+      if (i === 0) {
+        binEdges.push(0);
+        frequencies.push(0);
+        if (query.scope === StatisticsScope.WORKING_HOURS) {
+          binEdges.push(0.5);
+          frequencies.push(0);
+        }
+        binEdges.push(1);
+        frequencies.push(0);
+        binEdges.push(2);
+        i = 2;
+      } else {
+        i = binEdges.at(-2)! + binEdges.at(-1)!;
+        frequencies.push(0);
+        binEdges.push(i);
+      }
+    }
+
+    for (const day of days) {
+      for (let i = 0; i < binEdges.length - 1; i++) {
+        if (binEdges[i] < day && day <= binEdges[i + 1]) {
+          frequencies[i]++;
+          break;
+        }
+      }
+    }
+
+    return {
+      binEdges: binEdges.map((edge) => String(edge)),
+      frequencies,
+      xAxisLabel,
+      yAxisLabel: "Number of Tasks",
+    };
+  }
+
+  function createMedian(days: number[]) {
+    const maxDay = days.at(-1) ?? 0;
+    const edge0 = 0;
+    let edge25 = 0;
+    let edge50 = 0;
+    let edge75 = 0;
+    let edge100 = 0;
+    if (days.length > 0) {
+      const i25 = Math.max(0, days.length * 0.25 - 1);
+      if (Number.isInteger(i25)) {
+        edge25 = days[i25];
+      } else {
+        edge25 = (days[Math.floor(i25)] + days[Math.ceil(i25)]) / 2;
+      }
+      edge25 = Math.round(edge25 * 10) / 10;
+
+      if (days.length % 2 === 0) {
+        edge50 = (days[days.length / 2 - 1] + days[days.length / 2]) / 2;
+      } else {
+        edge50 = days[Math.floor(days.length / 2)];
+      }
+      edge50 = Math.round(edge50 * 10) / 10;
+
+      const i75 = days.length * 0.75 - 1;
+      if (Number.isInteger(i75)) {
+        edge75 = days[i75];
+      } else {
+        edge75 = (days[Math.floor(i75)] + days[Math.ceil(i75)]) / 2;
+      }
+      edge75 = Math.round(edge75 * 10) / 10;
+
+      edge100 = maxDay;
+    }
+
+    return { edge0, edge25, edge50, edge75, edge100 };
   }
 }
 
