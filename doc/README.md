@@ -5,10 +5,6 @@ analysis.
 
 ## Domain
 
-Activities are grouped as tasks by client and project. A Task can have multiple
-categories. The time between start and finish of a task is called the cycle
-time.
-
 ![Domain](domain.png)
 
 ### Start Timer
@@ -33,17 +29,17 @@ time.
 ### Recent Activities
 
 - [x] Group activities by working days for the last 30 days
-- [x] Summarize hours worked today, yesterday, this week and this month
+- [x] Summarise hours worked today, yesterday, this week and this month
 
 ### Reports
 
-- [x] Summarize hours worked for clients
-- [x] Summarize hours worked on projects
-- [x] Summarize hours worked on tasks
-- [x] Summarize hours worked on categories
-- [ ] Summarize hours worked for team members
-- [x] Summarize the total hours worked
-- [x] Summarize in a period
+- [x] Summarise hours worked for clients
+- [x] Summarise hours worked on projects
+- [x] Summarise hours worked on tasks
+- [x] Summarise hours worked on categories
+- [ ] Summarise hours worked for team members
+- [x] Summarise the total hours worked
+- [x] Summarise in a period
 - [ ] Determine throughput in a period
 - [ ] Create cumulative flow diagram with cycle time, throughput and WIP
 - [ ] Optionally aggregate clients of same project
@@ -66,9 +62,9 @@ time.
 
 ### Timesheet
 
-- [x] Summarize hours worked on tasks
-- [x] Summarize the total hours worked
-- [x] Summarize in a period
+- [x] Summarise hours worked on tasks
+- [x] Summarise the total hours worked
+- [x] Summarise in a period
 - [x] Compare with capacity
 - [x] Take holidays into account
 - [x] Take vacation into account
