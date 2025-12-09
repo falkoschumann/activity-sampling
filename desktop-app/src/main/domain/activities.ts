@@ -29,7 +29,6 @@ export class Activity {
     client,
     project,
     task,
-    notes,
     category,
     hours,
   }: {
@@ -38,20 +37,10 @@ export class Activity {
     client: string;
     project: string;
     task: string;
-    notes?: string;
     category?: string;
     hours: Temporal.DurationLike | string;
   }): Activity {
-    return new Activity(
-      start,
-      finish,
-      client,
-      project,
-      task,
-      hours,
-      notes,
-      category,
-    );
+    return new Activity(start, finish, client, project, task, hours, category);
   }
 
   static createTestInstance({
@@ -60,7 +49,6 @@ export class Activity {
     client = "Test client",
     project = "Test project",
     task = "Test task",
-    notes,
     category,
     hours = "PT30M",
   }: {
@@ -69,7 +57,6 @@ export class Activity {
     client?: string;
     project?: string;
     task?: string;
-    notes?: string;
     category?: string;
     hours?: Temporal.DurationLike | string;
   } = {}): Activity {
@@ -79,7 +66,6 @@ export class Activity {
       client,
       project,
       task,
-      notes,
       category,
       hours,
     });
@@ -90,7 +76,6 @@ export class Activity {
   readonly client: string;
   readonly project: string;
   readonly task: string;
-  readonly notes?: string;
   readonly category?: string;
   readonly hours: Temporal.Duration;
 
@@ -101,7 +86,6 @@ export class Activity {
     project: string,
     task: string,
     hours: Temporal.DurationLike | string,
-    notes?: string,
     category?: string,
   ) {
     this.start = Temporal.PlainDate.from(start);
@@ -109,7 +93,6 @@ export class Activity {
     this.client = client;
     this.project = project;
     this.task = task;
-    this.notes = notes;
     this.category = category;
     this.hours = Temporal.Duration.from(hours);
   }
