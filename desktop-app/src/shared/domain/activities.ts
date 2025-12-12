@@ -277,10 +277,10 @@ export class ReportEntry {
   static create({
     start,
     finish,
-    client = "",
-    project = "",
-    task = "",
-    category = "",
+    client = "N/A",
+    project = "N/A",
+    task = "N/A",
+    category = "N/A",
     hours,
     cycleTime,
   }: {

@@ -51,9 +51,7 @@ export default function TimeReportComponent({ scope, entries }: { scope: ReportS
                 <td>{entry.category}</td>
               </>
             )}
-            {scope === ReportScope.CATEGORIES && (
-              <td className="text-nowrap">{entry.category.length > 0 ? entry.category : "N/A"}</td>
-            )}
+            {scope === ReportScope.CATEGORIES && <td className="text-nowrap">{entry.category}</td>}
             <td>{formatDuration(entry.hours)}</td>
             <td className="text-nowrap">{entry.cycleTime} days</td>
           </tr>

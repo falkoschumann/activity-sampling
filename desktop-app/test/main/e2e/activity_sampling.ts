@@ -324,10 +324,10 @@ class ReportsDsl {
     const entries = args.entries?.map((entry) => ({
       start: Temporal.PlainDate.from(entry.start ?? "2025-08-14"),
       finish: Temporal.PlainDate.from(entry.finish ?? "2025-08-14"),
-      client: entry.client ?? "",
-      project: entry.project ?? "",
-      task: entry.task ?? "",
-      category: entry.category ?? "",
+      client: entry.client ?? "N/A",
+      project: entry.project ?? "N/A",
+      task: entry.task ?? "N/A",
+      category: entry.category ?? "N/A",
       hours: Temporal.Duration.from(entry.hours ?? "PT6H"),
       cycleTime: entry.cycleTime ?? 1,
     }));
