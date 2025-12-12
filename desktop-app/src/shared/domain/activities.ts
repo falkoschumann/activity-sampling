@@ -368,27 +368,27 @@ export type StatisticsScopeType =
 export class StatisticsQuery {
   static create({
     scope,
-    category,
+    categories,
     timeZone,
   }: {
     scope: StatisticsScopeType;
-    category?: string;
+    categories?: string[];
     timeZone?: Temporal.TimeZoneLike;
   }): StatisticsQuery {
-    return new StatisticsQuery(scope, category, timeZone);
+    return new StatisticsQuery(scope, categories, timeZone);
   }
 
   readonly scope: StatisticsScopeType;
-  readonly category?: string;
+  readonly categories?: string[];
   readonly timeZone?: Temporal.TimeZoneLike;
 
   private constructor(
     scope: StatisticsScopeType,
-    category?: string,
+    categories?: string[],
     timeZone?: Temporal.TimeZoneLike,
   ) {
     this.scope = scope;
-    this.category = category;
+    this.categories = categories;
     this.timeZone = timeZone;
   }
 }
@@ -660,20 +660,20 @@ export class Capacity {
 
 export class EstimateQuery {
   static create({
-    category,
+    categories,
     timeZone,
   }: {
-    category?: string;
+    categories?: string[];
     timeZone?: Temporal.TimeZoneLike;
   }) {
-    return new EstimateQuery(category, timeZone);
+    return new EstimateQuery(categories, timeZone);
   }
 
-  readonly category?: string;
+  readonly categories?: string[];
   readonly timeZone?: Temporal.TimeZoneLike;
 
-  private constructor(category?: string, timeZone?: Temporal.TimeZoneLike) {
-    this.category = category;
+  private constructor(categories?: string[], timeZone?: Temporal.TimeZoneLike) {
+    this.categories = categories;
     this.timeZone = timeZone;
   }
 }

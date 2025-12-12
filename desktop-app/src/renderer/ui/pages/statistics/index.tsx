@@ -24,8 +24,8 @@ export default function StatisticsPage() {
             <ScopeComponent value={query.scope} onChange={(scope) => setQuery({ ...query, scope })} />
             <CategoryComponent
               categories={statistics.categories}
-              value={query.category}
-              onChange={(category) => setQuery({ ...query, category })}
+              value={query.categories}
+              onChange={(categories) => setQuery({ ...query, categories })}
             />
           </div>
         </div>

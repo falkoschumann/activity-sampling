@@ -693,7 +693,7 @@ describe("Activities", () => {
           replay,
           query: {
             scope: StatisticsScope.WORKING_HOURS,
-            category: "Category A",
+            categories: ["Category A"],
           },
         });
 
@@ -839,7 +839,10 @@ describe("Activities", () => {
 
         const result = await projectStatistics({
           replay,
-          query: { scope: StatisticsScope.CYCLE_TIMES, category: "Category A" },
+          query: {
+            scope: StatisticsScope.CYCLE_TIMES,
+            categories: ["Category A"],
+          },
         });
 
         expect(result).toEqual<StatisticsQueryResult>({
@@ -1259,6 +1262,50 @@ describe("Activities", () => {
       });
     });
 
+    it("should join the cycle time of an activity with multiple categories", async () => {
+      const replay = createAsyncGenerator([
+        ActivityLoggedEvent.createTestInstance({
+          dateTime: "2025-11-03T10:00",
+          task: "Task A",
+          category: "Category 1",
+        }),
+        ActivityLoggedEvent.createTestInstance({
+          dateTime: "2025-11-03T10:00",
+          task: "Task B",
+          category: "Category 2",
+        }),
+        ActivityLoggedEvent.createTestInstance({
+          dateTime: "2025-11-04T10:00",
+          task: "Task A",
+          category: "Category 2",
+        }),
+      ]);
+
+      const result = await projectEstimate({
+        replay,
+        query: EstimateQuery.create({}),
+      });
+
+      expect(result).toEqual<EstimateQueryResult>({
+        cycleTimes: [
+          {
+            cycleTime: 1,
+            frequency: 1,
+            probability: 0.5,
+            cumulativeProbability: 0.5,
+          },
+          {
+            cycleTime: 2,
+            frequency: 1,
+            probability: 0.5,
+            cumulativeProbability: 1.0,
+          },
+        ],
+        categories: ["Category 1", "Category 2"],
+        totalCount: 2,
+      });
+    });
+
     it("should filter by category when category is provided", async () => {
       const replay = createAsyncGenerator([
         ActivityLoggedEvent.createTestInstance({
@@ -1272,35 +1319,20 @@ describe("Activities", () => {
           category: "Category A",
         }),
         ActivityLoggedEvent.createTestInstance({
-          dateTime: "2025-11-03T10:00",
-          task: "Task C",
-          category: "Category A",
-        }),
-        ActivityLoggedEvent.createTestInstance({
-          dateTime: "2025-11-03T12:00",
+          dateTime: "2025-11-04T10:00",
           task: "Task C",
           category: "Category B",
         }),
         ActivityLoggedEvent.createTestInstance({
-          dateTime: "2025-11-03T10:00",
-          task: "Task D",
-          category: "Category A",
-        }),
-        ActivityLoggedEvent.createTestInstance({
-          dateTime: "2025-11-04T10:00",
-          task: "Task C",
-          category: "Category A",
-        }),
-        ActivityLoggedEvent.createTestInstance({
           dateTime: "2025-11-05T10:00",
-          task: "Task D",
-          category: "Category A",
+          task: "Task A",
+          category: "Category B",
         }),
       ]);
 
       const result = await projectEstimate({
         replay,
-        query: EstimateQuery.create({ category: "Category A" }),
+        query: EstimateQuery.create({ categories: ["Category A"] }),
       });
 
       expect(result).toEqual<EstimateQueryResult>({
@@ -1308,24 +1340,127 @@ describe("Activities", () => {
           {
             cycleTime: 1,
             frequency: 2,
-            probability: 0.5,
-            cumulativeProbability: 0.5,
-          },
-          {
-            cycleTime: 2,
-            frequency: 1,
-            probability: 0.25,
-            cumulativeProbability: 0.75,
-          },
-          {
-            cycleTime: 3,
-            frequency: 1,
-            probability: 0.25,
+            probability: 1.0,
             cumulativeProbability: 1.0,
           },
         ],
         categories: ["Category A", "Category B"],
-        totalCount: 4,
+        totalCount: 2,
+      });
+    });
+
+    it("should filter by activities without a category", async () => {
+      const replay = createAsyncGenerator([
+        ActivityLoggedEvent.createTestInstance({
+          dateTime: "2025-11-03T10:00",
+          task: "Task A",
+        }),
+        ActivityLoggedEvent.createTestInstance({
+          dateTime: "2025-11-03T10:00",
+          task: "Task B",
+        }),
+        ActivityLoggedEvent.createTestInstance({
+          dateTime: "2025-11-04T10:00",
+          task: "Task C",
+          category: "Testing Category",
+        }),
+        ActivityLoggedEvent.createTestInstance({
+          dateTime: "2025-11-05T10:00",
+          task: "Task A",
+          category: "Testing Category",
+        }),
+      ]);
+
+      const result = await projectEstimate({
+        replay,
+        query: EstimateQuery.create({ categories: [""] }),
+      });
+
+      expect(result).toEqual<EstimateQueryResult>({
+        cycleTimes: [
+          {
+            cycleTime: 1,
+            frequency: 2,
+            probability: 1.0,
+            cumulativeProbability: 1.0,
+          },
+        ],
+        categories: ["", "Testing Category"],
+        totalCount: 2,
+      });
+    });
+
+    it("should filter by no category and a category", async () => {
+      const replay = createAsyncGenerator([
+        ActivityLoggedEvent.createTestInstance({
+          dateTime: "2025-11-03T10:00",
+          task: "Task A",
+          category: "Category A",
+        }),
+        ActivityLoggedEvent.createTestInstance({
+          dateTime: "2025-11-03T10:00",
+          task: "Task B",
+          category: "Category B",
+        }),
+        ActivityLoggedEvent.createTestInstance({
+          dateTime: "2025-11-04T10:00",
+          task: "Task C",
+        }),
+      ]);
+
+      const result = await projectEstimate({
+        replay,
+        query: EstimateQuery.create({ categories: ["", "Category A"] }),
+      });
+
+      expect(result).toEqual<EstimateQueryResult>({
+        cycleTimes: [
+          {
+            cycleTime: 1,
+            frequency: 2,
+            probability: 1.0,
+            cumulativeProbability: 1.0,
+          },
+        ],
+        categories: ["", "Category A", "Category B"],
+        totalCount: 2,
+      });
+    });
+
+    it("should do not filter when query categories is an empty array", async () => {
+      const replay = createAsyncGenerator([
+        ActivityLoggedEvent.createTestInstance({
+          dateTime: "2025-11-03T10:00",
+          task: "Task A",
+          category: "Category A",
+        }),
+        ActivityLoggedEvent.createTestInstance({
+          dateTime: "2025-11-03T10:00",
+          task: "Task B",
+          category: "Category B",
+        }),
+        ActivityLoggedEvent.createTestInstance({
+          dateTime: "2025-11-04T10:00",
+          task: "Task C",
+        }),
+      ]);
+
+      const result = await projectEstimate({
+        replay,
+        query: EstimateQuery.create({ categories: [] }),
+      });
+
+      expect(result).toEqual<EstimateQueryResult>({
+        cycleTimes: [
+          {
+            cycleTime: 1,
+            frequency: 3,
+            probability: 1.0,
+            cumulativeProbability: 1.0,
+          },
+        ],
+        categories: ["", "Category A", "Category B"],
+        totalCount: 3,
       });
     });
   });

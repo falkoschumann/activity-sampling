@@ -485,12 +485,53 @@ export async function projectStatistics({
   replay: AsyncGenerator<ActivityLoggedEvent>;
   query: StatisticsQuery;
 }): Promise<StatisticsQueryResult> {
-  let activities = await projectActivities(replay);
-  const categories = collectCategories();
-  activities = activities.filter(
-    (activity) =>
-      query.category == null || activity.category === query.category,
-  );
+  const activities = await projectActivities(replay);
+  const categories: string[] = [];
+  const joinedCategories: Activity[] = [];
+  for (const activity of activities) {
+    if (!categories.includes(activity.category ?? "")) {
+      categories.push(activity.category ?? "");
+    }
+
+    if (
+      query.categories &&
+      query.categories.length > 0 &&
+      activity.category &&
+      !query.categories.includes(activity.category)
+    ) {
+      // filter by selected categories
+      continue;
+    }
+
+    const index = joinedCategories.findIndex(
+      (a) =>
+        a.client === activity.client &&
+        a.project === activity.project &&
+        a.task === activity.task,
+    );
+    if (index === -1) {
+      joinedCategories.push(activity);
+    } else {
+      const existingActivity = joinedCategories[index];
+      let start = existingActivity.start;
+      let finish = existingActivity.finish;
+      if (Temporal.PlainDate.compare(activity.start, start) < 0) {
+        start = activity.start;
+      }
+      if (Temporal.PlainDate.compare(activity.finish, finish) > 0) {
+        finish = activity.finish;
+      }
+      joinedCategories[index] = Activity.create({
+        start,
+        finish,
+        client: existingActivity.client,
+        project: existingActivity.project,
+        task: existingActivity.task,
+        hours: normalizeDuration(existingActivity.hours.add(activity.hours)),
+      });
+    }
+  }
+  categories.sort();
 
   let result: {
     xAxisLabel: string;
@@ -511,26 +552,12 @@ export async function projectStatistics({
 
   return { histogram, median, categories, totalCount };
 
-  function collectCategories() {
-    const categories: string[] = [];
-    activities.forEach((activity) => {
-      if (
-        activity.category != null &&
-        !categories.includes(activity.category)
-      ) {
-        categories.push(activity.category);
-      }
-    });
-    categories.sort();
-    return categories;
-  }
-
   async function createWorkingHoursStatistics() {
     const xAxisLabel = "Duration (days)";
     const categories: string[] = [];
     const tasks: Record<string, Temporal.Duration> = {};
     let totalCount = 0;
-    for await (const activity of activities) {
+    for await (const activity of joinedCategories) {
       const hours = activity.hours;
       if (tasks[activity.task]) {
         tasks[activity.task] = normalizeDuration(
@@ -555,7 +582,7 @@ export async function projectStatistics({
     const categories: string[] = [];
     let totalCount = 0;
     let days: number[] = [];
-    for (const activity of activities) {
+    for (const activity of joinedCategories) {
       const cycleTime = activity.finish.since(activity.start).total("days") + 1;
       totalCount++;
       days.push(cycleTime);
@@ -651,19 +678,57 @@ export async function projectEstimate({
   replay: AsyncGenerator<ActivityLoggedEvent>;
   query: EstimateQuery;
 }): Promise<EstimateQueryResult> {
+  console.log("projectEstimate", query);
   const cycleTimeCounts = new Map<number, number>();
   const categories: string[] = [];
   let totalCount = 0;
   const activities = await projectActivities(replay);
+  const joinedCategories: Activity[] = [];
   for (const activity of activities) {
-    if (activity.category != null && !categories.includes(activity.category)) {
-      categories.push(activity.category);
+    if (!categories.includes(activity.category ?? "")) {
+      categories.push(activity.category ?? "");
     }
 
-    if (query.category != null && activity.category !== query.category) {
+    if (
+      query.categories &&
+      query.categories.length > 0 &&
+      !query.categories.includes(activity.category ?? "")
+    ) {
+      // filter by selected categories
       continue;
     }
 
+    const index = joinedCategories.findIndex(
+      (a) =>
+        a.client === activity.client &&
+        a.project === activity.project &&
+        a.task === activity.task,
+    );
+    if (index === -1) {
+      joinedCategories.push(activity);
+    } else {
+      const existingActivity = joinedCategories[index];
+      let start = existingActivity.start;
+      let finish = existingActivity.finish;
+      if (Temporal.PlainDate.compare(activity.start, start) < 0) {
+        start = activity.start;
+      }
+      if (Temporal.PlainDate.compare(activity.finish, finish) > 0) {
+        finish = activity.finish;
+      }
+      joinedCategories[index] = Activity.create({
+        start,
+        finish,
+        client: existingActivity.client,
+        project: existingActivity.project,
+        task: existingActivity.task,
+        hours: normalizeDuration(existingActivity.hours.add(activity.hours)),
+      });
+    }
+  }
+  categories.sort();
+
+  for (const activity of joinedCategories) {
     totalCount++;
     const cycleTimeDays =
       activity.finish.since(activity.start).total("days") + 1;
@@ -690,7 +755,6 @@ export async function projectEstimate({
     };
   });
 
-  categories.sort();
   return {
     cycleTimes,
     categories,

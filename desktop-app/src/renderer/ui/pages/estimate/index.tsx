@@ -10,7 +10,7 @@ import CycleTimesChart from "./cycle_times_chart";
 import CycleTimesTable from "./cycle_times_table";
 
 export default function EstimatePage() {
-  const [query, setQuery] = useState<EstimateQuery>({});
+  const [query, setQuery] = useState<EstimateQuery>(EstimateQuery.create({}));
   const estimate = useEstimate(query);
 
   return (
@@ -18,11 +18,13 @@ export default function EstimatePage() {
       <aside className="fixed-top bg-body-secondary">
         <div className="container">
           <div className="btn-toolbar py-2 gap-2" role="toolbar" aria-label="Toolbar with query parameters">
-            <CategoryComponent
-              categories={estimate.categories}
-              value={query.category}
-              onChange={(category) => setQuery({ ...query, category })}
-            />
+            <div className="btn-group btn-group-sm" role="group" aria-label="Select category">
+              <CategoryComponent
+                categories={estimate.categories}
+                value={query.categories}
+                onChange={(categories) => setQuery({ ...query, categories })}
+              />
+            </div>
           </div>
         </div>
       </aside>

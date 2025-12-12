@@ -464,35 +464,35 @@ export class ReportEntryDto {
 export class StatisticsQueryDto {
   static create({
     scope,
-    category,
+    categories,
     timeZone,
   }: {
     scope: StatisticsScopeType;
-    category?: string;
+    categories?: string[];
     timeZone?: string;
   }): StatisticsQueryDto {
-    return new StatisticsQueryDto(scope, category, timeZone);
+    return new StatisticsQueryDto(scope, categories, timeZone);
   }
 
   static fromModel(model: StatisticsQuery): StatisticsQueryDto {
     return StatisticsQueryDto.create({
       scope: model.scope,
-      category: model.category,
+      categories: model.categories,
       timeZone: model.timeZone?.toString(),
     });
   }
 
   readonly scope: StatisticsScopeType;
-  readonly category?: string;
+  readonly categories?: string[];
   readonly timeZone?: string;
 
   private constructor(
     scope: StatisticsScopeType,
-    category?: string,
+    categories?: string[],
     timeZone?: string,
   ) {
     this.scope = scope;
-    this.category = category;
+    this.categories = categories;
     this.timeZone = timeZone;
   }
 
@@ -849,27 +849,27 @@ export class CapacityDto {
 
 export class EstimateQueryDto {
   static create({
-    category,
+    categories,
     timeZone,
   }: {
-    category?: string;
+    categories?: string[];
     timeZone?: string;
   }): EstimateQueryDto {
-    return new EstimateQueryDto(category, timeZone);
+    return new EstimateQueryDto(categories, timeZone);
   }
 
   static fromModel(model: EstimateQuery): EstimateQueryDto {
     return EstimateQueryDto.create({
-      category: model.category,
+      categories: model.categories,
       timeZone: model.timeZone?.toString(),
     });
   }
 
-  readonly category?: string;
+  readonly categories?: string[];
   readonly timeZone?: string;
 
-  private constructor(category?: string, timeZone?: string) {
-    this.category = category;
+  private constructor(categories?: string[], timeZone?: string) {
+    this.categories = categories;
     this.timeZone = timeZone;
   }
 

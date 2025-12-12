@@ -370,8 +370,8 @@ class StatisticsDsl {
     args: { scope?: StatisticsScopeType; category?: string } = {},
   ) {
     const scope = args.scope ?? StatisticsScope.WORKING_HOURS;
-    const category = args.category;
-    await this.#activitiesDriver.queryStatistics({ scope, category });
+    const categories = args.category ? [args.category] : undefined;
+    await this.#activitiesDriver.queryStatistics({ scope, categories });
   }
 
   assertStatistics(args: {
@@ -399,7 +399,7 @@ class StatisticsDsl {
             edge100: 0,
           }
         : undefined;
-    const categories = args.categories ?? [];
+    const categories = args.categories;
     const totalCount = args.totalCount;
     this.#activitiesDriver.assertStatistics({
       histogram,
@@ -565,8 +565,8 @@ class EstimateDsl {
   //
 
   async queryEstimate(args: { category?: string } = {}) {
-    const category = args.category;
-    await this.#activitiesDriver.queryEstimate({ category });
+    const categories = args.category ? [args.category] : [];
+    await this.#activitiesDriver.queryEstimate({ categories });
   }
 
   assertEstimate(args: {
@@ -579,8 +579,8 @@ class EstimateDsl {
     categories?: string[];
     totalCount?: number;
   }) {
-    const cycleTimes = args.cycleTimes ?? [];
-    const categories = args.categories ?? [];
+    const cycleTimes = args.cycleTimes;
+    const categories = args.categories;
     const totalCount = args.totalCount;
     this.#activitiesDriver.assertEstimate({
       cycleTimes,

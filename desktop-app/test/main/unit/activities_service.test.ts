@@ -8,6 +8,7 @@ import { Clock } from "../../../src/shared/common/temporal";
 import { ActivitiesService } from "../../../src/main/application/activities_service";
 import {
   ActivityLoggedEvent,
+  EstimateQuery,
   EstimateQueryResult,
   LogActivityCommand,
   RecentActivitiesQueryResult,
@@ -301,7 +302,7 @@ describe("Activities service", () => {
         ],
       });
 
-      const result = await service.queryEstimate({});
+      const result = await service.queryEstimate(EstimateQuery.create({}));
 
       expect(result).toEqual<EstimateQueryResult>({
         cycleTimes: [
