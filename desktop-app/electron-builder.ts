@@ -6,7 +6,7 @@ const options: Configuration = {
   appId: "de.muspellheim.activitysampling",
   productName: "Activity Sampling",
   directories: {
-    buildResources: "build",
+    buildResources: "resources",
   },
   files: [
     "!**/.vscode/*",
@@ -26,8 +26,7 @@ const options: Configuration = {
     "!vitest.config.*",
     "!.prettierrc",
   ],
-  // uncomment to inspect distribution artifact
-  //asar: false,
+  asar: process.env.NODE_ENV === "production",
   asarUnpack: ["resources/**"],
   win: {
     executableName: "activity-sampling",
@@ -39,14 +38,13 @@ const options: Configuration = {
     createDesktopShortcut: "always",
   },
   mac: {
-    entitlementsInherit: "build/entitlements.mac.plist",
+    entitlementsInherit: "resources/entitlements.mac.plist",
     extendInfo: [
       "NSDocumentsFolderUsageDescription: Application requests access to the user's Documents folder.",
       "NSDownloadsFolderUsageDescription: Application requests access to the user's Downloads folder.",
     ],
-    // uncomment to speed up build for local testing
-    //notarize: false,
-    //identity: null,
+    notarize: process.env.NODE_ENV === "production",
+    identity: process.env.NODE_ENV === "production" ? undefined : null,
   },
   dmg: {
     artifactName: "${name}-${version}.${ext}",

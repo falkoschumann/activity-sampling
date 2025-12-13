@@ -4,7 +4,7 @@ import path from "node:path";
 
 import { app, BrowserWindow, dialog } from "electron/main";
 
-import icon from "../../../build/icon.png?asset";
+import icon from "../../../resources/icon.png?asset";
 import type { SettingsService } from "../application/settings_service";
 
 const isProduction = app.isPackaged;
