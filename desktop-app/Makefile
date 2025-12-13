@@ -1,7 +1,7 @@
 all: dist check
 
 clean:
-	rm -rf coverage out testdata
+	rm -rf build coverage testdata
 
 distclean: clean
 	rm -rf dist

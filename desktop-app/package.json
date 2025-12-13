@@ -2,7 +2,7 @@
   "name": "activity-sampling",
   "version": "1.0.0",
   "description": "Periodically asks the user about their current activity and logs it for analysis.",
-  "main": "./out/main/index.js",
+  "main": "./build/main/index.js",
   "author": "Falko Schumann",
   "homepage": "https://muspellheim.de",
   "engines": {
@@ -11,7 +11,7 @@
   "scripts": {
     "start": "electron-vite preview",
     "dev": "electron-vite dev --watch",
-    "build": "tsc --build && electron-vite build",
+    "build": "tsc --build && electron-vite build --outDir=build",
     "build:unpack": "electron-builder --dir",
     "build:electron": "electron-builder",
     "build:win": "electron-builder --win --x64",

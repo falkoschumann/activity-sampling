@@ -2,9 +2,9 @@
 /data/
 
 # Build and test
-coverage/
-dist/
-out/
-testdata/
+/build/
+/coverage/
+/dist/
+/testdata/
 vendor/
 corrupt.*

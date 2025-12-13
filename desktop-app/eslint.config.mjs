@@ -9,7 +9,7 @@ import globals from "globals";
 import ts from "typescript-eslint";
 
 export default ts.config(
-  { ignores: ["coverage", "dist", "out"] },
+  { ignores: ["build", "coverage", "dist"] },
   {
     extends: [js.configs.recommended, ...ts.configs.recommended],
     files: ["**/*.{cjs,mjs,js,jsx,ts,tsx}"],

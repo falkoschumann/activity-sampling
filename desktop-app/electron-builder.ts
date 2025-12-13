@@ -6,7 +6,7 @@ const options: Configuration = {
   appId: "de.muspellheim.activitysampling",
   productName: "Activity Sampling",
   directories: {
-    buildResources: "resources",
+    buildResources: "resources/",
   },
   files: [
     "!**/.vscode/*",
