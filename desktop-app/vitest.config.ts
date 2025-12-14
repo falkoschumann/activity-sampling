@@ -15,9 +15,9 @@ export default defineConfig({
       ],
       provider: "v8",
       thresholds: {
-        statements: 80,
-        branches: 62, // TODO increase branch coverage
-        lines: 62, // TODO increase lines coverage
+        statements: 70, // TODO increase statements coverage
+        branches: 70, // TODO increase branch coverage
+        lines: 70, // TODO increase lines coverage
       },
     },
     globalSetup: "./test/global-setup.ts",

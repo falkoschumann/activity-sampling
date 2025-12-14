@@ -9,8 +9,8 @@
     "node": ">=24.0.0"
   },
   "scripts": {
-    "start": "electron-vite preview",
-    "dev": "electron-vite dev --watch",
+    "start": "electron-vite preview --outDir=build",
+    "dev": "electron-vite dev --outDir=build --watch",
     "build": "tsc --build && electron-vite build --outDir=build",
     "build:unpack": "electron-builder --dir",
     "build:electron": "electron-builder",

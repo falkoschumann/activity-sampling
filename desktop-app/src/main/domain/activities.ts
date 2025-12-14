@@ -485,8 +485,8 @@ export async function projectStatistics({
   replay: AsyncGenerator<ActivityLoggedEvent>;
   query: StatisticsQuery;
 }): Promise<StatisticsQueryResult> {
-  const activities = await projectActivities(replay);
   const categories: string[] = [];
+  const activities = await projectActivities(replay);
   const joinedCategories: Activity[] = [];
   for (const activity of activities) {
     if (!categories.includes(activity.category ?? "")) {
@@ -496,8 +496,7 @@ export async function projectStatistics({
     if (
       query.categories &&
       query.categories.length > 0 &&
-      activity.category &&
-      !query.categories.includes(activity.category)
+      !query.categories.includes(activity.category ?? "")
     ) {
       // filter by selected categories
       continue;
@@ -553,11 +552,10 @@ export async function projectStatistics({
   return { histogram, median, categories, totalCount };
 
   async function createWorkingHoursStatistics() {
-    const xAxisLabel = "Duration (days)";
-    const categories: string[] = [];
-    const tasks: Record<string, Temporal.Duration> = {};
     let totalCount = 0;
+    const tasks: Record<string, Temporal.Duration> = {};
     for await (const activity of joinedCategories) {
+      totalCount++;
       const hours = activity.hours;
       if (tasks[activity.task]) {
         tasks[activity.task] = normalizeDuration(
@@ -566,7 +564,6 @@ export async function projectStatistics({
       } else {
         tasks[activity.task] = normalizeDuration(hours);
       }
-      totalCount++;
     }
 
     const days = Object.values(tasks)
@@ -574,22 +571,22 @@ export async function projectStatistics({
       .map((hours) => hours / 8)
       .sort((a, b) => a - b);
 
-    return { xAxisLabel, days, categories, totalCount };
+    const xAxisLabel = "Duration (days)";
+    return { xAxisLabel, days, totalCount };
   }
 
   async function createCycleTimesStatistics() {
-    const xAxisLabel = "Cycle time (days)";
-    const categories: string[] = [];
     let totalCount = 0;
     let days: number[] = [];
     for (const activity of joinedCategories) {
-      const cycleTime = activity.finish.since(activity.start).total("days") + 1;
       totalCount++;
+      const cycleTime = activity.finish.since(activity.start).total("days") + 1;
       days.push(cycleTime);
     }
     days = Object.values(days).sort((a, b) => a - b);
 
-    return { xAxisLabel, days, categories, totalCount };
+    const xAxisLabel = "Cycle time (days)";
+    return { xAxisLabel, days, totalCount };
   }
 
   function createHistogram(xAxisLabel: string, days: number[]) {
@@ -678,9 +675,7 @@ export async function projectEstimate({
   replay: AsyncGenerator<ActivityLoggedEvent>;
   query: EstimateQuery;
 }): Promise<EstimateQueryResult> {
-  const cycleTimeCounts = new Map<number, number>();
   const categories: string[] = [];
-  let totalCount = 0;
   const activities = await projectActivities(replay);
   const joinedCategories: Activity[] = [];
   for (const activity of activities) {
@@ -727,6 +722,8 @@ export async function projectEstimate({
   }
   categories.sort();
 
+  let totalCount = 0;
+  const cycleTimeCounts = new Map<number, number>();
   for (const activity of joinedCategories) {
     totalCount++;
     const cycleTimeDays =
