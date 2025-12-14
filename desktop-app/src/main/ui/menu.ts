@@ -56,6 +56,21 @@ export function createMenu({
           accelerator: "CmdOrCtrl+O",
           click: () => chooseDataDirectory(settingsService),
         },
+        ...((isMac
+          ? []
+          : [
+              { type: "separator" },
+              {
+                label: "Settings...",
+                accelerator: "CmdOrCtrl+,",
+                click: () =>
+                  openWindow({
+                    rendererFile: "settings.html",
+                    width: 800,
+                    height: 390,
+                  }),
+              },
+            ]) as MenuItemConstructorOptions[]),
         { type: "separator" },
         isMac ? { role: "close" } : { role: "quit" },
       ] as MenuItemConstructorOptions[],
