@@ -5,7 +5,6 @@ import fsPromise from "node:fs/promises";
 
 import { describe, expect, it } from "vitest";
 
-import { arrayFromAsync } from "../../../src/shared/common/polyfills";
 import { EventStore } from "../../../src/main/infrastructure/event_store";
 import { ActivityLoggedEventDto } from "../../../src/main/infrastructure/events";
 
@@ -23,7 +22,7 @@ describe("Event store", () => {
   it("should replay nothing when file does not exist", async () => {
     const store = EventStore.create({ fileName: NON_EXISTING_FILE });
 
-    const events = await arrayFromAsync(store.replay());
+    const events = await Array.fromAsync(store.replay());
 
     expect(events).toEqual<ActivityLoggedEventDto[]>([]);
   });
@@ -33,7 +32,7 @@ describe("Event store", () => {
     const store = EventStore.create({ fileName: TEST_FILE });
 
     await store.record(ActivityLoggedEventDto.createTestInstance());
-    const events = await arrayFromAsync(store.replay());
+    const events = await Array.fromAsync(store.replay());
 
     expect(events).toEqual<ActivityLoggedEventDto[]>([
       ActivityLoggedEventDto.createTestInstance(),
@@ -57,7 +56,7 @@ describe("Event store", () => {
         events: [ActivityLoggedEventDto.createTestInstance()],
       });
 
-      const events = await arrayFromAsync(store.replay());
+      const events = await Array.fromAsync(store.replay());
 
       expect(events).toEqual<ActivityLoggedEventDto[]>([
         ActivityLoggedEventDto.createTestInstance(),

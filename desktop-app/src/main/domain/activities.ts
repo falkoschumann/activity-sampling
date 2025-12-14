@@ -678,7 +678,6 @@ export async function projectEstimate({
   replay: AsyncGenerator<ActivityLoggedEvent>;
   query: EstimateQuery;
 }): Promise<EstimateQueryResult> {
-  console.log("projectEstimate", query);
   const cycleTimeCounts = new Map<number, number>();
   const categories: string[] = [];
   let totalCount = 0;

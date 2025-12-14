@@ -6,7 +6,6 @@ import path from "node:path";
 import { Temporal } from "@js-temporal/polyfill";
 import { expect } from "vitest";
 
-import { arrayFromAsync } from "../../../src/shared/common/polyfills";
 import { Clock } from "../../../src/shared/common/temporal";
 import { ActivitiesService } from "../../../src/main/application/activities_service";
 import { TimerService } from "../../../src/main/application/timer_service";
@@ -758,7 +757,7 @@ class ActivitiesDriver {
   }
 
   async assertActivityLogged(event: ActivityLoggedEventDto) {
-    const events = await arrayFromAsync(this.#eventStore.replay());
+    const events = await Array.fromAsync(this.#eventStore.replay());
     expect(events.at(-1)).toEqual<ActivityLoggedEventDto>(event);
   }
 
