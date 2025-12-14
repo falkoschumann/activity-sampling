@@ -142,19 +142,28 @@ export class CommandStatusDto {
 // region Queries
 
 export class RecentActivitiesQueryDto {
-  static create({ timeZone }: { timeZone?: string }): RecentActivitiesQueryDto {
-    return new RecentActivitiesQueryDto(timeZone);
+  static create({
+    today,
+    timeZone,
+  }: {
+    today?: string;
+    timeZone?: string;
+  }): RecentActivitiesQueryDto {
+    return new RecentActivitiesQueryDto(today, timeZone);
   }
 
   static fromModel(model: RecentActivitiesQuery): RecentActivitiesQueryDto {
     return RecentActivitiesQueryDto.create({
+      today: model.today?.toString(),
       timeZone: model.timeZone?.toString(),
     });
   }
 
+  readonly today?: string;
   readonly timeZone?: string;
 
-  private constructor(timeZone?: string) {
+  private constructor(today?: string, timeZone?: string) {
+    this.today = today;
     this.timeZone = timeZone;
   }
 
@@ -686,30 +695,40 @@ export class TimesheetQueryDto {
   static create({
     from,
     to,
+    today,
     timeZone,
   }: {
     from: string;
     to: string;
+    today?: string;
     timeZone?: string;
   }): TimesheetQueryDto {
-    return new TimesheetQueryDto(from, to, timeZone);
+    return new TimesheetQueryDto(from, to, today, timeZone);
   }
 
   static fromModel(model: TimesheetQuery): TimesheetQueryDto {
     return TimesheetQueryDto.create({
       from: model.from.toString(),
       to: model.to.toString(),
+      today: model.today?.toString(),
       timeZone: model.timeZone?.toString(),
     });
   }
 
   readonly from: string;
   readonly to: string;
+  readonly today?: string;
   readonly timeZone?: string;
 
-  private constructor(from: string, to: string, timeZone?: string) {
+  private constructor(
+    from: string,
+    to: string,
+    today?: string,
+    timeZone?: string,
+  ) {
     this.from = from;
     this.to = to;
+    this.today = today;
     this.timeZone = timeZone;
   }
 

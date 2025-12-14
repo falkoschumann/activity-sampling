@@ -1472,8 +1472,8 @@ function mapTimestamps(dateTimes: string[]) {
   );
 }
 
-async function* createAsyncGenerator(events: ActivityLoggedEvent[]) {
-  for (const event of events) {
-    yield event;
+async function* createAsyncGenerator<T>(array: T[]) {
+  for (const element of array) {
+    yield element;
   }
 }

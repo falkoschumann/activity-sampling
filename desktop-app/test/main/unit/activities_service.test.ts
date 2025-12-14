@@ -1,6 +1,5 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
-import { Temporal } from "@js-temporal/polyfill";
 import { type CommandStatus, Success } from "@muspellheim/shared";
 import { describe, expect, it } from "vitest";
 
@@ -8,6 +7,7 @@ import { Clock } from "../../../src/shared/common/temporal";
 import { ActivitiesService } from "../../../src/main/application/activities_service";
 import {
   ActivityLoggedEvent,
+  Capacity,
   EstimateQuery,
   EstimateQueryResult,
   LogActivityCommand,
@@ -18,7 +18,10 @@ import {
   StatisticsQueryResult,
   StatisticsScope,
   TimesheetEntry,
+  TimesheetQuery,
   TimesheetQueryResult,
+  TimeSummary,
+  WorkingDay,
 } from "../../../src/shared/domain/activities";
 import { Settings } from "../../../src/shared/domain/settings";
 import { EventStore } from "../../../src/main/infrastructure/event_store";
@@ -92,32 +95,32 @@ describe("Activities service", () => {
 
       expect(result).toEqual<RecentActivitiesQueryResult>({
         workingDays: [
-          {
-            date: Temporal.PlainDate.from("2025-06-05"),
+          WorkingDay.create({
+            date: "2025-06-05",
             activities: [
               ActivityLoggedEvent.createTestInstance({
-                dateTime: Temporal.PlainDateTime.from("2025-06-05T11:00"),
+                dateTime: "2025-06-05T11:00",
               }),
               ActivityLoggedEvent.createTestInstance({
-                dateTime: Temporal.PlainDateTime.from("2025-06-05T10:30"),
+                dateTime: "2025-06-05T10:30",
               }),
             ],
-          },
-          {
-            date: Temporal.PlainDate.from("2025-06-04"),
+          }),
+          WorkingDay.create({
+            date: "2025-06-04",
             activities: [
               ActivityLoggedEvent.createTestInstance({
-                dateTime: Temporal.PlainDateTime.from("2025-06-04T16:00"),
+                dateTime: "2025-06-04T16:00",
               }),
             ],
-          },
+          }),
         ],
-        timeSummary: {
-          hoursToday: Temporal.Duration.from("PT1H"),
-          hoursYesterday: Temporal.Duration.from("PT30M"),
-          hoursThisWeek: Temporal.Duration.from("PT1H30M"),
-          hoursThisMonth: Temporal.Duration.from("PT1H30M"),
-        },
+        timeSummary: TimeSummary.create({
+          hoursToday: "PT1H",
+          hoursYesterday: "PT30M",
+          hoursThisWeek: "PT1H30M",
+          hoursThisMonth: "PT1H30M",
+        }),
       });
     });
 
@@ -160,25 +163,27 @@ describe("Activities service", () => {
 
       const result = await service.queryReport({ scope: ReportScope.CLIENTS });
 
-      expect(result).toEqual<ReportQueryResult>({
-        entries: [
-          ReportEntry.create({
-            start: "2025-06-26",
-            finish: "2025-06-27",
-            client: "Client 1",
-            hours: Temporal.Duration.from("PT8H"),
-            cycleTime: 2,
-          }),
-          ReportEntry.create({
-            start: "2025-06-25",
-            finish: "2025-06-25",
-            client: "Client 2",
-            hours: Temporal.Duration.from("PT7H"),
-            cycleTime: 1,
-          }),
-        ],
-        totalHours: Temporal.Duration.from("PT15H"),
-      });
+      expect(result).toEqual<ReportQueryResult>(
+        ReportQueryResult.create({
+          entries: [
+            ReportEntry.create({
+              start: "2025-06-26",
+              finish: "2025-06-27",
+              client: "Client 1",
+              hours: "PT8H",
+              cycleTime: 2,
+            }),
+            ReportEntry.create({
+              start: "2025-06-25",
+              finish: "2025-06-25",
+              client: "Client 2",
+              hours: "PT7H",
+              cycleTime: 1,
+            }),
+          ],
+          totalHours: "PT15H",
+        }),
+      );
     });
   });
 
@@ -345,28 +350,32 @@ describe("Activities service", () => {
         fixedInstant: "2025-06-11T15:00:00Z",
       });
 
-      const result = await service.queryTimesheet({
-        from: Temporal.PlainDate.from("2025-06-09"),
-        to: Temporal.PlainDate.from("2025-06-15"),
-      });
+      const result = await service.queryTimesheet(
+        TimesheetQuery.create({
+          from: "2025-06-09",
+          to: "2025-06-15",
+        }),
+      );
 
-      expect(result).toEqual<TimesheetQueryResult>({
-        entries: [
-          TimesheetEntry.createTestInstance({
-            date: Temporal.PlainDate.from("2025-06-10"),
-            hours: Temporal.Duration.from("PT8H"),
+      expect(result).toEqual<TimesheetQueryResult>(
+        TimesheetQueryResult.create({
+          entries: [
+            TimesheetEntry.createTestInstance({
+              date: "2025-06-10",
+              hours: "PT8H",
+            }),
+            TimesheetEntry.createTestInstance({
+              date: "2025-06-11",
+              hours: "PT8H",
+            }),
+          ],
+          totalHours: "PT16H",
+          capacity: Capacity.create({
+            hours: "PT32H",
+            offset: "PT0H",
           }),
-          TimesheetEntry.createTestInstance({
-            date: Temporal.PlainDate.from("2025-06-11"),
-            hours: Temporal.Duration.from("PT8H"),
-          }),
-        ],
-        totalHours: Temporal.Duration.from("PT16H"),
-        capacity: {
-          hours: Temporal.Duration.from("PT32H"),
-          offset: Temporal.Duration.from("PT0H"),
-        },
-      });
+        }),
+      );
     });
   });
 });

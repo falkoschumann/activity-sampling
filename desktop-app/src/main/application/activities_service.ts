@@ -1,5 +1,6 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
+import { Temporal } from "@js-temporal/polyfill";
 import { type CommandStatus, Success } from "@muspellheim/shared";
 
 import { Clock } from "../../shared/common/temporal";
@@ -16,19 +17,15 @@ import {
   type TimesheetQuery,
   type TimesheetQueryResult,
 } from "../../shared/domain/activities";
-import {
-  projectEstimate,
-  projectRecentActivities,
-  projectReport,
-  projectStatistics,
-  projectTimesheet,
-} from "../domain/activities";
+import { projectRecentActivities } from "../domain/recent_activities_projection";
+import { projectReport } from "../domain/report_projection";
+import { projectTimesheet } from "../domain/timesheet_projection";
+import { projectEstimate, projectStatistics } from "../domain/activities";
 import { Settings } from "../../shared/domain/settings";
 import { EventStore } from "../infrastructure/event_store";
 import { ActivityLoggedEventDto } from "../infrastructure/events";
 import { HolidayRepository } from "../infrastructure/holiday_repository";
 import { VacationRepository } from "../infrastructure/vacation_repository";
-import { Temporal } from "@js-temporal/polyfill";
 
 export class ActivitiesService {
   static create(): ActivitiesService {
@@ -83,13 +80,15 @@ export class ActivitiesService {
     query: RecentActivitiesQuery,
   ): Promise<RecentActivitiesQueryResult> {
     const replay = this.#replayTyped(this.#eventStore.replay(), query.timeZone);
-    const today = this.#today(query.timeZone);
-    return await projectRecentActivities({ replay, today });
+    return await projectRecentActivities(replay, {
+      ...query,
+      today: query.today ?? this.#today(),
+    });
   }
 
   async queryReport(query: ReportQuery): Promise<ReportQueryResult> {
     const replay = this.#replayTyped(this.#eventStore.replay(), query.timeZone);
-    return projectReport({ replay, query });
+    return projectReport(replay, query);
   }
 
   async queryStatistics(
@@ -106,7 +105,6 @@ export class ActivitiesService {
 
   async queryTimesheet(query: TimesheetQuery): Promise<TimesheetQueryResult> {
     const replay = this.#replayTyped(this.#eventStore.replay(), query.timeZone);
-    const today = this.#today(query.timeZone);
     const holidays = await this.#holidayRepository.findAllByDate(
       query.from,
       query.to,
@@ -115,14 +113,15 @@ export class ActivitiesService {
       query.from,
       query.to,
     );
-    return projectTimesheet({
+    return projectTimesheet(
       replay,
-      query,
-      today,
-      holidays,
-      vacations,
-      capacity: this.#capacity,
-    });
+      { ...query, today: query.today ?? this.#today() },
+      {
+        holidays,
+        vacations,
+        capacity: this.#capacity,
+      },
+    );
   }
 
   #today(timeZone?: Temporal.TimeZoneLike) {

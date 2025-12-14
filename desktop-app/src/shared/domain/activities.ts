@@ -94,16 +94,23 @@ export class LogActivityCommand {
 
 export class RecentActivitiesQuery {
   static create({
+    today,
     timeZone,
   }: {
+    today?: Temporal.PlainDateLike | string;
     timeZone?: Temporal.TimeZoneLike;
   }): RecentActivitiesQuery {
-    return new RecentActivitiesQuery(timeZone);
+    return new RecentActivitiesQuery(today, timeZone);
   }
 
+  readonly today?: Temporal.PlainDate;
   readonly timeZone?: Temporal.TimeZoneLike;
 
-  private constructor(timeZone?: Temporal.TimeZoneLike) {
+  private constructor(
+    today?: Temporal.PlainDateLike | string,
+    timeZone?: Temporal.TimeZoneLike,
+  ) {
+    this.today = today ? Temporal.PlainDate.from(today) : undefined;
     this.timeZone = timeZone;
   }
 }
@@ -520,26 +527,31 @@ export class TimesheetQuery {
   static create({
     from,
     to,
+    today,
     timeZone,
   }: {
     from: Temporal.PlainDateLike | string;
     to: Temporal.PlainDateLike | string;
+    today?: Temporal.PlainDateLike | string;
     timeZone?: Temporal.TimeZoneLike;
   }): TimesheetQuery {
-    return new TimesheetQuery(from, to, timeZone);
+    return new TimesheetQuery(from, to, today, timeZone);
   }
 
   readonly from: Temporal.PlainDate;
   readonly to: Temporal.PlainDate;
+  readonly today?: Temporal.PlainDate;
   readonly timeZone?: Temporal.TimeZoneLike;
 
   private constructor(
     from: Temporal.PlainDateLike | string,
     to: Temporal.PlainDateLike | string,
+    today?: Temporal.PlainDateLike | string,
     timeZone?: Temporal.TimeZoneLike,
   ) {
     this.from = Temporal.PlainDate.from(from);
     this.to = Temporal.PlainDate.from(to);
+    this.today = today ? Temporal.PlainDate.from(today) : undefined;
     this.timeZone = timeZone;
   }
 }
@@ -603,7 +615,13 @@ export class TimesheetEntry {
     project = "Test project",
     task = "Test task",
     hours = Temporal.Duration.from("PT2H"),
-  }: Partial<TimesheetEntry> = {}): TimesheetEntry {
+  }: {
+    date?: Temporal.PlainDateLike | string;
+    client?: string;
+    project?: string;
+    task?: string;
+    hours?: Temporal.DurationLike | string;
+  } = {}): TimesheetEntry {
     return TimesheetEntry.create({ date, client, project, task, hours });
   }
 
