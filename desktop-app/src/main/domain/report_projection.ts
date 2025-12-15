@@ -30,8 +30,6 @@ export async function projectReport(
     case ReportScope.CATEGORIES:
       projection = new CategoryReportProjection();
       break;
-    default:
-      throw new Error(`Unknown scope: ${query.scope}`);
   }
   for await (const event of filterEvents(replay, query.from, query.to)) {
     projection.update(event);
@@ -116,14 +114,7 @@ class ProjectReportProjection {
   }
 
   get() {
-    return this.#entries.sort((a, b) => {
-      const projectComparison = a.project.localeCompare(b.project);
-      if (projectComparison !== 0) {
-        return projectComparison;
-      }
-
-      return a.client.localeCompare(b.client);
-    });
+    return this.#entries.sort((a, b) => a.project.localeCompare(b.project));
   }
 }
 
@@ -172,12 +163,7 @@ class TaskReportProjection {
         return projectComparison;
       }
 
-      const clientComparison = a.client.localeCompare(b.client);
-      if (clientComparison !== 0) {
-        return clientComparison;
-      }
-
-      return a.category.localeCompare(b.category);
+      return a.client.localeCompare(b.client);
     });
   }
 }
@@ -187,7 +173,7 @@ class CategoryReportProjection {
 
   update(event: ActivityLoggedEvent) {
     const index = this.#entries.findIndex(
-      (entry) => entry.category === (event.category ?? ""),
+      (entry) => entry.category === (event.category ?? "N/A"),
     );
     if (index == -1) {
       const date = event.dateTime.toPlainDate();
