@@ -1,3 +1,6 @@
+export ASAR?=true
+export SIGN?=true
+
 all: dist check
 
 clean:

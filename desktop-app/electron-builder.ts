@@ -26,7 +26,7 @@ const options: Configuration = {
     "!vitest.config.*",
     "!.prettierrc",
   ],
-  asar: process.env.NODE_ENV === "production",
+  asar: process.env.ASAR === "true",
   asarUnpack: ["resources/**"],
   win: {
     executableName: "activity-sampling",
@@ -43,8 +43,8 @@ const options: Configuration = {
       "NSDocumentsFolderUsageDescription: Application requests access to the user's Documents folder.",
       "NSDownloadsFolderUsageDescription: Application requests access to the user's Downloads folder.",
     ],
-    notarize: process.env.NODE_ENV === "production",
-    identity: process.env.NODE_ENV === "production" ? undefined : null,
+    notarize: process.env.SIGN === "true",
+    identity: process.env.SIGN === "true" ? undefined : null,
   },
   dmg: {
     artifactName: "${name}-${version}.${ext}",
