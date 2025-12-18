@@ -17,10 +17,11 @@ import {
   type TimesheetQuery,
   type TimesheetQueryResult,
 } from "../../shared/domain/activities";
+import { projectEstimate } from "../domain/estimate_projection";
 import { projectRecentActivities } from "../domain/recent_activities_projection";
 import { projectReport } from "../domain/report_projection";
 import { projectTimesheet } from "../domain/timesheet_projection";
-import { projectEstimate, projectStatistics } from "../domain/activities";
+import { projectStatistics } from "../domain/activities";
 import { Settings } from "../../shared/domain/settings";
 import { EventStore } from "../infrastructure/event_store";
 import { ActivityLoggedEventDto } from "../infrastructure/events";
