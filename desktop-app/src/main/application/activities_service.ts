@@ -96,12 +96,12 @@ export class ActivitiesService {
     query: StatisticsQuery,
   ): Promise<StatisticsQueryResult> {
     const replay = this.#replayTyped(this.#eventStore.replay(), query.timeZone);
-    return await projectStatistics({ replay, query });
+    return await projectStatistics(replay, query);
   }
 
   async queryEstimate(query: EstimateQuery): Promise<EstimateQueryResult> {
     const replay = this.#replayTyped(this.#eventStore.replay(), query.timeZone);
-    return projectEstimate({ query, replay });
+    return projectEstimate(replay, query);
   }
 
   async queryTimesheet(query: TimesheetQuery): Promise<TimesheetQueryResult> {

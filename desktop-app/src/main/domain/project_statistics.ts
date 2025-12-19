@@ -11,13 +11,10 @@ import {
 } from "../../shared/domain/activities";
 import { normalizeDuration } from "../../shared/common/temporal";
 
-export async function projectStatistics({
-  replay,
-  query,
-}: {
-  replay: AsyncGenerator<ActivityLoggedEvent>;
-  query: StatisticsQuery;
-}): Promise<StatisticsQueryResult> {
+export async function projectStatistics(
+  replay: AsyncGenerator<ActivityLoggedEvent>,
+  query: StatisticsQuery,
+): Promise<StatisticsQueryResult> {
   const activitiesProjection = new ActivitiesProjection(query.categories);
   const categoriesProjection = new CategoriesProjection();
   for await (const event of replay) {

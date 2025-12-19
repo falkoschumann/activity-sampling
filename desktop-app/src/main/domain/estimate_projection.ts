@@ -9,13 +9,10 @@ import {
   EstimateQueryResult,
 } from "../../shared/domain/activities";
 
-export async function projectEstimate({
-  replay,
-  query,
-}: {
-  replay: AsyncGenerator<ActivityLoggedEvent>;
-  query: EstimateQuery;
-}): Promise<EstimateQueryResult> {
+export async function projectEstimate(
+  replay: AsyncGenerator<ActivityLoggedEvent>,
+  query: EstimateQuery,
+): Promise<EstimateQueryResult> {
   const activitiesProjection = new ActivitiesProjection(query.categories);
   const categoriesProjection = new CategoriesProjection();
   for await (const event of replay) {

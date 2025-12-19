@@ -13,10 +13,7 @@ describe("Estimate projection", () => {
   it("should return an empty result when no activities are logged", async () => {
     const replay = createAsyncGenerator([]);
 
-    const result = await projectEstimate({
-      replay,
-      query: EstimateQuery.create({}),
-    });
+    const result = await projectEstimate(replay, EstimateQuery.create({}));
 
     expect(result).toEqual<EstimateQueryResult>({
       cycleTimes: [],
@@ -59,10 +56,7 @@ describe("Estimate projection", () => {
       }),
     ]);
 
-    const result = await projectEstimate({
-      replay,
-      query: EstimateQuery.create({}),
-    });
+    const result = await projectEstimate(replay, EstimateQuery.create({}));
 
     expect(result).toEqual<EstimateQueryResult>({
       cycleTimes: [
@@ -109,10 +103,7 @@ describe("Estimate projection", () => {
       }),
     ]);
 
-    const result = await projectEstimate({
-      replay,
-      query: EstimateQuery.create({}),
-    });
+    const result = await projectEstimate(replay, EstimateQuery.create({}));
 
     expect(result).toEqual<EstimateQueryResult>({
       cycleTimes: [
@@ -158,10 +149,10 @@ describe("Estimate projection", () => {
       }),
     ]);
 
-    const result = await projectEstimate({
+    const result = await projectEstimate(
       replay,
-      query: EstimateQuery.create({ categories: ["Category A"] }),
-    });
+      EstimateQuery.create({ categories: ["Category A"] }),
+    );
 
     expect(result).toEqual<EstimateQueryResult>({
       cycleTimes: [
@@ -199,10 +190,10 @@ describe("Estimate projection", () => {
       }),
     ]);
 
-    const result = await projectEstimate({
+    const result = await projectEstimate(
       replay,
-      query: EstimateQuery.create({ categories: [""] }),
-    });
+      EstimateQuery.create({ categories: [""] }),
+    );
 
     expect(result).toEqual<EstimateQueryResult>({
       cycleTimes: [
@@ -236,10 +227,10 @@ describe("Estimate projection", () => {
       }),
     ]);
 
-    const result = await projectEstimate({
+    const result = await projectEstimate(
       replay,
-      query: EstimateQuery.create({ categories: ["", "Category A"] }),
-    });
+      EstimateQuery.create({ categories: ["", "Category A"] }),
+    );
 
     expect(result).toEqual<EstimateQueryResult>({
       cycleTimes: [
@@ -273,10 +264,10 @@ describe("Estimate projection", () => {
       }),
     ]);
 
-    const result = await projectEstimate({
+    const result = await projectEstimate(
       replay,
-      query: EstimateQuery.create({ categories: [] }),
-    });
+      EstimateQuery.create({ categories: [] }),
+    );
 
     expect(result).toEqual<EstimateQueryResult>({
       cycleTimes: [
