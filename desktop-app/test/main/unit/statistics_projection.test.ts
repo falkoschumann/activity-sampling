@@ -2,7 +2,7 @@
 
 import { describe, expect, it } from "vitest";
 
-import { projectStatistics } from "../../../src/main/domain/project_statistics";
+import { projectStatistics } from "../../../src/main/domain/statistics_projection";
 import {
   ActivityLoggedEvent,
   StatisticsQuery,
