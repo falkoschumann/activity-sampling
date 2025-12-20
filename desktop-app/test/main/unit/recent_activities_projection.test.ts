@@ -10,6 +10,7 @@ import {
   TimeSummary,
   WorkingDay,
 } from "../../../src/shared/domain/activities";
+import { createAsyncGenerator } from "../common/tools";
 
 describe("Recent activities projection", () => {
   it("should return an empty result when no activity is logged", async () => {
@@ -26,16 +27,18 @@ describe("Recent activities projection", () => {
   });
 
   it("should group activities by day for the last 30 days", async () => {
-    const replay = createAsyncGenerator(
-      mapTimestamps([
-        "2025-05-05T16:00", // is not included, because older than 30 days
-        "2025-05-06T16:00", // 2 activities on different days
-        "2025-06-04T16:00",
-        "2025-06-05T10:30", // 2 activities on the same day
-        "2025-06-05T11:00",
-        "2025-07-01T12:30", // is not included, because it is in the next month
-      ]),
-    );
+    const replay = createAsyncGenerator([
+      // is not included, because older than 30 days
+      ActivityLoggedEvent.createTestInstance({ dateTime: "2025-05-05T16:00" }),
+      // 2 activities on different days
+      ActivityLoggedEvent.createTestInstance({ dateTime: "2025-05-06T16:00" }),
+      ActivityLoggedEvent.createTestInstance({ dateTime: "2025-06-04T16:00" }),
+      // 2 activities on the same day
+      ActivityLoggedEvent.createTestInstance({ dateTime: "2025-06-05T10:30" }),
+      ActivityLoggedEvent.createTestInstance({ dateTime: "2025-06-05T11:00" }),
+      // is not included, because it is in the next month
+      ActivityLoggedEvent.createTestInstance({ dateTime: "2025-07-01T12:30" }),
+    ]);
 
     const result = await projectRecentActivities(
       replay,
@@ -74,33 +77,31 @@ describe("Recent activities projection", () => {
   });
 
   it("should summarize hours worked for a month with 30 days", async () => {
-    const replay = createAsyncGenerator(
-      mapTimestamps([
-        // the last day of last month is not included
-        "2025-05-31T16:00",
-        // start of this month
-        "2025-06-01T16:00",
-        // end of last week
-        "2025-06-01T12:00",
-        // start of this week
-        "2025-06-02T12:00",
-        // the day before yesterday
-        "2025-06-03T12:00",
-        // yesterday
-        "2025-06-04T12:00",
-        "2025-06-04T12:30",
-        "2025-06-04T13:00",
-        // today
-        "2025-06-05T11:00",
-        "2025-06-05T11:30",
-        // tomorrow
-        "2025-06-06T10:30",
-        // last day of this month
-        "2025-06-30T10:30",
-        // first day of next month is not included
-        "2025-07-01T12:30",
-      ]),
-    );
+    const replay = createAsyncGenerator([
+      // the last day of last month is not included
+      ActivityLoggedEvent.createTestInstance({ dateTime: "2025-05-31T16:00" }),
+      // start of this month
+      ActivityLoggedEvent.createTestInstance({ dateTime: "2025-06-01T16:00" }),
+      // end of last week
+      ActivityLoggedEvent.createTestInstance({ dateTime: "2025-06-01T12:00" }),
+      // start of this week
+      ActivityLoggedEvent.createTestInstance({ dateTime: "2025-06-02T12:00" }),
+      // the day before yesterday
+      ActivityLoggedEvent.createTestInstance({ dateTime: "2025-06-03T12:00" }),
+      // yesterday
+      ActivityLoggedEvent.createTestInstance({ dateTime: "2025-06-04T12:00" }),
+      ActivityLoggedEvent.createTestInstance({ dateTime: "2025-06-04T12:30" }),
+      ActivityLoggedEvent.createTestInstance({ dateTime: "2025-06-04T13:00" }),
+      // today
+      ActivityLoggedEvent.createTestInstance({ dateTime: "2025-06-05T11:00" }),
+      ActivityLoggedEvent.createTestInstance({ dateTime: "2025-06-05T11:30" }),
+      // tomorrow
+      ActivityLoggedEvent.createTestInstance({ dateTime: "2025-06-06T10:30" }),
+      // last day of this month
+      ActivityLoggedEvent.createTestInstance({ dateTime: "2025-06-30T10:30" }),
+      // first day of next month is not included
+      ActivityLoggedEvent.createTestInstance({ dateTime: "2025-07-01T12:30" }),
+    ]);
 
     const result = await projectRecentActivities(
       replay,
@@ -118,18 +119,24 @@ describe("Recent activities projection", () => {
   });
 
   it("should summarize hours worked for a month with 31 days", async () => {
-    const replay = createAsyncGenerator(
-      mapTimestamps([
-        "2025-11-30T12:00", // the last day of last month is not included
-        "2025-12-06T12:00", // first day in month
-        "2025-12-08T12:00", // first day in week
-        "2025-12-12T12:00", // yesterday
-        "2025-12-13T12:00", // today
-        "2025-12-14T12:00", // last day in week
-        "2025-12-31T12:00", // last day in month
-        "2026-01-01T12:00", // first day of next month is not included
-      ]),
-    );
+    const replay = createAsyncGenerator([
+      // the last day of last month is not included
+      ActivityLoggedEvent.createTestInstance({ dateTime: "2025-11-30T12:00" }),
+      // first day in month
+      ActivityLoggedEvent.createTestInstance({ dateTime: "2025-12-06T12:00" }),
+      // first day in week
+      ActivityLoggedEvent.createTestInstance({ dateTime: "2025-12-08T12:00" }),
+      // yesterday
+      ActivityLoggedEvent.createTestInstance({ dateTime: "2025-12-12T12:00" }),
+      // today
+      ActivityLoggedEvent.createTestInstance({ dateTime: "2025-12-13T12:00" }),
+      // last day in week
+      ActivityLoggedEvent.createTestInstance({ dateTime: "2025-12-14T12:00" }),
+      // last day in month
+      ActivityLoggedEvent.createTestInstance({ dateTime: "2025-12-31T12:00" }),
+      // first day of next month is not included
+      ActivityLoggedEvent.createTestInstance({ dateTime: "2026-01-01T12:00" }),
+    ]);
 
     const result = await projectRecentActivities(
       replay,
@@ -147,18 +154,24 @@ describe("Recent activities projection", () => {
   });
 
   it("should summarize hours worked for a month with 28 days", async () => {
-    const replay = createAsyncGenerator(
-      mapTimestamps([
-        "2025-01-30T12:00", // the last day of last month is not included
-        "2025-02-06T12:00", // first day in month
-        "2025-02-10T12:00", // first day in week
-        "2025-02-12T12:00", // yesterday
-        "2025-02-13T12:00", // today
-        "2025-02-16T12:00", // last day in week
-        "2025-02-28T12:00", // last day in month
-        "2026-03-01T12:00", // first day of next month is not included
-      ]),
-    );
+    const replay = createAsyncGenerator([
+      // the last day of last month is not included
+      ActivityLoggedEvent.createTestInstance({ dateTime: "2025-01-30T12:00" }),
+      // first day in month
+      ActivityLoggedEvent.createTestInstance({ dateTime: "2025-02-06T12:00" }),
+      // first day in week
+      ActivityLoggedEvent.createTestInstance({ dateTime: "2025-02-10T12:00" }),
+      // yesterday
+      ActivityLoggedEvent.createTestInstance({ dateTime: "2025-02-12T12:00" }),
+      // today
+      ActivityLoggedEvent.createTestInstance({ dateTime: "2025-02-13T12:00" }),
+      // last day in week
+      ActivityLoggedEvent.createTestInstance({ dateTime: "2025-02-16T12:00" }),
+      // last day in month
+      ActivityLoggedEvent.createTestInstance({ dateTime: "2025-02-28T12:00" }),
+      // first day of next month is not included
+      ActivityLoggedEvent.createTestInstance({ dateTime: "2026-03-01T12:00" }),
+    ]);
 
     const result = await projectRecentActivities(
       replay,
@@ -175,17 +188,3 @@ describe("Recent activities projection", () => {
     );
   });
 });
-
-// TODO extract helper functions
-
-async function* createAsyncGenerator<T>(array: T[]) {
-  for (const element of array) {
-    yield element;
-  }
-}
-
-function mapTimestamps(dateTimes: string[]) {
-  return dateTimes.map((dateTime) =>
-    ActivityLoggedEvent.createTestInstance({ dateTime }),
-  );
-}

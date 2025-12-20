@@ -8,6 +8,7 @@ import {
   EstimateQuery,
   EstimateQueryResult,
 } from "../../../src/shared/domain/activities";
+import { createAsyncGenerator } from "../common/tools";
 
 describe("Estimate projection", () => {
   it("should return an empty result when no activities are logged", async () => {
@@ -283,11 +284,3 @@ describe("Estimate projection", () => {
     });
   });
 });
-
-// TODO extract helper functions
-
-async function* createAsyncGenerator<T>(array: T[]) {
-  for (const element of array) {
-    yield element;
-  }
-}

@@ -10,6 +10,7 @@ import {
   TimesheetQuery,
   TimesheetQueryResult,
 } from "../../shared/domain/activities";
+import { filterEvents, TotalHoursProjection } from "./activities";
 
 export async function projectTimesheet(
   replay: AsyncGenerator<ActivityLoggedEvent>,
@@ -41,26 +42,6 @@ export async function projectTimesheet(
     totalHours,
     capacity,
   };
-}
-
-// TODO extract helper function
-
-async function* filterEvents(
-  replay: AsyncGenerator<ActivityLoggedEvent>,
-  from?: Temporal.PlainDate | Temporal.PlainDateLike | string,
-  to?: Temporal.PlainDate | Temporal.PlainDateLike | string,
-): AsyncGenerator<ActivityLoggedEvent> {
-  for await (const event of replay) {
-    const date = event.dateTime.toPlainDate();
-    if (from && Temporal.PlainDate.compare(date, from) < 0) {
-      continue;
-    }
-    if (to && Temporal.PlainDate.compare(date, to) > 0) {
-      continue;
-    }
-
-    yield event;
-  }
 }
 
 class TimesheetProjection {
@@ -109,19 +90,6 @@ class TimesheetProjection {
       }
       return entry1.task.localeCompare(entry2.task);
     });
-  }
-}
-
-class TotalHoursProjection {
-  #totalHours = Temporal.Duration.from("PT0S");
-
-  update(event: ActivityLoggedEvent) {
-    const hours = event.duration;
-    this.#totalHours = this.#totalHours.add(hours);
-  }
-
-  get() {
-    return normalizeDuration(this.#totalHours);
   }
 }
 

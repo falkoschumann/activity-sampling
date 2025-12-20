@@ -11,6 +11,7 @@ import {
   ReportQueryResult,
   ReportScope,
 } from "../../../src/shared/domain/activities";
+import { createAsyncGenerator } from "../common/tools";
 
 describe("Report projection", () => {
   it("should return an empty result when no activity is logged", async () => {
@@ -715,11 +716,3 @@ describe("Report projection", () => {
     );
   });
 });
-
-// TODO extract helper functions
-
-async function* createAsyncGenerator<T>(array: T[]) {
-  for (const element of array) {
-    yield element;
-  }
-}

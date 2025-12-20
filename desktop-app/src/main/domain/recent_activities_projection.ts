@@ -10,6 +10,7 @@ import {
   WorkingDay,
 } from "../../shared/domain/activities";
 import { normalizeDuration } from "../../shared/common/temporal";
+import { filterEvents } from "./activities";
 
 export async function projectRecentActivities(
   replay: AsyncGenerator<ActivityLoggedEvent>,
@@ -30,26 +31,6 @@ export async function projectRecentActivities(
     workingDays: recentActivitiesProjection.get(),
     timeSummary: timeSummaryProjection.get(),
   };
-}
-
-// TODO extract helper function
-
-async function* filterEvents(
-  replay: AsyncGenerator<ActivityLoggedEvent>,
-  from?: Temporal.PlainDate | Temporal.PlainDateLike | string,
-  to?: Temporal.PlainDate | Temporal.PlainDateLike | string,
-): AsyncGenerator<ActivityLoggedEvent> {
-  for await (const event of replay) {
-    const date = event.dateTime.toPlainDate();
-    if (from && Temporal.PlainDate.compare(date, from) < 0) {
-      continue;
-    }
-    if (to && Temporal.PlainDate.compare(date, to) > 0) {
-      continue;
-    }
-
-    yield event;
-  }
 }
 
 class RecentActivitiesProjection {

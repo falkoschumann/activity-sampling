@@ -12,6 +12,7 @@ import {
   TimesheetQuery,
   TimesheetQueryResult,
 } from "../../../src/shared/domain/activities";
+import { createAsyncGenerator } from "../common/tools";
 
 describe("Timesheet projection", () => {
   it("should return an empty result when no activities are logged", async () => {
@@ -126,13 +127,11 @@ describe("Timesheet projection", () => {
   });
 
   it("should summarize the total hours worked", async () => {
-    const replay = createAsyncGenerator(
-      mapTimestamps([
-        "2025-06-02T12:00",
-        "2025-06-02T12:30",
-        "2025-06-02T13:00",
-      ]),
-    );
+    const replay = createAsyncGenerator([
+      ActivityLoggedEvent.createTestInstance({ dateTime: "2025-06-02T12:00" }),
+      ActivityLoggedEvent.createTestInstance({ dateTime: "2025-06-02T12:30" }),
+      ActivityLoggedEvent.createTestInstance({ dateTime: "2025-06-02T13:00" }),
+    ]);
 
     const result = await projectTimesheet(
       replay,
@@ -358,17 +357,3 @@ describe("Timesheet projection", () => {
     );
   });
 });
-
-// TODO extract helper functions
-
-async function* createAsyncGenerator<T>(array: T[]) {
-  for (const element of array) {
-    yield element;
-  }
-}
-
-function mapTimestamps(dateTimes: string[]) {
-  return dateTimes.map((dateTime) =>
-    ActivityLoggedEvent.createTestInstance({ dateTime }),
-  );
-}

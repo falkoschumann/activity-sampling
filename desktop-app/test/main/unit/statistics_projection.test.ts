@@ -9,6 +9,7 @@ import {
   StatisticsQueryResult,
   StatisticsScope,
 } from "../../../src/shared/domain/activities";
+import { createAsyncGenerator } from "../common/tools";
 
 describe("Statistics projection", () => {
   describe("Working hours", () => {
@@ -524,9 +525,3 @@ describe("Statistics projection", () => {
     });
   });
 });
-
-async function* createAsyncGenerator<T>(array: T[]) {
-  for (const element of array) {
-    yield element;
-  }
-}
