@@ -7,7 +7,7 @@ import {
   ActivityLoggedEvent,
   StatisticsQuery,
   StatisticsQueryResult,
-  StatisticsScope
+  StatisticsScope,
 } from "../../../src/shared/domain/activities";
 
 describe("Statistics projection", () => {
