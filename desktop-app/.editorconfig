@@ -35,7 +35,7 @@ charset = latin1
 [*.{csv,sln}]
 end_of_line = crlf
 
-[*.{html,xml,jsx,tsx}]
+[*.{html,xml,jsx,tsx,svg}]
 max_line_length = 120
 
 [*.ics]

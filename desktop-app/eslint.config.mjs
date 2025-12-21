@@ -9,12 +9,12 @@ import globals from "globals";
 import ts from "typescript-eslint";
 
 export default ts.config(
-  { ignores: ["build", "coverage", "dist"] },
+  { ignores: ["build", "coverage", "dist", ".venv"] },
   {
     extends: [js.configs.recommended, ...ts.configs.recommended],
     files: ["**/*.{cjs,mjs,js,jsx,ts,tsx}"],
     languageOptions: {
-      ecmaVersion: 2020,
+      ecmaVersion: 2022,
       globals: globals.browser,
       parserOptions: {
         ecmaFeatures: {

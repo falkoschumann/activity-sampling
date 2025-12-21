@@ -60,8 +60,8 @@ prepare: version
 	fi
 
 version:
-	@echo "Node.js $(shell node --version)"
-	@echo "NPM $(shell npm --version)"
+	@echo "Using Node.js $(shell node --version)"
+	@echo "Using NPM $(shell npm --version)"
 
 .PHONY: \
 	all clean distclean dist start \

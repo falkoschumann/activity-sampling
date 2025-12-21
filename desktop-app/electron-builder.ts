@@ -6,9 +6,11 @@ const options: Configuration = {
   appId: "de.muspellheim.activitysampling",
   productName: "Activity Sampling",
   directories: {
-    buildResources: "resources/",
+    buildResources: "resources",
   },
   files: [
+    "!**/.github/*",
+    "!**/.venv/*",
     "!**/.vscode/*",
     "!data/*",
     "!src/*",
