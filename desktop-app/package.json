@@ -2,12 +2,25 @@
   "name": "activity-sampling",
   "version": "1.0.0",
   "description": "Periodically asks the user about their current activity and logs it for analysis.",
-  "main": "./build/main/index.js",
+  "keywords": [
+    "pomodoro",
+    "time-tracking",
+    "estimation"
+  ],
   "author": "Falko Schumann",
-  "homepage": "https://muspellheim.de",
+  "homepage": "https://github.com/falkoschumann/activity-sampling",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/falkoschumann/activity-sampling/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/falkoschumann/activity-sampling.git"
+  },
   "engines": {
     "node": ">=24.0.0"
   },
+  "main": "./build/main/index.js",
   "scripts": {
     "start": "electron-vite preview --outDir=build",
     "dev": "electron-vite dev --outDir=build --watch",
@@ -28,7 +41,7 @@
     "@types/react": "19.2.7",
     "@types/react-dom": "19.2.3",
     "@vitejs/plugin-react": "5.1.2",
-    "@vitest/coverage-v8": "4.0.15",
+    "@vitest/coverage-v8": "4.0.16",
     "ajv": "8.17.1",
     "ajv-formats": "3.0.1",
     "bootstrap": "5.3.8",
@@ -43,16 +56,16 @@
     "eslint-plugin-headers": "1.3.3",
     "eslint-plugin-react": "7.37.5",
     "eslint-plugin-react-hooks": "7.0.1",
-    "eslint-plugin-react-refresh": "0.4.25",
+    "eslint-plugin-react-refresh": "0.4.26",
     "flux-standard-action": "2.1.2",
     "globals": "16.5.0",
     "prettier": "3.7.4",
     "react": "19.2.3",
     "react-dom": "19.2.3",
-    "sass": "1.96.0",
+    "sass": "1.97.1",
     "typescript": "5.9.3",
-    "typescript-eslint": "8.49.0",
+    "typescript-eslint": "8.50.0",
     "vite": "7.3.0",
-    "vitest": "4.0.15"
+    "vitest": "4.0.16"
   }
 }
