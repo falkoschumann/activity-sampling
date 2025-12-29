@@ -4,6 +4,7 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
+    merge-strategy: "rebase"
     groups:
       minor-and-patch:
         patterns:
@@ -15,6 +16,7 @@ updates:
     directory: "/api-app"
     schedule:
       interval: "weekly"
+    merge-strategy: "rebase"
     groups:
       minor-and-patch:
         patterns:
@@ -26,6 +28,7 @@ updates:
     directory: "/web-app"
     schedule:
       interval: "weekly"
+    merge-strategy: "rebase"
     groups:
       minor-and-patch:
         patterns:
@@ -45,6 +48,7 @@ updates:
     directory: "/desktop-app"
     schedule:
       interval: "weekly"
+    merge-strategy: "rebase"
     groups:
       minor-and-patch:
         patterns:
