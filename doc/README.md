@@ -5,7 +5,7 @@ analysis.
 
 ## Domain
 
-![Domain](domain.png)
+![Domain](images/domain.png)
 
 ### Start Timer
 
@@ -75,6 +75,12 @@ analysis.
 - [x] Estimate tasks with cycle times
 - [ ] Estimate tasks with throughput
 - [x] Filter tasks by category
+
+### Burn Up Chart
+
+- [ ] Display done tasks over time
+- [ ] Display work in progress tasks over time
+- [ ] Filter tasks by category
 
 ## Architecture
 

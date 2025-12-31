@@ -1,0 +1,21 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+
+LAYOUT_LEFT_RIGHT()
+
+title "System Context Diagram for Activity Sampling System"
+
+Person(softwareDeveloper, "Software Developer", "Wants to track his/her activities.")
+Person(productOwner, "Product Owner", "Wants to analyze the effort.")
+
+System(activitySampling, "Activity Sampling", "Periodically asks the user about their current activity and log it for analysis.")
+
+SystemDb_Ext(eventStore, "Event Store", "Stores the logged activities.")
+
+Rel(softwareDeveloper, activitySampling, "Log activity")
+Rel(productOwner, activitySampling, "Analyze effort")
+Rel(activitySampling, eventStore, "Store protocol")
+
+SHOW_FLOATING_LEGEND()
+Lay_Left(LEGEND(), eventStore)
+@enduml
