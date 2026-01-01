@@ -7,6 +7,8 @@ analysis.
 
 ![Domain](images/domain.png)
 
+Stories marked with ❗are planned for the next release.
+
 ### Start Timer
 
 - [ ] Start the timer with the default interval when the application starts
@@ -16,7 +18,7 @@ analysis.
 
 - [x] Stop the timer
 
-### Current Interval
+### Get current Interval
 
 - [x] Notify the user when an interval is elapsed
 
@@ -26,20 +28,20 @@ analysis.
       or category
 - [ ] Log activity with first and last name of team member
 
-### Recent Activities
+### Find recent Activities
 
 - [x] Group activities by working days for the last 30 days
-- [x] Summarise hours worked today, yesterday, this week and this month
+- [x] Summarize hours worked today, yesterday, this week and this month
 
-### Reports
+### Get Report
 
-- [x] Summarise hours worked for clients
-- [x] Summarise hours worked on projects
-- [x] Summarise hours worked on tasks
-- [x] Summarise hours worked on categories
-- [ ] Summarise hours worked for team members
-- [x] Summarise the total hours worked
-- [x] Summarise in a period
+- [x] Summarize hours worked for clients
+- [x] Summarize hours worked on projects
+- [x] Summarize hours worked on tasks
+- [x] Summarize hours worked on categories
+- [ ] Summarize hours worked for team members
+- [x] Summarize the total hours worked
+- [x] Summarize in a period
 - [ ] Determine throughput in a period
 - [ ] Create cumulative flow diagram with cycle time, throughput and WIP
 - [ ] Optionally aggregate clients of same project
@@ -47,7 +49,7 @@ analysis.
 - [ ] Optionally aggregate categories of same task
 - [ ] Filter tasks by client, project or category
 
-### Statistics
+### Get Statistics
 
 - [x] Create histogram for hours worked on tasks
 - [x] Create histogram for cycle times
@@ -60,27 +62,34 @@ analysis.
 - [ ] Exclude tasks not suitable for statistics
 - [x] Filter statistic data by category
 
-### Timesheet
-
-- [x] Summarise hours worked on tasks
-- [x] Summarise the total hours worked
-- [x] Summarise in a period
-- [x] Compare with capacity
-- [x] Take holidays into account
-- [x] Take vacation into account
-- [ ] Export timesheet in Harvest format
-
-### Estimate
+### Get Estimate
 
 - [x] Estimate tasks with cycle times
 - [ ] Estimate tasks with throughput
 - [x] Filter tasks by category
 
-### Burn Up Chart
+### Get Burn-Up
 
-- [ ] Display done tasks over time
-- [ ] Display work in progress tasks over time
-- [ ] Filter tasks by category
+- [ ] ❗Display done tasks over time
+- [ ] ❗Display work in progress tasks over time
+- [ ] ❗Filter tasks by category
+
+### Get Timesheet
+
+- [x] Summarize hours worked on tasks
+- [x] Summarize the total hours worked
+- [x] Summarize in a period
+- [x] Compare with capacity
+- [x] Take holidays into account
+- [x] Take vacation into account
+
+### Export Timesheet
+
+- [ ] ❗Export timesheet in Harvest format
+- [ ] ❗Export only tasks of a specific client
+- [ ] ❗Export only tasks of a specific project
+- [ ] ❗Export only tasks in a specific period
+- [ ] Export only tasks of a specific category
 
 ## Architecture
 
