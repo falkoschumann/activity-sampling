@@ -42,8 +42,6 @@ Stories marked with ❗are planned for the next release.
 - [ ] Summarize hours worked for team members
 - [x] Summarize the total hours worked
 - [x] Summarize in a period
-- [ ] Determine throughput in a period
-- [ ] Create cumulative flow diagram with cycle time, throughput and WIP
 - [ ] Optionally aggregate clients of same project
 - [ ] Filter projects by client
 - [ ] Optionally aggregate categories of same task
@@ -70,9 +68,19 @@ Stories marked with ❗are planned for the next release.
 
 ### Burn-Up
 
-- [ ] ❗Display done tasks over time
-- [ ] ❗Display work in progress tasks over time
+- [ ] ❗Determine tasks done over time
+- [ ] ❗Filter tasks in a period
 - [ ] ❗Filter tasks by category
+
+### Cumulative Flow
+
+- [ ] Determine tasks done over time
+- [ ] Determine tasks work in progress over time
+- [ ] Determine cycle time
+- [ ] Determine throughput and WIP
+- [ ] Determine WIP
+- [ ] Filter tasks in a period
+- [ ] Filter tasks by category
 
 ### Timesheet
 
