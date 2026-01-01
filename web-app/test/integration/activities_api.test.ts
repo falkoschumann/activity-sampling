@@ -1,4 +1,4 @@
-// Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
+// Copyright (c) 2026 Falko Schumann. All rights reserved. MIT license.
 
 import { describe, expect, it } from "vitest";
 import { Success } from "../../src/common/messages";
