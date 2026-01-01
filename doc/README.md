@@ -18,7 +18,7 @@ Stories marked with ❗are planned for the next release.
 
 - [x] Stop the timer
 
-### Get current Interval
+### Current Interval
 
 - [x] Notify the user when an interval is elapsed
 
@@ -28,12 +28,12 @@ Stories marked with ❗are planned for the next release.
       or category
 - [ ] Log activity with first and last name of team member
 
-### Find recent Activities
+### Recent Activities
 
 - [x] Group activities by working days for the last 30 days
 - [x] Summarize hours worked today, yesterday, this week and this month
 
-### Get Report
+### Report
 
 - [x] Summarize hours worked for clients
 - [x] Summarize hours worked on projects
@@ -49,7 +49,7 @@ Stories marked with ❗are planned for the next release.
 - [ ] Optionally aggregate categories of same task
 - [ ] Filter tasks by client, project or category
 
-### Get Statistics
+### Statistics
 
 - [x] Create histogram for hours worked on tasks
 - [x] Create histogram for cycle times
@@ -62,19 +62,19 @@ Stories marked with ❗are planned for the next release.
 - [ ] Exclude tasks not suitable for statistics
 - [x] Filter statistic data by category
 
-### Get Estimate
+### Estimate
 
 - [x] Estimate tasks with cycle times
 - [ ] Estimate tasks with throughput
 - [x] Filter tasks by category
 
-### Get Burn-Up
+### Burn-Up
 
 - [ ] ❗Display done tasks over time
 - [ ] ❗Display work in progress tasks over time
 - [ ] ❗Filter tasks by category
 
-### Get Timesheet
+### Timesheet
 
 - [x] Summarize hours worked on tasks
 - [x] Summarize the total hours worked
