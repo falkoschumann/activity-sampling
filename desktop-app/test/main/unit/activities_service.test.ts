@@ -1,4 +1,4 @@
-// Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
+// Copyright (c) 2026 Falko Schumann. All rights reserved. MIT license.
 
 import { type CommandStatus, Success } from "@muspellheim/shared";
 import { describe, expect, it } from "vitest";
