@@ -24,6 +24,24 @@ export class Activity {
     return new Activity(start, finish, client, project, task, hours);
   }
 
+  static createTestInstance({
+    start = "2025-08-14",
+    finish = "2025-08-14",
+    client = "Test client",
+    project = "Test project",
+    task = "Test task",
+    hours = "PT30M",
+  }: {
+    start: Temporal.PlainDateLike | string;
+    finish: Temporal.PlainDateLike | string;
+    client?: string;
+    project?: string;
+    task?: string;
+    hours: Temporal.DurationLike | string;
+  }): Activity {
+    return new Activity(start, finish, client, project, task, hours);
+  }
+
   readonly start: Temporal.PlainDate;
   readonly finish: Temporal.PlainDate;
   readonly client: string;
@@ -57,54 +75,71 @@ export class ActivitiesProjection {
   }
 
   update(event: ActivityLoggedEvent) {
-    if (
-      this.#categories &&
-      this.#categories.length > 0 &&
-      !this.#categories.includes(event.category ?? "")
-    ) {
-      // filter by selected categories
+    if (!this.#isSelectedCategory(event.category)) {
       return;
     }
 
     const date = event.dateTime.toPlainDate();
-    const index = this.#activities.findIndex(
-      (activity) =>
-        activity.client === event.client &&
-        activity.project === event.project &&
-        activity.task === event.task,
-    );
+    const index = this.#findIndexOfActivity(event);
     if (index === -1) {
-      const activity = Activity.create({
-        start: date,
-        finish: date,
-        client: event.client,
-        project: event.project,
-        task: event.task,
-        hours: event.duration,
-      });
-      this.#activities.push(activity);
+      this.#addActivity(date, event);
     } else {
-      const activity = this.#activities[index];
-      let start = activity.start;
-      let finish = activity.finish;
-      if (Temporal.PlainDate.compare(date, start) < 0) {
-        start = date;
-      }
-      if (Temporal.PlainDate.compare(date, finish) > 0) {
-        finish = date;
-      }
-      const hours = activity.hours.add(event.duration);
-      this.#activities[index] = Activity.create({
-        ...activity,
-        start,
-        finish,
-        hours: normalizeDuration(hours),
-      });
+      this.updateActivity(index, date, event);
     }
   }
 
   get() {
     return this.#activities;
+  }
+
+  #isSelectedCategory(category?: string) {
+    return (
+      this.#categories.length == 0 || this.#categories.includes(category ?? "")
+    );
+  }
+
+  #findIndexOfActivity(event: ActivityLoggedEvent) {
+    return this.#activities.findIndex(
+      (activity) =>
+        activity.client === event.client &&
+        activity.project === event.project &&
+        activity.task === event.task,
+    );
+  }
+
+  #addActivity(date: Temporal.PlainDate, event: ActivityLoggedEvent) {
+    const activity = Activity.create({
+      start: date,
+      finish: date,
+      client: event.client,
+      project: event.project,
+      task: event.task,
+      hours: event.duration,
+    });
+    this.#activities.push(activity);
+  }
+
+  private updateActivity(
+    index: number,
+    date: Temporal.PlainDate,
+    event: ActivityLoggedEvent,
+  ) {
+    const activity = this.#activities[index];
+    let start = activity.start;
+    let finish = activity.finish;
+    if (Temporal.PlainDate.compare(date, start) < 0) {
+      start = date;
+    }
+    if (Temporal.PlainDate.compare(date, finish) > 0) {
+      finish = date;
+    }
+    const hours = activity.hours.add(event.duration);
+    this.#activities[index] = Activity.create({
+      ...activity,
+      start,
+      finish,
+      hours: normalizeDuration(hours),
+    });
   }
 }
 
@@ -142,14 +177,22 @@ export async function* filterEvents(
   to?: Temporal.PlainDate | Temporal.PlainDateLike | string,
 ): AsyncGenerator<ActivityLoggedEvent> {
   for await (const event of replay) {
-    const date = event.dateTime.toPlainDate();
-    if (from && Temporal.PlainDate.compare(date, from) < 0) {
-      continue;
+    if (isDateInPeriod(event.dateTime.toPlainDate(), from, to)) {
+      yield event;
     }
-    if (to && Temporal.PlainDate.compare(date, to) > 0) {
-      continue;
-    }
-
-    yield event;
   }
+}
+
+function isDateInPeriod(
+  date: Temporal.PlainDate | Temporal.PlainDateLike | string,
+  from?: Temporal.PlainDate | Temporal.PlainDateLike | string,
+  to?: Temporal.PlainDate | Temporal.PlainDateLike | string,
+) {
+  if (from && Temporal.PlainDate.compare(date, from) < 0) {
+    return false;
+  }
+  if (to && Temporal.PlainDate.compare(date, to) > 0) {
+    return false;
+  }
+  return true;
 }
