@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 
 import { Clock } from "../../../src/shared/common/temporal";
 import { ActivityLoggedEventDto } from "../../../src/main/infrastructure/events";
-import { BurnUpQueryHandler } from "../../../src/main/application/burn_up_query_handler";
+import { queryBurnUp } from "../../../src/main/application/query_burn_up";
 import {
   BurnUpData,
   BurnUpQuery,
@@ -15,9 +15,9 @@ import { EventStore } from "../../../src/main/infrastructure/event_store";
 describe("Burn-up", () => {
   describe("Display tasks done over time", () => {
     it("should return an empty result when no event is recorded", async () => {
-      const { handler } = configure({ events: [] });
+      const { queryBurnUp } = configure({ events: [] });
 
-      const result = await handler.queryBurnUp(
+      const result = await queryBurnUp(
         BurnUpQuery.create({
           from: "2021-10-11",
           to: "2021-10-22",
@@ -78,9 +78,9 @@ describe("Burn-up", () => {
           task: "task-12",
         }),
       ];
-      const { handler } = configure({ events });
+      const { queryBurnUp } = configure({ events });
 
-      const result = await handler.queryBurnUp(
+      const result = await queryBurnUp(
         BurnUpQuery.create({
           from: "2021-10-11",
           to: "2021-10-22",
@@ -160,6 +160,8 @@ describe("Burn-up", () => {
 
 function configure({ events }: { events: unknown[] }) {
   const eventStore = EventStore.createNull({ events });
-  const handler = new BurnUpQueryHandler(eventStore, Clock.systemDefaultZone());
-  return { handler };
+  return {
+    queryBurnUp: (query: BurnUpQuery) =>
+      queryBurnUp(query, eventStore, Clock.systemDefaultZone()),
+  };
 }

@@ -17,6 +17,10 @@ import {
   type TimesheetQuery,
   type TimesheetQueryResult,
 } from "../../shared/domain/activities";
+import {
+  type BurnUpQuery,
+  BurnUpQueryResult,
+} from "../../shared/domain/burn_up_query";
 import { projectEstimate } from "../domain/estimate_projection";
 import { projectRecentActivities } from "../domain/recent_activities_projection";
 import { projectReport } from "../domain/report_projection";
@@ -27,11 +31,7 @@ import { EventStore } from "../infrastructure/event_store";
 import { ActivityLoggedEventDto } from "../infrastructure/events";
 import { HolidayRepository } from "../infrastructure/holiday_repository";
 import { VacationRepository } from "../infrastructure/vacation_repository";
-import {
-  type BurnUpQuery,
-  BurnUpQueryResult,
-} from "../../shared/domain/burn_up_query";
-import { BurnUpQueryHandler } from "./burn_up_query_handler";
+import { queryBurnUp } from "./query_burn_up";
 
 export class ActivitiesService {
   static create(): ActivitiesService {
@@ -44,7 +44,6 @@ export class ActivitiesService {
   }
 
   #capacity: Temporal.Duration;
-  readonly #burnUpQueryHandler: BurnUpQueryHandler;
   readonly #eventStore: EventStore;
   readonly #holidayRepository: HolidayRepository;
   readonly #vacationRepository: VacationRepository;
@@ -63,7 +62,6 @@ export class ActivitiesService {
     this.#vacationRepository = vacationRepository;
     this.#clock = clock;
 
-    this.#burnUpQueryHandler = new BurnUpQueryHandler(eventStore, clock);
     this.applySettings(settings);
   }
 
@@ -112,7 +110,7 @@ export class ActivitiesService {
   }
 
   async queryBurnUp(query: BurnUpQuery): Promise<BurnUpQueryResult> {
-    return this.#burnUpQueryHandler.queryBurnUp(query);
+    return queryBurnUp(query, this.#eventStore, this.#clock);
   }
 
   async queryTimesheet(query: TimesheetQuery): Promise<TimesheetQueryResult> {
