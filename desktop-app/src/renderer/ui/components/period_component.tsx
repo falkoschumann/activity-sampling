@@ -25,7 +25,7 @@ export function PeriodComponent({
   onChangePeriod: (unit: PeriodUnitType) => void;
 }) {
   return (
-    <div className="btn-toolbar py-2 gap-2" role="toolbar" aria-label="Toolbar with navigation buttons">
+    <div className="btn-toolbar py-2 gap-2" role="toolbar" aria-label="Toolbar with time navigation buttons">
       {unit === PeriodUnit.ALL_TIME ? (
         <div className="align-content-center">
           <strong>{unit}</strong>
@@ -52,7 +52,7 @@ export function PeriodComponent({
           </div>
         </div>
       )}
-      <div className="btn-group btn-group-sm ms-auto" role="group" aria-label="Option buttons">
+      <div className="btn-group btn-group-sm ms-auto" role="group" aria-label="Options buttons">
         <button
           className="btn btn-outline-secondary dropdown-toggle"
           type="button"

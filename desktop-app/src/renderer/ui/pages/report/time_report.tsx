@@ -38,7 +38,6 @@ export default function TimeReportComponent({ scope, entries }: { scope: ReportS
             {scope === ReportScope.CLIENTS && <td className="text-nowrap">{entry.client}</td>}
             {scope === ReportScope.PROJECTS && (
               <>
-                {" "}
                 <td className="text-nowrap">{entry.project}</td>
                 <td>{entry.client}</td>
               </>

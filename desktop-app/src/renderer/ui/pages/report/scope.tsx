@@ -11,7 +11,7 @@ export default function ScopeComponent({
 }) {
   return (
     <div className="btn-toolbar py-2 gap-2" role="toolbar" aria-label="Toolbar with scope buttons">
-      <div className="btn-group btn-group-sm">
+      <div className="btn-group btn-group-sm" role="group" aria-label="Select report scope">
         {Object.values(ReportScope).map((it) => (
           <button
             key={it}

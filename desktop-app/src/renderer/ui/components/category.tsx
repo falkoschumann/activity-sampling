@@ -29,7 +29,7 @@ export default function CategoryComponent({
   }
 
   return (
-    <div className="dropdown">
+    <>
       <button
         className="btn btn-outline-secondary dropdown-toggle"
         type="button"
@@ -39,9 +39,9 @@ export default function CategoryComponent({
       >
         {title}
       </button>
-      <div className="dropdown-menu p-4">
-        <h6>Categories</h6>
-        <div className="mb-3">
+      <div className="dropdown-menu">
+        <h6 className="dropdown-item">Categories</h6>
+        <div className="dropdown-item">
           {categories.map((category) => (
             <div key={`category-${category}`} className="form-check">
               <input
@@ -59,6 +59,6 @@ export default function CategoryComponent({
           ))}
         </div>
       </div>
-    </div>
+    </>
   );
 }
