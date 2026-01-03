@@ -112,7 +112,7 @@ export class ActivitiesService {
   }
 
   async queryBurnUp(query: BurnUpQuery): Promise<BurnUpQueryResult> {
-    return this.#burnUpQueryHandler.handle(query);
+    return this.#burnUpQueryHandler.queryBurnUp(query);
   }
 
   async queryTimesheet(query: TimesheetQuery): Promise<TimesheetQueryResult> {

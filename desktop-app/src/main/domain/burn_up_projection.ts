@@ -1,5 +1,7 @@
 // Copyright (c) 2026 Falko Schumann. All rights reserved. MIT license.
 
+import { Temporal } from "@js-temporal/polyfill";
+
 import { ActivityLoggedEvent } from "../../shared/domain/activities";
 import {
   BurnUpData,
@@ -7,54 +9,45 @@ import {
   BurnUpQueryResult,
 } from "../../shared/domain/burn_up_query";
 import { ActivitiesProjection, Activity, filterEvents } from "./activities";
-import { Temporal } from "@js-temporal/polyfill";
 
 export async function projectBurnUp(
   replay: AsyncGenerator<ActivityLoggedEvent>,
   query: BurnUpQuery,
 ): Promise<BurnUpQueryResult> {
+  const activities = await projectActivities(replay, query);
+  const throughputs = determineThroughputs(activities);
+  const data = fillPeriod(throughputs, query.from, query.to);
+  const totalThroughput = determineTotalThroughput(data);
+  return BurnUpQueryResult.create({ data, totalThroughput });
+}
+
+async function projectActivities(
+  replay: AsyncGenerator<ActivityLoggedEvent>,
+  query: BurnUpQuery,
+) {
   const activitiesProjection = new ActivitiesProjection();
   for await (const event of filterEvents(replay, query.from, query.to)) {
     activitiesProjection.update(event);
   }
-  const activities = activitiesProjection.get();
-  const { throughputs, from, to } = determineThroughputs(
-    activities,
-    query.from,
-    query.to,
-  );
-  const data = fillPeriod(throughputs, from, to);
-  const totalThroughput =
-    data.length > 0 ? data[data.length - 1].cumulativeThroughput : 0;
-  return BurnUpQueryResult.create({ data, totalThroughput });
+  return activitiesProjection.get();
 }
 
-function determineThroughputs(
-  activities: Activity[],
-  from?: Temporal.PlainDate,
-  to?: Temporal.PlainDate,
-) {
+function determineThroughputs(activities: Activity[]) {
   const throughputs = new Map<string, number>();
   for (const activity of activities) {
     const date = activity.finish.toString();
-    if (!from || Temporal.PlainDate.compare(activity.finish, from) < 0) {
-      from = activity.finish;
-    }
-    if (!to || Temporal.PlainDate.compare(activity.finish, to) > 0) {
-      to = activity.finish;
-    }
     const currentThroughput = throughputs.get(date) ?? 0;
     throughputs.set(date, currentThroughput + 1);
   }
-  return { throughputs, from, to };
+  return throughputs;
 }
 
 function fillPeriod(
   throughputs: Map<string, number>,
-  from: Temporal.PlainDate | undefined,
-  to: Temporal.PlainDate | undefined,
+  from: Temporal.PlainDate,
+  to: Temporal.PlainDate,
 ) {
-  if (throughputs.size === 0 || !from || !to) {
+  if (throughputs.size === 0) {
     return [];
   }
 
@@ -88,4 +81,8 @@ function fillPeriod(
     }
   }
   return data;
+}
+
+function determineTotalThroughput(data: BurnUpData[]) {
+  return data.length > 0 ? data[data.length - 1].cumulativeThroughput : 0;
 }

@@ -19,19 +19,15 @@ export class BurnUpQueryHandler {
     this.#clock = clock;
   }
 
-  async handle(query: BurnUpQuery): Promise<BurnUpQueryResult> {
-    const replay = this.#replayTyped(this.#eventStore.replay(), query.timeZone);
+  async queryBurnUp(query: BurnUpQuery): Promise<BurnUpQueryResult> {
+    const timeZone = query.timeZone || this.#clock.zone;
+    const replay = this.#replayTyped(this.#eventStore.replay(), timeZone);
     return projectBurnUp(replay, query);
   }
 
-  async *#replayTyped(
-    events: AsyncGenerator,
-    timeZone?: Temporal.TimeZoneLike,
-  ) {
+  async *#replayTyped(events: AsyncGenerator, timeZone: Temporal.TimeZoneLike) {
     for await (const e of events) {
-      yield ActivityLoggedEventDto.fromJson(e).validate(
-        timeZone || this.#clock.zone,
-      );
+      yield ActivityLoggedEventDto.fromJson(e).validate(timeZone);
     }
   }
 }

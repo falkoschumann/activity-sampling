@@ -17,7 +17,7 @@ describe("Burn-up", () => {
     it("should return an empty result when no event is recorded", async () => {
       const { handler } = configure({ events: [] });
 
-      const result = await handler.handle(
+      const result = await handler.queryBurnUp(
         BurnUpQuery.create({
           from: "2021-10-11",
           to: "2021-10-22",
@@ -80,7 +80,7 @@ describe("Burn-up", () => {
       ];
       const { handler } = configure({ events });
 
-      const result = await handler.handle(
+      const result = await handler.queryBurnUp(
         BurnUpQuery.create({
           from: "2021-10-11",
           to: "2021-10-22",
