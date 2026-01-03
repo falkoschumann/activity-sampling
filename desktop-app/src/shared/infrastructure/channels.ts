@@ -9,6 +9,7 @@ export const QUERY_REPORT_CHANNEL = "queryReport";
 export const QUERY_STATISTICS_CHANNEL = "queryStatistics";
 export const QUERY_TIMESHEET_CHANNEL = "queryTimesheet";
 export const QUERY_ESTIMATE_CHANNEL = "queryEstimate";
+export const QUERY_BURN_UP_CHANNEL = "queryBurnUp";
 
 // Events
 export const TIMER_STARTED_CHANNEL = "timerStarted";

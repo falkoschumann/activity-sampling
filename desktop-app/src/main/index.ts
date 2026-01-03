@@ -32,6 +32,7 @@ import {
   INTERVAL_ELAPSED_CHANNEL,
   LOAD_SETTINGS_CHANNEL,
   LOG_ACTIVITY_CHANNEL,
+  QUERY_BURN_UP_CHANNEL,
   QUERY_ESTIMATE_CHANNEL,
   QUERY_RECENT_ACTIVITIES_CHANNEL,
   QUERY_REPORT_CHANNEL,
@@ -55,6 +56,10 @@ import {
   TimerStartedEventDto,
   TimerStoppedEventDto,
 } from "../shared/infrastructure/timer";
+import {
+  BurnUpQueryDto,
+  BurnUpQueryResultDto,
+} from "../shared/infrastructure/burn_up_query";
 
 const settingsService = SettingsService.create();
 const activitiesService = ActivitiesService.create();
@@ -186,6 +191,14 @@ function createRendererToMainChannels() {
       const query = EstimateQueryDto.create(queryDto).validate();
       const result = await activitiesService.queryEstimate(query);
       return EstimateQueryResultDto.fromModel(result);
+    },
+  );
+  ipcMain.handle(
+    QUERY_BURN_UP_CHANNEL,
+    async (_event, queryDto: BurnUpQueryDto) => {
+      const query = BurnUpQueryDto.create(queryDto).validate();
+      const result = await activitiesService.queryBurnUp(query);
+      return BurnUpQueryResultDto.fromModel(result);
     },
   );
   ipcMain.handle(LOAD_SETTINGS_CHANNEL, async (_event) => {

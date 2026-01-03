@@ -23,6 +23,7 @@ import {
   INTERVAL_ELAPSED_CHANNEL,
   LOAD_SETTINGS_CHANNEL,
   LOG_ACTIVITY_CHANNEL,
+  QUERY_BURN_UP_CHANNEL,
   QUERY_ESTIMATE_CHANNEL,
   QUERY_RECENT_ACTIVITIES_CHANNEL,
   QUERY_REPORT_CHANNEL,
@@ -39,6 +40,10 @@ import type {
   TimerStartedEventDto,
   TimerStoppedEventDto,
 } from "../shared/infrastructure/timer";
+import {
+  type BurnUpQueryDto,
+  BurnUpQueryResultDto,
+} from "../shared/infrastructure/burn_up_query";
 
 contextBridge.exposeInMainWorld("activitySampling", {
   logActivity: async (
@@ -73,6 +78,10 @@ contextBridge.exposeInMainWorld("activitySampling", {
     query: StatisticsQueryDto,
   ): Promise<StatisticsQueryResultDto> => {
     return ipcRenderer.invoke(QUERY_ESTIMATE_CHANNEL, query);
+  },
+
+  queryBurnUp: async (query: BurnUpQueryDto): Promise<BurnUpQueryResultDto> => {
+    return ipcRenderer.invoke(QUERY_BURN_UP_CHANNEL, query);
   },
 
   onTimerStartedEvent: (

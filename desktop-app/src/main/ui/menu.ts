@@ -202,6 +202,16 @@ export function createMenu({
             }),
         },
         {
+          label: "Burn-up Chart",
+          accelerator: "Alt+CmdOrCtrl+B",
+          click: () =>
+            openWindow({
+              rendererFile: "burn-up-chart.html",
+              width: 1000,
+              height: 800,
+            }),
+        },
+        {
           label: "Timesheet",
           accelerator: "Alt+CmdOrCtrl+T",
           click: () =>

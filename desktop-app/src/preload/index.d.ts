@@ -43,6 +43,8 @@ export interface ActivitySampling {
 
   queryEstimate(query: EstimateQueryDto): Promise<EstimateQueryResultDto>;
 
+  queryBurnUp(query: BurnUpQueryDto): Promise<BurnUpQueryResultDto>;
+
   onTimerStartedEvent: (
     callback: (event: TimerStartedEventDto) => void,
   ) => Unsubscriber;

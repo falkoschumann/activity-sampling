@@ -27,6 +27,11 @@ import { EventStore } from "../infrastructure/event_store";
 import { ActivityLoggedEventDto } from "../infrastructure/events";
 import { HolidayRepository } from "../infrastructure/holiday_repository";
 import { VacationRepository } from "../infrastructure/vacation_repository";
+import {
+  type BurnUpQuery,
+  BurnUpQueryResult,
+} from "../../shared/domain/burn_up_query";
+import { BurnUpQueryHandler } from "./burn_up_query_handler";
 
 export class ActivitiesService {
   static create(): ActivitiesService {
@@ -39,6 +44,7 @@ export class ActivitiesService {
   }
 
   #capacity: Temporal.Duration;
+  readonly #burnUpQueryHandler: BurnUpQueryHandler;
   readonly #eventStore: EventStore;
   readonly #holidayRepository: HolidayRepository;
   readonly #vacationRepository: VacationRepository;
@@ -57,6 +63,7 @@ export class ActivitiesService {
     this.#vacationRepository = vacationRepository;
     this.#clock = clock;
 
+    this.#burnUpQueryHandler = new BurnUpQueryHandler(eventStore, clock);
     this.applySettings(settings);
   }
 
@@ -102,6 +109,10 @@ export class ActivitiesService {
   async queryEstimate(query: EstimateQuery): Promise<EstimateQueryResult> {
     const replay = this.#replayTyped(this.#eventStore.replay(), query.timeZone);
     return projectEstimate(replay, query);
+  }
+
+  async queryBurnUp(query: BurnUpQuery): Promise<BurnUpQueryResult> {
+    return this.#burnUpQueryHandler.handle(query);
   }
 
   async queryTimesheet(query: TimesheetQuery): Promise<TimesheetQueryResult> {
