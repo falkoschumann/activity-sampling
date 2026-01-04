@@ -6,26 +6,31 @@ export class BurnUpQuery {
   static create({
     from,
     to,
+    categories,
     timeZone,
   }: {
     from: Temporal.PlainDateLike | string;
     to: Temporal.PlainDateLike | string;
+    categories?: string[];
     timeZone?: Temporal.TimeZoneLike;
   }): BurnUpQuery {
-    return new BurnUpQuery(from, to, timeZone);
+    return new BurnUpQuery(from, to, categories, timeZone);
   }
 
   readonly from: Temporal.PlainDate;
   readonly to: Temporal.PlainDate;
+  readonly categories?: string[];
   readonly timeZone?: Temporal.TimeZoneLike;
 
   private constructor(
     from: Temporal.PlainDateLike | string,
     to: Temporal.PlainDateLike | string,
+    categories?: string[],
     timeZone?: Temporal.TimeZoneLike,
   ) {
     this.from = Temporal.PlainDate.from(from);
     this.to = Temporal.PlainDate.from(to);
+    this.categories = categories;
     this.timeZone = timeZone;
   }
 }
@@ -34,19 +39,27 @@ export class BurnUpQueryResult {
   static create({
     data = [],
     totalThroughput = 0,
+    categories = [],
   }: {
     data?: BurnUpData[];
     totalThroughput?: number;
+    categories?: string[];
   } = {}): BurnUpQueryResult {
-    return new BurnUpQueryResult(data, totalThroughput);
+    return new BurnUpQueryResult(data, totalThroughput, categories);
   }
 
   readonly data: BurnUpData[];
   readonly totalThroughput: number;
+  readonly categories: string[];
 
-  private constructor(data: BurnUpData[], totalThroughput: number) {
+  private constructor(
+    data: BurnUpData[],
+    totalThroughput: number,
+    categories: string[],
+  ) {
     this.data = data;
     this.totalThroughput = totalThroughput;
+    this.categories = categories;
   }
 }
 

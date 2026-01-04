@@ -10,30 +10,40 @@ export class BurnUpQueryDto {
   static create({
     from,
     to,
+    categories,
     timeZone,
   }: {
     from: string;
     to: string;
+    categories?: string[];
     timeZone?: string;
   }): BurnUpQueryDto {
-    return new BurnUpQueryDto(from, to, timeZone);
+    return new BurnUpQueryDto(from, to, categories, timeZone);
   }
 
   static fromModel(model: BurnUpQuery): BurnUpQueryDto {
     return BurnUpQueryDto.create({
       from: model.from.toString(),
       to: model.to.toString(),
+      categories: model.categories,
       timeZone: model.timeZone?.toString(),
     });
   }
 
   readonly from: string;
   readonly to: string;
+  readonly categories?: string[];
   readonly timeZone?: string;
 
-  private constructor(from: string, to: string, timeZone?: string) {
+  private constructor(
+    from: string,
+    to: string,
+    categories?: string[],
+    timeZone?: string,
+  ) {
     this.from = from;
     this.to = to;
+    this.categories = categories;
     this.timeZone = timeZone;
   }
 
@@ -46,11 +56,13 @@ export class BurnUpQueryResultDto {
   static create({
     data = [],
     totalThroughput = 0,
+    categories,
   }: {
     data?: BurnUpDataDto[];
     totalThroughput?: number;
+    readonly categories?: string[];
   } = {}): BurnUpQueryResultDto {
-    return new BurnUpQueryResultDto(data, totalThroughput);
+    return new BurnUpQueryResultDto(data, totalThroughput, categories);
   }
 
   static fromModel(model: BurnUpQueryResult): BurnUpQueryResultDto {
@@ -58,15 +70,22 @@ export class BurnUpQueryResultDto {
     return BurnUpQueryResultDto.create({
       data,
       totalThroughput: model.totalThroughput,
+      categories: model.categories,
     });
   }
 
   readonly data: BurnUpDataDto[];
   readonly totalThroughput: number;
+  readonly categories?: string[];
 
-  private constructor(data: BurnUpDataDto[], totalThroughput: number) {
+  private constructor(
+    data: BurnUpDataDto[],
+    totalThroughput: number,
+    categories?: string[],
+  ) {
     this.data = data;
     this.totalThroughput = totalThroughput;
+    this.categories = categories;
   }
 
   validate(): BurnUpQueryResult {

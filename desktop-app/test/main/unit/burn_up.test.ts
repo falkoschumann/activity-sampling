@@ -32,26 +32,32 @@ describe("Burn-up", () => {
         ActivityLoggedEventDto.createTestInstance({
           timestamp: "2021-10-12T16:00:00Z",
           task: "task-1",
+          category: "category-3",
         }),
         ActivityLoggedEventDto.createTestInstance({
           timestamp: "2021-10-13T16:00:00Z",
           task: "task-2",
+          category: "category-2",
         }),
         ActivityLoggedEventDto.createTestInstance({
           timestamp: "2021-10-14T16:00:00Z",
           task: "task-3",
+          category: "category-1",
         }),
         ActivityLoggedEventDto.createTestInstance({
           timestamp: "2021-10-15T16:00:00Z",
           task: "task-4",
+          category: "category-1",
         }),
         ActivityLoggedEventDto.createTestInstance({
           timestamp: "2021-10-18T12:00:00Z",
           task: "task-5",
+          category: "category-1",
         }),
         ActivityLoggedEventDto.createTestInstance({
           timestamp: "2021-10-18T16:00:00Z",
           task: "task-6",
+          category: "category-2",
         }),
         ActivityLoggedEventDto.createTestInstance({
           timestamp: "2021-10-19T12:00:00Z",
@@ -60,22 +66,27 @@ describe("Burn-up", () => {
         ActivityLoggedEventDto.createTestInstance({
           timestamp: "2021-10-19T16:00:00Z",
           task: "task-8",
+          category: "category-2",
         }),
         ActivityLoggedEventDto.createTestInstance({
           timestamp: "2021-10-20T16:00:00Z",
           task: "task-9",
+          category: "category-2",
         }),
         ActivityLoggedEventDto.createTestInstance({
           timestamp: "2021-10-21T16:00:00Z",
           task: "task-10",
+          category: "category-3",
         }),
         ActivityLoggedEventDto.createTestInstance({
           timestamp: "2021-10-22T12:00:00Z",
           task: "task-11",
+          category: "category-1",
         }),
         ActivityLoggedEventDto.createTestInstance({
           timestamp: "2021-10-22T16:00:00Z",
           task: "task-12",
+          category: "category-3",
         }),
       ];
       const { queryBurnUp } = configure({ events });
@@ -152,6 +163,60 @@ describe("Burn-up", () => {
             }),
           ],
           totalThroughput: 12,
+          categories: ["", "category-1", "category-2", "category-3"],
+        }),
+      );
+    });
+
+    it("should filter by categories", async () => {
+      const events = [
+        ActivityLoggedEventDto.createTestInstance({
+          timestamp: "2021-10-12T16:00:00Z",
+          task: "task-1",
+          category: "category-1",
+        }),
+        ActivityLoggedEventDto.createTestInstance({
+          timestamp: "2021-10-13T16:00:00Z",
+          task: "task-2",
+          category: "category-2",
+        }),
+        ActivityLoggedEventDto.createTestInstance({
+          timestamp: "2021-10-14T16:00:00Z",
+          task: "task-1",
+          category: "category-2",
+        }),
+      ];
+      const { queryBurnUp } = configure({ events });
+
+      const result = await queryBurnUp(
+        BurnUpQuery.create({
+          from: "2021-10-12",
+          to: "2021-10-14",
+          categories: ["category-1"],
+        }),
+      );
+
+      expect(result).toEqual(
+        BurnUpQueryResult.create({
+          data: [
+            BurnUpData.create({
+              date: "2021-10-12",
+              throughput: 1,
+              cumulativeThroughput: 1,
+            }),
+            BurnUpData.create({
+              date: "2021-10-13",
+              throughput: 0,
+              cumulativeThroughput: 1,
+            }),
+            BurnUpData.create({
+              date: "2021-10-14",
+              throughput: 0,
+              cumulativeThroughput: 1,
+            }),
+          ],
+          totalThroughput: 1,
+          categories: ["category-1", "category-2"],
         }),
       );
     });

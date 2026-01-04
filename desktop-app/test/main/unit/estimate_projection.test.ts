@@ -126,7 +126,7 @@ describe("Estimate projection", () => {
     });
   });
 
-  it("should filter by category when category is provided", async () => {
+  it("should filter activities by category", async () => {
     const replay = createAsyncGenerator([
       ActivityLoggedEvent.createTestInstance({
         dateTime: "2025-11-03T10:00",
@@ -169,7 +169,7 @@ describe("Estimate projection", () => {
     });
   });
 
-  it("should filter by activities without a category", async () => {
+  it("should filter activities without a category", async () => {
     const replay = createAsyncGenerator([
       ActivityLoggedEvent.createTestInstance({
         dateTime: "2025-11-03T10:00",
@@ -210,7 +210,7 @@ describe("Estimate projection", () => {
     });
   });
 
-  it("should filter by no category and a category", async () => {
+  it("should filter activities with and without category", async () => {
     const replay = createAsyncGenerator([
       ActivityLoggedEvent.createTestInstance({
         dateTime: "2025-11-03T10:00",
@@ -247,7 +247,7 @@ describe("Estimate projection", () => {
     });
   });
 
-  it("should do not filter when query categories is an empty array", async () => {
+  it("should do not filter by category when an empty array is given", async () => {
     const replay = createAsyncGenerator([
       ActivityLoggedEvent.createTestInstance({
         dateTime: "2025-11-03T10:00",

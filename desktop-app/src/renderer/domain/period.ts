@@ -3,21 +3,7 @@
 import { Temporal } from "@js-temporal/polyfill";
 import type { FluxStandardActionAuto } from "flux-standard-action";
 
-export const PeriodUnit = Object.freeze({
-  DAY: "Day",
-  WEEK: "Week",
-  MONTH: "Month",
-  QUARTER: "Quarter",
-  HALF_YEAR: "Half year",
-  YEAR: "Year",
-  ALL_TIME: "All time",
-});
-
-export type PeriodUnitType = (typeof PeriodUnit)[keyof typeof PeriodUnit];
-
-//
-// Actions and Action Creators
-//
+// region Actions and Action Creators
 
 const GO_TO_NEXT_PERIOD_ACTION = "goToNextPeriod";
 
@@ -67,9 +53,20 @@ export type Action =
   | ReturnType<typeof goToPreviousPeriod>
   | ReturnType<typeof changePeriod>;
 
-//
-// State and Reducer
-//
+// endregion
+// region State
+
+export const PeriodUnit = Object.freeze({
+  DAY: "Day",
+  WEEK: "Week",
+  MONTH: "Month",
+  QUARTER: "Quarter",
+  HALF_YEAR: "Half year",
+  YEAR: "Year",
+  ALL_TIME: "All time",
+});
+
+export type PeriodUnitType = (typeof PeriodUnit)[keyof typeof PeriodUnit];
 
 export interface State {
   from: Temporal.PlainDate;
@@ -145,6 +142,9 @@ export function init({
   };
 }
 
+// endregion
+// region Reducer
+
 export function reducer(state: State, action: Action): State {
   switch (action.type) {
     case GO_TO_NEXT_PERIOD_ACTION: {
@@ -217,12 +217,16 @@ export function reducer(state: State, action: Action): State {
         isCurrent: getCurrent(from, to, action.payload.today),
       };
     }
-    case CHANGE_PERIOD_ACTION:
-      return init({ unit: action.payload.unit, today: action.payload.today });
+    case CHANGE_PERIOD_ACTION: {
+      const initialState = init({
+        unit: action.payload.unit,
+        today: action.payload.today,
+      });
+      return { ...state, ...initialState };
+    }
+    default:
+      return state;
   }
-
-  // @ts-expect-error: code is unreachable if all action types are handled
-  throw new Error(`Unknown action in timer reducer: ${action.type}.`);
 }
 
 function getCurrent(
@@ -244,3 +248,5 @@ function parseToday(
     ? Temporal.PlainDate.from(today)
     : Temporal.Now.plainDateISO();
 }
+
+// endregion

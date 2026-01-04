@@ -68,9 +68,10 @@ Stories marked with ❗are planned for the next release.
 
 ### Burn-Up
 
-- [ ] ❗Determine tasks done over time
-- [ ] ❗Filter tasks in a period
-- [ ] ❗Filter tasks by category
+- [x] Determine tasks done over time
+- [x] Determine total throughput
+- [x] Filter tasks in a period
+- [x] Filter tasks by category
 
 ### Cumulative Flow
 

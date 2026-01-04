@@ -14,6 +14,15 @@ import {
 } from "../../../src/renderer/domain/period";
 
 describe("Period", () => {
+  it("should ignore unknown action", () => {
+    const initialState = init({ unit: PeriodUnit.MONTH });
+
+    // @ts-expect-error Testing unknown action handling
+    const state = reducer(initialState, { type: "unknown_action" });
+
+    expect(state).toBe(initialState);
+  });
+
   describe("Initialize period", () => {
     it("should initialize with current timestamp", () => {
       const state = init({ unit: PeriodUnit.DAY });

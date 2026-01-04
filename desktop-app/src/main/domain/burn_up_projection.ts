@@ -8,28 +8,38 @@ import {
   type BurnUpQuery,
   BurnUpQueryResult,
 } from "../../shared/domain/burn_up_query";
-import { ActivitiesProjection, Activity, filterEvents } from "./activities";
+import {
+  ActivitiesProjection,
+  Activity,
+  CategoriesProjection,
+  filterEvents,
+} from "./activities";
 
 export async function projectBurnUp(
   replay: AsyncGenerator<ActivityLoggedEvent>,
   query: BurnUpQuery,
 ): Promise<BurnUpQueryResult> {
-  const activities = await projectActivities(replay, query);
+  const { activities, categories } = await projectActivities(replay, query);
   const throughputs = determineThroughputs(activities);
   const data = fillPeriod(throughputs, query.from, query.to);
   const totalThroughput = determineTotalThroughput(data);
-  return BurnUpQueryResult.create({ data, totalThroughput });
+  return BurnUpQueryResult.create({ data, totalThroughput, categories });
 }
 
 async function projectActivities(
   replay: AsyncGenerator<ActivityLoggedEvent>,
   query: BurnUpQuery,
 ) {
-  const activitiesProjection = new ActivitiesProjection();
+  const activitiesProjection = new ActivitiesProjection(query.categories);
+  const categoriesProjection = new CategoriesProjection();
   for await (const event of filterEvents(replay, query.from, query.to)) {
     activitiesProjection.update(event);
+    categoriesProjection.update(event);
   }
-  return activitiesProjection.get();
+  return {
+    activities: activitiesProjection.get(),
+    categories: categoriesProjection.get(),
+  };
 }
 
 function determineThroughputs(activities: Activity[]) {
