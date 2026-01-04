@@ -18,6 +18,7 @@
     "url": "git+https://github.com/falkoschumann/activity-sampling.git"
   },
   "engines": {
+    "bun": ">=1.0.0",
     "node": ">=24.0.0"
   },
   "main": "./build/main/index.js",
