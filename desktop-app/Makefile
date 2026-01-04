@@ -1,9 +1,15 @@
 export ASAR?=true
 export SIGN?=true
 
-RUNTIME=node
-PACKAGE_MANAGER=npm
-COMMAND_RUNNER=npx
+RUNTIME=bun
+PACKAGE_MANAGER=bun
+COMMAND_RUNNER=bunx
+ifeq ("$(shell command -v $(RUNTIME))", "")
+    $(warning "$(COMMAND) is not available. Fallback to Node.js and npm.")
+	RUNTIME=node
+	PACKAGE_MANAGER=npm
+	COMMAND_RUNNER=npx
+endif
 
 all: dist check
 

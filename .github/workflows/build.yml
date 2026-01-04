@@ -17,10 +17,22 @@ jobs:
           # Use Java LTS
           distribution: temurin
           java-version: "25"
-      - name: Use Node.js LTS
+      - name: Setup Node.js LTS
         uses: actions/setup-node@v6
         with:
           # Use Node.js LTS
           node-version: "lts/*"
       - name: Build
         run: make
+
+  build-with-bun:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v6
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - name: Build
+        run: make -C desktop-app
