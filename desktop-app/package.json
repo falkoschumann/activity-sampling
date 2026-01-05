@@ -59,7 +59,7 @@
     "eslint-plugin-react-hooks": "7.0.1",
     "eslint-plugin-react-refresh": "0.4.26",
     "flux-standard-action": "2.1.2",
-    "globals": "16.5.0",
+    "globals": "17.0.0",
     "prettier": "3.7.4",
     "react": "19.2.3",
     "react-dom": "19.2.3",
