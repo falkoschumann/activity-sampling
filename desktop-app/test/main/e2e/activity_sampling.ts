@@ -752,7 +752,7 @@ class ActivitiesDriver {
   // Events
   //
 
-  async record(event: unknown) {
+  async record(event: ActivityLoggedEventDto) {
     await this.#eventStore.record(event);
   }
 

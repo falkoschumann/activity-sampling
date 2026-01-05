@@ -223,7 +223,7 @@ describe("Burn-up", () => {
   });
 });
 
-function configure({ events }: { events: unknown[] }) {
+function configure({ events }: { events: ActivityLoggedEventDto[] }) {
   const eventStore = EventStore.createNull({ events });
   return {
     queryBurnUp: (query: BurnUpQuery) =>

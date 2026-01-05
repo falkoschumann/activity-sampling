@@ -7,6 +7,7 @@ import stream from "node:stream";
 import { ConfigurableResponses, OutputTracker } from "@muspellheim/shared";
 import { parse, stringify } from "csv";
 import { stringify as syncStringify } from "csv-stringify/sync";
+import type { ActivityLoggedEventDto } from "./events";
 
 const RECORDED_EVENT = "recorded";
 
@@ -14,17 +15,19 @@ export interface EventStoreConfiguration {
   readonly fileName: string;
 }
 
-export class EventStore<T = unknown> extends EventTarget {
-  static create<T>(
+export class EventStore extends EventTarget {
+  static create(
     configuration: EventStoreConfiguration = {
       fileName: "data/activity-log.csv",
     },
-  ): EventStore<T> {
-    return new EventStore<T>(configuration, fsPromise);
+  ): EventStore {
+    return new EventStore(configuration, fsPromise);
   }
 
-  static createNull<T>({ events }: { events?: T[] } = {}): EventStore<T> {
-    return new EventStore<T>(
+  static createNull({
+    events,
+  }: { events?: ActivityLoggedEventDto[] } = {}): EventStore {
+    return new EventStore(
       { fileName: "null-activity-log.csv" },
       new FsPromiseStub(events) as unknown as typeof fsPromise,
     );
@@ -40,7 +43,7 @@ export class EventStore<T = unknown> extends EventTarget {
     this.#fs = fs;
   }
 
-  async record(event: T) {
+  async record(event: ActivityLoggedEventDto) {
     const dirName = path.resolve(path.dirname(this.fileName));
     await this.#fs.mkdir(dirName, { recursive: true });
 
@@ -67,11 +70,11 @@ export class EventStore<T = unknown> extends EventTarget {
     this.dispatchEvent(new CustomEvent(RECORDED_EVENT, { detail: event }));
   }
 
-  trackRecorded(): OutputTracker<T> {
-    return OutputTracker.create<T>(this, RECORDED_EVENT);
+  trackRecorded(): OutputTracker {
+    return OutputTracker.create(this, RECORDED_EVENT);
   }
 
-  async *replay(): AsyncGenerator<T> {
+  async *replay(): AsyncGenerator<ActivityLoggedEventDto> {
     try {
       const file = await this.#fs.open(this.fileName, "r");
       const parser = file.createReadStream().pipe(

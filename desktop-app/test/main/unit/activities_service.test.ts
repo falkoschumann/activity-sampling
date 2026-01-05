@@ -386,7 +386,7 @@ function configure({
   vacations,
   fixedInstant,
 }: {
-  events?: unknown[];
+  events?: ActivityLoggedEventDto[];
   holidays?: HolidayDto[];
   vacations?: VacationDto[];
   fixedInstant?: string;
