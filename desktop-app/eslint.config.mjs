@@ -37,7 +37,13 @@ export default ts.config(
           source: "string",
           style: "line",
           trailingNewlines: 2,
-          content: `Copyright (c) ${new Date().getUTCFullYear()} Falko Schumann. All rights reserved. MIT license.`,
+          content: `Copyright (c) (copyrightYear) Falko Schumann. All rights reserved. MIT license.`,
+          patterns: {
+            copyrightYear: {
+              pattern: "\\d{4}",
+              defaultValue: new Date().getUTCFullYear().toString(),
+            },
+          },
         },
       ],
       "@typescript-eslint/no-unused-vars": [
