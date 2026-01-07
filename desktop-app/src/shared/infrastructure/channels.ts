@@ -2,6 +2,7 @@
 
 // Commands
 export const LOG_ACTIVITY_CHANNEL = "logActivity";
+export const EXPORT_TIMESHEET_CHANNEL = "exportTimesheet";
 
 // Queries
 export const QUERY_RECENT_ACTIVITIES_CHANNEL = "queryRecentActivities";

@@ -17,6 +17,8 @@ import {
   type TimesheetQuery,
   type TimesheetQueryResult,
 } from "../../shared/domain/activities";
+import { queryBurnUp } from "./query_burn_up";
+import type { ExportTimesheetCommand } from "../../shared/domain/export_timesheet_command";
 import {
   type BurnUpQuery,
   BurnUpQueryResult,
@@ -31,7 +33,8 @@ import { EventStore } from "../infrastructure/event_store";
 import { ActivityLoggedEventDto } from "../infrastructure/events";
 import { HolidayRepository } from "../infrastructure/holiday_repository";
 import { VacationRepository } from "../infrastructure/vacation_repository";
-import { queryBurnUp } from "./query_burn_up";
+import { TimesheetExporter } from "../infrastructure/timesheet_exporter";
+import { exportTimesheet } from "./export_timesheet";
 
 export class ActivitiesService {
   static create(): ActivitiesService {
@@ -40,6 +43,7 @@ export class ActivitiesService {
       EventStore.create(),
       HolidayRepository.create(),
       VacationRepository.create(),
+      TimesheetExporter.create(),
     );
   }
 
@@ -47,6 +51,7 @@ export class ActivitiesService {
   readonly #eventStore: EventStore;
   readonly #holidayRepository: HolidayRepository;
   readonly #vacationRepository: VacationRepository;
+  readonly #timesheetExporter: TimesheetExporter;
   readonly #clock: Clock;
 
   constructor(
@@ -54,12 +59,14 @@ export class ActivitiesService {
     eventStore: EventStore,
     holidayRepository: HolidayRepository,
     vacationRepository: VacationRepository,
+    timesheetExporter: TimesheetExporter,
     clock = Clock.systemDefaultZone(),
   ) {
     this.#capacity = settings.capacity;
     this.#eventStore = eventStore;
     this.#holidayRepository = holidayRepository;
     this.#vacationRepository = vacationRepository;
+    this.#timesheetExporter = timesheetExporter;
     this.#clock = clock;
 
     this.applySettings(settings);
@@ -80,6 +87,10 @@ export class ActivitiesService {
     });
     await this.#eventStore.record(event);
     return new Success();
+  }
+
+  async exportTimesheet(command: ExportTimesheetCommand) {
+    return exportTimesheet(command, this.#timesheetExporter);
   }
 
   async queryRecentActivities(

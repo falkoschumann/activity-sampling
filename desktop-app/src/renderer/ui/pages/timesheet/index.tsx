@@ -7,11 +7,16 @@ import { changePeriod, goToNextPeriod, goToPreviousPeriod, init, PeriodUnit, red
 import { PeriodComponent } from "../../components/period_component";
 import CapacityComponent from "./capacity";
 import TimesheetComponent from "./timesheet";
+import { ExportTimesheetCommand } from "../../../../shared/domain/export_timesheet_command";
 
 export default function TimesheetPage() {
   const [state, dispatch] = useReducer(reducer, { unit: PeriodUnit.WEEK }, init);
 
-  const timesheet = useTimesheet(state);
+  const { timesheet, exportTimesheet } = useTimesheet(state);
+
+  async function handleExport() {
+    await exportTimesheet(ExportTimesheetCommand.create({ timesheets: timesheet.entries, fileName: "timesheets.csv" }));
+  }
 
   return (
     <>
@@ -27,9 +32,16 @@ export default function TimesheetPage() {
             onNextPeriod={() => dispatch(goToNextPeriod({}))}
             onChangePeriod={(unit) => dispatch(changePeriod({ unit }))}
           />
+          <div className="btn-toolbar py-2 gap-2" role="toolbar" aria-label="Toolbar with query parameters">
+            <div className="btn-group btn-group-sm" role="group" aria-label="Select category">
+              <button type="button" className="btn btn-outline-secondary" onClick={handleExport}>
+                Export
+              </button>
+            </div>
+          </div>
         </div>
       </aside>
-      <main className="container my-4" style={{ paddingTop: "3rem", paddingBottom: "3rem" }}>
+      <main className="container my-4" style={{ paddingTop: "6rem", paddingBottom: "3rem" }}>
         <TimesheetComponent entries={timesheet.entries} />
       </main>
       <footer className="fixed-bottom bg-body">

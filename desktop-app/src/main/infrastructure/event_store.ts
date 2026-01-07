@@ -149,8 +149,6 @@ class FsPromiseStub {
   async open() {
     return Promise.resolve(new FileHandleStub(this.createReadStreamResponses));
   }
-
-  async writeFile() {}
 }
 
 class FileHandleStub {

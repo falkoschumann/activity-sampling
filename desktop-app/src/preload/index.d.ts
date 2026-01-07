@@ -9,6 +9,7 @@ import type {
   CommandStatusDto,
   EstimateQueryDto,
   EstimateQueryResultDto,
+  ExportTimesheetCommandDto,
   LogActivityCommandDto,
   RecentActivitiesQueryDto,
   RecentActivitiesQueryResultDto,
@@ -30,6 +31,10 @@ export type Unsubscriber = () => void;
 
 export interface ActivitySampling {
   logActivity(command: LogActivityCommandDto): Promise<CommandStatusDto>;
+
+  exportTimesheet(
+    command: ExportTimesheetCommandDto,
+  ): Promise<CommandStatusDto>;
 
   queryRecentActivities(
     query: RecentActivitiesQueryDto,

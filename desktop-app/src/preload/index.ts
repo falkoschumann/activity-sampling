@@ -9,6 +9,7 @@ import {
 
 import type {
   CommandStatusDto,
+  ExportTimesheetCommandDto,
   LogActivityCommandDto,
   RecentActivitiesQueryDto,
   RecentActivitiesQueryResultDto,
@@ -20,6 +21,7 @@ import type {
   TimesheetQueryResultDto,
 } from "../shared/infrastructure/activities";
 import {
+  EXPORT_TIMESHEET_CHANNEL,
   INTERVAL_ELAPSED_CHANNEL,
   LOAD_SETTINGS_CHANNEL,
   LOG_ACTIVITY_CHANNEL,
@@ -50,6 +52,12 @@ contextBridge.exposeInMainWorld("activitySampling", {
     command: LogActivityCommandDto,
   ): Promise<CommandStatusDto> => {
     return ipcRenderer.invoke(LOG_ACTIVITY_CHANNEL, command);
+  },
+
+  exportTimesheet: async (
+    command: ExportTimesheetCommandDto,
+  ): Promise<CommandStatusDto> => {
+    return ipcRenderer.invoke(EXPORT_TIMESHEET_CHANNEL, command);
   },
 
   queryRecentActivities: async (

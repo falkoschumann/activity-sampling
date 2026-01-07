@@ -34,6 +34,7 @@ import {
   VacationDto,
   VacationRepository,
 } from "../../../src/main/infrastructure/vacation_repository";
+import { TimesheetExporter } from "../../../src/main/infrastructure/timesheet_exporter";
 
 describe("Activities service", () => {
   describe("Log activity", () => {
@@ -407,6 +408,7 @@ function configure({
     eventStore,
     holidayRepository,
     vacationRepository,
+    TimesheetExporter.createNull(),
     clock,
   );
   return { service, eventStore, holidayRepository, clock };

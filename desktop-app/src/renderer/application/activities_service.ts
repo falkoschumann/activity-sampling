@@ -28,6 +28,7 @@ import {
   CommandStatusDto,
   EstimateQueryDto,
   EstimateQueryResultDto,
+  ExportTimesheetCommandDto,
   LogActivityCommandDto,
   RecentActivitiesQueryDto,
   RecentActivitiesQueryResultDto,
@@ -43,6 +44,7 @@ import {
   NotificationGateway,
 } from "../infrastructure/notification_gateway";
 import { SettingsDto } from "../../shared/infrastructure/settings";
+import type { ExportTimesheetCommand } from "../../shared/domain/export_timesheet_command";
 
 export function useLog() {
   const [state, dispatch] = useReducer(reducer, initialState);
@@ -233,7 +235,10 @@ export function useTimesheet(query: TimesheetQuery) {
     })();
   }, [query.from, query.to]);
 
-  return result;
+  return {
+    timesheet: result,
+    exportTimesheet,
+  };
 }
 
 async function queryTimesheet(query: TimesheetQuery) {
@@ -241,6 +246,13 @@ async function queryTimesheet(query: TimesheetQuery) {
     TimesheetQueryDto.fromModel(query),
   );
   return TimesheetQueryResultDto.create(resultDto).validate();
+}
+
+async function exportTimesheet(command: ExportTimesheetCommand) {
+  const statusDto = await window.activitySampling.exportTimesheet(
+    ExportTimesheetCommandDto.fromModel(command),
+  );
+  return CommandStatusDto.create(statusDto).validate();
 }
 
 export function useEstimate(query: EstimateQuery): EstimateQueryResult {

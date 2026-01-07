@@ -45,6 +45,7 @@ import { EventStore } from "../../../src/main/infrastructure/event_store";
 import { ActivityLoggedEventDto } from "../../../src/main/infrastructure/events";
 import { HolidayRepository } from "../../../src/main/infrastructure/holiday_repository";
 import { VacationRepository } from "../../../src/main/infrastructure/vacation_repository";
+import { TimesheetExporter } from "../../../src/main/infrastructure/timesheet_exporter";
 
 const dataDir = path.resolve(import.meta.dirname, "../../../testdata");
 
@@ -627,6 +628,7 @@ class ActivitiesDriver {
       this.#eventStore,
       this.#holidayRepository,
       this.#vacationRepository,
+      TimesheetExporter.createNull(),
       clock,
     );
   }

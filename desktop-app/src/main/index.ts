@@ -18,6 +18,7 @@ import {
   CommandStatusDto,
   EstimateQueryDto,
   EstimateQueryResultDto,
+  ExportTimesheetCommandDto,
   LogActivityCommandDto,
   RecentActivitiesQueryDto,
   RecentActivitiesQueryResultDto,
@@ -29,6 +30,7 @@ import {
   TimesheetQueryResultDto,
 } from "../shared/infrastructure/activities";
 import {
+  EXPORT_TIMESHEET_CHANNEL,
   INTERVAL_ELAPSED_CHANNEL,
   LOAD_SETTINGS_CHANNEL,
   LOG_ACTIVITY_CHANNEL,
@@ -150,6 +152,26 @@ function createRendererToMainChannels() {
     async (_event, commandDto: LogActivityCommandDto) => {
       const command = LogActivityCommandDto.create(commandDto).validate();
       const status = await activitiesService.logActivity(command);
+      return CommandStatusDto.fromModel(status);
+    },
+  );
+  ipcMain.handle(
+    EXPORT_TIMESHEET_CHANNEL,
+    async (_event, commandDto: ExportTimesheetCommandDto) => {
+      const result = await dialog.showSaveDialog({
+        title: "Export timesheet file",
+        properties: ["showOverwriteConfirmation", "createDirectory"],
+        defaultPath: "timesheet.csv",
+      });
+      const fileName = result.filePath;
+      if (fileName == null) {
+        return;
+      }
+      const command = ExportTimesheetCommandDto.create({
+        ...commandDto,
+        fileName,
+      }).validate();
+      const status = await activitiesService.exportTimesheet(command);
       return CommandStatusDto.fromModel(status);
     },
   );

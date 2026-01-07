@@ -30,7 +30,7 @@ export class Activity {
     client = "Test client",
     project = "Test project",
     task = "Test task",
-    hours = "PT30M",
+    hours = "PT2H",
   }: {
     start: Temporal.PlainDateLike | string;
     finish: Temporal.PlainDateLike | string;
