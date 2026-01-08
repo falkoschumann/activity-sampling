@@ -161,7 +161,7 @@ function createRendererToMainChannels() {
       const result = await dialog.showSaveDialog({
         title: "Export timesheet file",
         properties: ["showOverwriteConfirmation", "createDirectory"],
-        defaultPath: "timesheet.csv",
+        defaultPath: "timesheets.csv",
       });
       const fileName = result.filePath;
       if (fileName == null) {

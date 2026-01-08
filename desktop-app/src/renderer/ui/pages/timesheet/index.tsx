@@ -27,7 +27,14 @@ export default function TimesheetPage() {
             to={state.to}
             unit={state.unit}
             isCurrent={state.isCurrent}
-            units={[PeriodUnit.DAY, PeriodUnit.WEEK, PeriodUnit.MONTH]}
+            units={[
+              PeriodUnit.DAY,
+              PeriodUnit.WEEK,
+              PeriodUnit.MONTH,
+              PeriodUnit.QUARTER,
+              PeriodUnit.HALF_YEAR,
+              PeriodUnit.YEAR,
+            ]}
             onPreviousPeriod={() => dispatch(goToPreviousPeriod({}))}
             onNextPeriod={() => dispatch(goToNextPeriod({}))}
             onChangePeriod={(unit) => dispatch(changePeriod({ unit }))}
