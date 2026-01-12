@@ -36,10 +36,10 @@
   "devDependencies": {
     "@eslint/js": "9.39.2",
     "@js-temporal/polyfill": "0.5.1",
-    "@muspellheim/shared": "0.13.0",
+    "@muspellheim/shared": "0.15.0",
     "@softarc/sheriff-core": "0.19.6",
-    "@types/node": "24.10.4",
-    "@types/react": "19.2.7",
+    "@types/node": "24.10.7",
+    "@types/react": "19.2.8",
     "@types/react-dom": "19.2.3",
     "@vitejs/plugin-react": "5.1.2",
     "@vitest/coverage-v8": "4.0.16",
@@ -50,7 +50,7 @@
     "chart.js": "4.5.1",
     "csv": "6.4.1",
     "electron": "39.2.7",
-    "electron-builder": "26.0.12",
+    "electron-builder": "26.4.0",
     "electron-devtools-installer": "4.0.0",
     "electron-vite": "5.0.0",
     "eslint": "9.39.2",
@@ -63,10 +63,10 @@
     "prettier": "3.7.4",
     "react": "19.2.3",
     "react-dom": "19.2.3",
-    "sass": "1.97.1",
+    "sass": "1.97.2",
     "typescript": "5.9.3",
-    "typescript-eslint": "8.51.0",
-    "vite": "7.3.0",
+    "typescript-eslint": "8.53.0",
+    "vite": "7.3.1",
     "vitest": "4.0.16"
   }
 }
