@@ -1,5 +1,5 @@
 export ASAR?=true
-export SIGN?=true
+export SIGN?=false
 
 RUNTIME=bun
 PACKAGE_MANAGER=bun
