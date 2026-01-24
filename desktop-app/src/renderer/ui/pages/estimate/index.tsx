@@ -3,7 +3,7 @@
 import { useState } from "react";
 
 import { useEstimate } from "../../../application/activities_service";
-import { EstimateQuery } from "../../../../shared/domain/activities";
+import { EstimateQuery } from "../../../../shared/domain/estimate_query";
 import CategoryComponent from "../../components/category";
 import TotalCountComponent from "../../components/total_count_component";
 import CycleTimesChart from "./cycle_times_chart";

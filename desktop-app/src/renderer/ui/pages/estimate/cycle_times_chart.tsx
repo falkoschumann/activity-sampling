@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 import Chart from "chart.js/auto";
 
-import { EstimateEntry } from "../../../../shared/domain/activities";
+import { EstimateEntry } from "../../../../shared/domain/estimate_query";
 import { thresholdPlugin, type ThresholdPluginOptions } from "./chart_threshold_plugin";
 
 export default function CycleTimesChart({ cycleTimes }: { cycleTimes: EstimateEntry[] }) {

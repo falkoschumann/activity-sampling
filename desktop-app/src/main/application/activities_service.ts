@@ -4,9 +4,11 @@ import { Temporal } from "@js-temporal/polyfill";
 import { type CommandStatus, Success } from "@muspellheim/shared";
 
 import { Clock } from "../../shared/common/temporal";
+import { exportTimesheet } from "./export_timesheet";
+import { queryEstimate } from "./estimate_query_handler";
+import { queryBurnUp } from "./burn_up_query_handler";
+import { Settings } from "../../shared/domain/settings";
 import {
-  type EstimateQuery,
-  type EstimateQueryResult,
   type LogActivityCommand,
   type RecentActivitiesQuery,
   type RecentActivitiesQueryResult,
@@ -17,24 +19,26 @@ import {
   type TimesheetQuery,
   type TimesheetQueryResult,
 } from "../../shared/domain/activities";
-import { queryBurnUp } from "./query_burn_up";
 import type { ExportTimesheetCommand } from "../../shared/domain/export_timesheet_command";
 import {
   type BurnUpQuery,
   BurnUpQueryResult,
 } from "../../shared/domain/burn_up_query";
-import { projectEstimate } from "../domain/estimate_projection";
+import {
+  type EstimateQuery,
+  type EstimateQueryResult,
+} from "../../shared/domain/estimate_query";
 import { projectRecentActivities } from "../domain/recent_activities_projection";
 import { projectReport } from "../domain/report_projection";
 import { projectStatistics } from "../domain/statistics_projection";
 import { projectTimesheet } from "../domain/timesheet_projection";
-import { Settings } from "../../shared/domain/settings";
-import { EventStore } from "../infrastructure/event_store";
 import { ActivityLoggedEventDto } from "../infrastructure/events";
+import { EventStore } from "../infrastructure/event_store";
 import { HolidayRepository } from "../infrastructure/holiday_repository";
 import { VacationRepository } from "../infrastructure/vacation_repository";
 import { TimesheetExporter } from "../infrastructure/timesheet_exporter";
-import { exportTimesheet } from "./export_timesheet";
+
+// TODO remove activities service, use message handlers instead
 
 export class ActivitiesService {
   static create(): ActivitiesService {
@@ -116,8 +120,7 @@ export class ActivitiesService {
   }
 
   async queryEstimate(query: EstimateQuery): Promise<EstimateQueryResult> {
-    const replay = this.#replayTyped(this.#eventStore.replay(), query.timeZone);
-    return projectEstimate(replay, query);
+    return queryEstimate(query, this.#eventStore, this.#clock);
   }
 
   async queryBurnUp(query: BurnUpQuery): Promise<BurnUpQueryResult> {

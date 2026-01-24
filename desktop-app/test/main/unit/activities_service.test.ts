@@ -8,8 +8,6 @@ import { ActivitiesService } from "../../../src/main/application/activities_serv
 import {
   ActivityLoggedEvent,
   Capacity,
-  EstimateQuery,
-  EstimateQueryResult,
   LogActivityCommand,
   RecentActivitiesQueryResult,
   ReportEntry,
@@ -280,51 +278,6 @@ describe("Activities service", () => {
           edge75: 5,
           edge100: 6,
         },
-        categories: ["Category A", "Category B"],
-        totalCount: 2,
-      });
-    });
-  });
-
-  describe("Query estimate", () => {
-    it("should return estimate", async () => {
-      const { service } = configure({
-        events: [
-          ActivityLoggedEventDto.createTestInstance({
-            timestamp: "2025-11-17T15:00:00Z",
-            task: "Task A",
-            category: "Category A",
-          }),
-          ActivityLoggedEventDto.createTestInstance({
-            timestamp: "2025-11-17T15:00:00Z",
-            task: "Task B",
-            category: "Category B",
-          }),
-          ActivityLoggedEventDto.createTestInstance({
-            timestamp: "2025-11-18T15:00:00Z",
-            task: "Task A",
-            category: "Category A",
-          }),
-        ],
-      });
-
-      const result = await service.queryEstimate(EstimateQuery.create({}));
-
-      expect(result).toEqual<EstimateQueryResult>({
-        cycleTimes: [
-          {
-            cycleTime: 1,
-            frequency: 1,
-            probability: 0.5,
-            cumulativeProbability: 0.5,
-          },
-          {
-            cycleTime: 2,
-            frequency: 1,
-            probability: 0.5,
-            cumulativeProbability: 1.0,
-          },
-        ],
         categories: ["Category A", "Category B"],
         totalCount: 2,
       });

@@ -4,8 +4,6 @@ import { Temporal } from "@js-temporal/polyfill";
 import { useCallback, useEffect, useReducer, useState } from "react";
 
 import {
-  EstimateQuery,
-  EstimateQueryResult,
   LogActivityCommand,
   RecentActivitiesQuery,
   RecentActivitiesQueryResult,
@@ -24,10 +22,18 @@ import {
   initialState,
   reducer,
 } from "../domain/log";
+import type { ExportTimesheetCommand } from "../../shared/domain/export_timesheet_command";
 import {
-  CommandStatusDto,
+  type EstimateQuery,
+  EstimateQueryResult,
+} from "../../shared/domain/estimate_query";
+import {
   EstimateQueryDto,
   EstimateQueryResultDto,
+} from "../../shared/infrastructure/estimate_query";
+import { SettingsDto } from "../../shared/infrastructure/settings";
+import {
+  CommandStatusDto,
   ExportTimesheetCommandDto,
   LogActivityCommandDto,
   RecentActivitiesQueryDto,
@@ -43,8 +49,6 @@ import {
   NotificationClickedEvent,
   NotificationGateway,
 } from "../infrastructure/notification_gateway";
-import { SettingsDto } from "../../shared/infrastructure/settings";
-import type { ExportTimesheetCommand } from "../../shared/domain/export_timesheet_command";
 
 export function useLog() {
   const [state, dispatch] = useReducer(reducer, initialState);

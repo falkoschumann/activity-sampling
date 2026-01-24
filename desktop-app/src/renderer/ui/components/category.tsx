@@ -2,8 +2,11 @@
 
 import type { ChangeEvent } from "react";
 
+// TODO rename file to category_component.tsx
 export default function CategoryComponent({
   categories,
+  // WORKAROUND: set categories and value same, when value is not provided
+  //   categories value must not be [] to get this working
   value = [...categories],
   onChange,
 }: {
@@ -19,6 +22,7 @@ export default function CategoryComponent({
   }
 
   function handleChange(event: ChangeEvent<HTMLInputElement>, category: string) {
+    // TODO move to category reducer
     const filter = value;
     if (event.target.checked) {
       filter.push(category);

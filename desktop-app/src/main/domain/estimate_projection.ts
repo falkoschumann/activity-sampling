@@ -1,11 +1,11 @@
 // Copyright (c) 2026 Falko Schumann. All rights reserved. MIT license.
 
+import { ActivityLoggedEvent } from "../../shared/domain/activities";
 import {
-  ActivityLoggedEvent,
   EstimateEntry,
   EstimateQuery,
   EstimateQueryResult,
-} from "../../shared/domain/activities";
+} from "../../shared/domain/estimate_query";
 import {
   ActivitiesProjection,
   Activity,

@@ -1,6 +1,6 @@
 // Copyright (c) 2026 Falko Schumann. All rights reserved. MIT license.
 
-import { EstimateEntry } from "../../../../shared/domain/activities";
+import { EstimateEntry } from "../../../../shared/domain/estimate_query";
 
 export default function CycleTimesTable({ cycleTimes }: { cycleTimes: EstimateEntry[] }) {
   return (

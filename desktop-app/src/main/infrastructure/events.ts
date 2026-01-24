@@ -1,10 +1,10 @@
 // Copyright (c) 2026 Falko Schumann. All rights reserved. MIT license.
 
+import { Temporal } from "@js-temporal/polyfill";
 import Ajv from "ajv";
 import addFormats from "ajv-formats";
 
 import { ActivityLoggedEvent } from "../../shared/domain/activities";
-import { Temporal } from "@js-temporal/polyfill";
 
 const ACTIVITY_LOGGED_EVENT_SCHEMA = {
   type: "object",
@@ -111,6 +111,7 @@ export class ActivityLoggedEventDto {
   }
 
   validate(timeZone: Temporal.TimeZoneLike): ActivityLoggedEvent {
+    // TODO handle time zone in projection
     return ActivityLoggedEvent.create({
       dateTime: Temporal.Instant.from(this.timestamp).toZonedDateTimeISO(
         timeZone,

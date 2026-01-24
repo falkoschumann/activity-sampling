@@ -11,9 +11,6 @@ import { ActivitiesService } from "../../../src/main/application/activities_serv
 import { TimerService } from "../../../src/main/application/timer_service";
 import {
   Capacity,
-  EstimateEntry,
-  EstimateQuery,
-  EstimateQueryResult,
   Histogram,
   type LogActivityCommand,
   type RecentActivitiesQuery,
@@ -41,6 +38,11 @@ import {
   TimerStartedEvent,
   TimerStoppedEvent,
 } from "../../../src/shared/domain/timer";
+import {
+  EstimateEntry,
+  EstimateQuery,
+  type EstimateQueryResult,
+} from "../../../src/shared/domain/estimate_query";
 import { EventStore } from "../../../src/main/infrastructure/event_store";
 import { ActivityLoggedEventDto } from "../../../src/main/infrastructure/events";
 import { HolidayRepository } from "../../../src/main/infrastructure/holiday_repository";

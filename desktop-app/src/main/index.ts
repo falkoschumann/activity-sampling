@@ -15,9 +15,12 @@ import {
 import { TimerService } from "./application/timer_service";
 import { Settings } from "../shared/domain/settings";
 import {
+  IntervalElapsedEvent,
+  TimerStartedEvent,
+  TimerStoppedEvent,
+} from "../shared/domain/timer";
+import {
   CommandStatusDto,
-  EstimateQueryDto,
-  EstimateQueryResultDto,
   ExportTimesheetCommandDto,
   LogActivityCommandDto,
   RecentActivitiesQueryDto,
@@ -29,6 +32,19 @@ import {
   TimesheetQueryDto,
   TimesheetQueryResultDto,
 } from "../shared/infrastructure/activities";
+import {
+  IntervalElapsedEventDto,
+  TimerStartedEventDto,
+  TimerStoppedEventDto,
+} from "../shared/infrastructure/timer";
+import {
+  BurnUpQueryDto,
+  BurnUpQueryResultDto,
+} from "../shared/infrastructure/burn_up_query";
+import {
+  EstimateQueryDto,
+  EstimateQueryResultDto,
+} from "../shared/infrastructure/estimate_query";
 import {
   EXPORT_TIMESHEET_CHANNEL,
   INTERVAL_ELAPSED_CHANNEL,
@@ -48,21 +64,8 @@ import {
 import { SettingsDto } from "../shared/infrastructure/settings";
 import { chooseDataDirectory, openWindow } from "./ui/actions";
 import { createMenu } from "./ui/menu";
-import {
-  IntervalElapsedEvent,
-  TimerStartedEvent,
-  TimerStoppedEvent,
-} from "../shared/domain/timer";
-import {
-  IntervalElapsedEventDto,
-  TimerStartedEventDto,
-  TimerStoppedEventDto,
-} from "../shared/infrastructure/timer";
-import {
-  BurnUpQueryDto,
-  BurnUpQueryResultDto,
-} from "../shared/infrastructure/burn_up_query";
 
+// TODO extract module for reuse in e2e tests
 const settingsService = SettingsService.create();
 const activitiesService = ActivitiesService.create();
 const timerService = TimerService.create();
