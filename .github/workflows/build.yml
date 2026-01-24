@@ -11,6 +11,10 @@ jobs:
     steps:
       - name: Checkout source code
         uses: actions/checkout@v6
+      - name: Setup latest Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
       - name: Use Java LTS
         uses: actions/setup-java@v5
         with:
