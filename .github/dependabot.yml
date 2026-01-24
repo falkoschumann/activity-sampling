@@ -44,7 +44,7 @@ updates:
       - dependency-name: "@types/node"
         update-types:
           - "version-update:semver-major"
-  - package-ecosystem: "npm"
+  - package-ecosystem: "bun"
     directory: "/desktop-app"
     schedule:
       interval: "weekly"
