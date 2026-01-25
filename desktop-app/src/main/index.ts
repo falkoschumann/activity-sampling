@@ -25,8 +25,6 @@ import {
   LogActivityCommandDto,
   ReportQueryDto,
   ReportQueryResultDto,
-  StatisticsQueryDto,
-  StatisticsQueryResultDto,
   TimesheetQueryDto,
   TimesheetQueryResultDto,
 } from "../shared/infrastructure/activities";
@@ -47,6 +45,10 @@ import {
   RecentActivitiesQueryDto,
   RecentActivitiesQueryResultDto,
 } from "../shared/infrastructure/recent_activities_query_dto";
+import {
+  StatisticsQueryDto,
+  StatisticsQueryResultDto,
+} from "../shared/infrastructure/statistics_query_dto";
 import {
   EXPORT_TIMESHEET_CHANNEL,
   INTERVAL_ELAPSED_CHANNEL,

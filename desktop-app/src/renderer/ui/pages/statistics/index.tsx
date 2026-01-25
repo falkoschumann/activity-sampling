@@ -3,7 +3,7 @@
 import { useState } from "react";
 
 import { useStatistics } from "../../../application/activities_service";
-import { type StatisticsQuery, StatisticsScope } from "../../../../shared/domain/activities";
+import { type StatisticsQuery, StatisticsScope } from "../../../../shared/domain/statistics_query";
 import CategoryComponent from "../../components/category";
 import TotalCountComponent from "../../components/total_count_component";
 import HistogramComponent from "./histogram";

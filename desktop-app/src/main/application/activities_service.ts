@@ -12,8 +12,6 @@ import {
   type LogActivityCommand,
   type ReportQuery,
   type ReportQueryResult,
-  type StatisticsQuery,
-  type StatisticsQueryResult,
   type TimesheetQuery,
   type TimesheetQueryResult,
 } from "../../shared/domain/activities";
@@ -30,6 +28,10 @@ import type {
   RecentActivitiesQuery,
   RecentActivitiesQueryResult,
 } from "../../shared/domain/recent_activities_query";
+import {
+  type StatisticsQuery,
+  type StatisticsQueryResult,
+} from "../../shared/domain/statistics_query";
 import { projectReport } from "../domain/report_projection";
 import { projectStatistics } from "../domain/statistics_projection";
 import { projectTimesheet } from "../domain/timesheet_projection";

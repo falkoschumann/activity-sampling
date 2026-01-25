@@ -11,8 +11,6 @@ import {
   ReportEntry,
   ReportQueryResult,
   ReportScope,
-  StatisticsQueryResult,
-  StatisticsScope,
   TimesheetEntry,
   TimesheetQuery,
   TimesheetQueryResult,
@@ -120,104 +118,6 @@ describe("Activities service", () => {
           totalHours: "PT15H",
         }),
       );
-    });
-  });
-
-  describe("Query statistics", () => {
-    it("should return statistics for working hours", async () => {
-      const { service } = configure({
-        events: [
-          ActivityLoggedEventDto.createTestInstance({
-            timestamp: "2025-10-13T11:00:00Z",
-            task: "Task A",
-            duration: "PT24H",
-            category: "Category 2",
-          }),
-          ActivityLoggedEventDto.createTestInstance({
-            timestamp: "2025-10-14T13:00:00Z",
-            task: "Task B",
-            duration: "PT40H",
-            category: "Category 1",
-          }),
-          ActivityLoggedEventDto.createTestInstance({
-            timestamp: "2025-10-15T13:00:00Z",
-            task: "Task C",
-            duration: "PT40H",
-            category: "Category 2",
-          }),
-        ],
-      });
-
-      const result = await service.queryStatistics({
-        scope: StatisticsScope.WORKING_HOURS,
-      });
-
-      expect(result).toEqual<StatisticsQueryResult>({
-        histogram: {
-          binEdges: ["0", "0.5", "1", "2", "3", "5"],
-          frequencies: [0, 0, 0, 1, 2],
-          xAxisLabel: "Duration (days)",
-          yAxisLabel: "Number of Tasks",
-        },
-        median: {
-          edge0: 0,
-          edge25: 3,
-          edge50: 5,
-          edge75: 5,
-          edge100: 5,
-        },
-        categories: ["Category 1", "Category 2"],
-        totalCount: 3,
-      });
-    });
-
-    it("should return statistics for cycle time", async () => {
-      const { service } = configure({
-        events: [
-          ActivityLoggedEventDto.createTestInstance({
-            timestamp: "2025-08-13T12:00:00Z",
-            task: "Task A",
-            category: "Category A",
-          }),
-          ActivityLoggedEventDto.createTestInstance({
-            timestamp: "2025-08-13T12:00:00Z",
-            task: "Task B",
-            category: "Category B",
-          }),
-          ActivityLoggedEventDto.createTestInstance({
-            timestamp: "2025-08-16T12:00:00Z",
-            task: "Task A",
-            category: "Category A",
-          }),
-          ActivityLoggedEventDto.createTestInstance({
-            timestamp: "2025-08-18T12:00:00Z",
-            task: "Task B",
-            category: "Category B",
-          }),
-        ],
-      });
-
-      const result = await service.queryStatistics({
-        scope: StatisticsScope.CYCLE_TIMES,
-      });
-
-      expect(result).toEqual<StatisticsQueryResult>({
-        histogram: {
-          binEdges: ["0", "1", "2", "3", "5", "8"],
-          frequencies: [0, 0, 0, 1, 1],
-          xAxisLabel: "Cycle time (days)",
-          yAxisLabel: "Number of Tasks",
-        },
-        median: {
-          edge0: 0,
-          edge25: 4,
-          edge50: 5,
-          edge75: 5,
-          edge100: 6,
-        },
-        categories: ["Category A", "Category B"],
-        totalCount: 2,
-      });
     });
   });
 

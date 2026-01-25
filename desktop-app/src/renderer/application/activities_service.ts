@@ -7,8 +7,6 @@ import {
   LogActivityCommand,
   ReportQuery,
   ReportQueryResult,
-  StatisticsQuery,
-  StatisticsQueryResult,
   TimesheetQuery,
   TimesheetQueryResult,
 } from "../../shared/domain/activities";
@@ -30,6 +28,10 @@ import {
   RecentActivitiesQueryResult,
 } from "../../shared/domain/recent_activities_query";
 import {
+  StatisticsQuery,
+  StatisticsQueryResult,
+} from "../../shared/domain/statistics_query";
+import {
   EstimateQueryDto,
   EstimateQueryResultDto,
 } from "../../shared/infrastructure/estimate_query_dto";
@@ -37,6 +39,10 @@ import {
   RecentActivitiesQueryDto,
   RecentActivitiesQueryResultDto,
 } from "../../shared/infrastructure/recent_activities_query_dto";
+import {
+  StatisticsQueryDto,
+  StatisticsQueryResultDto,
+} from "../../shared/infrastructure/statistics_query_dto";
 import { SettingsDto } from "../../shared/infrastructure/settings";
 import {
   CommandStatusDto,
@@ -44,8 +50,6 @@ import {
   LogActivityCommandDto,
   ReportQueryDto,
   ReportQueryResultDto,
-  StatisticsQueryDto,
-  StatisticsQueryResultDto,
   TimesheetQueryDto,
   TimesheetQueryResultDto,
 } from "../../shared/infrastructure/activities";

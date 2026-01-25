@@ -1,6 +1,6 @@
 // Copyright (c) 2026 Falko Schumann. All rights reserved. MIT license.
 
-import { StatisticsScope, type StatisticsScopeType } from "../../../../shared/domain/activities";
+import { StatisticsScope, type StatisticsScopeType } from "../../../../shared/domain/statistics_query";
 
 export default function ScopeComponent({
   value,

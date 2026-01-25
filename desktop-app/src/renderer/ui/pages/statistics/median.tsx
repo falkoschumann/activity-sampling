@@ -1,6 +1,6 @@
 // Copyright (c) 2026 Falko Schumann. All rights reserved. MIT license.
 
-import type { Median } from "../../../../shared/domain/activities";
+import type { Median } from "../../../../shared/domain/statistics_query";
 
 export default function MedianComponent({ median }: { median: Median }) {
   return (

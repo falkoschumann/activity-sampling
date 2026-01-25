@@ -2,7 +2,7 @@
 
 import { describe, it } from "vitest";
 import { startActivitySampling } from "./activity_sampling";
-import { StatisticsScope } from "../../../src/shared/domain/activities";
+import { StatisticsScope } from "../../../src/shared/domain/statistics_query";
 
 describe("Activity Sampling", () => {
   describe("Start Timer", () => {

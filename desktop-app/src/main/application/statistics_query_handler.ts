@@ -4,29 +4,24 @@ import { Temporal } from "@js-temporal/polyfill";
 
 import type { Clock } from "../../shared/common/temporal";
 import type {
-  RecentActivitiesQuery,
-  RecentActivitiesQueryResult,
-} from "../../shared/domain/recent_activities_query";
-import { projectRecentActivities } from "../domain/recent_activities_projection";
+  StatisticsQuery,
+  StatisticsQueryResult,
+} from "../../shared/domain/statistics_query";
+import { projectStatistics } from "../domain/statistics_projection";
 import { ActivityLoggedEventDto } from "../infrastructure/events";
 import type { EventStore } from "../infrastructure/event_store";
 
-// TODO merge all parameters after query into options object
-
-export async function queryRecentActivities(
-  query: RecentActivitiesQuery,
+export async function queryStatistics(
+  query: StatisticsQuery,
   eventStore: EventStore,
   clock: Clock,
-): Promise<RecentActivitiesQueryResult> {
+): Promise<StatisticsQueryResult> {
   // TODO handle time zone in projection
   // TODO join ActivityLoggedEvent and ActivityLoggedEventDto to ActivityLoggedEvent
   const timeZone = query.timeZone || clock.zone;
   const replay = replayTyped(eventStore.replay(), timeZone);
-  return projectRecentActivities(replay, {
+  return projectStatistics(replay, {
     ...query,
-    today:
-      query.today ??
-      clock.instant().toZonedDateTimeISO(clock.zone).toPlainDate(),
     timeZone: query.timeZone ?? clock.zone,
   });
 }

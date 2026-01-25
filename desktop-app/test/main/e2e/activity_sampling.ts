@@ -11,19 +11,21 @@ import { ActivitiesService } from "../../../src/main/application/activities_serv
 import { TimerService } from "../../../src/main/application/timer_service";
 import {
   Capacity,
-  Histogram,
   type LogActivityCommand,
   ReportEntry,
   ReportQuery,
   ReportQueryResult,
-  StatisticsQuery,
-  StatisticsQueryResult,
-  StatisticsScope,
-  type StatisticsScopeType,
   TimesheetEntry,
   TimesheetQuery,
   TimesheetQueryResult,
 } from "../../../src/shared/domain/activities";
+import {
+  Histogram,
+  StatisticsQuery,
+  StatisticsQueryResult,
+  StatisticsScope,
+  type StatisticsScopeType,
+} from "../../../src/shared/domain/statistics_query";
 import { Holiday, Vacation } from "../../../src/main/domain/calendar";
 import { Settings } from "../../../src/shared/domain/settings";
 import {
