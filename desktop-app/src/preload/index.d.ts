@@ -1,32 +1,5 @@
 // Copyright (c) 2026 Falko Schumann. All rights reserved. MIT license.
 
-import type {
-  OpenDialogOptions,
-  OpenDialogReturnValue,
-} from "electron/renderer";
-
-import type {
-  CommandStatusDto,
-  EstimateQueryDto,
-  EstimateQueryResultDto,
-  ExportTimesheetCommandDto,
-  LogActivityCommandDto,
-  RecentActivitiesQueryDto,
-  RecentActivitiesQueryResultDto,
-  ReportQueryDto,
-  ReportQueryResultDto,
-  StatisticsQueryDto,
-  StatisticsQueryResultDto,
-  TimesheetQueryDto,
-  TimesheetQueryResultDto,
-} from "../shared/infrastructure/activities";
-import type { SettingsDto } from "../shared/infrastructure/settings";
-import type {
-  IntervalElapsedEventDto,
-  TimerStartedEventDto,
-  TimerStoppedEventDto,
-} from "../shared/infrastructure/timer";
-
 export type Unsubscriber = () => void;
 
 export interface ActivitySampling {

@@ -2,14 +2,14 @@
 
 import { Temporal } from "@js-temporal/polyfill";
 
+import { normalizeDuration } from "../../shared/common/temporal";
 import {
-  ActivityLoggedEvent,
-  RecentActivitiesQuery,
+  type RecentActivitiesQuery,
   RecentActivitiesQueryResult,
   TimeSummary,
   WorkingDay,
-} from "../../shared/domain/activities";
-import { normalizeDuration } from "../../shared/common/temporal";
+} from "../../shared/domain/recent_activities_query";
+import { ActivityLoggedEvent } from "../../shared/domain/activities";
 import { filterEvents } from "./activities";
 
 export async function projectRecentActivities(

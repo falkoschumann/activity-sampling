@@ -6,10 +6,8 @@ import { describe, expect, it } from "vitest";
 import { Clock } from "../../../src/shared/common/temporal";
 import { ActivitiesService } from "../../../src/main/application/activities_service";
 import {
-  ActivityLoggedEvent,
   Capacity,
   LogActivityCommand,
-  RecentActivitiesQueryResult,
   ReportEntry,
   ReportQueryResult,
   ReportScope,
@@ -18,8 +16,6 @@ import {
   TimesheetEntry,
   TimesheetQuery,
   TimesheetQueryResult,
-  TimeSummary,
-  WorkingDay,
 } from "../../../src/shared/domain/activities";
 import { Settings } from "../../../src/shared/domain/settings";
 import { EventStore } from "../../../src/main/infrastructure/event_store";
@@ -76,65 +72,6 @@ describe("Activities service", () => {
       expect(recordEvents.data).toEqual<ActivityLoggedEventDto[]>([
         ActivityLoggedEventDto.createTestInstance({ category: "Lorem ipsum" }),
       ]);
-    });
-  });
-
-  describe("Query recent activities", () => {
-    it("should return recent activities", async () => {
-      const { service } = configure({
-        events: mapTimestampsToEvents([
-          "2025-06-04T14:00:00Z",
-          "2025-06-05T08:30:00Z",
-          "2025-06-05T09:00:00Z",
-        ]),
-        fixedInstant: "2025-06-05T10:00:00Z",
-      });
-
-      const result = await service.queryRecentActivities({});
-
-      expect(result).toEqual<RecentActivitiesQueryResult>({
-        workingDays: [
-          WorkingDay.create({
-            date: "2025-06-05",
-            activities: [
-              ActivityLoggedEvent.createTestInstance({
-                dateTime: "2025-06-05T11:00",
-              }),
-              ActivityLoggedEvent.createTestInstance({
-                dateTime: "2025-06-05T10:30",
-              }),
-            ],
-          }),
-          WorkingDay.create({
-            date: "2025-06-04",
-            activities: [
-              ActivityLoggedEvent.createTestInstance({
-                dateTime: "2025-06-04T16:00",
-              }),
-            ],
-          }),
-        ],
-        timeSummary: TimeSummary.create({
-          hoursToday: "PT1H",
-          hoursYesterday: "PT30M",
-          hoursThisWeek: "PT1H30M",
-          hoursThisMonth: "PT1H30M",
-        }),
-      });
-    });
-
-    it("should throw an error when event is not parseable", async () => {
-      const { service } = configure({
-        events: [
-          ActivityLoggedEventDto.createTestInstance({
-            timestamp: "invalid-timestamp",
-          }),
-        ],
-      });
-
-      const result = service.queryRecentActivities({});
-
-      await expect(result).rejects.toThrowError(TypeError);
     });
   });
 
@@ -365,10 +302,4 @@ function configure({
     clock,
   );
   return { service, eventStore, holidayRepository, clock };
-}
-
-function mapTimestampsToEvents(timestamps: string[]) {
-  return timestamps.map((timestamp) =>
-    ActivityLoggedEventDto.createTestInstance({ timestamp }),
-  );
 }

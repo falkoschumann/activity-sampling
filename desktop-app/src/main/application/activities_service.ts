@@ -10,8 +10,6 @@ import { queryBurnUp } from "./burn_up_query_handler";
 import { Settings } from "../../shared/domain/settings";
 import {
   type LogActivityCommand,
-  type RecentActivitiesQuery,
-  type RecentActivitiesQueryResult,
   type ReportQuery,
   type ReportQueryResult,
   type StatisticsQuery,
@@ -28,7 +26,10 @@ import {
   type EstimateQuery,
   type EstimateQueryResult,
 } from "../../shared/domain/estimate_query";
-import { projectRecentActivities } from "../domain/recent_activities_projection";
+import type {
+  RecentActivitiesQuery,
+  RecentActivitiesQueryResult,
+} from "../../shared/domain/recent_activities_query";
 import { projectReport } from "../domain/report_projection";
 import { projectStatistics } from "../domain/statistics_projection";
 import { projectTimesheet } from "../domain/timesheet_projection";
@@ -37,6 +38,7 @@ import { EventStore } from "../infrastructure/event_store";
 import { HolidayRepository } from "../infrastructure/holiday_repository";
 import { VacationRepository } from "../infrastructure/vacation_repository";
 import { TimesheetExporter } from "../infrastructure/timesheet_exporter";
+import { queryRecentActivities } from "./recent_activities_query_handler";
 
 // TODO remove activities service, use message handlers instead
 
@@ -100,11 +102,7 @@ export class ActivitiesService {
   async queryRecentActivities(
     query: RecentActivitiesQuery,
   ): Promise<RecentActivitiesQueryResult> {
-    const replay = this.#replayTyped(this.#eventStore.replay(), query.timeZone);
-    return await projectRecentActivities(replay, {
-      ...query,
-      today: query.today ?? this.#today(),
-    });
+    return queryRecentActivities(query, this.#eventStore, this.#clock);
   }
 
   async queryReport(query: ReportQuery): Promise<ReportQueryResult> {

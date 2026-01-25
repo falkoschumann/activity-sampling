@@ -9,7 +9,7 @@ import {
 import {
   BurnUpQueryDto,
   BurnUpQueryResultDto,
-} from "../../shared/infrastructure/burn_up_query";
+} from "../../shared/infrastructure/burn_up_query_dto";
 
 export function useBurnUp(query: BurnUpQuery) {
   const [result, setResult] = useState(BurnUpQueryResult.create());

@@ -13,8 +13,6 @@ import {
   Capacity,
   Histogram,
   type LogActivityCommand,
-  type RecentActivitiesQuery,
-  type RecentActivitiesQueryResult,
   ReportEntry,
   ReportQuery,
   ReportQueryResult,
@@ -25,8 +23,6 @@ import {
   TimesheetEntry,
   TimesheetQuery,
   TimesheetQueryResult,
-  TimeSummary,
-  WorkingDay,
 } from "../../../src/shared/domain/activities";
 import { Holiday, Vacation } from "../../../src/main/domain/calendar";
 import { Settings } from "../../../src/shared/domain/settings";
@@ -43,6 +39,12 @@ import {
   EstimateQuery,
   type EstimateQueryResult,
 } from "../../../src/shared/domain/estimate_query";
+import {
+  RecentActivitiesQuery,
+  type RecentActivitiesQueryResult,
+  TimeSummary,
+  WorkingDay,
+} from "../../../src/shared/domain/recent_activities_query";
 import { EventStore } from "../../../src/main/infrastructure/event_store";
 import { ActivityLoggedEventDto } from "../../../src/main/infrastructure/events";
 import { HolidayRepository } from "../../../src/main/infrastructure/holiday_repository";

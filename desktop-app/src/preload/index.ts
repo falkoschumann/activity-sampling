@@ -11,8 +11,6 @@ import type {
   CommandStatusDto,
   ExportTimesheetCommandDto,
   LogActivityCommandDto,
-  RecentActivitiesQueryDto,
-  RecentActivitiesQueryResultDto,
   ReportQueryDto,
   ReportQueryResultDto,
   StatisticsQueryDto,
@@ -45,7 +43,11 @@ import type {
 import {
   type BurnUpQueryDto,
   BurnUpQueryResultDto,
-} from "../shared/infrastructure/burn_up_query";
+} from "../shared/infrastructure/burn_up_query_dto";
+import {
+  type RecentActivitiesQueryDto,
+  RecentActivitiesQueryResultDto,
+} from "../shared/infrastructure/recent_activities_query_dto";
 
 contextBridge.exposeInMainWorld("activitySampling", {
   logActivity: async (

@@ -5,8 +5,6 @@ import { useCallback, useEffect, useReducer, useState } from "react";
 
 import {
   LogActivityCommand,
-  RecentActivitiesQuery,
-  RecentActivitiesQueryResult,
   ReportQuery,
   ReportQueryResult,
   StatisticsQuery,
@@ -28,16 +26,22 @@ import {
   EstimateQueryResult,
 } from "../../shared/domain/estimate_query";
 import {
+  RecentActivitiesQuery,
+  RecentActivitiesQueryResult,
+} from "../../shared/domain/recent_activities_query";
+import {
   EstimateQueryDto,
   EstimateQueryResultDto,
-} from "../../shared/infrastructure/estimate_query";
+} from "../../shared/infrastructure/estimate_query_dto";
+import {
+  RecentActivitiesQueryDto,
+  RecentActivitiesQueryResultDto,
+} from "../../shared/infrastructure/recent_activities_query_dto";
 import { SettingsDto } from "../../shared/infrastructure/settings";
 import {
   CommandStatusDto,
   ExportTimesheetCommandDto,
   LogActivityCommandDto,
-  RecentActivitiesQueryDto,
-  RecentActivitiesQueryResultDto,
   ReportQueryDto,
   ReportQueryResultDto,
   StatisticsQueryDto,

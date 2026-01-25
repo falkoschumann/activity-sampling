@@ -23,8 +23,6 @@ import {
   CommandStatusDto,
   ExportTimesheetCommandDto,
   LogActivityCommandDto,
-  RecentActivitiesQueryDto,
-  RecentActivitiesQueryResultDto,
   ReportQueryDto,
   ReportQueryResultDto,
   StatisticsQueryDto,
@@ -40,11 +38,15 @@ import {
 import {
   BurnUpQueryDto,
   BurnUpQueryResultDto,
-} from "../shared/infrastructure/burn_up_query";
+} from "../shared/infrastructure/burn_up_query_dto";
 import {
   EstimateQueryDto,
   EstimateQueryResultDto,
-} from "../shared/infrastructure/estimate_query";
+} from "../shared/infrastructure/estimate_query_dto";
+import {
+  RecentActivitiesQueryDto,
+  RecentActivitiesQueryResultDto,
+} from "../shared/infrastructure/recent_activities_query_dto";
 import {
   EXPORT_TIMESHEET_CHANNEL,
   INTERVAL_ELAPSED_CHANNEL,
