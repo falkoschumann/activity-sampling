@@ -42,7 +42,7 @@
     "@types/react": "19.2.8",
     "@types/react-dom": "19.2.3",
     "@vitejs/plugin-react": "5.1.2",
-    "@vitest/coverage-v8": "4.0.17",
+    "@vitest/coverage-v8": "4.0.18",
     "ajv": "8.17.1",
     "ajv-formats": "3.0.1",
     "bootstrap": "5.3.8",
@@ -67,6 +67,6 @@
     "typescript": "5.9.3",
     "typescript-eslint": "8.53.1",
     "vite": "7.3.1",
-    "vitest": "4.0.17"
+    "vitest": "4.0.18"
   }
 }
