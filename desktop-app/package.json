@@ -38,8 +38,8 @@
     "@js-temporal/polyfill": "0.5.1",
     "@muspellheim/shared": "0.18.1",
     "@softarc/sheriff-core": "0.19.6",
-    "@types/node": "24.10.9",
-    "@types/react": "19.2.10",
+    "@types/node": "24.10.12",
+    "@types/react": "19.2.13",
     "@types/react-dom": "19.2.3",
     "@vitejs/plugin-react": "5.1.3",
     "@vitest/coverage-v8": "4.0.18",
@@ -49,7 +49,7 @@
     "bootstrap-icons": "1.13.1",
     "chart.js": "4.5.1",
     "csv": "6.4.1",
-    "electron": "40.1.0",
+    "electron": "40.2.1",
     "electron-builder": "26.7.0",
     "electron-devtools-installer": "4.0.0",
     "electron-vite": "5.0.0",
@@ -65,7 +65,7 @@
     "react-dom": "19.2.4",
     "sass": "1.97.3",
     "typescript": "5.9.3",
-    "typescript-eslint": "8.54.0",
+    "typescript-eslint": "8.55.0",
     "vite": "7.3.1",
     "vitest": "4.0.18"
   }
