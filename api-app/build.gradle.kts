@@ -18,8 +18,8 @@ configurations { compileOnly { extendsFrom(configurations.annotationProcessor.ge
 repositories { mavenCentral() }
 
 dependencyManagement {
-  imports { mavenBom("com.azure.spring:spring-cloud-azure-dependencies:6.1.0") }
-  imports { mavenBom("com.azure.spring:spring-cloud-azure-dependencies:6.1.0") }
+  imports { mavenBom("com.azure.spring:spring-cloud-azure-dependencies:7.0.0") }
+  imports { mavenBom("com.azure.spring:spring-cloud-azure-dependencies:7.0.0") }
 }
 
 dependencies {
