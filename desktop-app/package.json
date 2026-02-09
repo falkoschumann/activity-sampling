@@ -34,7 +34,7 @@
     "postinstall": "electron-builder install-app-deps"
   },
   "devDependencies": {
-    "@eslint/js": "9.39.2",
+    "@eslint/js": "10.0.1",
     "@js-temporal/polyfill": "0.5.1",
     "@muspellheim/shared": "0.18.1",
     "@softarc/sheriff-core": "0.19.6",
