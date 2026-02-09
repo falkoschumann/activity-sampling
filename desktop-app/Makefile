@@ -62,12 +62,17 @@ build: prepare
 	$(PACKAGE_MANAGER) run build
 
 prepare: version
-	@if [ -n "$(CI)" ] ; then \
-		echo "CI detected, run $(PACKAGE_MANAGER) ci"; \
-		$(PACKAGE_MANAGER) ci; \
-	else \
-		$(PACKAGE_MANAGER) install; \
-	fi
+ifdef CI
+ifeq ($(findstring $(DEPENDABOT), $(GITHUB_ACTOR)), $(DEPENDABOT))
+	@echo "dependabot detected, run $(PACKAGE_MANAGER) install"
+	$(PACKAGE_MANAGER) install
+else
+	@echo "CI detected, run $(PACKAGE_MANAGER) ci"
+	$(PACKAGE_MANAGER) ci
+endif
+else
+	$(PACKAGE_MANAGER) install
+endif
 
 version:
 	@echo "Using $(RUNTIME) $(shell $(RUNTIME) --version)"
