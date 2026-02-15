@@ -1,0 +1,7 @@
+black
+ipykernel
+isodate
+matplotlib
+matplotlib-inline
+nbconvert
+pandas
