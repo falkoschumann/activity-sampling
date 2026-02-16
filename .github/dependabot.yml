@@ -5,13 +5,6 @@ updates:
     schedule:
       interval: "weekly"
     merge-strategy: "rebase"
-    groups:
-      minor-and-patch:
-        patterns:
-          - "*"
-        update-types:
-          - "minor"
-          - "patch"
   - package-ecosystem: gradle
     directory: "/api-app"
     schedule:
@@ -36,6 +29,10 @@ updates:
         update-types:
           - "minor"
           - "patch"
+      eslint:
+        patterns:
+          - "eslint"
+          - "@eslint/*"
       vitest:
         patterns:
           - "vitest"
@@ -56,6 +53,10 @@ updates:
         update-types:
           - "minor"
           - "patch"
+      eslint:
+        patterns:
+          - "eslint"
+          - "@eslint/*"
       vitest:
         patterns:
           - "vitest"
