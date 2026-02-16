@@ -11,17 +11,17 @@ jobs:
     steps:
       - name: Checkout source code
         uses: actions/checkout@v6
-      - name: Setup latest Bun
+      - name: Set up Bun
         uses: oven-sh/setup-bun@v2
         with:
           bun-version: latest
-      - name: Use Java LTS
+      - name: Set up Java LTS
         uses: actions/setup-java@v5
         with:
           # Use Java LTS
           distribution: temurin
           java-version: "25"
-      - name: Setup Node.js LTS
+      - name: Set up Node.js LTS
         uses: actions/setup-node@v6
         with:
           # Use Node.js LTS
