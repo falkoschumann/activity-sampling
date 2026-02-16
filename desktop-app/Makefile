@@ -3,7 +3,7 @@ export SIGN?=false
 
 RUNTIME=bun
 PACKAGE_MANAGER=bun
-COMMAND_RUNNER=bunx
+COMMAND_RUNNER=bunx --bun
 ifeq ("$(shell command -v $(RUNTIME))", "")
     $(warning "$(COMMAND) is not available. Fallback to Node.js and npm.")
 	RUNTIME=node

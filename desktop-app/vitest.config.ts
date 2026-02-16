@@ -13,7 +13,7 @@ export default defineConfig({
         "src/**/infrastructure/**/*",
         // exclude layers UI and root
       ],
-      provider: "v8",
+      provider: "istanbul",
       thresholds: {
         statements: 70, // TODO increase statements coverage
         branches: 80,
@@ -21,5 +21,6 @@ export default defineConfig({
       },
     },
     globalSetup: "./test/global-setup.ts",
+    reporters: ["tree"],
   },
 });
