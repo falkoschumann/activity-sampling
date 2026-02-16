@@ -20,7 +20,6 @@ export default defineConfig({
         lines: 70, // TODO increase lines coverage
       },
     },
-    globalSetup: "./test/global-setup.ts",
     reporters: ["tree"],
   },
 });

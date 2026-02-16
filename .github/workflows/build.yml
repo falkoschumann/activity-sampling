@@ -7,6 +7,8 @@ permissions:
 
 jobs:
   build:
+    env:
+      TZ: "Europe/Berlin"
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source code
