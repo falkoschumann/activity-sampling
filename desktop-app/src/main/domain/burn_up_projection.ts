@@ -62,7 +62,6 @@ function fillPeriod(
   }
 
   const data = [];
-  let throughput = 0;
   let cumulativeThroughput = 0;
   for (
     let date = from;
@@ -71,7 +70,7 @@ function fillPeriod(
   ) {
     const dateStr = date.toString();
     if (throughputs.has(dateStr)) {
-      throughput = throughputs.get(dateStr)!;
+      const throughput = throughputs.get(dateStr)!;
       cumulativeThroughput += throughput;
       data.push(
         BurnUpData.create({
