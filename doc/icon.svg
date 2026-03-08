@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="100%" height="100%" viewBox="0 0 76 76" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+    <g transform="matrix(1.11689,0,0,1.23954,-2.41596,-11.3051)">
+        <g id="macOS-background" serif:id="macOS background">
+            <path d="M65.733,23.803L65.733,55.75C65.733,61.628 60.437,66.4 53.914,66.4L18.458,66.4C11.936,66.4 6.64,61.628 6.64,55.75L6.64,23.803C6.64,17.926 11.936,13.154 18.458,13.154L53.914,13.154C60.437,13.154 65.733,17.926 65.733,23.803Z" style="fill:white;"/>
+        </g>
+    </g>
+    <g transform="matrix(3.166667,0,0,3.166667,0,0)">
+        <rect x="0" y="0" width="24" height="24" style="fill:none;"/>
+    </g>
+    <g transform="matrix(2.47619,0,0,2.47619,8.285714,8.940476)">
+        <g>
+            <path d="M19,6L18,6L18,1L6,1L6,6L5,6C3.9,6 3,6.9 3,8L3,20C3,21.1 3.9,22 5,22L19,22C20.1,22 21,21.1 21,20L21,8C21,6.9 20.1,6 19,6ZM8,3L16,3L16,6L8,6L8,3ZM12,19C9.24,19 7,16.76 7,14C7,11.24 9.24,9 12,9C14.76,9 17,11.24 17,14C17,16.76 14.76,19 12,19Z" style="fill:rgb(13,110,253);fill-rule:nonzero;"/>
+            <path d="M12.5,11.5L11.5,11.5L11.5,14.21L13.14,15.85L13.85,15.14L12.5,13.79L12.5,11.5Z" style="fill-rule:nonzero;"/>
+        </g>
+    </g>
+</svg>
