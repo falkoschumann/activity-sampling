@@ -6,7 +6,7 @@ import path from "node:path";
 import { Temporal } from "@js-temporal/polyfill";
 import { expect } from "vitest";
 
-import { Clock } from "../../../src/shared/common/temporal";
+import { Clock } from "../../../src/shared/domain/temporal";
 import { ActivitiesService } from "../../../src/main/application/activities_service";
 import { TimerService } from "../../../src/main/application/timer_service";
 import {

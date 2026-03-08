@@ -1,7 +1,7 @@
 // Copyright (c) 2026 Falko Schumann. All rights reserved. MIT license.
 
 import { ReportEntry, ReportScope, type ReportScopeType } from "../../../../shared/domain/activities";
-import { formatDate, formatDuration } from "../../../../shared/common/temporal";
+import { formatDate, formatDuration } from "../../../../shared/domain/temporal";
 
 export default function TimeReportComponent({ scope, entries }: { scope: ReportScopeType; entries: ReportEntry[] }) {
   return (

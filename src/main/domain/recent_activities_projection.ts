@@ -2,7 +2,7 @@
 
 import { Temporal } from "@js-temporal/polyfill";
 
-import { normalizeDuration } from "../../shared/common/temporal";
+import { normalizeDuration } from "../../shared/domain/temporal";
 import {
   type RecentActivitiesQuery,
   RecentActivitiesQueryResult,

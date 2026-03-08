@@ -3,7 +3,7 @@
 import { type CommandStatus, Success } from "@muspellheim/shared";
 import { describe, expect, it } from "vitest";
 
-import { Clock } from "../../../src/shared/common/temporal";
+import { Clock } from "../../../src/shared/domain/temporal";
 import { ActivitiesService } from "../../../src/main/application/activities_service";
 import {
   Capacity,

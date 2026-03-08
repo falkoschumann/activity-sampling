@@ -3,7 +3,7 @@
 import { Temporal } from "@js-temporal/polyfill";
 import { memo } from "react";
 
-import { formatDuration } from "../../../../shared/common/temporal";
+import { formatDuration } from "../../../../shared/domain/temporal";
 
 const MemoizedTimeSummaryComponent = memo(TimeSummaryComponent);
 

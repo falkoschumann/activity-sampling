@@ -2,7 +2,7 @@
 
 import { Temporal } from "@js-temporal/polyfill";
 
-import { formatDate } from "../../../shared/common/temporal";
+import { formatDate } from "../../../shared/domain/temporal";
 import { PeriodUnit, type PeriodUnitType } from "../../domain/period";
 
 export function PeriodComponent({

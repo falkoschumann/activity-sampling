@@ -3,7 +3,7 @@
 import { Temporal } from "@js-temporal/polyfill";
 import { type CommandStatus, Success } from "@muspellheim/shared";
 
-import { Clock } from "../../shared/common/temporal";
+import { Clock } from "../../shared/domain/temporal";
 import {
   type CurrentIntervalQuery,
   CurrentIntervalQueryResult,

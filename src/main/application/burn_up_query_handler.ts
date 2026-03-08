@@ -2,7 +2,7 @@
 
 import { Temporal } from "@js-temporal/polyfill";
 
-import type { Clock } from "../../shared/common/temporal";
+import type { Clock } from "../../shared/domain/temporal";
 import {
   type BurnUpQuery,
   BurnUpQueryResult,

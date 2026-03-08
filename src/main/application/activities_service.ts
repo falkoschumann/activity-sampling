@@ -3,7 +3,7 @@
 import { Temporal } from "@js-temporal/polyfill";
 import { type CommandStatus, Success } from "@muspellheim/shared";
 
-import { Clock } from "../../shared/common/temporal";
+import { Clock } from "../../shared/domain/temporal";
 import { exportTimesheet } from "./export_timesheet";
 import { queryEstimate } from "./estimate_query_handler";
 import { queryBurnUp } from "./burn_up_query_handler";

@@ -3,7 +3,7 @@
 import { Temporal } from "@js-temporal/polyfill";
 import type { FluxStandardActionAuto } from "flux-standard-action";
 
-import { normalizeDuration } from "../../shared/common/temporal";
+import { normalizeDuration } from "../../shared/domain/temporal";
 
 export interface ActivityTemplate {
   client: string;

@@ -9,7 +9,7 @@ import {
   ReportQueryResult,
   ReportScope,
 } from "../../shared/domain/activities";
-import { normalizeDuration } from "../../shared/common/temporal";
+import { normalizeDuration } from "../../shared/domain/temporal";
 import { filterEvents, TotalHoursProjection } from "./activities";
 
 export async function projectReport(

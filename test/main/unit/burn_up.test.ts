@@ -2,7 +2,7 @@
 
 import { describe, expect, it } from "vitest";
 
-import { Clock } from "../../../src/shared/common/temporal";
+import { Clock } from "../../../src/shared/domain/temporal";
 import { queryBurnUp } from "../../../src/main/application/burn_up_query_handler";
 import {
   BurnUpData,

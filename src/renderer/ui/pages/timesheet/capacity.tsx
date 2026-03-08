@@ -2,7 +2,7 @@
 
 import { Temporal } from "@js-temporal/polyfill";
 
-import { formatDuration } from "../../../../shared/common/temporal";
+import { formatDuration } from "../../../../shared/domain/temporal";
 
 export default function CapacityComponent({
   totalHours,

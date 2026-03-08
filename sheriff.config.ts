@@ -21,7 +21,6 @@ export const config: SheriffConfig = {
       "component:<component>",
       "layer:application",
     ],
-    "src/<component>/common": ["component:<component>", "layer:common"],
     "src/<component>/domain": ["component:<component>", "layer:domain"],
     "src/<component>/infrastructure": [
       "component:<component>",
@@ -49,10 +48,10 @@ export const config: SheriffConfig = {
     "layer:ui": ["layer:application", "layer:domain"],
     "layer:application": ["layer:domain", "layer:infrastructure"],
     "layer:infrastructure": ["layer:domain"],
-    "layer:*": [sameTag, "layer:common"],
+    "layer:*": [sameTag],
     "ui:entry": ["ui:*", "layer:application"],
     "ui:page": ["ui:layout", "layer:application"],
-    "ui:*": [sameTag, "ui:component", "layer:common", "layer:domain"],
+    "ui:*": [sameTag, "ui:component", "layer:domain"],
     "component:*": [sameTag, "component:shared"],
   },
 };
