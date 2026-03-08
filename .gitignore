@@ -1,28 +1,20 @@
 # see also https://gitignore.io
 
-/coverage/
-/data/
-/build/
-/dist/
-/testdata/
+# Common
+data/
+dist/
+!test/**/data/
+testdata/
 tmp/
-vendor/
 .env.local
-
-# Gradle
-.gradle/
-build/
-
-# Maven
-target/
+*.log*
 
 # Node
-.vite/
 coverage/
 node_modules/
-junit.xml
 
 # Python
+.venv/
 __pycache__/
 
 # Eclipse

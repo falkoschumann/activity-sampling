@@ -1,21 +1,26 @@
 // Copyright (c) 2026 Falko Schumann. All rights reserved. MIT license.
 
-import { Configuration } from "./electron-builder";
+import type { Configuration } from "electron-builder";
 
 const options: Configuration = {
   appId: "de.muspellheim.activitysampling",
   productName: "Activity Sampling",
   directories: {
-    buildResources: "resources",
+    buildResources: "build",
   },
   files: [
-    "!**/.github/*",
-    "!**/.venv/*",
-    "!**/.vscode/*",
+    "!.github/*",
+    "!.venv/*",
+    "!.vscode/*",
+    "!coverage/*",
     "!data/*",
+    "!doc/*",
+    "!migration/*",
     "!src/*",
     "!test/*",
     "!testdata/*",
+    "!tmp/*",
+    "!bunfig.toml",
     "!electron.vite.config.*",
     "!eslint.config.*",
     "!Makefile",
@@ -26,7 +31,7 @@ const options: Configuration = {
     "!sheriff.config.*",
     "!tsconfig.*",
     "!vitest.config.*",
-    "!.prettierrc",
+    "!.prettier*",
   ],
   asar: process.env.ASAR === "true",
   asarUnpack: ["resources/**"],

@@ -33,12 +33,5 @@
     // Completeness
     "skipLibCheck": true
   },
-  "include": [
-    "src/main/**/*",
-    "src/preload/**/*",
-    "test/**/*",
-    "electron.vite.config.*",
-    "sheriff.config.ts",
-    "vitest.config.ts"
-  ]
+  "include": ["src/main/**/*", "src/preload/**/*", "test/**/*", "*.ts"]
 }

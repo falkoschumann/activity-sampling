@@ -1,85 +1,82 @@
 export ASAR?=true
-export SIGN?=false
+export MAC_SIGN?=false
 
-RUNTIME=bun
-PACKAGE_MANAGER=bun
-COMMAND_RUNNER=bunx --bun
-ifeq ("$(shell command -v $(RUNTIME))", "")
-    $(warning "$(COMMAND) is not available. Fallback to Node.js and npm.")
-	RUNTIME=node
-	PACKAGE_MANAGER=npm
-	COMMAND_RUNNER=npx
-endif
+PLANTUML_FILES = $(wildcard doc/*.puml)
+DIAGRAM_FILES = $(subst .puml,.png,$(PLANTUML_FILES))
 
 all: dist check
 
 clean:
-	rm -rf build coverage testdata
+	rm -rf coverage out testdata
 
 distclean: clean
 	rm -rf dist
 	rm -rf node_modules
 
 dist: build
-	$(PACKAGE_MANAGER) run build:electron
-#	$(PACKAGE_MANAGER) run build:mac
-#	$(PACKAGE_MANAGER) run build:win
+	bun run build:electron
+#	bun run build:mac
+#	bun run build:win
 
-start:
-	$(PACKAGE_MANAGER) start
+start: prepare
+	bun start
+
+doc: $(DIAGRAM_FILES)
 
 check: test
-	$(COMMAND_RUNNER) eslint .
-	$(COMMAND_RUNNER) prettier --check .
-	$(COMMAND_RUNNER) sheriff verify
+	bunx eslint .
+	bunx stylelint "**/*.scss" --ignore-path .gitignore
+	bunx prettier --check .
+	bunx sheriff verify
 
 format:
-	$(COMMAND_RUNNER) eslint --fix .
-	$(COMMAND_RUNNER) prettier --write .
+	bunx eslint --fix .
+	bunx stylelint "**/*.scss" --fix --ignore-path .gitignore
+	bunx prettier --write .
 
 dev: prepare
-	$(PACKAGE_MANAGER) run dev
+	bun run dev
 
 test: prepare
-	$(COMMAND_RUNNER) vitest run
+	bunx vitest run
 
 watch: prepare
-	$(PACKAGE_MANAGER) test
-
-coverage: prepare
-	$(COMMAND_RUNNER) vitest run --coverage
+	bun test
 
 unit-tests: prepare
-	$(COMMAND_RUNNER) vitest run unit
+	bunx vitest run unit
 
 integration-tests: prepare
-	$(COMMAND_RUNNER) vitest run integration
+	bunx vitest run integration
 
 e2e-tests: prepare
-	$(COMMAND_RUNNER) vitest run e2e
+	bunx vitest run e2e
 
 build: prepare
-	$(PACKAGE_MANAGER) run build
+	bun run build
 
 prepare: version
 ifdef CI
 ifeq ($(findstring $(DEPENDABOT), $(GITHUB_ACTOR)), $(DEPENDABOT))
-	@echo "dependabot detected, run $(PACKAGE_MANAGER) install"
-	$(PACKAGE_MANAGER) install
+	@echo "dependabot detected, run bun install"
+	bun install
 else
-	@echo "CI detected, run $(PACKAGE_MANAGER) ci"
-	$(PACKAGE_MANAGER) ci
+	@echo "CI detected, run bun ci"
+	bun ci
 endif
 else
-	$(PACKAGE_MANAGER) install
+	bun install
 endif
 
 version:
-	@echo "Using $(RUNTIME) $(shell $(RUNTIME) --version)"
-	@echo "Using $(PACKAGE_MANAGER) $(shell $(PACKAGE_MANAGER) --version)"
+	@echo "Using bun $(shell bun --version)"
+
+$(DIAGRAM_FILES): %.png: %.puml
+	plantuml $^
 
 .PHONY: \
-	all clean distclean dist start \
+	all clean distclean dist \
+	start doc \
 	check format \
-	dev test watch coverage unit-tests integration-tests e2e-tests \
+	dev test watch unit-tests integration-tests e2e-tests \
 	build prepare version

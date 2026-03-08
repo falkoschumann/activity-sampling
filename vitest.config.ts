@@ -16,8 +16,7 @@ export default defineConfig({
       provider: "istanbul",
       thresholds: {
         statements: 70, // TODO increase statements coverage
-        branches: 80,
-        lines: 70, // TODO increase lines coverage
+        branches: 85,
       },
     },
     reporters: ["tree"],
