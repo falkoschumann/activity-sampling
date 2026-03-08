@@ -1,7 +1,0 @@
-# Proxy
-
-## Installation
-
-## Usage
-
-## Contributing

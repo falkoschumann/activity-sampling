@@ -3,10 +3,12 @@
 # Based on following Google Style Guides:
 # - C++: https://google.github.io/styleguide/cppguide.html
 # - C#: https://google.github.io/styleguide/csharp-style.html
-# - Go: https://google.github.io/styleguide/goguide.html
+# - Go: https://google.github.io/styleguide/go/
 # - HTML/CSS: https://google.github.io/styleguide/htmlcssguide.html
 # - JavaScript: https://google.github.io/styleguide/jsguide.html
 # - Java: https://google.github.io/styleguide/javaguide.html
+# - JSON: https://google.github.io/styleguide/jsoncstyleguide.xml
+# - Markdown: https://google.github.io/styleguide/docguide/style.html
 # - Python: https://google.github.io/styleguide/pyguide.html
 # - Shell: https://google.github.io/styleguide/shellguide.html
 # - TypeScript: https://google.github.io/styleguide/tsguide.html
@@ -22,7 +24,7 @@ trim_trailing_whitespace = true
 insert_final_newline = true
 max_line_length = 80
 
-[*.{md,py,ipynb}]
+[*.{md,py,sql}]
 indent_size = 4
 
 [*.{cs,java,kt,kts,yaml,yml}]
@@ -35,7 +37,7 @@ charset = latin1
 [*.{csv,sln}]
 end_of_line = crlf
 
-[*.{html,xml,jsx,tsx}]
+[*.{html,xml,jsx,tsx,svg}]
 max_line_length = 120
 
 [*.ics]

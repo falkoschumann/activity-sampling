@@ -1,78 +1,85 @@
-export NPM_CONFIG_YES=true
-SUBDIRS = desktop-app web-app api-app
-APP_DIRS = web-app api-app
-ROOT_FILES = .github/ doc/ README.md
-PLANTUML_FILES = $(wildcard doc/*.puml)
-DIAGRAM_FILES = $(subst .puml,.png,$(PLANTUML_FILES))
+export ASAR?=true
+export SIGN?=false
 
-all: $(SUBDIRS) root doc
-
-clean: $(SUBDIRS)
-clean: TARGET=clean
-
-distclean: $(SUBDIRS)
-distclean: TARGET=distclean
-
-dist: $(SUBDIRS)
-dist: TARGET=dist
-
-up:
-	docker compose up --build --detach
-
-down:
-	docker compose down --volumes --remove-orphans --rmi local
-
-prune:
-	docker container prune
-	docker image prune --all
-	docker volume prune --all
-
-root: check-root
-
-doc: $(DIAGRAM_FILES)
-
-check: $(SUBDIRS) check-root
-check: TARGET=check
-
-check-root:
-	npx prettier --check $(ROOT_FILES)
-
-format: $(SUBDIRS) format-root
-format: TARGET=format
-
-format-root:
-	npx prettier --write $(ROOT_FILES)
-
-dev: build
-	npx concurrently \
-		--kill-others \
-		--names "WEB,API" \
-		--prefix-colors "bgMagenta.bold,bgGreen.bold" \
-		$(foreach app,$(APP_DIRS),"$(MAKE) -C $(app) dev")
-
-test: $(SUBDIRS)
-test: TARGET=test
-
-build: $(SUBDIRS)
-build: TARGET=build
-
-version: $(SUBDIRS)
-version: TARGET=version
-
-$(SUBDIRS): force
-	@$(MAKE) -C $@ $(TARGET)
-
-ifneq ($(CI),true)
-$(DIAGRAM_FILES): %.png: %.puml
-	plantuml $^
+RUNTIME=bun
+PACKAGE_MANAGER=bun
+COMMAND_RUNNER=bunx --bun
+ifeq ("$(shell command -v $(RUNTIME))", "")
+    $(warning "$(COMMAND) is not available. Fallback to Node.js and npm.")
+	RUNTIME=node
+	PACKAGE_MANAGER=npm
+	COMMAND_RUNNER=npx
 endif
 
-force: ;
+all: dist check
+
+clean:
+	rm -rf build coverage testdata
+
+distclean: clean
+	rm -rf dist
+	rm -rf node_modules
+
+dist: build
+	$(PACKAGE_MANAGER) run build:electron
+#	$(PACKAGE_MANAGER) run build:mac
+#	$(PACKAGE_MANAGER) run build:win
+
+start:
+	$(PACKAGE_MANAGER) start
+
+check: test
+	$(COMMAND_RUNNER) eslint .
+	$(COMMAND_RUNNER) prettier --check .
+	$(COMMAND_RUNNER) sheriff verify
+
+format:
+	$(COMMAND_RUNNER) eslint --fix .
+	$(COMMAND_RUNNER) prettier --write .
+
+dev: prepare
+	$(PACKAGE_MANAGER) run dev
+
+test: prepare
+	$(COMMAND_RUNNER) vitest run
+
+watch: prepare
+	$(PACKAGE_MANAGER) test
+
+coverage: prepare
+	$(COMMAND_RUNNER) vitest run --coverage
+
+unit-tests: prepare
+	$(COMMAND_RUNNER) vitest run unit
+
+integration-tests: prepare
+	$(COMMAND_RUNNER) vitest run integration
+
+e2e-tests: prepare
+	$(COMMAND_RUNNER) vitest run e2e
+
+build: prepare
+	$(PACKAGE_MANAGER) run build
+
+prepare: version
+ifdef CI
+ifeq ($(findstring $(DEPENDABOT), $(GITHUB_ACTOR)), $(DEPENDABOT))
+	@echo "dependabot detected, run $(PACKAGE_MANAGER) install"
+	$(PACKAGE_MANAGER) install
+else
+	@echo "CI detected, run $(PACKAGE_MANAGER) ci"
+	$(PACKAGE_MANAGER) ci
+endif
+else
+	$(PACKAGE_MANAGER) install
+endif
+
+version:
+	@echo "Using $(RUNTIME) $(shell $(RUNTIME) --version)"
+	@echo "Using $(PACKAGE_MANAGER) $(shell $(PACKAGE_MANAGER) --version)"
 
 .PHONY: \
-	all clean distclean distclean-root dist \
-	up down prune \
-	root doc \
-	check check-root format format-root \
-	dev test \
-	build version
+	all clean distclean dist start \
+	check format \
+	dev test watch coverage unit-tests integration-tests e2e-tests \
+	build prepare version

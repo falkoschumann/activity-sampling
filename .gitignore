@@ -1,5 +1,10 @@
 # see also https://gitignore.io
 
+/coverage/
+/data/
+/build/
+/dist/
+/testdata/
 tmp/
 vendor/
 .env.local
@@ -12,6 +17,7 @@ build/
 target/
 
 # Node
+.vite/
 coverage/
 node_modules/
 junit.xml
