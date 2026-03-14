@@ -1,4 +1,4 @@
-// Copyright (c) 2026 Falko Schumann. All rights reserved. MIT license.
+// Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
 import js from "@eslint/js";
 import headers from "eslint-plugin-headers";
@@ -14,8 +14,11 @@ export default ts.config(
     extends: [js.configs.recommended, ...ts.configs.recommended],
     files: ["**/*.{cjs,mjs,js,jsx,ts,tsx}"],
     languageOptions: {
-      ecmaVersion: 2022,
-      globals: globals.browser,
+      ecmaVersion: 2024,
+      globals: {
+        ...globals.es2024,
+        ...globals.browser,
+      },
       parserOptions: {
         ecmaFeatures: {
           jsx: true,

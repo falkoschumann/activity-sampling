@@ -8,6 +8,7 @@ all: dist check
 
 clean:
 	rm -rf coverage out testdata
+	rm -rf node_modules/.tmp
 
 distclean: clean
 	rm -rf dist
@@ -24,9 +25,9 @@ start: prepare
 doc: $(DIAGRAM_FILES)
 
 check: test
+	bunx prettier --check .
 	bunx eslint .
 	bunx stylelint "**/*.scss" --ignore-path .gitignore
-	bunx prettier --check .
 	bunx sheriff verify
 
 format:

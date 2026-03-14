@@ -3,7 +3,10 @@
     // Type Checking
     "noFallthroughCasesInSwitch": true,
     "noImplicitAny": true,
+    "noImplicitOverride": true,
     "noImplicitReturns": true,
+    "noPropertyAccessFromIndexSignature": true,
+    "noUncheckedIndexedAccess": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "strict": true,
@@ -12,23 +15,26 @@
     "strictPropertyInitialization": true,
     "useUnknownInCatchVariables": true,
     // Modules
-    "module": "ESNext",
+    "allowImportingTsExtensions": true,
+    "module": "Preserve",
     "moduleResolution": "bundler",
     "noUncheckedSideEffectImports": true,
-    "types": ["node", "electron-vite/node"],
     // Emit
     "noEmit": true,
+    // JavaScript Support
+    "allowJs": true,
     // Interop Constraints
+    "allowSyntheticDefaultImports": true,
     "erasableSyntaxOnly": true,
     "forceConsistentCasingInFileNames": true,
     "verbatimModuleSyntax": true,
     // Language and Environment
-    "jsx": "preserve",
+    "jsx": "react-jsx",
     "moduleDetection": "force",
     "target": "ES2024",
     "useDefineForClassFields": true,
     // Projects
-    "lib": ["ESNext", "DOM", "DOM.Iterable"],
+    "lib": ["ES2024"],
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.node.tsbuildinfo",
     // Completeness
     "skipLibCheck": true

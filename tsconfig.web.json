@@ -3,7 +3,10 @@
     // Type Checking
     "noFallthroughCasesInSwitch": true,
     "noImplicitAny": true,
+    "noImplicitOverride": true,
     "noImplicitReturns": true,
+    "noPropertyAccessFromIndexSignature": true,
+    "noUncheckedIndexedAccess": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "strict": true,
@@ -12,13 +15,16 @@
     "strictPropertyInitialization": true,
     "useUnknownInCatchVariables": true,
     // Modules
-    "baseUrl": ".",
-    "module": "ESNext",
+    "allowImportingTsExtensions": true,
+    "module": "Preserve",
     "moduleResolution": "bundler",
     "noUncheckedSideEffectImports": true,
     // Emit
     "noEmit": true,
+    // JavaScript Support
+    "allowJs": true,
     // Interop Constraints
+    "allowSyntheticDefaultImports": true,
     "erasableSyntaxOnly": true,
     "forceConsistentCasingInFileNames": true,
     "verbatimModuleSyntax": true,
@@ -28,7 +34,7 @@
     "target": "ES2024",
     "useDefineForClassFields": true,
     // Projects
-    "lib": ["ESNext", "DOM", "DOM.Iterable"],
+    "lib": ["ES2024", "DOM"],
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.web.tsbuildinfo",
     // Completeness
     "skipLibCheck": true
