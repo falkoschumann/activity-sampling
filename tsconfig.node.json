@@ -34,7 +34,7 @@
     "target": "ES2024",
     "useDefineForClassFields": true,
     // Projects
-    "lib": ["ES2024"],
+    "lib": ["ES2024", "ESNext.Array"],
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.node.tsbuildinfo",
     // Completeness
     "skipLibCheck": true

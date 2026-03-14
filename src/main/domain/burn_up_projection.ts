@@ -93,5 +93,5 @@ function fillPeriod(
 }
 
 function determineTotalThroughput(data: BurnUpData[]) {
-  return data.length > 0 ? data[data.length - 1].cumulativeThroughput : 0;
+  return data.length > 0 ? data[data.length - 1]!.cumulativeThroughput : 0;
 }

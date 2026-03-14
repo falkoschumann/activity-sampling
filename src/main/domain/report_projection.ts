@@ -61,7 +61,7 @@ class ClientReportProjection {
         }),
       );
     } else {
-      this.#entries[index] = updateEntry(this.#entries[index], event);
+      this.#entries[index] = updateEntry(this.#entries[index]!, event);
     }
   }
 
@@ -90,7 +90,11 @@ class ProjectReportProjection {
         }),
       );
     } else {
-      this.#entries[index] = updateEntry(this.#entries[index], event, "client");
+      this.#entries[index] = updateEntry(
+        this.#entries[index]!,
+        event,
+        "client",
+      );
     }
   }
 
@@ -125,7 +129,7 @@ class TaskReportProjection {
       );
     } else {
       this.#entries[index] = updateEntry(
-        this.#entries[index],
+        this.#entries[index]!,
         event,
         "category",
       );
@@ -168,7 +172,7 @@ class CategoryReportProjection {
         }),
       );
     } else {
-      this.#entries[index] = updateEntry(this.#entries[index], event);
+      this.#entries[index] = updateEntry(this.#entries[index]!, event);
     }
   }
 

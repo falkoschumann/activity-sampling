@@ -64,7 +64,7 @@ class TimesheetProjection {
       });
       this.#entries.push(newEntry);
     } else {
-      const existingEntry = this.#entries[index];
+      const existingEntry = this.#entries[index]!;
       const accumulatedHours = existingEntry.hours.add(event.duration);
       this.#entries[index] = TimesheetEntry.create({
         ...existingEntry,

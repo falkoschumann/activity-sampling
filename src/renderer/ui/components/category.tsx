@@ -16,7 +16,7 @@ export default function CategoryComponent({
 }) {
   let title = "All categories";
   if (value.length === 1) {
-    title = value[0].length === 0 ? "No category" : value[0];
+    title = value[0]!.length === 0 ? "No category" : value[0]!;
   } else if (value.length > 1 && value.length < categories.length) {
     title = `${value.length} categories`;
   }

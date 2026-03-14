@@ -124,7 +124,7 @@ export class ActivitiesProjection {
     date: Temporal.PlainDate,
     event: ActivityLoggedEvent,
   ) {
-    const activity = this.#activities[index];
+    const activity = this.#activities[index]!;
     let start = activity.start;
     let finish = activity.finish;
     if (Temporal.PlainDate.compare(date, start) < 0) {
