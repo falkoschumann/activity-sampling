@@ -23,6 +23,8 @@
   },
   "main": "./out/main/index.js",
   "scripts": {
+    "test": "vitest run",
+    "watch": "vitest watch",
     "start": "electron-vite preview",
     "dev": "electron-vite dev --watch",
     "build": "tsc --build && electron-vite build",

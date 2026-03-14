@@ -4,6 +4,11 @@ export MAC_SIGN?=false
 PLANTUML_FILES = $(wildcard doc/*.puml)
 DIAGRAM_FILES = $(subst .puml,.png,$(PLANTUML_FILES))
 
+JS?=bun
+PM?=bun
+#PM_OPTIONS?= --ignore-scripts
+RUN?=bunx
+
 all: dist check
 
 clean:
@@ -15,62 +20,63 @@ distclean: clean
 	rm -rf node_modules
 
 dist: build
-	bun run build:electron
-#	bun run build:mac
-#	bun run build:win
+	$(PM) run build:electron
+#	$(PM) run build:mac
+#	$(PM) run build:win
 
 start: prepare
-	bun start
+	$(PM) run start
 
 doc: $(DIAGRAM_FILES)
 
 check: test
-	bunx prettier --check .
-	bunx eslint .
-	bunx stylelint "**/*.scss" --ignore-path .gitignore
-	bunx sheriff verify
+	$(RUN) prettier --check .
+	$(RUN) eslint .
+	$(RUN) stylelint "**/*.scss" --ignore-path .gitignore
+	$(RUN) sheriff verify
 
 format:
-	bunx eslint --fix .
-	bunx stylelint "**/*.scss" --fix --ignore-path .gitignore
-	bunx prettier --write .
+	$(RUN) eslint --fix .
+	$(RUN) stylelint "**/*.scss" --fix --ignore-path .gitignore
+	$(RUN) prettier --write .
 
 dev: prepare
-	bun run dev
+	$(PM) run dev
 
 test: prepare
-	bunx vitest run
+	$(PM) run test
 
 watch: prepare
-	bun test
+	$(PM) run watch
 
 unit-tests: prepare
-	bunx vitest run unit
+	$(RUN) vitest run unit
 
 integration-tests: prepare
-	bunx vitest run integration
+	$(RUN) vitest run integration
 
 e2e-tests: prepare
-	bunx vitest run e2e
+	$(RUN) vitest run e2e
 
 build: prepare
-	bun run build
+	$(PM) run build
 
 prepare: version
 ifdef CI
 ifeq ($(findstring $(DEPENDABOT), $(GITHUB_ACTOR)), $(DEPENDABOT))
-	@echo "dependabot detected, run bun install"
-	bun install
+	@echo "dependabot detected, run $(PM) install"
+	$(PM) install $(PM_OPTIONS)
 else
-	@echo "CI detected, run bun ci"
-	bun ci
+	@echo "CI detected, run $(PM) ci"
+	$(PM) ci $(PM_OPTIONS)
 endif
 else
-	bun install
+	$(PM) install $(PM_OPTIONS)
 endif
 
 version:
-	@echo "Using bun $(shell bun --version)"
+	@echo "Using runtime $(JS) version $(shell $(JS) --version)"
+	@echo "Using package manager $(PM) version $(shell $(PM) --version)"
 
 $(DIAGRAM_FILES): %.png: %.puml
 	plantuml $^
