@@ -11,19 +11,35 @@ import { projectStatistics } from "../domain/statistics_projection";
 import { ActivityLoggedEventDto } from "../infrastructure/events";
 import type { EventStore } from "../infrastructure/event_store";
 
-export async function queryStatistics(
-  query: StatisticsQuery,
-  eventStore: EventStore,
-  clock: Clock,
-): Promise<StatisticsQueryResult> {
-  // TODO handle time zone in projection
-  // TODO join ActivityLoggedEvent and ActivityLoggedEventDto to ActivityLoggedEvent
-  const timeZone = query.timeZone || clock.zone;
-  const replay = replayTyped(eventStore.replay(), timeZone);
-  return projectStatistics(replay, {
-    ...query,
-    timeZone: query.timeZone ?? clock.zone,
-  });
+export class StatisticsQueryHandler {
+  static create({
+    eventStore,
+    clock,
+  }: {
+    eventStore: EventStore;
+    clock: Clock;
+  }) {
+    return new StatisticsQueryHandler(eventStore, clock);
+  }
+
+  #eventStore: EventStore;
+  #clock: Clock;
+
+  private constructor(eventStore: EventStore, clock: Clock) {
+    this.#eventStore = eventStore;
+    this.#clock = clock;
+  }
+
+  async handle(query: StatisticsQuery): Promise<StatisticsQueryResult> {
+    // TODO handle time zone in projection
+    // TODO join ActivityLoggedEvent and ActivityLoggedEventDto to ActivityLoggedEvent
+    const timeZone = query.timeZone || this.#clock.zone;
+    const replay = replayTyped(this.#eventStore.replay(), timeZone);
+    return projectStatistics(replay, {
+      ...query,
+      timeZone: query.timeZone ?? this.#clock.zone,
+    });
+  }
 }
 
 async function* replayTyped(

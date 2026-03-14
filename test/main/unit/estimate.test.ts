@@ -3,7 +3,7 @@
 import { describe, expect, it } from "vitest";
 
 import { Clock } from "../../../src/shared/domain/temporal";
-import { queryEstimate } from "../../../src/main/application/estimate_query_handler";
+import { EstimateQueryHandler } from "../../../src/main/application/estimate_query_handler";
 import {
   EstimateEntry,
   EstimateQuery,
@@ -15,9 +15,9 @@ import { EventStore } from "../../../src/main/infrastructure/event_store";
 describe("Estimate", () => {
   describe("Estimate tasks with cycle times", () => {
     it("should return an empty list when no activity is logged", async () => {
-      const { queryEstimate } = configure({ events: [] });
+      const { handler } = configure({ events: [] });
 
-      const result = await queryEstimate(EstimateQuery.create({}));
+      const result = await handler.handle(EstimateQuery.create({}));
 
       expect(result.cycleTimes).toEqual<EstimateEntry[]>([]);
     });
@@ -55,9 +55,9 @@ describe("Estimate", () => {
           category: "Category 3",
         }),
       ];
-      const { queryEstimate } = configure({ events });
+      const { handler } = configure({ events });
 
-      const result = await queryEstimate(EstimateQuery.create({}));
+      const result = await handler.handle(EstimateQuery.create({}));
 
       expect(result).toEqual<EstimateQueryResult>({
         cycleTimes: [
@@ -103,9 +103,9 @@ describe("Estimate", () => {
           category: "Category 2",
         }),
       ];
-      const { queryEstimate } = configure({ events });
+      const { handler } = configure({ events });
 
-      const result = await queryEstimate(EstimateQuery.create({}));
+      const result = await handler.handle(EstimateQuery.create({}));
 
       expect(result).toEqual<EstimateQueryResult>({
         cycleTimes: [
@@ -152,9 +152,9 @@ describe("Estimate", () => {
           category: "Category B",
         }),
       ];
-      const { queryEstimate } = configure({ events });
+      const { handler } = configure({ events });
 
-      const result = await queryEstimate(
+      const result = await handler.handle(
         EstimateQuery.create({ categories: ["Category A"] }),
       );
 
@@ -193,9 +193,9 @@ describe("Estimate", () => {
           category: "Testing Category",
         }),
       ];
-      const { queryEstimate } = configure({ events });
+      const { handler } = configure({ events });
 
-      const result = await queryEstimate(
+      const result = await handler.handle(
         EstimateQuery.create({ categories: [""] }),
       );
 
@@ -230,9 +230,9 @@ describe("Estimate", () => {
           task: "Task C",
         }),
       ];
-      const { queryEstimate } = configure({ events });
+      const { handler } = configure({ events });
 
-      const result = await queryEstimate(
+      const result = await handler.handle(
         EstimateQuery.create({ categories: ["", "Category A"] }),
       );
 
@@ -267,9 +267,9 @@ describe("Estimate", () => {
           task: "Task C",
         }),
       ];
-      const { queryEstimate } = configure({ events });
+      const { handler } = configure({ events });
 
-      const result = await queryEstimate(
+      const result = await handler.handle(
         EstimateQuery.create({ categories: [] }),
       );
 
@@ -291,8 +291,7 @@ describe("Estimate", () => {
 
 function configure({ events }: { events: ActivityLoggedEventDto[] }) {
   const eventStore = EventStore.createNull({ events });
-  return {
-    queryEstimate: (query: EstimateQuery) =>
-      queryEstimate(query, eventStore, Clock.systemDefaultZone()),
-  };
+  const clock = Clock.systemDefaultZone();
+  const handler = EstimateQueryHandler.create({ eventStore, clock });
+  return { handler };
 }

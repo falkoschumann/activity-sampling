@@ -3,7 +3,7 @@
 import { describe, expect, it } from "vitest";
 
 import { Clock } from "../../../src/shared/domain/temporal";
-import { queryBurnUp } from "../../../src/main/application/burn_up_query_handler";
+import { BurnUpQueryHandler } from "../../../src/main/application/burn_up_query_handler";
 import {
   BurnUpData,
   BurnUpQuery,
@@ -15,9 +15,9 @@ import { EventStore } from "../../../src/main/infrastructure/event_store";
 describe("Burn-up", () => {
   describe("Determine tasks done over time", () => {
     it("should return an empty list when no activity is logged", async () => {
-      const { queryBurnUp } = configure({ events: [] });
+      const { handler } = configure({ events: [] });
 
-      const result = await queryBurnUp(
+      const result = await handler.handle(
         BurnUpQuery.create({
           from: "2021-10-11",
           to: "2021-10-22",
@@ -89,9 +89,9 @@ describe("Burn-up", () => {
           category: "category-3",
         }),
       ];
-      const { queryBurnUp } = configure({ events });
+      const { handler } = configure({ events });
 
-      const result = await queryBurnUp(
+      const result = await handler.handle(
         BurnUpQuery.create({
           from: "2021-10-11",
           to: "2021-10-22",
@@ -165,9 +165,9 @@ describe("Burn-up", () => {
 
   describe("Determine total throughput", () => {
     it("should return 0 when no activity is logged", async () => {
-      const { queryBurnUp } = configure({ events: [] });
+      const { handler } = configure({ events: [] });
 
-      const result = await queryBurnUp(
+      const result = await handler.handle(
         BurnUpQuery.create({
           from: "2021-10-11",
           to: "2021-10-22",
@@ -239,9 +239,9 @@ describe("Burn-up", () => {
           category: "category-3",
         }),
       ];
-      const { queryBurnUp } = configure({ events });
+      const { handler } = configure({ events });
 
-      const result = await queryBurnUp(
+      const result = await handler.handle(
         BurnUpQuery.create({
           from: "2021-10-11",
           to: "2021-10-22",
@@ -254,9 +254,9 @@ describe("Burn-up", () => {
 
   describe("Filter tasks in a period", () => {
     it("should return an empty result when no activity is logged", async () => {
-      const { queryBurnUp } = configure({ events: [] });
+      const { handler } = configure({ events: [] });
 
-      const result = await queryBurnUp(
+      const result = await handler.handle(
         BurnUpQuery.create({
           from: "2021-10-11",
           to: "2021-10-22",
@@ -328,9 +328,9 @@ describe("Burn-up", () => {
           category: "category-3",
         }),
       ];
-      const { queryBurnUp } = configure({ events });
+      const { handler } = configure({ events });
 
-      const result = await queryBurnUp(
+      const result = await handler.handle(
         BurnUpQuery.create({
           from: "2021-10-11",
           to: "2021-10-22",
@@ -410,9 +410,9 @@ describe("Burn-up", () => {
 
   describe("Filter tasks by category", () => {
     it("should return no categories when no activity is logged", async () => {
-      const { queryBurnUp } = configure({ events: [] });
+      const { handler } = configure({ events: [] });
 
-      const result = await queryBurnUp(
+      const result = await handler.handle(
         BurnUpQuery.create({
           from: "2021-10-11",
           to: "2021-10-22",
@@ -440,9 +440,9 @@ describe("Burn-up", () => {
           category: "category-2",
         }),
       ];
-      const { queryBurnUp } = configure({ events });
+      const { handler } = configure({ events });
 
-      const result = await queryBurnUp(
+      const result = await handler.handle(
         BurnUpQuery.create({
           from: "2021-10-12",
           to: "2021-10-14",
@@ -479,8 +479,7 @@ describe("Burn-up", () => {
 
 function configure({ events }: { events: ActivityLoggedEventDto[] }) {
   const eventStore = EventStore.createNull({ events });
-  return {
-    queryBurnUp: (query: BurnUpQuery) =>
-      queryBurnUp(query, eventStore, Clock.systemDefaultZone()),
-  };
+  const clock = Clock.systemDefaultZone();
+  const handler = BurnUpQueryHandler.create({ eventStore, clock });
+  return { handler };
 }

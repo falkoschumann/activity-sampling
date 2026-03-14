@@ -11,16 +11,32 @@ import { projectBurnUp } from "../domain/burn_up_projection";
 import { ActivityLoggedEventDto } from "../infrastructure/events";
 import type { EventStore } from "../infrastructure/event_store";
 
-export async function queryBurnUp(
-  query: BurnUpQuery,
-  eventStore: EventStore,
-  clock: Clock,
-): Promise<BurnUpQueryResult> {
-  // TODO handle time zone in projection
-  // TODO join ActivityLoggedEvent and ActivityLoggedEventDto to ActivityLoggedEvent
-  const timeZone = query.timeZone || clock.zone;
-  const replay = replayTyped(eventStore.replay(), timeZone);
-  return projectBurnUp(replay, query);
+export class BurnUpQueryHandler {
+  static create({
+    eventStore,
+    clock,
+  }: {
+    eventStore: EventStore;
+    clock: Clock;
+  }) {
+    return new BurnUpQueryHandler(eventStore, clock);
+  }
+
+  #eventStore: EventStore;
+  #clock: Clock;
+
+  private constructor(eventStore: EventStore, clock: Clock) {
+    this.#eventStore = eventStore;
+    this.#clock = clock;
+  }
+
+  async handle(query: BurnUpQuery): Promise<BurnUpQueryResult> {
+    // TODO handle time zone in projection
+    // TODO join ActivityLoggedEvent and ActivityLoggedEventDto to ActivityLoggedEvent
+    const timeZone = query.timeZone || this.#clock.zone;
+    const replay = replayTyped(this.#eventStore.replay(), timeZone);
+    return projectBurnUp(replay, query);
+  }
 }
 
 async function* replayTyped(

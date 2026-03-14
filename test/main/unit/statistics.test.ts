@@ -3,11 +3,10 @@
 import { describe, expect, it } from "vitest";
 
 import { Clock } from "../../../src/shared/domain/temporal";
-import { queryStatistics } from "../../../src/main/application/statistics_query_handler";
+import { StatisticsQueryHandler } from "../../../src/main/application/statistics_query_handler";
 import {
   Histogram,
   Median,
-  type StatisticsQuery,
   StatisticsQueryResult,
   StatisticsScope,
 } from "../../../src/shared/domain/statistics_query";
@@ -17,9 +16,9 @@ import { EventStore } from "../../../src/main/infrastructure/event_store";
 describe("Statistics", () => {
   describe("Create histogram for hours worked on tasks", () => {
     it("should return empty histogram when no activities are logged", async () => {
-      const { queryStatistics } = configure({ events: [] });
+      const { handler } = configure({ events: [] });
 
-      const result = await queryStatistics({
+      const result = await handler.handle({
         scope: StatisticsScope.WORKING_HOURS,
       });
 
@@ -52,9 +51,9 @@ describe("Statistics", () => {
           category: "Category 2",
         }),
       ];
-      const { queryStatistics } = configure({ events });
+      const { handler } = configure({ events });
 
-      const result = await queryStatistics({
+      const result = await handler.handle({
         scope: StatisticsScope.WORKING_HOURS,
       });
 
@@ -84,9 +83,9 @@ describe("Statistics", () => {
           category: "Category 1",
         }),
       ];
-      const { queryStatistics } = configure({ events });
+      const { handler } = configure({ events });
 
-      const result = await queryStatistics({
+      const result = await handler.handle({
         scope: StatisticsScope.WORKING_HOURS,
       });
 
@@ -132,9 +131,9 @@ describe("Statistics", () => {
           category: "Category 2",
         }),
       ];
-      const { queryStatistics } = configure({ events });
+      const { handler } = configure({ events });
 
-      const result = await queryStatistics({
+      const result = await handler.handle({
         scope: StatisticsScope.WORKING_HOURS,
       });
 
@@ -185,9 +184,9 @@ describe("Statistics", () => {
           category: "Category 2",
         }),
       ];
-      const { queryStatistics } = configure({ events });
+      const { handler } = configure({ events });
 
-      const result = await queryStatistics({
+      const result = await handler.handle({
         scope: StatisticsScope.WORKING_HOURS,
       });
 
@@ -213,9 +212,9 @@ describe("Statistics", () => {
 
   describe("Create histogram for cycle times", () => {
     it("should return an empty histogram when no activities are logged", async () => {
-      const { queryStatistics } = configure({ events: [] });
+      const { handler } = configure({ events: [] });
 
-      const result = await queryStatistics({
+      const result = await handler.handle({
         scope: StatisticsScope.CYCLE_TIMES,
       });
 
@@ -255,9 +254,9 @@ describe("Statistics", () => {
           category: "Category 2",
         }),
       ];
-      const { queryStatistics } = configure({ events });
+      const { handler } = configure({ events });
 
-      const result = await queryStatistics({
+      const result = await handler.handle({
         scope: StatisticsScope.CYCLE_TIMES,
       });
 
@@ -307,9 +306,9 @@ describe("Statistics", () => {
           category: "Category A",
         }),
       ];
-      const { queryStatistics } = configure({ events });
+      const { handler } = configure({ events });
 
-      const result = await queryStatistics({
+      const result = await handler.handle({
         scope: StatisticsScope.CYCLE_TIMES,
         categories: ["Category A"],
       });
@@ -336,9 +335,9 @@ describe("Statistics", () => {
 
   describe("Determine median for hours worked on tasks", () => {
     it("should return empty histogram when no activities are logged", async () => {
-      const { queryStatistics } = configure({ events: [] });
+      const { handler } = configure({ events: [] });
 
-      const result = await queryStatistics({
+      const result = await handler.handle({
         scope: StatisticsScope.WORKING_HOURS,
       });
 
@@ -372,9 +371,9 @@ describe("Statistics", () => {
           category: "Category 2",
         }),
       ];
-      const { queryStatistics } = configure({ events });
+      const { handler } = configure({ events });
 
-      const result = await queryStatistics({
+      const result = await handler.handle({
         scope: StatisticsScope.WORKING_HOURS,
       });
 
@@ -390,9 +389,9 @@ describe("Statistics", () => {
 
   describe("Determine median for cycle times", () => {
     it("should return an empty histogram when no activities are logged", async () => {
-      const { queryStatistics } = configure({ events: [] });
+      const { handler } = configure({ events: [] });
 
-      const result = await queryStatistics({
+      const result = await handler.handle({
         scope: StatisticsScope.CYCLE_TIMES,
       });
 
@@ -433,9 +432,9 @@ describe("Statistics", () => {
           category: "Category 2",
         }),
       ];
-      const { queryStatistics } = configure({ events });
+      const { handler } = configure({ events });
 
-      const result = await queryStatistics({
+      const result = await handler.handle({
         scope: StatisticsScope.CYCLE_TIMES,
       });
 
@@ -473,9 +472,9 @@ describe("Statistics", () => {
           category: "Category A",
         }),
       ];
-      const { queryStatistics } = configure({ events });
+      const { handler } = configure({ events });
 
-      const result = await queryStatistics({
+      const result = await handler.handle({
         scope: StatisticsScope.WORKING_HOURS,
         categories: ["Category A"],
       });
@@ -520,9 +519,9 @@ describe("Statistics", () => {
           category: "Testing Category",
         }),
       ];
-      const { queryStatistics } = configure({ events });
+      const { handler } = configure({ events });
 
-      const result = await queryStatistics({
+      const result = await handler.handle({
         scope: StatisticsScope.CYCLE_TIMES,
         categories: [""],
       });
@@ -563,9 +562,9 @@ describe("Statistics", () => {
           task: "Task C",
         }),
       ];
-      const { queryStatistics } = configure({ events });
+      const { handler } = configure({ events });
 
-      const result = await queryStatistics({
+      const result = await handler.handle({
         scope: StatisticsScope.CYCLE_TIMES,
         categories: ["", "Category A"],
       });
@@ -606,9 +605,9 @@ describe("Statistics", () => {
           task: "Task C",
         }),
       ];
-      const { queryStatistics } = configure({ events });
+      const { handler } = configure({ events });
 
-      const result = await queryStatistics({
+      const result = await handler.handle({
         scope: StatisticsScope.CYCLE_TIMES,
         categories: [],
       });
@@ -637,8 +636,6 @@ describe("Statistics", () => {
 function configure({ events }: { events?: ActivityLoggedEventDto[] }) {
   const eventStore = EventStore.createNull({ events });
   const clock = Clock.fixed("1970-01-01T00:00:00Z", "Europe/Berlin");
-  return {
-    queryStatistics: (query: StatisticsQuery) =>
-      queryStatistics(query, eventStore, clock),
-  };
+  const handler = StatisticsQueryHandler.create({ eventStore, clock });
+  return { handler };
 }

@@ -3,7 +3,7 @@
 import { describe, expect, it } from "vitest";
 
 import { Clock } from "../../../src/shared/domain/temporal";
-import { queryRecentActivities } from "../../../src/main/application/recent_activities_query_handler";
+import { RecentActivitiesQueryHandler } from "../../../src/main/application/recent_activities_query_handler";
 import { ActivityLoggedEvent } from "../../../src/shared/domain/activities";
 import {
   RecentActivitiesQuery,
@@ -16,13 +16,11 @@ import { EventStore } from "../../../src/main/infrastructure/event_store";
 describe("Recent Activities", () => {
   describe("Group activities by working days for the last 30 days", () => {
     it("should return an empty list when no activity is logged", async () => {
-      const { queryRecentActivities } = configure({
+      const { handler } = configure({
         events: [],
       });
 
-      const result = await queryRecentActivities(
-        RecentActivitiesQuery.create(),
-      );
+      const result = await handler.handle(RecentActivitiesQuery.create());
 
       expect(result.workingDays).toEqual<WorkingDay[]>([]);
     });
@@ -52,9 +50,9 @@ describe("Recent Activities", () => {
           timestamp: "2025-07-01T10:30:00Z",
         }),
       ];
-      const { queryRecentActivities } = configure({ events });
+      const { handler } = configure({ events });
 
-      const result = await queryRecentActivities(
+      const result = await handler.handle(
         RecentActivitiesQuery.create({ today: "2025-06-05" }),
       );
 
@@ -95,12 +93,12 @@ describe("Recent Activities", () => {
           timestamp: "invalid-timestamp",
         }),
       ];
-      const { queryRecentActivities } = configure({
+      const { handler } = configure({
         events,
         fixedInstant: "2025-06-05T10:00:00Z",
       });
 
-      const result = queryRecentActivities(RecentActivitiesQuery.create());
+      const result = handler.handle(RecentActivitiesQuery.create());
 
       await expect(result).rejects.toThrowError(TypeError);
     });
@@ -108,13 +106,11 @@ describe("Recent Activities", () => {
 
   describe("Summarize hours worked today, yesterday, this week and this month", () => {
     it("should return 0 when no activity is logged", async () => {
-      const { queryRecentActivities } = configure({
+      const { handler } = configure({
         events: [],
       });
 
-      const result = await queryRecentActivities(
-        RecentActivitiesQuery.create(),
-      );
+      const result = await handler.handle(RecentActivitiesQuery.create());
 
       expect(result.timeSummary).toEqual<TimeSummary>(
         TimeSummary.create({
@@ -178,9 +174,9 @@ describe("Recent Activities", () => {
           timestamp: "2025-07-01T10:30:00Z",
         }),
       ];
-      const { queryRecentActivities } = configure({ events });
+      const { handler } = configure({ events });
 
-      const result = await queryRecentActivities(
+      const result = await handler.handle(
         RecentActivitiesQuery.create({ today: "2025-06-05" }),
       );
 
@@ -229,9 +225,9 @@ describe("Recent Activities", () => {
           timestamp: "2026-01-01T10:00:00Z",
         }),
       ];
-      const { queryRecentActivities } = configure({ events });
+      const { handler } = configure({ events });
 
-      const result = await queryRecentActivities(
+      const result = await handler.handle(
         RecentActivitiesQuery.create({ today: "2025-12-13" }),
       );
 
@@ -280,9 +276,9 @@ describe("Recent Activities", () => {
           timestamp: "2026-03-01T10:00:00Z",
         }),
       ];
-      const { queryRecentActivities } = configure({ events });
+      const { handler } = configure({ events });
 
-      const result = await queryRecentActivities(
+      const result = await handler.handle(
         RecentActivitiesQuery.create({ today: "2025-02-13" }),
       );
 
@@ -310,8 +306,6 @@ function configure({
     fixedInstant ?? "1970-01-01T00:00:00Z",
     "Europe/Berlin",
   );
-  return {
-    queryRecentActivities: (query: RecentActivitiesQuery) =>
-      queryRecentActivities(query, eventStore, clock),
-  };
+  const handler = RecentActivitiesQueryHandler.create({ eventStore, clock });
+  return { handler };
 }

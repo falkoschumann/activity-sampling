@@ -3,7 +3,7 @@
 import { Success } from "@muspellheim/shared";
 import { describe, expect, it } from "vitest";
 
-import { exportTimesheet } from "../../../src/main/application/export_timesheet";
+import { ExportTimesheetCommandHandler } from "../../../src/main/application/export_timesheet_command_handler";
 import { ExportTimesheetCommand } from "../../../src/shared/domain/export_timesheet_command";
 import {
   TimesheetDto,
@@ -14,13 +14,15 @@ import { TimesheetEntry } from "../../../src/shared/domain/activities";
 describe("Export timesheet", () => {
   describe("Export timesheet in Harvest format", () => {
     it("should export timesheet", async () => {
-      const timesheetExporter = TimesheetExporter.createNull();
+      const { handler, timesheetExporter } = configure();
       const exported = timesheetExporter.trackExported();
 
-      const timesheets = [TimesheetEntry.createTestInstance()];
-      const fileName = "export/null-timesheets.csv";
-      const command = ExportTimesheetCommand.create({ timesheets, fileName });
-      const result = await exportTimesheet(command, timesheetExporter);
+      const result = await handler.handle(
+        ExportTimesheetCommand.create({
+          timesheets: [TimesheetEntry.createTestInstance()],
+          fileName: "export/null-timesheets.csv",
+        }),
+      );
 
       expect(result).toEqual(new Success());
       expect(exported.data).toEqual<TimesheetDto[][]>([
@@ -29,3 +31,9 @@ describe("Export timesheet", () => {
     });
   });
 });
+
+function configure() {
+  const timesheetExporter = TimesheetExporter.createNull();
+  const handler = ExportTimesheetCommandHandler.create({ timesheetExporter });
+  return { handler, timesheetExporter };
+}

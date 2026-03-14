@@ -3,10 +3,11 @@
 import { Temporal } from "@js-temporal/polyfill";
 import { type CommandStatus, Success } from "@muspellheim/shared";
 
+import { BurnUpQueryHandler } from "./burn_up_query_handler";
+import { EstimateQueryHandler } from "./estimate_query_handler";
+import { ExportTimesheetCommandHandler } from "./export_timesheet_command_handler";
+import { RecentActivitiesQueryHandler } from "./recent_activities_query_handler";
 import { Clock } from "../../shared/domain/temporal";
-import { exportTimesheet } from "./export_timesheet";
-import { queryEstimate } from "./estimate_query_handler";
-import { queryBurnUp } from "./burn_up_query_handler";
 import { Settings } from "../../shared/domain/settings";
 import {
   type LogActivityCommand,
@@ -40,7 +41,6 @@ import { EventStore } from "../infrastructure/event_store";
 import { HolidayRepository } from "../infrastructure/holiday_repository";
 import { VacationRepository } from "../infrastructure/vacation_repository";
 import { TimesheetExporter } from "../infrastructure/timesheet_exporter";
-import { queryRecentActivities } from "./recent_activities_query_handler";
 
 // TODO remove activities service, use message handlers instead
 
@@ -98,13 +98,20 @@ export class ActivitiesService {
   }
 
   async exportTimesheet(command: ExportTimesheetCommand) {
-    return exportTimesheet(command, this.#timesheetExporter);
+    const handler = ExportTimesheetCommandHandler.create({
+      timesheetExporter: this.#timesheetExporter,
+    });
+    return handler.handle(command);
   }
 
   async queryRecentActivities(
     query: RecentActivitiesQuery,
   ): Promise<RecentActivitiesQueryResult> {
-    return queryRecentActivities(query, this.#eventStore, this.#clock);
+    const handler = RecentActivitiesQueryHandler.create({
+      eventStore: this.#eventStore,
+      clock: this.#clock,
+    });
+    return handler.handle(query);
   }
 
   async queryReport(query: ReportQuery): Promise<ReportQueryResult> {
@@ -120,11 +127,19 @@ export class ActivitiesService {
   }
 
   async queryEstimate(query: EstimateQuery): Promise<EstimateQueryResult> {
-    return queryEstimate(query, this.#eventStore, this.#clock);
+    const handler = EstimateQueryHandler.create({
+      eventStore: this.#eventStore,
+      clock: this.#clock,
+    });
+    return handler.handle(query);
   }
 
   async queryBurnUp(query: BurnUpQuery): Promise<BurnUpQueryResult> {
-    return queryBurnUp(query, this.#eventStore, this.#clock);
+    const handler = BurnUpQueryHandler.create({
+      eventStore: this.#eventStore,
+      clock: this.#clock,
+    });
+    return handler.handle(query);
   }
 
   async queryTimesheet(query: TimesheetQuery): Promise<TimesheetQueryResult> {

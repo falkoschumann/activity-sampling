@@ -11,16 +11,32 @@ import { projectEstimate } from "../domain/estimate_projection";
 import { ActivityLoggedEventDto } from "../infrastructure/events";
 import type { EventStore } from "../infrastructure/event_store";
 
-export async function queryEstimate(
-  query: EstimateQuery,
-  eventStore: EventStore,
-  clock: Clock,
-): Promise<EstimateQueryResult> {
-  // TODO handle time zone in projection
-  // TODO join ActivityLoggedEvent and ActivityLoggedEventDto to ActivityLoggedEvent
-  const timeZone = query.timeZone || clock.zone;
-  const replay = replayTyped(eventStore.replay(), timeZone);
-  return projectEstimate(replay, query);
+export class EstimateQueryHandler {
+  static create({
+    eventStore,
+    clock,
+  }: {
+    eventStore: EventStore;
+    clock: Clock;
+  }) {
+    return new EstimateQueryHandler(eventStore, clock);
+  }
+
+  #eventStore: EventStore;
+  #clock: Clock;
+
+  private constructor(eventStore: EventStore, clock: Clock) {
+    this.#eventStore = eventStore;
+    this.#clock = clock;
+  }
+
+  async handle(query: EstimateQuery): Promise<EstimateQueryResult> {
+    // TODO handle time zone in projection
+    // TODO join ActivityLoggedEvent and ActivityLoggedEventDto to ActivityLoggedEvent
+    const timeZone = query.timeZone || this.#clock.zone;
+    const replay = replayTyped(this.#eventStore.replay(), timeZone);
+    return projectEstimate(replay, query);
+  }
 }
 
 async function* replayTyped(
