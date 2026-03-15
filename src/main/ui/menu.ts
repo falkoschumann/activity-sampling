@@ -4,7 +4,8 @@ import { app, Menu, type MenuItemConstructorOptions } from "electron/main";
 
 import type { SettingsService } from "../application/settings_service";
 import type { TimerService } from "../application/timer_service";
-import { StartTimerCommand, StopTimerCommand } from "../../shared/domain/timer";
+import { StartTimerCommand } from "../../shared/domain/start_timer_command";
+import { StopTimerCommand } from "../../shared/domain/stop_timer_command";
 import { chooseDataDirectory, openWindow } from "./actions";
 
 const isMac = process.platform === "darwin";

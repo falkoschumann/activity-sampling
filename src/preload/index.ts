@@ -43,11 +43,9 @@ import {
   StatisticsQueryDto,
   StatisticsQueryResultDto,
 } from "../shared/infrastructure/statistics_query_dto";
-import type {
-  IntervalElapsedEventDto,
-  TimerStartedEventDto,
-  TimerStoppedEventDto,
-} from "../shared/infrastructure/timer";
+import type { IntervalElapsedEventDto } from "../shared/infrastructure/interval_elapsed_event_dto";
+import type { TimerStartedEventDto } from "../shared/infrastructure/timer_started_event_dto";
+import type { TimerStoppedEventDto } from "../shared/infrastructure/timer_stopped_event_dto";
 import type {
   TimesheetQueryDto,
   TimesheetQueryResultDto,

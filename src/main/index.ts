@@ -14,11 +14,9 @@ import {
 } from "./application/settings_service";
 import { TimerService } from "./application/timer_service";
 import { Settings } from "../shared/domain/settings";
-import {
-  IntervalElapsedEvent,
-  TimerStartedEvent,
-  TimerStoppedEvent,
-} from "../shared/domain/timer";
+import { IntervalElapsedEvent } from "../shared/domain/interval_elapsed_event";
+import { TimerStartedEvent } from "../shared/domain/timer_started_event";
+import { TimerStoppedEvent } from "../shared/domain/timer_stopped_event";
 import { CommandStatusDto } from "../shared/infrastructure/command_status_dto";
 import {
   BurnUpQueryDto,
@@ -59,11 +57,9 @@ import {
   StatisticsQueryDto,
   StatisticsQueryResultDto,
 } from "../shared/infrastructure/statistics_query_dto";
-import {
-  IntervalElapsedEventDto,
-  TimerStartedEventDto,
-  TimerStoppedEventDto,
-} from "../shared/infrastructure/timer";
+import { IntervalElapsedEventDto } from "../shared/infrastructure/interval_elapsed_event_dto";
+import { TimerStartedEventDto } from "../shared/infrastructure/timer_started_event_dto";
+import { TimerStoppedEventDto } from "../shared/infrastructure/timer_stopped_event_dto";
 import {
   TimesheetQueryDto,
   TimesheetQueryResultDto,

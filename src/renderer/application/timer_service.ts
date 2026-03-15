@@ -1,5 +1,6 @@
 // Copyright (c) 2026 Falko Schumann. All rights reserved. MIT license.
 
+import { Temporal } from "@js-temporal/polyfill";
 import { type Dispatch, useEffect, useRef } from "react";
 
 import {
@@ -10,12 +11,9 @@ import {
   timerTicked,
 } from "../domain/log";
 import { NotificationGateway } from "../infrastructure/notification_gateway";
-import type {
-  IntervalElapsedEventDto,
-  TimerStartedEventDto,
-  TimerStoppedEventDto,
-} from "../../shared/infrastructure/timer";
-import { Temporal } from "@js-temporal/polyfill";
+import type { IntervalElapsedEventDto } from "../../shared/infrastructure/interval_elapsed_event_dto";
+import type { TimerStartedEventDto } from "../../shared/infrastructure/timer_started_event_dto";
+import type { TimerStoppedEventDto } from "../../shared/infrastructure/timer_stopped_event_dto";
 
 export function useCurrentInterval(dispatch: Dispatch<Action>) {
   const timeoutId =

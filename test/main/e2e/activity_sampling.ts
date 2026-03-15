@@ -33,11 +33,11 @@ import { Settings } from "../../../src/shared/domain/settings";
 import {
   type CurrentIntervalQuery,
   type CurrentIntervalQueryResult,
-  type StartTimerCommand,
-  StopTimerCommand,
-  TimerStartedEvent,
-  TimerStoppedEvent,
-} from "../../../src/shared/domain/timer";
+} from "../../../src/shared/domain/current_interval_query";
+import { type StartTimerCommand } from "../../../src/shared/domain/start_timer_command";
+import { StopTimerCommand } from "../../../src/shared/domain/stop_timer_command";
+import { TimerStartedEvent } from "../../../src/shared/domain/timer_started_event";
+import { TimerStoppedEvent } from "../../../src/shared/domain/timer_stopped_event";
 import {
   EstimateEntry,
   EstimateQuery,

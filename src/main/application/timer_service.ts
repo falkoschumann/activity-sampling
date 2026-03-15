@@ -7,12 +7,12 @@ import { Clock } from "../../shared/domain/temporal";
 import {
   type CurrentIntervalQuery,
   CurrentIntervalQueryResult,
-  IntervalElapsedEvent,
-  type StartTimerCommand,
-  type StopTimerCommand,
-  TimerStartedEvent,
-  TimerStoppedEvent,
-} from "../../shared/domain/timer";
+} from "../../shared/domain/current_interval_query";
+import { IntervalElapsedEvent } from "../../shared/domain/interval_elapsed_event";
+import { type StartTimerCommand } from "../../shared/domain/start_timer_command";
+import { type StopTimerCommand } from "../../shared/domain/stop_timer_command";
+import { TimerStartedEvent } from "../../shared/domain/timer_started_event";
+import { TimerStoppedEvent } from "../../shared/domain/timer_stopped_event";
 
 export class TimerService extends EventTarget {
   static create({ clock = Clock.systemDefaultZone() } = {}): TimerService {

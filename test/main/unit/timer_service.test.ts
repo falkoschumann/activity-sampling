@@ -7,12 +7,12 @@ import { TimerService } from "../../../src/main/application/timer_service";
 import {
   CurrentIntervalQuery,
   CurrentIntervalQueryResult,
-  IntervalElapsedEvent,
-  StartTimerCommand,
-  StopTimerCommand,
-  TimerStartedEvent,
-  TimerStoppedEvent,
-} from "../../../src/shared/domain/timer";
+} from "../../../src/shared/domain/current_interval_query";
+import { IntervalElapsedEvent } from "../../../src/shared/domain/interval_elapsed_event";
+import { StartTimerCommand } from "../../../src/shared/domain/start_timer_command";
+import { StopTimerCommand } from "../../../src/shared/domain/stop_timer_command";
+import { TimerStartedEvent } from "../../../src/shared/domain/timer_started_event";
+import { TimerStoppedEvent } from "../../../src/shared/domain/timer_stopped_event";
 import { EventTracker } from "@muspellheim/shared";
 
 describe("Timer service", () => {
