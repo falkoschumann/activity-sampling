@@ -15,7 +15,7 @@
     "strictPropertyInitialization": true,
     "useUnknownInCatchVariables": true,
     // Modules
-    "allowImportingTsExtensions": true,
+    "allowImportingTsExtensions": false,
     "module": "Preserve",
     "moduleResolution": "bundler",
     "noUncheckedSideEffectImports": true,

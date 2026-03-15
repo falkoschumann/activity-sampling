@@ -1,11 +1,12 @@
 // Copyright (c) 2026 Falko Schumann. All rights reserved. MIT license.
 
 import { Temporal } from "@js-temporal/polyfill";
-import { type CommandStatus, Success } from "@muspellheim/shared";
+import { type CommandStatus } from "@muspellheim/shared";
 
 import { BurnUpQueryHandler } from "./burn_up_query_handler";
 import { EstimateQueryHandler } from "./estimate_query_handler";
 import { ExportTimesheetCommandHandler } from "./export_timesheet_command_handler";
+import { LogActivityCommandHandler } from "./log_activity_command_handler";
 import { RecentActivitiesQueryHandler } from "./recent_activities_query_handler";
 import { Clock } from "../../shared/domain/temporal";
 import { Settings } from "../../shared/domain/settings";
@@ -24,7 +25,7 @@ import {
   type EstimateQuery,
   type EstimateQueryResult,
 } from "../../shared/domain/estimate_query";
-import { LogActivityCommand } from "../../shared/domain/log_activity_command.ts";
+import { LogActivityCommand } from "../../shared/domain/log_activity_command";
 import type {
   RecentActivitiesQuery,
   RecentActivitiesQueryResult,
@@ -88,13 +89,10 @@ export class ActivitiesService {
   }
 
   async logActivity(command: LogActivityCommand): Promise<CommandStatus> {
-    const event = ActivityLoggedEventDto.create({
-      ...command,
-      timestamp: command.timestamp.toString({ smallestUnit: "seconds" }),
-      duration: command.duration.toString(),
+    const handler = LogActivityCommandHandler.create({
+      eventStore: this.#eventStore,
     });
-    await this.#eventStore.record(event);
-    return new Success();
+    return handler.handle(command);
   }
 
   async exportTimesheet(command: ExportTimesheetCommand) {

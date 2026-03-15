@@ -22,7 +22,7 @@ import {
   type EstimateQuery,
   EstimateQueryResult,
 } from "../../shared/domain/estimate_query";
-import { LogActivityCommand } from "../../shared/domain/log_activity_command.ts";
+import { LogActivityCommand } from "../../shared/domain/log_activity_command";
 import {
   RecentActivitiesQuery,
   RecentActivitiesQueryResult,
@@ -31,13 +31,13 @@ import {
   StatisticsQuery,
   StatisticsQueryResult,
 } from "../../shared/domain/statistics_query";
-import { CommandStatusDto } from "../../shared/infrastructure/command_status_dto.ts";
+import { CommandStatusDto } from "../../shared/infrastructure/command_status_dto";
 import {
   EstimateQueryDto,
   EstimateQueryResultDto,
 } from "../../shared/infrastructure/estimate_query_dto";
-import { ExportTimesheetCommandDto } from "../../shared/infrastructure/export_timesheet_command_dto.ts";
-import { LogActivityCommandDto } from "../../shared/infrastructure/log_activity_command_dto.ts";
+import { ExportTimesheetCommandDto } from "../../shared/infrastructure/export_timesheet_command_dto";
+import { LogActivityCommandDto } from "../../shared/infrastructure/log_activity_command_dto";
 import {
   RecentActivitiesQueryDto,
   RecentActivitiesQueryResultDto,

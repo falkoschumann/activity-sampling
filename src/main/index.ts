@@ -19,7 +19,7 @@ import {
   TimerStartedEvent,
   TimerStoppedEvent,
 } from "../shared/domain/timer";
-import { CommandStatusDto } from "../shared/infrastructure/command_status_dto.ts";
+import { CommandStatusDto } from "../shared/infrastructure/command_status_dto";
 import {
   ReportQueryDto,
   ReportQueryResultDto,
@@ -50,8 +50,8 @@ import {
   EstimateQueryDto,
   EstimateQueryResultDto,
 } from "../shared/infrastructure/estimate_query_dto";
-import { LogActivityCommandDto } from "../shared/infrastructure/log_activity_command_dto.ts";
-import { ExportTimesheetCommandDto } from "../shared/infrastructure/export_timesheet_command_dto.ts";
+import { LogActivityCommandDto } from "../shared/infrastructure/log_activity_command_dto";
+import { ExportTimesheetCommandDto } from "../shared/infrastructure/export_timesheet_command_dto";
 import {
   RecentActivitiesQueryDto,
   RecentActivitiesQueryResultDto,
