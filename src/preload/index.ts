@@ -8,8 +8,6 @@ import {
 } from "electron/renderer";
 
 import type {
-  ReportQueryDto,
-  ReportQueryResultDto,
   TimesheetQueryDto,
   TimesheetQueryResultDto,
 } from "../shared/infrastructure/activities";
@@ -40,6 +38,10 @@ import {
   type RecentActivitiesQueryDto,
   RecentActivitiesQueryResultDto,
 } from "../shared/infrastructure/recent_activities_query_dto";
+import type {
+  ReportQueryDto,
+  ReportQueryResultDto,
+} from "../shared/infrastructure/report_query_dto";
 import type { SettingsDto } from "../shared/infrastructure/settings";
 import {
   StatisticsQueryDto,

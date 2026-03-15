@@ -11,9 +11,6 @@ import { ActivitiesService } from "../../../src/main/application/activities_serv
 import { TimerService } from "../../../src/main/application/timer_service";
 import {
   Capacity,
-  ReportEntry,
-  ReportQuery,
-  ReportQueryResult,
   TimesheetEntry,
   TimesheetQuery,
   TimesheetQueryResult,
@@ -27,6 +24,11 @@ import {
   type StatisticsScopeType,
 } from "../../../src/shared/domain/statistics_query";
 import { Holiday, Vacation } from "../../../src/main/domain/calendar";
+import {
+  ReportEntry,
+  ReportQuery,
+  ReportQueryResult,
+} from "../../../src/shared/domain/report_query";
 import { Settings } from "../../../src/shared/domain/settings";
 import {
   type CurrentIntervalQuery,

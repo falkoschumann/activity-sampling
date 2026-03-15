@@ -6,9 +6,6 @@ import { Clock } from "../../../src/shared/domain/temporal";
 import { ActivitiesService } from "../../../src/main/application/activities_service";
 import {
   Capacity,
-  ReportEntry,
-  ReportQueryResult,
-  ReportScope,
   TimesheetEntry,
   TimesheetQuery,
   TimesheetQueryResult,
@@ -27,54 +24,6 @@ import {
 import { TimesheetExporter } from "../../../src/main/infrastructure/timesheet_exporter";
 
 describe("Activities service", () => {
-  describe("Query report", () => {
-    it("should return report", async () => {
-      const { service } = configure({
-        events: [
-          ActivityLoggedEventDto.createTestInstance({
-            timestamp: "2025-06-25T15:00:00Z",
-            client: "Client 2",
-            duration: "PT7H",
-          }),
-          ActivityLoggedEventDto.createTestInstance({
-            timestamp: "2025-06-26T15:00:00Z",
-            client: "Client 1",
-            duration: "PT5H",
-          }),
-          ActivityLoggedEventDto.createTestInstance({
-            timestamp: "2025-06-27T15:00:00Z",
-            client: "Client 1",
-            duration: "PT3H",
-          }),
-        ],
-      });
-
-      const result = await service.queryReport({ scope: ReportScope.CLIENTS });
-
-      expect(result).toEqual<ReportQueryResult>(
-        ReportQueryResult.create({
-          entries: [
-            ReportEntry.create({
-              start: "2025-06-26",
-              finish: "2025-06-27",
-              client: "Client 1",
-              hours: "PT8H",
-              cycleTime: 2,
-            }),
-            ReportEntry.create({
-              start: "2025-06-25",
-              finish: "2025-06-25",
-              client: "Client 2",
-              hours: "PT7H",
-              cycleTime: 1,
-            }),
-          ],
-          totalHours: "PT15H",
-        }),
-      );
-    });
-  });
-
   describe("Query timesheet", () => {
     it("should return timesheet", async () => {
       const { service } = configure({

@@ -4,8 +4,6 @@ import { Temporal } from "@js-temporal/polyfill";
 import { useCallback, useEffect, useReducer, useState } from "react";
 
 import {
-  ReportQuery,
-  ReportQueryResult,
   TimesheetQuery,
   TimesheetQueryResult,
 } from "../../shared/domain/activities";
@@ -28,6 +26,10 @@ import {
   RecentActivitiesQueryResult,
 } from "../../shared/domain/recent_activities_query";
 import {
+  ReportQuery,
+  ReportQueryResult,
+} from "../../shared/domain/report_query";
+import {
   StatisticsQuery,
   StatisticsQueryResult,
 } from "../../shared/domain/statistics_query";
@@ -43,13 +45,15 @@ import {
   RecentActivitiesQueryResultDto,
 } from "../../shared/infrastructure/recent_activities_query_dto";
 import {
+  ReportQueryDto,
+  ReportQueryResultDto,
+} from "../../shared/infrastructure/report_query_dto";
+import {
   StatisticsQueryDto,
   StatisticsQueryResultDto,
 } from "../../shared/infrastructure/statistics_query_dto";
 import { SettingsDto } from "../../shared/infrastructure/settings";
 import {
-  ReportQueryDto,
-  ReportQueryResultDto,
   TimesheetQueryDto,
   TimesheetQueryResultDto,
 } from "../../shared/infrastructure/activities";

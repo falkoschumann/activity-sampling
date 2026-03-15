@@ -21,8 +21,6 @@ import {
 } from "../shared/domain/timer";
 import { CommandStatusDto } from "../shared/infrastructure/command_status_dto";
 import {
-  ReportQueryDto,
-  ReportQueryResultDto,
   TimesheetQueryDto,
   TimesheetQueryResultDto,
 } from "../shared/infrastructure/activities";
@@ -56,6 +54,10 @@ import {
   RecentActivitiesQueryDto,
   RecentActivitiesQueryResultDto,
 } from "../shared/infrastructure/recent_activities_query_dto";
+import {
+  ReportQueryDto,
+  ReportQueryResultDto,
+} from "../shared/infrastructure/report_query_dto";
 import { SettingsDto } from "../shared/infrastructure/settings";
 import {
   StatisticsQueryDto,

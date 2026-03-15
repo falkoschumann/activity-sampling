@@ -1,6 +1,6 @@
 // Copyright (c) 2026 Falko Schumann. All rights reserved. MIT license.
 
-import { ReportScope, type ReportScopeType } from "../../../../shared/domain/activities";
+import { ReportScope, type ReportScopeType } from "../../../../shared/domain/report_query";
 
 export default function ScopeComponent({
   scope,

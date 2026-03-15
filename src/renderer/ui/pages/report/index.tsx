@@ -3,7 +3,7 @@
 import { useReducer, useState } from "react";
 
 import { useReport } from "../../../application/activities_service";
-import { ReportScope, type ReportScopeType } from "../../../../shared/domain/activities";
+import { ReportScope, type ReportScopeType } from "../../../../shared/domain/report_query";
 import { changePeriod, goToNextPeriod, goToPreviousPeriod, init, PeriodUnit, reducer } from "../../../domain/period";
 import { PeriodComponent } from "../../components/period_component";
 import ScopeComponent from "./scope";

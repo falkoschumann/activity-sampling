@@ -11,8 +11,6 @@ import { RecentActivitiesQueryHandler } from "./recent_activities_query_handler"
 import { Clock } from "../../shared/domain/temporal";
 import { Settings } from "../../shared/domain/settings";
 import {
-  type ReportQuery,
-  type ReportQueryResult,
   type TimesheetQuery,
   type TimesheetQueryResult,
 } from "../../shared/domain/activities";
@@ -31,10 +29,13 @@ import type {
   RecentActivitiesQueryResult,
 } from "../../shared/domain/recent_activities_query";
 import {
+  type ReportQuery,
+  type ReportQueryResult,
+} from "../../shared/domain/report_query";
+import {
   type StatisticsQuery,
   type StatisticsQueryResult,
 } from "../../shared/domain/statistics_query";
-import { projectReport } from "../domain/report_projection";
 import { projectStatistics } from "../domain/statistics_projection";
 import { projectTimesheet } from "../domain/timesheet_projection";
 import { ActivityLoggedEventDto } from "../infrastructure/events";
@@ -42,6 +43,7 @@ import { EventStore } from "../infrastructure/event_store";
 import { HolidayRepository } from "../infrastructure/holiday_repository";
 import { VacationRepository } from "../infrastructure/vacation_repository";
 import { TimesheetExporter } from "../infrastructure/timesheet_exporter";
+import { ReportQueryHandler } from "./report_query_handler";
 
 // TODO remove activities service, use message handlers instead
 
@@ -113,8 +115,11 @@ export class ActivitiesService {
   }
 
   async queryReport(query: ReportQuery): Promise<ReportQueryResult> {
-    const replay = this.#replayTyped(this.#eventStore.replay(), query.timeZone);
-    return projectReport(replay, query);
+    const handler = ReportQueryHandler.create({
+      eventStore: this.#eventStore,
+      clock: this.#clock,
+    });
+    return handler.handle(query);
   }
 
   async queryStatistics(

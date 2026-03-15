@@ -2,13 +2,13 @@
 
 import { Temporal } from "@js-temporal/polyfill";
 
+import { ActivityLoggedEvent } from "../../shared/domain/activities";
 import {
-  ActivityLoggedEvent,
   ReportEntry,
   ReportQuery,
   ReportQueryResult,
   ReportScope,
-} from "../../shared/domain/activities";
+} from "../../shared/domain/report_query";
 import { normalizeDuration } from "../../shared/domain/temporal";
 import { filterEvents, TotalHoursProjection } from "./activities";
 
