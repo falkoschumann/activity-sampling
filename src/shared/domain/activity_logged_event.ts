@@ -2,8 +2,6 @@
 
 import { Temporal } from "@js-temporal/polyfill";
 
-// region Events
-
 export class ActivityLoggedEvent {
   // TODO rename ActivityLoggedEvent to LoggedActivity
   // TODO remove duration?

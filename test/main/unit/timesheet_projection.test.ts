@@ -5,7 +5,7 @@ import { describe, expect, it } from "vitest";
 
 import { projectTimesheet } from "../../../src/main/domain/timesheet_projection";
 import { Holiday, Vacation } from "../../../src/main/domain/calendar";
-import { ActivityLoggedEvent } from "../../../src/shared/domain/activities";
+import { ActivityLoggedEvent } from "../../../src/shared/domain/activity_logged_event";
 import {
   Capacity,
   TimesheetEntry,

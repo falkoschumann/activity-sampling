@@ -4,7 +4,7 @@ import { Temporal } from "@js-temporal/polyfill";
 import { describe, expect, it } from "vitest";
 
 import { createAsyncGenerator } from "../common/tools";
-import { ActivityLoggedEvent } from "../../../src/shared/domain/activities";
+import { ActivityLoggedEvent } from "../../../src/shared/domain/activity_logged_event";
 import {
   ActivitiesProjection,
   Activity,

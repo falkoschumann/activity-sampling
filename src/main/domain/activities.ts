@@ -2,7 +2,7 @@
 
 import { Temporal } from "@js-temporal/polyfill";
 
-import { ActivityLoggedEvent } from "../../shared/domain/activities";
+import { ActivityLoggedEvent } from "../../shared/domain/activity_logged_event";
 import { normalizeDuration } from "../../shared/domain/temporal";
 
 export class Activity {

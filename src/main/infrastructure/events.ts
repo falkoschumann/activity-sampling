@@ -4,7 +4,7 @@ import { Temporal } from "@js-temporal/polyfill";
 import Ajv from "ajv";
 import addFormats from "ajv-formats";
 
-import { ActivityLoggedEvent } from "../../shared/domain/activities";
+import { ActivityLoggedEvent } from "../../shared/domain/activity_logged_event";
 
 const ACTIVITY_LOGGED_EVENT_SCHEMA = {
   type: "object",

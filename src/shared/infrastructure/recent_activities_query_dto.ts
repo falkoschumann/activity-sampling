@@ -8,7 +8,7 @@ import {
   TimeSummary,
   WorkingDay,
 } from "../domain/recent_activities_query";
-import { ActivityLoggedEventDto } from "./activities";
+import { ActivityLoggedEventDto } from "./activity_logged_event_dto";
 
 export class RecentActivitiesQueryDto {
   static create({

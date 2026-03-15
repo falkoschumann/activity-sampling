@@ -2,7 +2,7 @@
 
 import { Temporal } from "@js-temporal/polyfill";
 
-import { ActivityLoggedEvent } from "./activities";
+import { ActivityLoggedEvent } from "./activity_logged_event";
 
 // TODO replace ActivityLoggedEvent with domain object
 

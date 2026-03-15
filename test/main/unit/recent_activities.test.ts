@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 
 import { Clock } from "../../../src/shared/domain/temporal";
 import { RecentActivitiesQueryHandler } from "../../../src/main/application/recent_activities_query_handler";
-import { ActivityLoggedEvent } from "../../../src/shared/domain/activities";
+import { ActivityLoggedEvent } from "../../../src/shared/domain/activity_logged_event";
 import {
   RecentActivitiesQuery,
   TimeSummary,

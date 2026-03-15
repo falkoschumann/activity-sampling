@@ -2,9 +2,7 @@
 
 import { Temporal } from "@js-temporal/polyfill";
 
-import { ActivityLoggedEvent } from "../domain/activities";
-
-// region Events
+import { ActivityLoggedEvent } from "../domain/activity_logged_event";
 
 export class ActivityLoggedEventDto {
   static create(dto: {

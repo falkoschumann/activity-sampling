@@ -5,7 +5,7 @@ import { memo } from "react";
 
 import { FormatStyle, formatTime } from "../../../../shared/domain/temporal";
 import type { WorkingDay } from "../../../../shared/domain/recent_activities_query";
-import type { ActivityLoggedEvent } from "../../../../shared/domain/activities";
+import type { ActivityLoggedEvent } from "../../../../shared/domain/activity_logged_event";
 import type { ActivityTemplate } from "../../../domain/log";
 
 const MemoizedWorkingDaysComponent = memo(WorkingDaysComponent);

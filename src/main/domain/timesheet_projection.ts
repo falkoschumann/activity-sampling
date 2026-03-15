@@ -4,7 +4,7 @@ import { Temporal } from "@js-temporal/polyfill";
 
 import { Calendar, type Holiday, Vacation } from "./calendar";
 import { normalizeDuration } from "../../shared/domain/temporal";
-import { ActivityLoggedEvent } from "../../shared/domain/activities";
+import { ActivityLoggedEvent } from "../../shared/domain/activity_logged_event";
 import {
   TimesheetEntry,
   TimesheetQuery,

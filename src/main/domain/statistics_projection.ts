@@ -1,6 +1,6 @@
 // Copyright (c) 2026 Falko Schumann. All rights reserved. MIT license.
 
-import { ActivityLoggedEvent } from "../../shared/domain/activities";
+import { ActivityLoggedEvent } from "../../shared/domain/activity_logged_event";
 import {
   StatisticsQuery,
   StatisticsQueryResult,

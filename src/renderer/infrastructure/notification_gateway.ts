@@ -1,6 +1,6 @@
 // Copyright (c) 2026 Falko Schumann. All rights reserved. MIT license.
 
-import type { ActivityLoggedEvent } from "../../shared/domain/activities";
+import type { ActivityLoggedEvent } from "../../shared/domain/activity_logged_event";
 
 interface NotificationClickedEventInit extends EventInit {
   activity?: ActivityLoggedEvent;

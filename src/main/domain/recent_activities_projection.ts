@@ -9,7 +9,7 @@ import {
   TimeSummary,
   WorkingDay,
 } from "../../shared/domain/recent_activities_query";
-import { ActivityLoggedEvent } from "../../shared/domain/activities";
+import { ActivityLoggedEvent } from "../../shared/domain/activity_logged_event";
 import { filterEvents } from "./activities";
 
 export async function projectRecentActivities(
