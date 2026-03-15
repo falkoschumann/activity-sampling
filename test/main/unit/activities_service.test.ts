@@ -1,13 +1,11 @@
 // Copyright (c) 2026 Falko Schumann. All rights reserved. MIT license.
 
-import { type CommandStatus, Success } from "@muspellheim/shared";
 import { describe, expect, it } from "vitest";
 
 import { Clock } from "../../../src/shared/domain/temporal";
 import { ActivitiesService } from "../../../src/main/application/activities_service";
 import {
   Capacity,
-  LogActivityCommand,
   ReportEntry,
   ReportQueryResult,
   ReportScope,
@@ -29,50 +27,6 @@ import {
 import { TimesheetExporter } from "../../../src/main/infrastructure/timesheet_exporter";
 
 describe("Activities service", () => {
-  describe("Log activity", () => {
-    it("should log with all required fields", async () => {
-      const { service, eventStore } = configure();
-      const recordEvents = eventStore.trackRecorded();
-
-      const status = await service.logActivity(
-        LogActivityCommand.createTestInstance(),
-      );
-
-      expect(status).toEqual<CommandStatus>(new Success());
-      expect(recordEvents.data).toEqual<ActivityLoggedEventDto[]>([
-        ActivityLoggedEventDto.createTestInstance(),
-      ]);
-    });
-
-    it("should log with an optional notes", async () => {
-      const { service, eventStore } = configure();
-      const recordEvents = eventStore.trackRecorded();
-
-      const status = await service.logActivity(
-        LogActivityCommand.createTestInstance({ notes: "Lorem ipsum" }),
-      );
-
-      expect(status).toEqual<CommandStatus>(new Success());
-      expect(recordEvents.data).toEqual<ActivityLoggedEventDto[]>([
-        ActivityLoggedEventDto.createTestInstance({ notes: "Lorem ipsum" }),
-      ]);
-    });
-
-    it("should log with an optional category", async () => {
-      const { service, eventStore } = configure();
-      const recordEvents = eventStore.trackRecorded();
-
-      const status = await service.logActivity(
-        LogActivityCommand.createTestInstance({ category: "Lorem ipsum" }),
-      );
-
-      expect(status).toEqual<CommandStatus>(new Success());
-      expect(recordEvents.data).toEqual<ActivityLoggedEventDto[]>([
-        ActivityLoggedEventDto.createTestInstance({ category: "Lorem ipsum" }),
-      ]);
-    });
-  });
-
   describe("Query report", () => {
     it("should return report", async () => {
       const { service } = configure({

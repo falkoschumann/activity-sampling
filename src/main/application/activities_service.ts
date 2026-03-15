@@ -10,7 +10,6 @@ import { RecentActivitiesQueryHandler } from "./recent_activities_query_handler"
 import { Clock } from "../../shared/domain/temporal";
 import { Settings } from "../../shared/domain/settings";
 import {
-  type LogActivityCommand,
   type ReportQuery,
   type ReportQueryResult,
   type TimesheetQuery,
@@ -25,6 +24,7 @@ import {
   type EstimateQuery,
   type EstimateQueryResult,
 } from "../../shared/domain/estimate_query";
+import { LogActivityCommand } from "../../shared/domain/log_activity_command.ts";
 import type {
   RecentActivitiesQuery,
   RecentActivitiesQueryResult,

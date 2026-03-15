@@ -8,9 +8,6 @@ import {
 } from "electron/renderer";
 
 import type {
-  CommandStatusDto,
-  ExportTimesheetCommandDto,
-  LogActivityCommandDto,
   ReportQueryDto,
   ReportQueryResultDto,
   TimesheetQueryDto,
@@ -32,24 +29,27 @@ import {
   TIMER_STARTED_CHANNEL,
   TIMER_STOPPED_CHANNEL,
 } from "../shared/infrastructure/channels";
+import type { CommandStatusDto } from "../shared/infrastructure/command_status_dto.ts";
+import {
+  type BurnUpQueryDto,
+  BurnUpQueryResultDto,
+} from "../shared/infrastructure/burn_up_query_dto";
+import type { ExportTimesheetCommandDto } from "../shared/infrastructure/export_timesheet_command_dto.ts";
+import type { LogActivityCommandDto } from "../shared/infrastructure/log_activity_command_dto.ts";
+import {
+  type RecentActivitiesQueryDto,
+  RecentActivitiesQueryResultDto,
+} from "../shared/infrastructure/recent_activities_query_dto";
 import type { SettingsDto } from "../shared/infrastructure/settings";
+import {
+  StatisticsQueryDto,
+  StatisticsQueryResultDto,
+} from "../shared/infrastructure/statistics_query_dto";
 import type {
   IntervalElapsedEventDto,
   TimerStartedEventDto,
   TimerStoppedEventDto,
 } from "../shared/infrastructure/timer";
-import {
-  type BurnUpQueryDto,
-  BurnUpQueryResultDto,
-} from "../shared/infrastructure/burn_up_query_dto";
-import {
-  type RecentActivitiesQueryDto,
-  RecentActivitiesQueryResultDto,
-} from "../shared/infrastructure/recent_activities_query_dto";
-import {
-  StatisticsQueryDto,
-  StatisticsQueryResultDto,
-} from "../shared/infrastructure/statistics_query_dto";
 
 // TODO map between DTOs and domain objects
 

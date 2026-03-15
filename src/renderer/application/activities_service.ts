@@ -4,7 +4,6 @@ import { Temporal } from "@js-temporal/polyfill";
 import { useCallback, useEffect, useReducer, useState } from "react";
 
 import {
-  LogActivityCommand,
   ReportQuery,
   ReportQueryResult,
   TimesheetQuery,
@@ -23,6 +22,7 @@ import {
   type EstimateQuery,
   EstimateQueryResult,
 } from "../../shared/domain/estimate_query";
+import { LogActivityCommand } from "../../shared/domain/log_activity_command.ts";
 import {
   RecentActivitiesQuery,
   RecentActivitiesQueryResult,
@@ -31,10 +31,13 @@ import {
   StatisticsQuery,
   StatisticsQueryResult,
 } from "../../shared/domain/statistics_query";
+import { CommandStatusDto } from "../../shared/infrastructure/command_status_dto.ts";
 import {
   EstimateQueryDto,
   EstimateQueryResultDto,
 } from "../../shared/infrastructure/estimate_query_dto";
+import { ExportTimesheetCommandDto } from "../../shared/infrastructure/export_timesheet_command_dto.ts";
+import { LogActivityCommandDto } from "../../shared/infrastructure/log_activity_command_dto.ts";
 import {
   RecentActivitiesQueryDto,
   RecentActivitiesQueryResultDto,
@@ -45,9 +48,6 @@ import {
 } from "../../shared/infrastructure/statistics_query_dto";
 import { SettingsDto } from "../../shared/infrastructure/settings";
 import {
-  CommandStatusDto,
-  ExportTimesheetCommandDto,
-  LogActivityCommandDto,
   ReportQueryDto,
   ReportQueryResultDto,
   TimesheetQueryDto,

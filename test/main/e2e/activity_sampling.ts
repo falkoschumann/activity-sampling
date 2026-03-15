@@ -11,7 +11,6 @@ import { ActivitiesService } from "../../../src/main/application/activities_serv
 import { TimerService } from "../../../src/main/application/timer_service";
 import {
   Capacity,
-  type LogActivityCommand,
   ReportEntry,
   ReportQuery,
   ReportQueryResult,
@@ -19,6 +18,7 @@ import {
   TimesheetQuery,
   TimesheetQueryResult,
 } from "../../../src/shared/domain/activities";
+import type { LogActivityCommand } from "../../../src/shared/domain/log_activity_command.ts";
 import {
   Histogram,
   StatisticsQuery,

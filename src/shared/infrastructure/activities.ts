@@ -1,12 +1,10 @@
 // Copyright (c) 2026 Falko Schumann. All rights reserved. MIT license.
 
 import { Temporal } from "@js-temporal/polyfill";
-import { type CommandStatus, Failure, Success } from "@muspellheim/shared";
 
 import {
   ActivityLoggedEvent,
   Capacity,
-  LogActivityCommand,
   ReportEntry,
   ReportQuery,
   ReportQueryResult,
@@ -15,156 +13,6 @@ import {
   TimesheetQuery,
   TimesheetQueryResult,
 } from "../domain/activities";
-import { ExportTimesheetCommand } from "../domain/export_timesheet_command";
-
-// region Commands
-
-export class LogActivityCommandDto {
-  static create({
-    timestamp,
-    duration,
-    client,
-    project,
-    task,
-    notes,
-    category,
-  }: {
-    timestamp: string;
-    duration: string;
-    client: string;
-    project: string;
-    task: string;
-    notes?: string;
-    category?: string;
-  }): LogActivityCommandDto {
-    return new LogActivityCommandDto(
-      timestamp,
-      duration,
-      client,
-      project,
-      task,
-      notes,
-      category,
-    );
-  }
-
-  static fromModel(model: LogActivityCommand): LogActivityCommandDto {
-    return LogActivityCommandDto.create({
-      timestamp: model.timestamp.toString(),
-      duration: model.duration.toString(),
-      client: model.client,
-      project: model.project,
-      task: model.task,
-      notes: model.notes,
-      category: model.category,
-    });
-  }
-
-  readonly timestamp: string;
-  readonly duration: string;
-  readonly client: string;
-  readonly project: string;
-  readonly task: string;
-  readonly notes?: string;
-  readonly category?: string;
-
-  private constructor(
-    timestamp: string,
-    duration: string,
-    client: string,
-    project: string,
-    task: string,
-    notes?: string,
-    category?: string,
-  ) {
-    this.timestamp = timestamp;
-    this.duration = duration;
-    this.client = client;
-    this.project = project;
-    this.task = task;
-    this.notes = notes;
-    this.category = category;
-  }
-
-  validate(): LogActivityCommand {
-    return LogActivityCommand.create(this);
-  }
-}
-
-export class ExportTimesheetCommandDto {
-  static create({
-    timesheets,
-    fileName,
-  }: {
-    timesheets: TimesheetEntryDto[];
-    fileName: string;
-  }): ExportTimesheetCommandDto {
-    return new ExportTimesheetCommandDto(timesheets, fileName);
-  }
-
-  static fromModel(model: ExportTimesheetCommand): ExportTimesheetCommandDto {
-    return ExportTimesheetCommandDto.create({
-      timesheets: model.timesheets.map((entry) =>
-        TimesheetEntryDto.from(entry),
-      ),
-      fileName: model.fileName,
-    });
-  }
-
-  readonly timesheets: TimesheetEntryDto[];
-  readonly fileName: string;
-
-  private constructor(timesheets: TimesheetEntryDto[], fileName: string) {
-    this.timesheets = timesheets;
-    this.fileName = fileName;
-  }
-
-  validate(): ExportTimesheetCommand {
-    return ExportTimesheetCommand.create({
-      timesheets: this.timesheets.map((dto) =>
-        TimesheetEntryDto.create(dto).validate(),
-      ),
-      fileName: this.fileName,
-    });
-  }
-}
-
-export class CommandStatusDto {
-  static create({
-    isSuccess,
-    errorMessage,
-  }: {
-    isSuccess: boolean;
-    errorMessage?: string;
-  }): CommandStatusDto {
-    return new CommandStatusDto(isSuccess, errorMessage);
-  }
-
-  static fromModel(model: CommandStatus): CommandStatusDto {
-    if (model.isSuccess) {
-      return new CommandStatusDto(true);
-    }
-
-    return CommandStatusDto.create({
-      isSuccess: model.isSuccess,
-      errorMessage: model.errorMessage,
-    });
-  }
-
-  readonly isSuccess: boolean;
-  readonly errorMessage?: string;
-
-  private constructor(isSuccess: boolean, errorMessage?: string) {
-    this.isSuccess = isSuccess;
-    this.errorMessage = errorMessage;
-  }
-
-  validate(): CommandStatus {
-    return this.isSuccess ? new Success() : new Failure(this.errorMessage!);
-  }
-}
-
-// endregion
 
 // region Queries
 

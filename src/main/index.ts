@@ -19,36 +19,17 @@ import {
   TimerStartedEvent,
   TimerStoppedEvent,
 } from "../shared/domain/timer";
+import { CommandStatusDto } from "../shared/infrastructure/command_status_dto.ts";
 import {
-  CommandStatusDto,
-  ExportTimesheetCommandDto,
-  LogActivityCommandDto,
   ReportQueryDto,
   ReportQueryResultDto,
   TimesheetQueryDto,
   TimesheetQueryResultDto,
 } from "../shared/infrastructure/activities";
 import {
-  IntervalElapsedEventDto,
-  TimerStartedEventDto,
-  TimerStoppedEventDto,
-} from "../shared/infrastructure/timer";
-import {
   BurnUpQueryDto,
   BurnUpQueryResultDto,
 } from "../shared/infrastructure/burn_up_query_dto";
-import {
-  EstimateQueryDto,
-  EstimateQueryResultDto,
-} from "../shared/infrastructure/estimate_query_dto";
-import {
-  RecentActivitiesQueryDto,
-  RecentActivitiesQueryResultDto,
-} from "../shared/infrastructure/recent_activities_query_dto";
-import {
-  StatisticsQueryDto,
-  StatisticsQueryResultDto,
-} from "../shared/infrastructure/statistics_query_dto";
 import {
   EXPORT_TIMESHEET_CHANNEL,
   INTERVAL_ELAPSED_CHANNEL,
@@ -65,7 +46,26 @@ import {
   TIMER_STARTED_CHANNEL,
   TIMER_STOPPED_CHANNEL,
 } from "../shared/infrastructure/channels";
+import {
+  EstimateQueryDto,
+  EstimateQueryResultDto,
+} from "../shared/infrastructure/estimate_query_dto";
+import { LogActivityCommandDto } from "../shared/infrastructure/log_activity_command_dto.ts";
+import { ExportTimesheetCommandDto } from "../shared/infrastructure/export_timesheet_command_dto.ts";
+import {
+  RecentActivitiesQueryDto,
+  RecentActivitiesQueryResultDto,
+} from "../shared/infrastructure/recent_activities_query_dto";
 import { SettingsDto } from "../shared/infrastructure/settings";
+import {
+  StatisticsQueryDto,
+  StatisticsQueryResultDto,
+} from "../shared/infrastructure/statistics_query_dto";
+import {
+  IntervalElapsedEventDto,
+  TimerStartedEventDto,
+  TimerStoppedEventDto,
+} from "../shared/infrastructure/timer";
 import { chooseDataDirectory, openWindow } from "./ui/actions";
 import { createMenu } from "./ui/menu";
 
