@@ -22,8 +22,8 @@ export class StatisticsQueryHandler {
     return new StatisticsQueryHandler(eventStore, clock);
   }
 
-  #eventStore: EventStore;
-  #clock: Clock;
+  readonly #eventStore: EventStore;
+  readonly #clock: Clock;
 
   private constructor(eventStore: EventStore, clock: Clock) {
     this.#eventStore = eventStore;

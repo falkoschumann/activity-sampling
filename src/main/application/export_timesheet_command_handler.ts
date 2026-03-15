@@ -17,7 +17,7 @@ export class ExportTimesheetCommandHandler {
     return new ExportTimesheetCommandHandler(timesheetExporter);
   }
 
-  #timesheetExporter: TimesheetExporter;
+  readonly #timesheetExporter: TimesheetExporter;
 
   private constructor(timesheetExporter: TimesheetExporter) {
     this.#timesheetExporter = timesheetExporter;

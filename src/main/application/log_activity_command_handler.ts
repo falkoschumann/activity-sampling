@@ -11,7 +11,7 @@ export class LogActivityCommandHandler {
     return new LogActivityCommandHandler(eventStore);
   }
 
-  #eventStore: EventStore;
+  readonly #eventStore: EventStore;
 
   private constructor(eventStore: EventStore) {
     this.#eventStore = eventStore;

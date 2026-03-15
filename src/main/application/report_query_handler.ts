@@ -22,8 +22,8 @@ export class ReportQueryHandler {
     return new ReportQueryHandler(eventStore, clock);
   }
 
-  #eventStore: EventStore;
-  #clock: Clock;
+  readonly #eventStore: EventStore;
+  readonly #clock: Clock;
 
   private constructor(eventStore: EventStore, clock: Clock) {
     this.#eventStore = eventStore;
