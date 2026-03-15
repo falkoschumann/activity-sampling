@@ -5,13 +5,13 @@ import { describe, expect, it } from "vitest";
 
 import { projectTimesheet } from "../../../src/main/domain/timesheet_projection";
 import { Holiday, Vacation } from "../../../src/main/domain/calendar";
+import { ActivityLoggedEvent } from "../../../src/shared/domain/activities";
 import {
-  ActivityLoggedEvent,
   Capacity,
   TimesheetEntry,
   TimesheetQuery,
   TimesheetQueryResult,
-} from "../../../src/shared/domain/activities";
+} from "../../../src/shared/domain/timesheet_query";
 import { createAsyncGenerator } from "../common/tools";
 
 describe("Timesheet projection", () => {

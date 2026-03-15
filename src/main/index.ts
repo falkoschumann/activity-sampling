@@ -21,10 +21,6 @@ import {
 } from "../shared/domain/timer";
 import { CommandStatusDto } from "../shared/infrastructure/command_status_dto";
 import {
-  TimesheetQueryDto,
-  TimesheetQueryResultDto,
-} from "../shared/infrastructure/activities";
-import {
   BurnUpQueryDto,
   BurnUpQueryResultDto,
 } from "../shared/infrastructure/burn_up_query_dto";
@@ -68,6 +64,10 @@ import {
   TimerStartedEventDto,
   TimerStoppedEventDto,
 } from "../shared/infrastructure/timer";
+import {
+  TimesheetQueryDto,
+  TimesheetQueryResultDto,
+} from "../shared/infrastructure/timesheet_query_dto";
 import { chooseDataDirectory, openWindow } from "./ui/actions";
 import { createMenu } from "./ui/menu";
 

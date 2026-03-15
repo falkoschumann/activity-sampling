@@ -7,10 +7,6 @@ import {
   type OpenDialogReturnValue,
 } from "electron/renderer";
 
-import type {
-  TimesheetQueryDto,
-  TimesheetQueryResultDto,
-} from "../shared/infrastructure/activities";
 import {
   EXPORT_TIMESHEET_CHANNEL,
   INTERVAL_ELAPSED_CHANNEL,
@@ -52,6 +48,10 @@ import type {
   TimerStartedEventDto,
   TimerStoppedEventDto,
 } from "../shared/infrastructure/timer";
+import type {
+  TimesheetQueryDto,
+  TimesheetQueryResultDto,
+} from "../shared/infrastructure/timesheet_query_dto";
 
 // TODO map between DTOs and domain objects
 

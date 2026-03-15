@@ -10,10 +10,6 @@ import { LogActivityCommandHandler } from "./log_activity_command_handler";
 import { RecentActivitiesQueryHandler } from "./recent_activities_query_handler";
 import { Clock } from "../../shared/domain/temporal";
 import { Settings } from "../../shared/domain/settings";
-import {
-  type TimesheetQuery,
-  type TimesheetQueryResult,
-} from "../../shared/domain/activities";
 import type { ExportTimesheetCommand } from "../../shared/domain/export_timesheet_command";
 import {
   type BurnUpQuery,
@@ -36,14 +32,17 @@ import {
   type StatisticsQuery,
   type StatisticsQueryResult,
 } from "../../shared/domain/statistics_query";
-import { projectStatistics } from "../domain/statistics_projection";
-import { projectTimesheet } from "../domain/timesheet_projection";
-import { ActivityLoggedEventDto } from "../infrastructure/events";
+import {
+  type TimesheetQuery,
+  type TimesheetQueryResult,
+} from "../../shared/domain/timesheet_query";
 import { EventStore } from "../infrastructure/event_store";
 import { HolidayRepository } from "../infrastructure/holiday_repository";
 import { VacationRepository } from "../infrastructure/vacation_repository";
 import { TimesheetExporter } from "../infrastructure/timesheet_exporter";
 import { ReportQueryHandler } from "./report_query_handler";
+import { TimesheetQueryHandler } from "./timesheet_query_handler";
+import { StatisticsQueryHandler } from "./statistics_query_handler";
 
 // TODO remove activities service, use message handlers instead
 
@@ -125,8 +124,11 @@ export class ActivitiesService {
   async queryStatistics(
     query: StatisticsQuery,
   ): Promise<StatisticsQueryResult> {
-    const replay = this.#replayTyped(this.#eventStore.replay(), query.timeZone);
-    return await projectStatistics(replay, query);
+    const handler = StatisticsQueryHandler.create({
+      eventStore: this.#eventStore,
+      clock: this.#clock,
+    });
+    return handler.handle(query);
   }
 
   async queryEstimate(query: EstimateQuery): Promise<EstimateQueryResult> {
@@ -146,41 +148,13 @@ export class ActivitiesService {
   }
 
   async queryTimesheet(query: TimesheetQuery): Promise<TimesheetQueryResult> {
-    const replay = this.#replayTyped(this.#eventStore.replay(), query.timeZone);
-    const holidays = await this.#holidayRepository.findAllByDate(
-      query.from,
-      query.to,
-    );
-    const vacations = await this.#vacationRepository.findAllByDate(
-      query.from,
-      query.to,
-    );
-    return projectTimesheet(
-      replay,
-      { ...query, today: query.today ?? this.#today() },
-      {
-        holidays,
-        vacations,
-        capacity: this.#capacity,
-      },
-    );
-  }
-
-  #today(timeZone?: Temporal.TimeZoneLike) {
-    return this.#clock
-      .instant()
-      .toZonedDateTimeISO(timeZone ?? this.#clock.zone)
-      .toPlainDate();
-  }
-
-  async *#replayTyped(
-    events: AsyncGenerator,
-    timeZone?: Temporal.TimeZoneLike,
-  ) {
-    for await (const e of events) {
-      yield ActivityLoggedEventDto.fromJson(e).validate(
-        timeZone || this.#clock.zone,
-      );
-    }
+    const handler = TimesheetQueryHandler.create({
+      capacity: this.#capacity,
+      eventStore: this.#eventStore,
+      holidayRepository: this.#holidayRepository,
+      vacationRepository: this.#vacationRepository,
+      clock: this.#clock,
+    });
+    return handler.handle(query);
   }
 }

@@ -1,7 +1,7 @@
 // Copyright (c) 2026 Falko Schumann. All rights reserved. MIT license.
 
 import { ExportTimesheetCommand } from "../domain/export_timesheet_command";
-import { TimesheetEntryDto } from "./activities";
+import { TimesheetEntryDto } from "./timesheet_query_dto";
 
 export class ExportTimesheetCommandDto {
   static create({

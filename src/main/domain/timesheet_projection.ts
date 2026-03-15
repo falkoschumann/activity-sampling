@@ -4,12 +4,12 @@ import { Temporal } from "@js-temporal/polyfill";
 
 import { Calendar, type Holiday, Vacation } from "./calendar";
 import { normalizeDuration } from "../../shared/domain/temporal";
+import { ActivityLoggedEvent } from "../../shared/domain/activities";
 import {
-  ActivityLoggedEvent,
   TimesheetEntry,
   TimesheetQuery,
   TimesheetQueryResult,
-} from "../../shared/domain/activities";
+} from "../../shared/domain/timesheet_query";
 import { filterEvents, TotalHoursProjection } from "./activities";
 
 export async function projectTimesheet(

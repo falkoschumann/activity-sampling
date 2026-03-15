@@ -1,6 +1,6 @@
 // Copyright (c) 2026 Falko Schumann. All rights reserved. MIT license.
 
-import { TimesheetEntry } from "./activities";
+import { TimesheetEntry } from "./timesheet_query";
 
 export class ExportTimesheetCommand {
   static create({

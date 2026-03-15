@@ -14,7 +14,7 @@ import {
   TimesheetEntry,
   TimesheetQuery,
   TimesheetQueryResult,
-} from "../../../src/shared/domain/activities";
+} from "../../../src/shared/domain/timesheet_query";
 import type { LogActivityCommand } from "../../../src/shared/domain/log_activity_command.ts";
 import {
   Histogram,

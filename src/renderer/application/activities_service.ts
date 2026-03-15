@@ -4,10 +4,6 @@ import { Temporal } from "@js-temporal/polyfill";
 import { useCallback, useEffect, useReducer, useState } from "react";
 
 import {
-  TimesheetQuery,
-  TimesheetQueryResult,
-} from "../../shared/domain/activities";
-import {
   activityLogged,
   activitySelected,
   type ActivityTemplate,
@@ -33,6 +29,10 @@ import {
   StatisticsQuery,
   StatisticsQueryResult,
 } from "../../shared/domain/statistics_query";
+import {
+  TimesheetQuery,
+  TimesheetQueryResult,
+} from "../../shared/domain/timesheet_query";
 import { CommandStatusDto } from "../../shared/infrastructure/command_status_dto";
 import {
   EstimateQueryDto,
@@ -56,7 +56,7 @@ import { SettingsDto } from "../../shared/infrastructure/settings";
 import {
   TimesheetQueryDto,
   TimesheetQueryResultDto,
-} from "../../shared/infrastructure/activities";
+} from "../../shared/infrastructure/timesheet_query_dto";
 import {
   NotificationClickedEvent,
   NotificationGateway,

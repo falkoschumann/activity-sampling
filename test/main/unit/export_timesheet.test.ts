@@ -9,7 +9,7 @@ import {
   TimesheetDto,
   TimesheetExporter,
 } from "../../../src/main/infrastructure/timesheet_exporter";
-import { TimesheetEntry } from "../../../src/shared/domain/activities";
+import { TimesheetEntry } from "../../../src/shared/domain/timesheet_query";
 
 describe("Export timesheet", () => {
   describe("Export timesheet in Harvest format", () => {
