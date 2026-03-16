@@ -5,51 +5,8 @@ updates:
     schedule:
       interval: "weekly"
     merge-strategy: "rebase"
-  - package-ecosystem: gradle
-    directory: "/api-app"
-    schedule:
-      interval: "weekly"
-    merge-strategy: "rebase"
-    groups:
-      minor-and-patch:
-        patterns:
-          - "*"
-        update-types:
-          - "minor"
-          - "patch"
-  - package-ecosystem: "npm"
-    directory: "/web-app"
-    schedule:
-      interval: "weekly"
-    merge-strategy: "rebase"
-    groups:
-      minor-and-patch:
-        patterns:
-          - "*"
-        update-types:
-          - "minor"
-          - "patch"
-      eslint:
-        patterns:
-          - "eslint"
-          - "@eslint/*"
-      vitest:
-        patterns:
-          - "vitest"
-          - "@vitest/*"
-    ignore:
-      - dependency-name: "@types/node"
-        update-types:
-          - "version-update:semver-major"
-      - dependency-name: "eslint"
-        update-types:
-          - "version-update:semver-major"
-      - dependency-name: "@eslint/*"
-        update-types:
-          - "version-update:semver-major"
-      - dependency-name: "eslint-plugin-headers"
   - package-ecosystem: "bun"
-    directory: "/desktop-app"
+    directory: "/"
     schedule:
       interval: "weekly"
     merge-strategy: "rebase"
@@ -79,3 +36,5 @@ updates:
         update-types:
           - "version-update:semver-major"
       - dependency-name: "eslint-plugin-headers"
+        update-types:
+          - "version-update:semver-patch"
