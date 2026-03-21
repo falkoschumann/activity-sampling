@@ -79,6 +79,7 @@ endif
 version:
 	@echo "Using runtime $(JS) version $(shell $(JS) --version)"
 	@echo "Using package manager $(PM) version $(shell $(PM) --version)"
+	@echo "Using package runner $(RUN) version $(shell $(RUN) --version)"
 
 $(DIAGRAM_FILES): %.png: %.puml
 	plantuml $^
