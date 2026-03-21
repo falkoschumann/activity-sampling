@@ -7,8 +7,9 @@ JS?=bun
 PM?=bun
 #PM_OPTIONS?=--ignore-scripts
 RUN?=bunx
-DEPENDABOT=dependabot[bot]
+#RUN_OPTIONS?=--bun
 SHELL:=/bin/bash
+DEPENDENCY_UPDATER=dependabot[bot]
 
 all: dist check
 
@@ -21,51 +22,51 @@ distclean: clean
 	rm -rf node_modules
 
 dist: build
-	$(PM) run build:electron
-#	$(PM) run build:mac
-#	$(PM) run build:win
+	$(PM) run $(RUN_OPTIONS) build:electron
+#	$(PM) run $(RUN_OPTIONS) build:mac
+#	$(PM) run $(RUN_OPTIONS) build:win
 
 start: prepare
-	$(PM) run start
+	$(PM) run $(RUN_OPTIONS) start
 
 doc: $(DIAGRAM_FILES)
 
 check: test
-	$(RUN) eslint .
-	$(RUN) stylelint "**/*.scss" --ignore-path .gitignore
-	$(RUN) prettier --check .
-	$(RUN) sheriff verify
+	$(RUN) $(RUN_OPTIONS) eslint .
+	$(RUN) $(RUN_OPTIONS) stylelint "**/*.scss" --ignore-path .gitignore
+	$(RUN) $(RUN_OPTIONS) prettier --check .
+	$(RUN) $(RUN_OPTIONS) sheriff verify
 
 format:
-	$(RUN) eslint --fix .
-	$(RUN) stylelint "**/*.scss" --fix --ignore-path .gitignore
-	$(RUN) prettier --write .
+	$(RUN) $(RUN_OPTIONS) eslint --fix .
+	$(RUN) $(RUN_OPTIONS) stylelint "**/*.scss" --fix --ignore-path .gitignore
+	$(RUN) $(RUN_OPTIONS) prettier --write .
 
 dev: prepare
-	$(PM) run dev
+	$(PM) run $(RUN_OPTIONS) dev
 
 test: prepare
-	$(PM) run test
+	$(PM) run $(RUN_OPTIONS) test
 
 watch: prepare
-	$(PM) run watch
+	$(PM) run $(RUN_OPTIONS) watch
 
 unit-tests: prepare
-	$(RUN) vitest run unit
+	$(RUN) $(RUN_OPTIONS) vitest run unit
 
 integration-tests: prepare
-	$(RUN) vitest run integration
+	$(RUN) $(RUN_OPTIONS) vitest run integration
 
 e2e-tests: prepare
-	$(RUN) vitest run e2e
+	$(RUN) $(RUN_OPTIONS) vitest run e2e
 
 build: prepare
-	$(PM) run build
+	$(PM) run $(RUN_OPTIONS) build
 
 prepare: version
 ifdef CI
-ifeq ($(findstring $(DEPENDABOT), $(GITHUB_ACTOR)), $(DEPENDABOT))
-	@echo "dependabot detected, run $(PM) install"
+ifeq ($(findstring $(DEPENDENCY_UPDATER), $(GITLAB_USER_LOGIN)), $(DEPENDENCY_UPDATER))
+	@echo "dependency updater detected, run $(PM) install"
 	$(PM) install $(PM_OPTIONS)
 else
 	@echo "CI detected, run $(PM) ci"

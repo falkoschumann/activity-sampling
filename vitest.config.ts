@@ -14,11 +14,13 @@ export default defineConfig({
         // exclude layers UI and root
       ],
       provider: "istanbul",
+      reporter: ["text", "html", "cobertura", "json"],
       thresholds: {
         statements: 70, // TODO increase statements coverage
         branches: 85,
       },
     },
-    reporters: ["tree"],
+    outputFile: "coverage/junit.xml",
+    reporters: ["junit", "tree"],
   },
 });

@@ -1,2 +1,5 @@
 [install]
 exact = true
+
+[serve.static]
+env = "BUN_PUBLIC_*"
