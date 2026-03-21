@@ -15,21 +15,21 @@ export interface SettingsConfiguration {
   readonly fileName: string;
 }
 
-export class SettingsGateway extends EventTarget {
+export class SettingsProvider extends EventTarget {
   static create(
     configuration: SettingsConfiguration = {
       fileName: path.join(app.getPath("userData"), "settings.json"),
     },
-  ): SettingsGateway {
-    return new SettingsGateway(configuration, fsPromise);
+  ): SettingsProvider {
+    return new SettingsProvider(configuration, fsPromise);
   }
 
   static createNull({
     readFileResponses = [],
   }: {
     readFileResponses?: (SettingsDto | null | Error)[];
-  } = {}): SettingsGateway {
-    return new SettingsGateway(
+  } = {}): SettingsProvider {
+    return new SettingsProvider(
       { fileName: "null-settings.json" },
       new FsPromiseStub(readFileResponses) as unknown as typeof fsPromise,
     );
@@ -44,15 +44,15 @@ export class SettingsGateway extends EventTarget {
     this.#fs = fs;
   }
 
-  async load(): Promise<Settings | undefined> {
+  async load(): Promise<Settings> {
     try {
       const fileContent = await this.#fs.readFile(this.#fileName, "utf-8");
       const json = JSON.parse(fileContent);
       return SettingsDto.fromJson(json).validate();
     } catch (error) {
       if ((error as NodeJS.ErrnoException).code === "ENOENT") {
-        // No such file or directory, no events recorded yet
-        return;
+        // No settings stored yet
+        return Settings.createDefault();
       }
 
       throw error;

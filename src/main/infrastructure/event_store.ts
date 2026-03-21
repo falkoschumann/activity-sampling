@@ -110,7 +110,7 @@ export class EventStore extends EventTarget {
       parser.end();
     } catch (error) {
       if ((error as NodeJS.ErrnoException).code === "ENOENT") {
-        // No such file or directory, no events recorded yet
+        // No events recorded yet
         return;
       }
 

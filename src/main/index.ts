@@ -7,16 +7,24 @@ import {
   REACT_DEVELOPER_TOOLS,
 } from "electron-devtools-installer";
 
-import { ActivitiesService } from "./application/activities_service";
-import {
-  SettingsChangedEvent,
-  SettingsService,
-} from "./application/settings_service";
+import { LogActivityCommandHandler } from "./application/log_activity_command_handler";
+import { ExportTimesheetCommandHandler } from "./application/export_timesheet_command_handler";
+import { RecentActivitiesQueryHandler } from "./application/recent_activities_query_handler";
+import { Clock } from "../shared/domain/temporal";
+import { ReportQueryHandler } from "./application/report_query_handler";
+import { StatisticsQueryHandler } from "./application/statistics_query_handler";
+import { EstimateQueryHandler } from "./application/estimate_query_handler";
+import { BurnUpQueryHandler } from "./application/burn_up_query_handler";
+import { TimesheetQueryHandler } from "./application/timesheet_query_handler";
 import { TimerService } from "./application/timer_service";
 import { Settings } from "../shared/domain/settings";
 import { IntervalElapsedEvent } from "../shared/domain/interval_elapsed_event";
 import { TimerStartedEvent } from "../shared/domain/timer_started_event";
 import { TimerStoppedEvent } from "../shared/domain/timer_stopped_event";
+import { EventStore } from "./infrastructure/event_store";
+import { HolidayRepository } from "./infrastructure/holiday_repository";
+import { VacationRepository } from "./infrastructure/vacation_repository";
+import { TimesheetExporter } from "./infrastructure/timesheet_exporter";
 import { CommandStatusDto } from "../shared/infrastructure/command_status_dto";
 import {
   BurnUpQueryDto,
@@ -66,15 +74,48 @@ import {
 } from "../shared/infrastructure/timesheet_query_dto";
 import { chooseDataDirectory, openWindow } from "./ui/actions";
 import { createMenu } from "./ui/menu";
+import { SettingsProvider } from "./infrastructure/settings_provider";
 
-// TODO extract module for reuse in e2e tests
-const settingsService = SettingsService.create();
-const activitiesService = ActivitiesService.create();
-const timerService = TimerService.create();
+let settings = Settings.createDefault();
+const settingsProvider = SettingsProvider.create();
+const eventStore = EventStore.create();
+const holidayRepository = HolidayRepository.create();
+const vacationRepository = VacationRepository.create();
+const timesheetExporter = TimesheetExporter.create();
+const clock = Clock.systemDefaultZone();
 
-settingsService.addEventListener(SettingsChangedEvent.TYPE, (event) => {
-  applySettings(event as SettingsChangedEvent);
+const logActivityCommandHandler = LogActivityCommandHandler.create({
+  eventStore,
 });
+const recentActivitiesQueryHandler = RecentActivitiesQueryHandler.create({
+  eventStore,
+  clock,
+});
+const reportQueryHandler = ReportQueryHandler.create({ eventStore, clock });
+const statisticsQueryHandler = StatisticsQueryHandler.create({
+  eventStore,
+  clock,
+});
+const estimateQueryHandler = EstimateQueryHandler.create({
+  eventStore,
+  clock,
+});
+const burnUpQueryHandler = BurnUpQueryHandler.create({
+  eventStore,
+  clock,
+});
+const timesheetQueryHandler = TimesheetQueryHandler.create({
+  capacity: settings.capacity,
+  eventStore,
+  holidayRepository,
+  vacationRepository,
+  clock,
+});
+const exportTimesheetCommandHandler = ExportTimesheetCommandHandler.create({
+  timesheetExporter,
+});
+
+const timerService = TimerService.create();
 
 const isProduction = app.isPackaged;
 
@@ -119,20 +160,26 @@ app.on("activate", function () {
 });
 
 async function initializeApplication() {
-  const settings = await settingsService.loadSettings();
+  settings = await settingsProvider.load();
   if (settings.dataDir !== Settings.createDefault().dataDir) {
     applySettings(settings);
     return;
   }
 
-  let canceled: boolean;
+  let dataDir;
   do {
-    canceled = await chooseDataDirectory(settingsService);
-  } while (canceled);
+    dataDir = await chooseDataDirectory();
+  } while (dataDir == null);
+  settings = { ...settings, dataDir };
+  await settingsProvider.store(settings);
+  applySettings(settings);
 }
 
 function applySettings(settings: Settings) {
-  activitiesService.applySettings(settings);
+  eventStore.fileName = `${settings.dataDir}/activity-log.csv`;
+  holidayRepository.fileName = `${settings.dataDir}/holidays.csv`;
+  vacationRepository.fileName = `${settings.dataDir}/vacation.csv`;
+  timesheetQueryHandler.capacity = settings.capacity;
 }
 
 async function installDevTools() {
@@ -156,7 +203,7 @@ function createRendererToMainChannels() {
     LOG_ACTIVITY_CHANNEL,
     async (_event, commandDto: LogActivityCommandDto) => {
       const command = LogActivityCommandDto.create(commandDto).validate();
-      const status = await activitiesService.logActivity(command);
+      const status = await logActivityCommandHandler.handle(command);
       return CommandStatusDto.fromModel(status);
     },
   );
@@ -176,7 +223,7 @@ function createRendererToMainChannels() {
         ...commandDto,
         fileName,
       }).validate();
-      const status = await activitiesService.exportTimesheet(command);
+      const status = await exportTimesheetCommandHandler.handle(command);
       return CommandStatusDto.fromModel(status);
     },
   );
@@ -184,7 +231,7 @@ function createRendererToMainChannels() {
     QUERY_RECENT_ACTIVITIES_CHANNEL,
     async (_event, queryDto: RecentActivitiesQueryDto) => {
       const query = RecentActivitiesQueryDto.create(queryDto).validate();
-      const result = await activitiesService.queryRecentActivities(query);
+      const result = await recentActivitiesQueryHandler.handle(query);
       return RecentActivitiesQueryResultDto.fromModel(result);
     },
   );
@@ -192,7 +239,7 @@ function createRendererToMainChannels() {
     QUERY_REPORT_CHANNEL,
     async (_event, queryDto: ReportQueryDto) => {
       const query = ReportQueryDto.create(queryDto).validate();
-      const result = await activitiesService.queryReport(query);
+      const result = await reportQueryHandler.handle(query);
       return ReportQueryResultDto.fromModel(result);
     },
   );
@@ -200,7 +247,7 @@ function createRendererToMainChannels() {
     QUERY_STATISTICS_CHANNEL,
     async (_event, queryDto: StatisticsQueryDto) => {
       const query = StatisticsQueryDto.create(queryDto).validate();
-      const result = await activitiesService.queryStatistics(query);
+      const result = await statisticsQueryHandler.handle(query);
       return StatisticsQueryResultDto.fromModel(result);
     },
   );
@@ -208,7 +255,7 @@ function createRendererToMainChannels() {
     QUERY_TIMESHEET_CHANNEL,
     async (_event, queryDto: TimesheetQueryDto) => {
       const query = TimesheetQueryDto.create(queryDto).validate();
-      const result = await activitiesService.queryTimesheet(query);
+      const result = await timesheetQueryHandler.handle(query);
       return TimesheetQueryResultDto.fromModel(result);
     },
   );
@@ -216,7 +263,7 @@ function createRendererToMainChannels() {
     QUERY_ESTIMATE_CHANNEL,
     async (_event, queryDto: EstimateQueryDto) => {
       const query = EstimateQueryDto.create(queryDto).validate();
-      const result = await activitiesService.queryEstimate(query);
+      const result = await estimateQueryHandler.handle(query);
       return EstimateQueryResultDto.fromModel(result);
     },
   );
@@ -224,20 +271,20 @@ function createRendererToMainChannels() {
     QUERY_BURN_UP_CHANNEL,
     async (_event, queryDto: BurnUpQueryDto) => {
       const query = BurnUpQueryDto.create(queryDto).validate();
-      const result = await activitiesService.queryBurnUp(query);
+      const result = await burnUpQueryHandler.handle(query);
       return BurnUpQueryResultDto.fromModel(result);
     },
   );
   ipcMain.handle(LOAD_SETTINGS_CHANNEL, async (_event) => {
-    const settings = await settingsService.loadSettings();
+    const settings = await settingsProvider.load();
     return SettingsDto.fromModel(settings!);
   });
   ipcMain.handle(
     STORE_SETTINGS_CHANNEL,
     async (_event, settings: SettingsDto) => {
       const model = SettingsDto.create(settings).validate();
-      await settingsService.storeSettings(model);
-      activitiesService.applySettings(model);
+      await settingsProvider.store(model);
+      applySettings(model);
     },
   );
   ipcMain.handle(
@@ -254,11 +301,14 @@ function createWindow() {
     height: 900,
   });
 
-  settingsService.addEventListener(SettingsChangedEvent.TYPE, () =>
-    mainWindow.webContents.reload(),
-  );
+  const onDataDirectoryChanged = async (dataDir: string) => {
+    settings = { ...settings, dataDir };
+    await settingsProvider.store(settings);
+    applySettings(settings);
+    mainWindow.webContents.reload();
+  };
 
-  const menu = createMenu({ timerService, settingsService });
+  const menu = createMenu({ timerService, onDataDirectoryChanged });
   Menu.setApplicationMenu(menu);
 
   createMainToLogWindowChannels(mainWindow);

@@ -36,11 +36,12 @@ export class TimesheetQueryHandler {
     );
   }
 
+  capacity: Temporal.Duration;
+
   readonly #eventStore: EventStore;
   readonly #holidayRepository: HolidayRepository;
   readonly #vacationRepository: VacationRepository;
   readonly #clock: Clock;
-  #capacity: Temporal.Duration;
 
   private constructor(
     capacity: Temporal.Duration,
@@ -53,11 +54,7 @@ export class TimesheetQueryHandler {
     this.#holidayRepository = holidayRepository;
     this.#vacationRepository = vacationRepository;
     this.#clock = clock;
-    this.#capacity = capacity;
-  }
-
-  applySettings({ capacity }: { capacity: Temporal.Duration }) {
-    this.#capacity = capacity;
+    this.capacity = capacity;
   }
 
   async handle(query: TimesheetQuery): Promise<TimesheetQueryResult> {
@@ -83,7 +80,7 @@ export class TimesheetQueryHandler {
       {
         holidays,
         vacations,
-        capacity: this.#capacity,
+        capacity: this.capacity,
       },
     );
   }

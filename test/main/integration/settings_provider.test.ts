@@ -7,7 +7,7 @@ import { describe, expect, it } from "vitest";
 
 import { Settings } from "../../../src/shared/domain/settings";
 import { SettingsDto } from "../../../src/shared/infrastructure/settings";
-import { SettingsGateway } from "../../../src/main/infrastructure/settings_gateway";
+import { SettingsProvider } from "../../../src/main/infrastructure/settings_provider";
 
 const NON_EXISTING_FILE = path.resolve(
   import.meta.dirname,
@@ -34,18 +34,18 @@ const TEST_FILE = path.resolve(
   "../../../testdata/test-settings.csv",
 );
 
-describe("Settings gateway", () => {
+describe("Settings provider", () => {
   describe("Load", () => {
-    it("should return nothing when file does not exist", async () => {
-      const gateway = SettingsGateway.create({ fileName: NON_EXISTING_FILE });
+    it("should return default settings when file does not exist", async () => {
+      const gateway = SettingsProvider.create({ fileName: NON_EXISTING_FILE });
 
       const settings = await gateway.load();
 
-      expect(settings).toBeUndefined();
+      expect(settings).toEqual(Settings.createDefault());
     });
 
     it("should return full minimal file", async () => {
-      const gateway = SettingsGateway.create({ fileName: MINIMAL_FILE });
+      const gateway = SettingsProvider.create({ fileName: MINIMAL_FILE });
 
       const settings = await gateway.load();
 
@@ -58,7 +58,7 @@ describe("Settings gateway", () => {
     });
 
     it("should return full example file", async () => {
-      const gateway = SettingsGateway.create({ fileName: FULL_FILE });
+      const gateway = SettingsProvider.create({ fileName: FULL_FILE });
 
       const settings = await gateway.load();
 
@@ -72,7 +72,7 @@ describe("Settings gateway", () => {
     });
 
     it("should throw an error when the file is corrupted", async () => {
-      const gateway = SettingsGateway.create({ fileName: CORRUPT_FILE });
+      const gateway = SettingsProvider.create({ fileName: CORRUPT_FILE });
 
       const result = gateway.load();
 
@@ -82,7 +82,7 @@ describe("Settings gateway", () => {
 
   describe("Store", () => {
     it("should store settings", async () => {
-      const gateway = SettingsGateway.create({ fileName: TEST_FILE });
+      const gateway = SettingsProvider.create({ fileName: TEST_FILE });
       const example = Settings.create({
         dataDir: "test-data-dir",
         capacity: Temporal.Duration.from("PT35H"),
@@ -97,18 +97,18 @@ describe("Settings gateway", () => {
 
   describe("Nullable", () => {
     describe("Load", () => {
-      it("should return nothing when configurable response is null", async () => {
-        const gateway = SettingsGateway.createNull({
+      it("should return default settings when configurable response is null", async () => {
+        const gateway = SettingsProvider.createNull({
           readFileResponses: [null],
         });
 
         const settings = await gateway.load();
 
-        expect(settings).toBeUndefined();
+        expect(settings).toEqual(Settings.createDefault());
       });
 
       it("should return configurable responses", async () => {
-        const gateway = SettingsGateway.createNull({
+        const gateway = SettingsProvider.createNull({
           readFileResponses: [
             SettingsDto.create({
               dataDir: "data-dir",
@@ -130,7 +130,7 @@ describe("Settings gateway", () => {
       });
 
       it("should throw an error when configurable response is an error", async () => {
-        const gateway = SettingsGateway.createNull({
+        const gateway = SettingsProvider.createNull({
           readFileResponses: [new Error("Test error")],
         });
 
@@ -142,7 +142,7 @@ describe("Settings gateway", () => {
 
     describe("Store", () => {
       it("should store settings", async () => {
-        const gateway = SettingsGateway.createNull();
+        const gateway = SettingsProvider.createNull();
         const storedSettings = gateway.trackStored();
 
         await gateway.store(

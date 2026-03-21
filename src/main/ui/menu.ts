@@ -2,7 +2,6 @@
 
 import { app, Menu, type MenuItemConstructorOptions } from "electron/main";
 
-import type { SettingsService } from "../application/settings_service";
 import type { TimerService } from "../application/timer_service";
 import { StartTimerCommand } from "../../shared/domain/start_timer_command";
 import { StopTimerCommand } from "../../shared/domain/stop_timer_command";
@@ -12,10 +11,10 @@ const isMac = process.platform === "darwin";
 
 export function createMenu({
   timerService,
-  settingsService,
+  onDataDirectoryChanged,
 }: {
   timerService: TimerService;
-  settingsService: SettingsService;
+  onDataDirectoryChanged: (directory: string) => void;
 }): Menu {
   const template: MenuItemConstructorOptions[] = [
     // { role: 'appMenu' }
@@ -55,7 +54,12 @@ export function createMenu({
         {
           label: "Open...",
           accelerator: "CmdOrCtrl+O",
-          click: () => chooseDataDirectory(settingsService),
+          click: async () => {
+            const directory = await chooseDataDirectory();
+            if (directory != null) {
+              onDataDirectoryChanged(directory);
+            }
+          },
         },
         ...((isMac
           ? []
