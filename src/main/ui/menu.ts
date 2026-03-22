@@ -2,7 +2,6 @@
 
 import { app, Menu, type MenuItemConstructorOptions } from "electron/main";
 
-import type { TimerService } from "../application/timer_service";
 import { StartTimerCommand } from "../../shared/domain/start_timer_command";
 import { StopTimerCommand } from "../../shared/domain/stop_timer_command";
 import { chooseDataDirectory, openWindow } from "./actions";
@@ -10,10 +9,12 @@ import { chooseDataDirectory, openWindow } from "./actions";
 const isMac = process.platform === "darwin";
 
 export function createMenu({
-  timerService,
+  onStartTimer,
+  onStopTimer,
   onDataDirectoryChanged,
 }: {
-  timerService: TimerService;
+  onStartTimer: (command: StartTimerCommand) => void;
+  onStopTimer: (command: StopTimerCommand) => void;
   onDataDirectoryChanged: (directory: string) => void;
 }): Menu {
   const template: MenuItemConstructorOptions[] = [
@@ -118,57 +119,43 @@ export function createMenu({
             {
               label: "5 min",
               click: () =>
-                timerService.startTimer(
-                  StartTimerCommand.create({ interval: "PT5M" }),
-                ),
+                onStartTimer(StartTimerCommand.create({ interval: "PT5M" })),
             },
             {
               label: "10 min",
               click: () =>
-                timerService.startTimer(
-                  StartTimerCommand.create({ interval: "PT10M" }),
-                ),
+                onStartTimer(StartTimerCommand.create({ interval: "PT10M" })),
             },
             {
               label: "15 min",
               click: () =>
-                timerService.startTimer(
-                  StartTimerCommand.create({ interval: "PT15M" }),
-                ),
+                onStartTimer(StartTimerCommand.create({ interval: "PT15M" })),
             },
             {
               label: "20 min",
               click: () =>
-                timerService.startTimer(
-                  StartTimerCommand.create({ interval: "PT20M" }),
-                ),
+                onStartTimer(StartTimerCommand.create({ interval: "PT20M" })),
             },
             {
               label: "30 min",
               click: () =>
-                timerService.startTimer(
-                  StartTimerCommand.create({ interval: "PT30M" }),
-                ),
+                onStartTimer(StartTimerCommand.create({ interval: "PT30M" })),
             },
             {
               label: "60 min",
               click: () =>
-                timerService.startTimer(
-                  StartTimerCommand.create({ interval: "PT1H" }),
-                ),
+                onStartTimer(StartTimerCommand.create({ interval: "PT1H" })),
             },
             {
               label: "1 min",
               click: () =>
-                timerService.startTimer(
-                  StartTimerCommand.create({ interval: "PT1M" }),
-                ),
+                onStartTimer(StartTimerCommand.create({ interval: "PT1M" })),
             },
           ],
         },
         {
           label: "Stop",
-          click: () => timerService.stopTimer(StopTimerCommand.create()),
+          click: () => onStopTimer(StopTimerCommand.create()),
         },
       ],
     },

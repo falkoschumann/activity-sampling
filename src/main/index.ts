@@ -7,6 +7,8 @@ import {
   REACT_DEVELOPER_TOOLS,
 } from "electron-devtools-installer";
 
+import { StartTimerCommandHandler } from "./application/start_timer_command_handler";
+import { StopTimerCommandHandler } from "./application/stop_timer_command_handler";
 import { LogActivityCommandHandler } from "./application/log_activity_command_handler";
 import { ExportTimesheetCommandHandler } from "./application/export_timesheet_command_handler";
 import { RecentActivitiesQueryHandler } from "./application/recent_activities_query_handler";
@@ -16,8 +18,8 @@ import { StatisticsQueryHandler } from "./application/statistics_query_handler";
 import { EstimateQueryHandler } from "./application/estimate_query_handler";
 import { BurnUpQueryHandler } from "./application/burn_up_query_handler";
 import { TimesheetQueryHandler } from "./application/timesheet_query_handler";
-import { TimerService } from "./application/timer_service";
 import { Settings } from "../shared/domain/settings";
+import { TimerState } from "./domain/timer_state";
 import { IntervalElapsedEvent } from "../shared/domain/interval_elapsed_event";
 import { TimerStartedEvent } from "../shared/domain/timer_started_event";
 import { TimerStoppedEvent } from "../shared/domain/timer_stopped_event";
@@ -75,6 +77,8 @@ import {
 import { chooseDataDirectory, openWindow } from "./ui/actions";
 import { createMenu } from "./ui/menu";
 import { SettingsProvider } from "./infrastructure/settings_provider";
+import type { StartTimerCommand } from "../shared/domain/start_timer_command";
+import type { StopTimerCommand } from "../shared/domain/stop_timer_command";
 
 let settings = Settings.createDefault();
 const settingsProvider = SettingsProvider.create();
@@ -84,6 +88,15 @@ const vacationRepository = VacationRepository.create();
 const timesheetExporter = TimesheetExporter.create();
 const clock = Clock.systemDefaultZone();
 
+const timerState = TimerState.create();
+const startTimerCommandHandler = StartTimerCommandHandler.create({
+  timerState,
+  clock,
+});
+const stopTimerCommandHandler = StopTimerCommandHandler.create({
+  timerState,
+  clock,
+});
 const logActivityCommandHandler = LogActivityCommandHandler.create({
   eventStore,
 });
@@ -114,8 +127,6 @@ const timesheetQueryHandler = TimesheetQueryHandler.create({
 const exportTimesheetCommandHandler = ExportTimesheetCommandHandler.create({
   timesheetExporter,
 });
-
-const timerService = TimerService.create();
 
 const isProduction = app.isPackaged;
 
@@ -301,6 +312,12 @@ function createWindow() {
     height: 900,
   });
 
+  const onStartTimer = (command: StartTimerCommand) =>
+    startTimerCommandHandler.handle(command);
+
+  const onStopTimer = (command: StopTimerCommand) =>
+    stopTimerCommandHandler.handle(command);
+
   const onDataDirectoryChanged = async (dataDir: string) => {
     settings = { ...settings, dataDir };
     await settingsProvider.store(settings);
@@ -308,29 +325,35 @@ function createWindow() {
     mainWindow.webContents.reload();
   };
 
-  const menu = createMenu({ timerService, onDataDirectoryChanged });
+  const menu = createMenu({
+    onStartTimer,
+    onStopTimer,
+    onDataDirectoryChanged,
+  });
   Menu.setApplicationMenu(menu);
 
   createMainToLogWindowChannels(mainWindow);
 }
 
 function createMainToLogWindowChannels(window: BrowserWindow) {
-  timerService.addEventListener(TimerStartedEvent.TYPE, (event) =>
+  startTimerCommandHandler.addEventListener(TimerStartedEvent.TYPE, (event) =>
     window.webContents.send(
       TIMER_STARTED_CHANNEL,
       TimerStartedEventDto.fromModel(event as TimerStartedEvent),
     ),
   );
-  timerService.addEventListener(TimerStoppedEvent.TYPE, (event) =>
+  stopTimerCommandHandler.addEventListener(TimerStoppedEvent.TYPE, (event) =>
     window.webContents.send(
       TIMER_STOPPED_CHANNEL,
       TimerStoppedEventDto.fromModel(event as TimerStoppedEvent),
     ),
   );
-  timerService.addEventListener(IntervalElapsedEvent.TYPE, (event) =>
-    window.webContents.send(
-      INTERVAL_ELAPSED_CHANNEL,
-      IntervalElapsedEventDto.fromModel(event as IntervalElapsedEvent),
-    ),
+  startTimerCommandHandler.addEventListener(
+    IntervalElapsedEvent.TYPE,
+    (event) =>
+      window.webContents.send(
+        INTERVAL_ELAPSED_CHANNEL,
+        IntervalElapsedEventDto.fromModel(event as IntervalElapsedEvent),
+      ),
   );
 }
