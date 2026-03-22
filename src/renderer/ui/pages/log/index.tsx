@@ -1,6 +1,6 @@
 // Copyright (c) 2026 Falko Schumann. All rights reserved. MIT license.
 
-import { useLog } from "../../../application/activities_service";
+import { useLog } from "../../../application/log_hook";
 import { useCurrentInterval } from "../../../application/timer_service";
 import ScrollToTopButton from "../../components/scroll_to_top_button";
 import ActivityFormComponent from "./activity_form";

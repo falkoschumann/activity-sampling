@@ -2,12 +2,12 @@
 
 import { useReducer } from "react";
 
-import { useTimesheet } from "../../../application/activities_service";
+import { useTimesheet } from "../../../application/timesheet_hook";
+import { ExportTimesheetCommand } from "../../../../shared/domain/export_timesheet_command";
 import { changePeriod, goToNextPeriod, goToPreviousPeriod, init, PeriodUnit, reducer } from "../../../domain/period";
 import { PeriodComponent } from "../../components/period_component";
 import CapacityComponent from "./capacity";
 import TimesheetComponent from "./timesheet";
-import { ExportTimesheetCommand } from "../../../../shared/domain/export_timesheet_command";
 
 export default function TimesheetPage() {
   const [state, dispatch] = useReducer(reducer, { unit: PeriodUnit.WEEK }, init);

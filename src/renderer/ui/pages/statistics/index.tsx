@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-import { useStatistics } from "../../../application/activities_service";
+import { useStatistics } from "../../../application/statistics_hook";
 import { type StatisticsQuery, StatisticsScope } from "../../../../shared/domain/statistics_query";
 import CategoryComponent from "../../components/category";
 import TotalCountComponent from "../../components/total_count_component";

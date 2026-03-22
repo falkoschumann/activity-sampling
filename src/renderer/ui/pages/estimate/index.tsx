@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-import { useEstimate } from "../../../application/activities_service";
+import { useEstimate } from "../../../application/estimate_hook";
 import { EstimateQuery } from "../../../../shared/domain/estimate_query";
 import CategoryComponent from "../../components/category";
 import TotalCountComponent from "../../components/total_count_component";

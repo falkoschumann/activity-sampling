@@ -1,0 +1,37 @@
+// Copyright (c) 2026 Falko Schumann. All rights reserved. MIT license.
+
+import { Temporal } from "@js-temporal/polyfill";
+import { useEffect, useState } from "react";
+
+import {
+  type ReportQuery,
+  ReportQueryResult,
+} from "../../shared/domain/report_query";
+import {
+  ReportQueryDto,
+  ReportQueryResultDto,
+} from "../../shared/infrastructure/report_query_dto";
+
+export function useReport(query: ReportQuery) {
+  const [result, setResult] = useState(ReportQueryResult.empty());
+
+  useEffect(() => {
+    (async function () {
+      const result = await queryReport({
+        scope: query.scope,
+        from: query.from ? Temporal.PlainDate.from(query.from) : undefined,
+        to: query.to ? Temporal.PlainDate.from(query.to) : undefined,
+      });
+      setResult(result);
+    })();
+  }, [query.scope, query.from, query.to]);
+
+  return result;
+}
+
+async function queryReport(query: ReportQuery) {
+  const resultDto = await window.activitySampling.queryReport(
+    ReportQueryDto.fromModel(query),
+  );
+  return ReportQueryResultDto.create(resultDto).validate();
+}

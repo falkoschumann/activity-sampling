@@ -11,52 +11,18 @@ import {
   initialState,
   reducer,
 } from "../domain/log";
-import type { ExportTimesheetCommand } from "../../shared/domain/export_timesheet_command";
-import {
-  type EstimateQuery,
-  EstimateQueryResult,
-} from "../../shared/domain/estimate_query";
 import { LogActivityCommand } from "../../shared/domain/log_activity_command";
 import {
   RecentActivitiesQuery,
   RecentActivitiesQueryResult,
 } from "../../shared/domain/recent_activities_query";
-import {
-  ReportQuery,
-  ReportQueryResult,
-} from "../../shared/domain/report_query";
-import {
-  StatisticsQuery,
-  StatisticsQueryResult,
-} from "../../shared/domain/statistics_query";
-import {
-  TimesheetQuery,
-  TimesheetQueryResult,
-} from "../../shared/domain/timesheet_query";
 import { CommandStatusDto } from "../../shared/infrastructure/command_status_dto";
-import {
-  EstimateQueryDto,
-  EstimateQueryResultDto,
-} from "../../shared/infrastructure/estimate_query_dto";
-import { ExportTimesheetCommandDto } from "../../shared/infrastructure/export_timesheet_command_dto";
 import { LogActivityCommandDto } from "../../shared/infrastructure/log_activity_command_dto";
 import {
   RecentActivitiesQueryDto,
   RecentActivitiesQueryResultDto,
 } from "../../shared/infrastructure/recent_activities_query_dto";
-import {
-  ReportQueryDto,
-  ReportQueryResultDto,
-} from "../../shared/infrastructure/report_query_dto";
-import {
-  StatisticsQueryDto,
-  StatisticsQueryResultDto,
-} from "../../shared/infrastructure/statistics_query_dto";
 import { SettingsDto } from "../../shared/infrastructure/settings";
-import {
-  TimesheetQueryDto,
-  TimesheetQueryResultDto,
-} from "../../shared/infrastructure/timesheet_query_dto";
 import {
   NotificationClickedEvent,
   NotificationGateway,
@@ -192,101 +158,4 @@ async function queryRecentActivities(query: RecentActivitiesQuery) {
     NotificationGateway.getInstance().setCurrentActivity(activity);
   }
   return result;
-}
-
-export function useReport(query: ReportQuery) {
-  const [result, setResult] = useState(ReportQueryResult.empty());
-
-  useEffect(() => {
-    (async function () {
-      const result = await queryReport({
-        scope: query.scope,
-        from: query.from ? Temporal.PlainDate.from(query.from) : undefined,
-        to: query.to ? Temporal.PlainDate.from(query.to) : undefined,
-      });
-      setResult(result);
-    })();
-  }, [query.scope, query.from, query.to]);
-
-  return result;
-}
-
-async function queryReport(query: ReportQuery) {
-  const resultDto = await window.activitySampling.queryReport(
-    ReportQueryDto.fromModel(query),
-  );
-  return ReportQueryResultDto.create(resultDto).validate();
-}
-
-export function useStatistics(query: StatisticsQuery) {
-  const [result, setResult] = useState(StatisticsQueryResult.empty());
-
-  useEffect(() => {
-    (async function () {
-      const result = await queryStatistics(query);
-      setResult(result);
-    })();
-  }, [query]);
-
-  return result;
-}
-
-async function queryStatistics(query: StatisticsQuery) {
-  const resultDto = await window.activitySampling.queryStatistics(
-    StatisticsQueryDto.fromModel(query),
-  );
-  return StatisticsQueryResultDto.create(resultDto).validate();
-}
-
-export function useTimesheet(query: TimesheetQuery) {
-  const [result, setResult] = useState(TimesheetQueryResult.empty());
-
-  useEffect(() => {
-    (async function () {
-      const result = await queryTimesheet({
-        from: Temporal.PlainDate.from(query.from),
-        to: Temporal.PlainDate.from(query.to),
-      });
-      setResult(result);
-    })();
-  }, [query.from, query.to]);
-
-  return {
-    timesheet: result,
-    exportTimesheet,
-  };
-}
-
-async function queryTimesheet(query: TimesheetQuery) {
-  const resultDto = await window.activitySampling.queryTimesheet(
-    TimesheetQueryDto.fromModel(query),
-  );
-  return TimesheetQueryResultDto.create(resultDto).validate();
-}
-
-async function exportTimesheet(command: ExportTimesheetCommand) {
-  const statusDto = await window.activitySampling.exportTimesheet(
-    ExportTimesheetCommandDto.fromModel(command),
-  );
-  return CommandStatusDto.create(statusDto).validate();
-}
-
-export function useEstimate(query: EstimateQuery): EstimateQueryResult {
-  const [result, setResult] = useState(EstimateQueryResult.empty());
-
-  useEffect(() => {
-    (async function () {
-      const result = await queryEstimate(query);
-      setResult(result);
-    })();
-  }, [query]);
-
-  return result;
-}
-
-async function queryEstimate(query: EstimateQuery) {
-  const resultDto = await window.activitySampling.queryEstimate(
-    EstimateQueryDto.fromModel(query),
-  );
-  return EstimateQueryResultDto.create(resultDto).validate();
 }
