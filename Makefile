@@ -65,7 +65,7 @@ build: prepare
 
 prepare: version
 ifdef CI
-ifeq ($(findstring $(DEPENDENCY_UPDATER), $(GITLAB_USER_LOGIN)), $(DEPENDENCY_UPDATER))
+ifeq ($(findstring $(DEPENDENCY_UPDATER), $(GITHUB_ACTOR)), $(DEPENDENCY_UPDATER))
 	@echo "dependency updater detected, run $(PM) install"
 	$(PM) install $(PM_OPTIONS)
 else
