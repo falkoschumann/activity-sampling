@@ -7,7 +7,7 @@
       "devDependencies": {
         "@eslint/js": "9.39.3",
         "@js-temporal/polyfill": "0.5.1",
-        "@muspellheim/shared": "0.19.1",
+        "@muspellheim/shared": "0.20.0",
         "@softarc/sheriff-core": "0.19.6",
         "@types/node": "24.11.0",
         "@types/react": "19.2.14",
@@ -229,7 +229,7 @@
 
     "@malept/flatpak-bundler": ["@malept/flatpak-bundler@0.4.0", "", { "dependencies": { "debug": "^4.1.1", "fs-extra": "^9.0.0", "lodash": "^4.17.15", "tmp-promise": "^3.0.2" } }, ""],
 
-    "@muspellheim/shared": ["@muspellheim/shared@0.19.1", "", {}, "sha512-6GvE1I40mtZGsuJAMFpkxT7+8Hr/fWyrcqtpZqzkMCdd8f5CcjMVU6UiHfg65Exn+kz+il1yfdPZ7C1Yk6JDgA=="],
+    "@muspellheim/shared": ["@muspellheim/shared@0.20.0", "", {}, "sha512-Bk1XX+OoyQg/ESDv2DCg4LwF0m23dET6+iWECwr/LsPf5LZK2e+0Wlx1Knisu8k6kT60YnNZ7a4U4VcGDhbmUQ=="],
 
     "@nodelib/fs.scandir": ["@nodelib/fs.scandir@2.1.5", "", { "dependencies": { "@nodelib/fs.stat": "2.0.5", "run-parallel": "^1.1.9" } }, "sha512-vq24Bq3ym5HEQm2NKCr3yXDwjc7vTsEThRDnkp2DK9p1uqLR+DHurm/NOTo0KG7HYHU7eppKZj3MyqYuMBf62g=="],
 
