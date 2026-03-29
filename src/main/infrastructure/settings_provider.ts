@@ -52,7 +52,7 @@ export class SettingsProvider extends EventTarget {
     } catch (error) {
       if ((error as NodeJS.ErrnoException).code === "ENOENT") {
         // No settings stored yet
-        return Settings.createDefault();
+        return Settings.create();
       }
 
       throw error;

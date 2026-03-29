@@ -31,7 +31,7 @@ import {
 export function useLog() {
   const [state, dispatch] = useReducer(reducer, initialState);
   const [recentActivities, setRecentActivities] = useState(
-    RecentActivitiesQueryResult.empty(),
+    RecentActivitiesQueryResult.create(),
   );
   const [categories, setCategories] = useState<string[]>([]);
 

@@ -4,19 +4,27 @@ import { Temporal } from "@js-temporal/polyfill";
 
 export class Settings {
   static create({
-    dataDir,
+    dataDir = "data",
     capacity = "PT40H",
     categories = ["", "Feature", "Rework"],
   }: {
-    dataDir: string;
+    dataDir?: string;
     capacity?: Temporal.DurationLike | string;
     categories?: string[];
-  }): Settings {
+  } = {}): Settings {
     return new Settings(dataDir, capacity, categories);
   }
 
-  static createDefault(): Settings {
-    return Settings.create({ dataDir: "data" });
+  static createTestInstance({
+    dataDir = "test-data",
+    capacity = "PT32H",
+    categories = ["", "Feature", "Rework", "Training"],
+  }: {
+    dataDir?: string;
+    capacity?: Temporal.DurationLike | string;
+    categories?: string[];
+  } = {}): Settings {
+    return new Settings(dataDir, capacity, categories);
   }
 
   readonly dataDir: string;

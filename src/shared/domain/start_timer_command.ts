@@ -11,6 +11,14 @@ export class StartTimerCommand {
     return new StartTimerCommand(interval);
   }
 
+  static createTestInstance({
+    interval = "PT30M",
+  }: {
+    interval?: Temporal.DurationLike | string;
+  } = {}) {
+    return StartTimerCommand.create({ interval });
+  }
+
   readonly interval: Temporal.Duration;
 
   private constructor(interval: Temporal.DurationLike | string) {

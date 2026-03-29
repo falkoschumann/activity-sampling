@@ -12,7 +12,7 @@ import {
 } from "../../shared/infrastructure/statistics_query_dto";
 
 export function useStatistics(query: StatisticsQuery) {
-  const [result, setResult] = useState(StatisticsQueryResult.empty());
+  const [result, setResult] = useState(StatisticsQueryResult.create());
 
   useEffect(() => {
     (async function () {

@@ -5,7 +5,6 @@ import {
   StatisticsQuery,
   StatisticsQueryResult,
   StatisticsScope,
-  type StatisticsScopeType,
 } from "../../shared/domain/statistics_query";
 import {
   ActivitiesProjection,
@@ -77,7 +76,7 @@ async function createCycleTimesStatistics(activities: Activity[]) {
 function createHistogram(
   xAxisLabel: string,
   days: number[],
-  scope: StatisticsScopeType,
+  scope: StatisticsScope,
 ) {
   const maxDay = days.at(-1) ?? 0;
   const binEdges: number[] = [];

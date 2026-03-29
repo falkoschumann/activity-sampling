@@ -12,7 +12,7 @@ import {
 } from "../../shared/infrastructure/estimate_query_dto";
 
 export function useEstimate(query: EstimateQuery): EstimateQueryResult {
-  const [result, setResult] = useState(EstimateQueryResult.empty());
+  const [result, setResult] = useState(EstimateQueryResult.create());
 
   useEffect(() => {
     (async function () {

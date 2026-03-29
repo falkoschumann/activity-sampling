@@ -13,6 +13,16 @@ export class EstimateQuery {
     return new EstimateQuery(categories, timeZone);
   }
 
+  static createTestInstance({
+    categories = ["Feature"],
+    timeZone = "Europe/Berlin",
+  }: {
+    categories?: string[];
+    timeZone?: Temporal.TimeZoneLike;
+  } = {}) {
+    return new EstimateQuery(categories, timeZone);
+  }
+
   readonly categories?: string[];
   readonly timeZone?: Temporal.TimeZoneLike;
 
@@ -24,27 +34,27 @@ export class EstimateQuery {
 
 export class EstimateQueryResult {
   static create({
-    cycleTimes,
-    categories,
-    totalCount,
+    cycleTimes = [],
+    categories = [],
+    totalCount = 0,
   }: {
-    cycleTimes: EstimateEntry[];
-    categories: string[];
-    totalCount: number;
-  }) {
-    return new EstimateQueryResult(
-      cycleTimes.map((entry) => EstimateEntry.create(entry)),
-      categories,
-      totalCount,
-    );
+    cycleTimes?: EstimateEntry[];
+    categories?: string[];
+    totalCount?: number;
+  } = {}) {
+    return new EstimateQueryResult(cycleTimes, categories, totalCount);
   }
 
-  static empty() {
-    return EstimateQueryResult.create({
-      cycleTimes: [],
-      categories: [],
-      totalCount: 0,
-    });
+  static createTestInstance({
+    cycleTimes = [EstimateEntry.createTestInstance()],
+    categories = ["Feature"],
+    totalCount = 1,
+  }: {
+    cycleTimes?: EstimateEntry[];
+    categories?: string[];
+    totalCount?: number;
+  } = {}) {
+    return EstimateQueryResult.create({ cycleTimes, categories, totalCount });
   }
 
   readonly cycleTimes: EstimateEntry[];
@@ -56,7 +66,7 @@ export class EstimateQueryResult {
     categories: string[],
     totalCount: number,
   ) {
-    this.cycleTimes = cycleTimes;
+    this.cycleTimes = cycleTimes.map((entry) => EstimateEntry.create(entry));
     this.categories = categories;
     this.totalCount = totalCount;
   }
@@ -80,6 +90,25 @@ export class EstimateEntry {
       probability,
       cumulativeProbability,
     );
+  }
+
+  static createTestInstance({
+    cycleTime = 1,
+    frequency = 1,
+    probability = 1.0,
+    cumulativeProbability = 1.0,
+  }: {
+    cycleTime?: number;
+    frequency?: number;
+    probability?: number;
+    cumulativeProbability?: number;
+  } = {}): EstimateEntry {
+    return EstimateEntry.create({
+      cycleTime,
+      frequency,
+      probability,
+      cumulativeProbability,
+    });
   }
 
   readonly cycleTime: number;

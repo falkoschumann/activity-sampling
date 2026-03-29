@@ -17,6 +17,16 @@ export class RecentActivitiesQuery {
     return new RecentActivitiesQuery(today, timeZone);
   }
 
+  static createTestInstance({
+    today = "2026-03-29T11:56",
+    timeZone = "Europe/Berlin",
+  }: {
+    today?: Temporal.PlainDateLike | string;
+    timeZone?: Temporal.TimeZoneLike;
+  } = {}): RecentActivitiesQuery {
+    return RecentActivitiesQuery.create({ today, timeZone });
+  }
+
   readonly today?: Temporal.PlainDate;
   readonly timeZone?: Temporal.TimeZoneLike;
 
@@ -31,34 +41,33 @@ export class RecentActivitiesQuery {
 
 export class RecentActivitiesQueryResult {
   static create({
-    workingDays,
-    timeSummary,
+    workingDays = [],
+    timeSummary = TimeSummary.create(),
   }: {
-    workingDays: WorkingDay[];
-    timeSummary: TimeSummary;
-  }): RecentActivitiesQueryResult {
+    workingDays?: WorkingDay[];
+    timeSummary?: TimeSummary;
+  } = {}): RecentActivitiesQueryResult {
     return new RecentActivitiesQueryResult(workingDays, timeSummary);
   }
 
-  static empty(): RecentActivitiesQueryResult {
-    // TODO replace xxxResult.empty() with xxxResult.create() pattern throughout the codebase
-    return RecentActivitiesQueryResult.create({
-      workingDays: [],
-      timeSummary: {
-        hoursToday: Temporal.Duration.from("PT0S"),
-        hoursYesterday: Temporal.Duration.from("PT0S"),
-        hoursThisWeek: Temporal.Duration.from("PT0S"),
-        hoursThisMonth: Temporal.Duration.from("PT0S"),
-      },
-    });
+  static createTestInstance({
+    workingDays = [WorkingDay.createTestInstance()],
+    timeSummary = TimeSummary.createTestInstance(),
+  }: {
+    workingDays?: WorkingDay[];
+    timeSummary?: TimeSummary;
+  } = {}): RecentActivitiesQueryResult {
+    return RecentActivitiesQueryResult.create({ workingDays, timeSummary });
   }
 
   readonly workingDays: WorkingDay[];
   readonly timeSummary: TimeSummary;
 
   private constructor(workingDays: WorkingDay[], timeSummary: TimeSummary) {
-    this.workingDays = workingDays;
-    this.timeSummary = timeSummary;
+    this.workingDays = workingDays.map((workingDay) =>
+      WorkingDay.create(workingDay),
+    );
+    this.timeSummary = TimeSummary.create(timeSummary);
   }
 }
 
@@ -73,6 +82,16 @@ export class WorkingDay {
     return new WorkingDay(date, activities);
   }
 
+  static createTestInstance({
+    date = "2026-03-29T13:07",
+    activities = [ActivityLoggedEvent.createTestInstance()],
+  }: {
+    date?: Temporal.PlainDateLike | string;
+    activities?: ActivityLoggedEvent[];
+  } = {}): WorkingDay {
+    return new WorkingDay(date, activities);
+  }
+
   readonly date: Temporal.PlainDate;
   readonly activities: ActivityLoggedEvent[];
 
@@ -81,28 +100,49 @@ export class WorkingDay {
     activities: ActivityLoggedEvent[],
   ) {
     this.date = Temporal.PlainDate.from(date);
-    this.activities = activities;
+    this.activities = activities.map((activity) =>
+      ActivityLoggedEvent.create(activity),
+    );
   }
 }
 
 export class TimeSummary {
   static create({
-    hoursToday,
-    hoursYesterday,
-    hoursThisWeek,
-    hoursThisMonth,
+    hoursToday = "PT0S",
+    hoursYesterday = "PT0S",
+    hoursThisWeek = "PT0S",
+    hoursThisMonth = "PT0S",
   }: {
-    hoursToday: Temporal.DurationLike | string;
-    hoursYesterday: Temporal.DurationLike | string;
-    hoursThisWeek: Temporal.DurationLike | string;
-    hoursThisMonth: Temporal.DurationLike | string;
-  }): TimeSummary {
+    hoursToday?: Temporal.DurationLike | string;
+    hoursYesterday?: Temporal.DurationLike | string;
+    hoursThisWeek?: Temporal.DurationLike | string;
+    hoursThisMonth?: Temporal.DurationLike | string;
+  } = {}): TimeSummary {
     return new TimeSummary(
       hoursToday,
       hoursYesterday,
       hoursThisWeek,
       hoursThisMonth,
     );
+  }
+
+  static createTestInstance({
+    hoursToday = "PT30M",
+    hoursYesterday = "PT0S",
+    hoursThisWeek = "PT30M",
+    hoursThisMonth = "PT30M",
+  }: {
+    hoursToday?: Temporal.DurationLike | string;
+    hoursYesterday?: Temporal.DurationLike | string;
+    hoursThisWeek?: Temporal.DurationLike | string;
+    hoursThisMonth?: Temporal.DurationLike | string;
+  } = {}): TimeSummary {
+    return TimeSummary.create({
+      hoursToday,
+      hoursYesterday,
+      hoursThisWeek,
+      hoursThisMonth,
+    });
   }
 
   readonly hoursToday: Temporal.Duration;

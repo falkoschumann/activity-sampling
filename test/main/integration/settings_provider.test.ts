@@ -41,7 +41,7 @@ describe("Settings provider", () => {
 
       const settings = await gateway.load();
 
-      expect(settings).toEqual(Settings.createDefault());
+      expect(settings).toEqual(Settings.create());
     });
 
     it("should return full minimal file", async () => {
@@ -104,7 +104,7 @@ describe("Settings provider", () => {
 
         const settings = await gateway.load();
 
-        expect(settings).toEqual(Settings.createDefault());
+        expect(settings).toEqual(Settings.create());
       });
 
       it("should return configurable responses", async () => {

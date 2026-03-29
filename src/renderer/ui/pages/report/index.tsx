@@ -3,7 +3,7 @@
 import { useReducer, useState } from "react";
 
 import { useReport } from "../../../application/report_hook";
-import { ReportScope, type ReportScopeType } from "../../../../shared/domain/report_query";
+import { ReportScope } from "../../../../shared/domain/report_query";
 import { changePeriod, goToNextPeriod, goToPreviousPeriod, init, PeriodUnit, reducer } from "../../../domain/period";
 import { PeriodComponent } from "../../components/period_component";
 import ScopeComponent from "./scope";
@@ -12,7 +12,7 @@ import TotalHoursComponent from "./total_hours";
 
 export default function ReportPage() {
   const [state, dispatch] = useReducer(reducer, { unit: PeriodUnit.MONTH }, init);
-  const [scope, setScope] = useState<ReportScopeType>(ReportScope.PROJECTS);
+  const [scope, setScope] = useState<ReportScope>(ReportScope.PROJECTS);
 
   const report = useReport({ ...state, scope });
 

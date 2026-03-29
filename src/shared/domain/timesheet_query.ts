@@ -17,6 +17,20 @@ export class TimesheetQuery {
     return new TimesheetQuery(from, to, today, timeZone);
   }
 
+  static createTestInstance({
+    from = "2026-03-23",
+    to = "2026-03-29",
+    today = "2026-03-25",
+    timeZone = "Europe/Berlin",
+  }: {
+    from?: Temporal.PlainDateLike | string;
+    to?: Temporal.PlainDateLike | string;
+    today?: Temporal.PlainDateLike | string;
+    timeZone?: Temporal.TimeZoneLike;
+  } = {}): TimesheetQuery {
+    return TimesheetQuery.create({ from, to, today, timeZone });
+  }
+
   readonly from: Temporal.PlainDate;
   readonly to: Temporal.PlainDate;
   readonly today?: Temporal.PlainDate;
@@ -37,23 +51,27 @@ export class TimesheetQuery {
 
 export class TimesheetQueryResult {
   static create({
-    entries,
-    totalHours,
-    capacity,
+    entries = [],
+    totalHours = "PT0S",
+    capacity = Capacity.create(),
   }: {
-    entries: TimesheetEntry[];
-    totalHours: Temporal.DurationLike | string;
-    capacity: Capacity;
-  }): TimesheetQueryResult {
+    entries?: TimesheetEntry[];
+    totalHours?: Temporal.DurationLike | string;
+    capacity?: Capacity;
+  } = {}): TimesheetQueryResult {
     return new TimesheetQueryResult(entries, totalHours, capacity);
   }
 
-  static empty(): TimesheetQueryResult {
-    return TimesheetQueryResult.create({
-      entries: [],
-      totalHours: Temporal.Duration.from("PT0S"),
-      capacity: Capacity.empty(),
-    });
+  static createTestInstance({
+    entries = [TimesheetEntry.createTestInstance()],
+    totalHours = "PT2H",
+    capacity = Capacity.createTestInstance(),
+  }: {
+    entries?: TimesheetEntry[];
+    totalHours?: Temporal.DurationLike | string;
+    capacity?: Capacity;
+  } = {}): TimesheetQueryResult {
+    return TimesheetQueryResult.create({ entries, totalHours, capacity });
   }
 
   readonly entries: TimesheetEntry[];
@@ -65,9 +83,9 @@ export class TimesheetQueryResult {
     totalHours: Temporal.DurationLike | string,
     capacity: Capacity,
   ) {
-    this.entries = entries;
+    this.entries = entries.map((entry) => TimesheetEntry.create(entry));
     this.totalHours = Temporal.Duration.from(totalHours);
-    this.capacity = capacity;
+    this.capacity = Capacity.create(capacity);
   }
 }
 
@@ -127,20 +145,23 @@ export class TimesheetEntry {
 
 export class Capacity {
   static create({
-    hours,
-    offset,
+    hours = "PT40H",
+    offset = "-PT40H",
   }: {
-    hours: Temporal.DurationLike | string;
-    offset: Temporal.DurationLike | string;
-  }): Capacity {
+    hours?: Temporal.DurationLike | string;
+    offset?: Temporal.DurationLike | string;
+  } = {}): Capacity {
     return new Capacity(hours, offset);
   }
 
-  static empty(): Capacity {
-    return Capacity.create({
-      hours: Temporal.Duration.from("PT40H"),
-      offset: Temporal.Duration.from("-PT40H"),
-    });
+  static createTestInstance({
+    hours = "PT2H",
+    offset = "-PT38H",
+  }: {
+    hours?: Temporal.DurationLike | string;
+    offset?: Temporal.DurationLike | string;
+  } = {}): Capacity {
+    return Capacity.create({ hours, offset });
   }
 
   readonly hours: Temporal.Duration;

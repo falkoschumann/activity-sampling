@@ -4,7 +4,7 @@ import {
   ReportEntry,
   ReportQuery,
   ReportQueryResult,
-  type ReportScopeType,
+  type ReportScope,
 } from "../domain/report_query";
 
 export class ReportQueryDto {
@@ -14,7 +14,7 @@ export class ReportQueryDto {
     to,
     timeZone,
   }: {
-    scope: ReportScopeType;
+    scope: ReportScope;
     from?: string;
     to?: string;
     timeZone?: string;
@@ -31,13 +31,13 @@ export class ReportQueryDto {
     });
   }
 
-  readonly scope: ReportScopeType;
+  readonly scope: ReportScope;
   readonly from?: string;
   readonly to?: string;
   readonly timeZone?: string;
 
   private constructor(
-    scope: ReportScopeType,
+    scope: ReportScope,
     from?: string,
     to?: string,
     timeZone?: string,

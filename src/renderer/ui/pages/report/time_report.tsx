@@ -1,9 +1,9 @@
 // Copyright (c) 2026 Falko Schumann. All rights reserved. MIT license.
 
-import { ReportEntry, ReportScope, type ReportScopeType } from "../../../../shared/domain/report_query";
+import { ReportEntry, ReportScope } from "../../../../shared/domain/report_query";
 import { formatDate, formatDuration } from "../../../../shared/domain/temporal";
 
-export default function TimeReportComponent({ scope, entries }: { scope: ReportScopeType; entries: ReportEntry[] }) {
+export default function TimeReportComponent({ scope, entries }: { scope: ReportScope; entries: ReportEntry[] }) {
   return (
     <table className="table">
       <thead className="sticky-top" style={{ top: "5.875rem" }}>

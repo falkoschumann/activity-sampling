@@ -8,19 +8,31 @@ export class StatisticsQuery {
     categories,
     timeZone,
   }: {
-    scope: StatisticsScopeType;
+    scope: StatisticsScope;
     categories?: string[];
     timeZone?: Temporal.TimeZoneLike;
   }): StatisticsQuery {
     return new StatisticsQuery(scope, categories, timeZone);
   }
 
-  readonly scope: StatisticsScopeType;
+  static createTestInstance({
+    scope = StatisticsScope.CYCLE_TIMES,
+    categories = ["Feature"],
+    timeZone = "Europe/Berlin",
+  }: {
+    scope?: StatisticsScope;
+    categories?: string[];
+    timeZone?: Temporal.TimeZoneLike;
+  } = {}): StatisticsQuery {
+    return StatisticsQuery.create({ scope, categories, timeZone });
+  }
+
+  readonly scope: StatisticsScope;
   readonly categories?: string[];
   readonly timeZone?: Temporal.TimeZoneLike;
 
   private constructor(
-    scope: StatisticsScopeType,
+    scope: StatisticsScope,
     categories?: string[],
     timeZone?: Temporal.TimeZoneLike,
   ) {
@@ -30,28 +42,26 @@ export class StatisticsQuery {
   }
 }
 
-// TODO name all enum objects and types equally
-// TODO use Object.freeze({} as const) everywhere for enums
 export const StatisticsScope = Object.freeze({
   WORKING_HOURS: "Working hours",
   CYCLE_TIMES: "Cycle times",
 });
 
-export type StatisticsScopeType =
+export type StatisticsScope =
   (typeof StatisticsScope)[keyof typeof StatisticsScope];
 
 export class StatisticsQueryResult {
   static create({
-    histogram,
-    median,
-    categories,
-    totalCount,
+    histogram = Histogram.create(),
+    median = Median.create(),
+    categories = [],
+    totalCount = 0,
   }: {
-    histogram: Histogram;
-    median: Median;
-    categories: string[];
-    totalCount: number;
-  }): StatisticsQueryResult {
+    histogram?: Histogram;
+    median?: Median;
+    categories?: string[];
+    totalCount?: number;
+  } = {}): StatisticsQueryResult {
     return new StatisticsQueryResult(
       Histogram.create(histogram),
       Median.create(median),
@@ -60,17 +70,22 @@ export class StatisticsQueryResult {
     );
   }
 
-  static empty(): StatisticsQueryResult {
+  static createTestInstance({
+    histogram = Histogram.createTestInstance(),
+    median = Median.createTestInstance(),
+    categories = ["Feature"],
+    totalCount = 1,
+  }: {
+    histogram?: Histogram;
+    median?: Median;
+    categories?: string[];
+    totalCount?: number;
+  } = {}): StatisticsQueryResult {
     return StatisticsQueryResult.create({
-      histogram: Histogram.create({
-        binEdges: [],
-        frequencies: [],
-        xAxisLabel: "",
-        yAxisLabel: "",
-      }),
-      median: { edge0: 0, edge25: 0, edge50: 0, edge75: 0, edge100: 0 },
-      categories: [],
-      totalCount: 0,
+      histogram,
+      median,
+      categories,
+      totalCount,
     });
   }
 
@@ -85,8 +100,8 @@ export class StatisticsQueryResult {
     categories: string[],
     totalCount: number,
   ) {
-    this.histogram = histogram;
-    this.median = median;
+    this.histogram = Histogram.create(histogram);
+    this.median = Median.create(median);
     this.categories = categories;
     this.totalCount = totalCount;
   }
@@ -94,17 +109,31 @@ export class StatisticsQueryResult {
 
 export class Histogram {
   static create({
-    binEdges,
-    frequencies,
-    xAxisLabel,
-    yAxisLabel,
+    binEdges = [],
+    frequencies = [],
+    xAxisLabel = "",
+    yAxisLabel = "",
   }: {
-    binEdges: string[];
-    frequencies: number[];
-    xAxisLabel: string;
-    yAxisLabel: string;
-  }) {
+    binEdges?: string[];
+    frequencies?: number[];
+    xAxisLabel?: string;
+    yAxisLabel?: string;
+  } = {}) {
     return new Histogram(binEdges, frequencies, xAxisLabel, yAxisLabel);
+  }
+
+  static createTestInstance({
+    binEdges = ["0", "0.5", "1", "2", "3", "5"],
+    frequencies = [0, 1, 0, 0, 0],
+    xAxisLabel = "Cycle times (days)",
+    yAxisLabel = "Number of tasks",
+  }: {
+    binEdges?: string[];
+    frequencies?: number[];
+    xAxisLabel?: string;
+    yAxisLabel?: string;
+  } = {}) {
+    return Histogram.create({ binEdges, frequencies, xAxisLabel, yAxisLabel });
   }
 
   readonly binEdges: string[];
@@ -127,19 +156,35 @@ export class Histogram {
 
 export class Median {
   static create({
-    edge0,
-    edge25,
-    edge50,
-    edge75,
-    edge100,
+    edge0 = 0,
+    edge25 = 0,
+    edge50 = 0,
+    edge75 = 0,
+    edge100 = 0,
   }: {
-    edge0: number;
-    edge25: number;
-    edge50: number;
-    edge75: number;
-    edge100: number;
-  }) {
+    edge0?: number;
+    edge25?: number;
+    edge50?: number;
+    edge75?: number;
+    edge100?: number;
+  } = {}) {
     return new Median(edge0, edge25, edge50, edge75, edge100);
+  }
+
+  static createTestInstance({
+    edge0 = 0,
+    edge25 = 0,
+    edge50 = 1,
+    edge75 = 0,
+    edge100 = 0,
+  }: {
+    edge0?: number;
+    edge25?: number;
+    edge50?: number;
+    edge75?: number;
+    edge100?: number;
+  } = {}) {
+    return Median.create({ edge0, edge25, edge50, edge75, edge100 });
   }
 
   readonly edge0: number;

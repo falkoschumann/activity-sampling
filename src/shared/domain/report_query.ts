@@ -9,7 +9,7 @@ export class ReportQuery {
     to,
     timeZone,
   }: {
-    scope: ReportScopeType;
+    scope: ReportScope;
     from?: Temporal.PlainDateLike | string;
     to?: Temporal.PlainDateLike | string;
     timeZone?: Temporal.TimeZoneLike;
@@ -17,13 +17,27 @@ export class ReportQuery {
     return new ReportQuery(scope, from, to, timeZone);
   }
 
-  readonly scope: ReportScopeType;
+  static createTestInstance({
+    scope = ReportScope.TASKS,
+    from = "2026-02-01",
+    to = "2026-02-28",
+    timeZone,
+  }: {
+    scope?: ReportScope;
+    from?: Temporal.PlainDateLike | string;
+    to?: Temporal.PlainDateLike | string;
+    timeZone?: Temporal.TimeZoneLike;
+  } = {}): ReportQuery {
+    return ReportQuery.create({ scope, from, to, timeZone });
+  }
+
+  readonly scope: ReportScope;
   readonly from?: Temporal.PlainDate;
   readonly to?: Temporal.PlainDate;
   readonly timeZone?: Temporal.TimeZoneLike;
 
   private constructor(
-    scope: ReportScopeType,
+    scope: ReportScope,
     from?: Temporal.PlainDateLike | string,
     to?: Temporal.PlainDateLike | string,
     timeZone?: Temporal.TimeZoneLike,
@@ -42,24 +56,27 @@ export const ReportScope = Object.freeze({
   CATEGORIES: "Categories",
 });
 
-export type ReportScopeType = (typeof ReportScope)[keyof typeof ReportScope];
+export type ReportScope = (typeof ReportScope)[keyof typeof ReportScope];
 
 export class ReportQueryResult {
   static create({
-    entries,
-    totalHours,
+    entries = [],
+    totalHours = "PT0S",
   }: {
-    entries: ReportEntry[];
-    totalHours: Temporal.DurationLike | string;
-  }): ReportQueryResult {
+    entries?: ReportEntry[];
+    totalHours?: Temporal.DurationLike | string;
+  } = {}): ReportQueryResult {
     return new ReportQueryResult(entries, totalHours);
   }
 
-  static empty(): ReportQueryResult {
-    return ReportQueryResult.create({
-      entries: [],
-      totalHours: Temporal.Duration.from("PT0S"),
-    });
+  static createTestInstance({
+    entries = [ReportEntry.createTestInstance()],
+    totalHours = "PT8H",
+  }: {
+    entries?: ReportEntry[];
+    totalHours?: Temporal.DurationLike | string;
+  } = {}): ReportQueryResult {
+    return ReportQueryResult.create({ entries, totalHours });
   }
 
   readonly entries: ReportEntry[];
@@ -69,7 +86,7 @@ export class ReportQueryResult {
     entries: ReportEntry[],
     totalHours: Temporal.DurationLike | string,
   ) {
-    this.entries = entries;
+    this.entries = entries.map((entry) => ReportEntry.create(entry));
     this.totalHours = Temporal.Duration.from(totalHours);
   }
 }

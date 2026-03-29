@@ -12,6 +12,16 @@ export class TimerStartedEvent extends Event {
     return new TimerStartedEvent(TimerStartedEvent.TYPE, eventInitDict);
   }
 
+  static createTestInstance({
+    timestamp = "2026-03-29T14:52:00Z",
+    interval = "PT30M",
+  }: {
+    timestamp?: Temporal.Instant | string;
+    interval?: Temporal.DurationLike | string;
+  } = {}): TimerStartedEvent {
+    return TimerStartedEvent.create({ timestamp, interval });
+  }
+
   static readonly TYPE = "timerStarted";
 
   readonly timestamp: Temporal.Instant;

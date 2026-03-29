@@ -1,13 +1,13 @@
 // Copyright (c) 2026 Falko Schumann. All rights reserved. MIT license.
 
-import { ReportScope, type ReportScopeType } from "../../../../shared/domain/report_query";
+import { ReportScope } from "../../../../shared/domain/report_query";
 
 export default function ScopeComponent({
   scope,
   onChangeScope,
 }: {
-  scope: ReportScopeType;
-  onChangeScope: (scope: ReportScopeType) => void;
+  scope: ReportScope;
+  onChangeScope: (scope: ReportScope) => void;
 }) {
   return (
     <div className="btn-toolbar py-2 gap-2" role="toolbar" aria-label="Toolbar with scope buttons">

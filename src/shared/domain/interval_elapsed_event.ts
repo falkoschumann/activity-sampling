@@ -12,6 +12,16 @@ export class IntervalElapsedEvent extends Event {
     return new IntervalElapsedEvent(IntervalElapsedEvent.TYPE, eventInitDict);
   }
 
+  static createTestInstance({
+    timestamp = "2026-03-29T14:56:00Z",
+    interval = "PT30M",
+  }: {
+    timestamp?: Temporal.Instant | string;
+    interval?: Temporal.DurationLike | string;
+  } = {}): IntervalElapsedEvent {
+    return IntervalElapsedEvent.create({ timestamp, interval });
+  }
+
   static readonly TYPE = "intervalElapsed";
 
   readonly timestamp: Temporal.Instant;

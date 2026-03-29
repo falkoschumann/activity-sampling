@@ -94,7 +94,7 @@ function configure({
     "Europe/Berlin",
   );
   const handler = TimesheetQueryHandler.create({
-    capacity: Settings.createDefault().capacity,
+    capacity: Settings.create().capacity,
     eventStore,
     holidayRepository,
     vacationRepository,

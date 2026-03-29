@@ -80,7 +80,7 @@ import { SettingsProvider } from "./infrastructure/settings_provider";
 import type { StartTimerCommand } from "../shared/domain/start_timer_command";
 import type { StopTimerCommand } from "../shared/domain/stop_timer_command";
 
-let settings = Settings.createDefault();
+let settings = Settings.create();
 const settingsProvider = SettingsProvider.create();
 const eventStore = EventStore.create();
 const holidayRepository = HolidayRepository.create();
@@ -172,7 +172,7 @@ app.on("activate", function () {
 
 async function initializeApplication() {
   settings = await settingsProvider.load();
-  if (settings.dataDir !== Settings.createDefault().dataDir) {
+  if (settings.dataDir !== Settings.create().dataDir) {
     applySettings(settings);
     return;
   }

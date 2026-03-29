@@ -17,6 +17,20 @@ export class BurnUpQuery {
     return new BurnUpQuery(from, to, categories, timeZone);
   }
 
+  static createTestInstance({
+    from = "2026-03-23",
+    to = "2026-03-29",
+    categories = ["Feature"],
+    timeZone = "Europe/Berlin",
+  }: {
+    from?: Temporal.PlainDateLike | string;
+    to?: Temporal.PlainDateLike | string;
+    categories?: string[];
+    timeZone?: Temporal.TimeZoneLike;
+  } = {}): BurnUpQuery {
+    return BurnUpQuery.create({ from, to, categories, timeZone });
+  }
+
   readonly from: Temporal.PlainDate;
   readonly to: Temporal.PlainDate;
   readonly categories?: string[];
@@ -48,6 +62,18 @@ export class BurnUpQueryResult {
     return new BurnUpQueryResult(data, totalThroughput, categories);
   }
 
+  static createTestInstance({
+    data = [BurnUpData.createTestInstance()],
+    totalThroughput = 1,
+    categories = ["Feature"],
+  }: {
+    data?: BurnUpData[];
+    totalThroughput?: number;
+    categories?: string[];
+  } = {}): BurnUpQueryResult {
+    return BurnUpQueryResult.create({ data, totalThroughput, categories });
+  }
+
   readonly data: BurnUpData[];
   readonly totalThroughput: number;
   readonly categories: string[];
@@ -57,7 +83,7 @@ export class BurnUpQueryResult {
     totalThroughput: number,
     categories: string[],
   ) {
-    this.data = data;
+    this.data = data.map((entry) => BurnUpData.create(entry));
     this.totalThroughput = totalThroughput;
     this.categories = categories;
   }
@@ -74,6 +100,18 @@ export class BurnUpData {
     cumulativeThroughput: number;
   }): BurnUpData {
     return new BurnUpData(date, throughput, cumulativeThroughput);
+  }
+
+  static createTestInstance({
+    date = "2026-03-24",
+    throughput = 1,
+    cumulativeThroughput = 1,
+  }: {
+    date?: Temporal.PlainDate | string;
+    throughput?: number;
+    cumulativeThroughput?: number;
+  } = {}): BurnUpData {
+    return BurnUpData.create({ date, throughput, cumulativeThroughput });
   }
 
   readonly date: Temporal.PlainDate;

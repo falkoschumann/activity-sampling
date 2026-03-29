@@ -1,13 +1,13 @@
 // Copyright (c) 2026 Falko Schumann. All rights reserved. MIT license.
 
-import { StatisticsScope, type StatisticsScopeType } from "../../../../shared/domain/statistics_query";
+import { StatisticsScope } from "../../../../shared/domain/statistics_query";
 
 export default function ScopeComponent({
   value,
   onChange,
 }: {
-  value: StatisticsScopeType;
-  onChange: (scope: StatisticsScopeType) => void;
+  value: StatisticsScope;
+  onChange: (scope: StatisticsScope) => void;
 }) {
   return (
     <div className="btn-group btn-group-sm" role="group" aria-label="Select scope">

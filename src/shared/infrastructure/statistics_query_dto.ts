@@ -5,7 +5,7 @@ import {
   Median,
   StatisticsQuery,
   StatisticsQueryResult,
-  type StatisticsScopeType,
+  type StatisticsScope,
 } from "../domain/statistics_query";
 
 export class StatisticsQueryDto {
@@ -14,7 +14,7 @@ export class StatisticsQueryDto {
     categories,
     timeZone,
   }: {
-    scope: StatisticsScopeType;
+    scope: StatisticsScope;
     categories?: string[];
     timeZone?: string;
   }): StatisticsQueryDto {
@@ -29,12 +29,12 @@ export class StatisticsQueryDto {
     });
   }
 
-  readonly scope: StatisticsScopeType;
+  readonly scope: StatisticsScope;
   readonly categories?: string[];
   readonly timeZone?: string;
 
   private constructor(
-    scope: StatisticsScopeType,
+    scope: StatisticsScope,
     categories?: string[],
     timeZone?: string,
   ) {

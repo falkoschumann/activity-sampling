@@ -2,16 +2,16 @@
 
 import { describe, expect, it } from "vitest";
 
-import { SettingsDto } from "../../../src/shared/infrastructure/settings";
+import { Settings } from "../../../src/shared/domain/settings";
 
 describe("Settings", () => {
-  describe("Validate", () => {
-    it("should throw a type error when DTO is not valid", () => {
-      const dto = {
-        dataDir: false,
-      };
+  it("should map settings", () => {
+    const command = Settings.createTestInstance();
 
-      expect(() => SettingsDto.fromJson(dto)).toThrow(TypeError);
-    });
+    const json = JSON.stringify(command);
+    const dto = JSON.parse(json);
+    const model = Settings.create(dto);
+
+    expect(model).toEqual<Settings>(Settings.createTestInstance());
   });
 });

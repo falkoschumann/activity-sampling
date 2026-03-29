@@ -13,11 +13,21 @@ export class ExportTimesheetCommand {
     return new ExportTimesheetCommand(timesheets, fileName);
   }
 
+  static createTestInstance({
+    timesheets = [TimesheetEntry.createTestInstance()],
+    fileName = "test-export.csv",
+  }: {
+    timesheets?: TimesheetEntry[];
+    fileName?: string;
+  } = {}): ExportTimesheetCommand {
+    return new ExportTimesheetCommand(timesheets, fileName);
+  }
+
   readonly timesheets: TimesheetEntry[];
   readonly fileName: string;
 
   private constructor(timesheets: TimesheetEntry[], fileName: string) {
-    this.timesheets = timesheets;
+    this.timesheets = timesheets.map((entry) => TimesheetEntry.create(entry));
     this.fileName = fileName;
   }
 }

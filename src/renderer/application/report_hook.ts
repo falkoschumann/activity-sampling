@@ -13,7 +13,7 @@ import {
 } from "../../shared/infrastructure/report_query_dto";
 
 export function useReport(query: ReportQuery) {
-  const [result, setResult] = useState(ReportQueryResult.empty());
+  const [result, setResult] = useState(ReportQueryResult.create());
 
   useEffect(() => {
     (async function () {

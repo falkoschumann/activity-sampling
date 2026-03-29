@@ -16,7 +16,7 @@ import { ExportTimesheetCommandDto } from "../../shared/infrastructure/export_ti
 import { CommandStatusDto } from "../../shared/infrastructure/command_status_dto";
 
 export function useTimesheet(query: TimesheetQuery) {
-  const [result, setResult] = useState(TimesheetQueryResult.empty());
+  const [result, setResult] = useState(TimesheetQueryResult.create());
 
   useEffect(() => {
     (async function () {
