@@ -3,6 +3,9 @@
 import { Temporal } from "@js-temporal/polyfill";
 import { type Dispatch, useEffect, useRef } from "react";
 
+import { IntervalElapsedEvent } from "../../shared/domain/interval_elapsed_event";
+import { TimerStartedEvent } from "../../shared/domain/timer_started_event";
+import { TimerStoppedEvent } from "../../shared/domain/timer_stopped_event";
 import {
   type Action,
   intervalElapsed,
@@ -11,9 +14,6 @@ import {
   timerTicked,
 } from "../domain/log";
 import { NotificationGateway } from "../infrastructure/notification_gateway";
-import type { IntervalElapsedEventDto } from "../../shared/infrastructure/interval_elapsed_event_dto";
-import type { TimerStartedEventDto } from "../../shared/infrastructure/timer_started_event_dto";
-import type { TimerStoppedEventDto } from "../../shared/infrastructure/timer_stopped_event_dto";
 
 export function useCurrentInterval(dispatch: Dispatch<Action>) {
   const timeoutId =
@@ -21,7 +21,7 @@ export function useCurrentInterval(dispatch: Dispatch<Action>) {
 
   useEffect(() => {
     const offTimerStartedEvent = window.activitySampling.onTimerStartedEvent(
-      (event: TimerStartedEventDto) => {
+      (json) => {
         clearInterval(timeoutId.current);
         timeoutId.current = setInterval(
           () =>
@@ -32,25 +32,32 @@ export function useCurrentInterval(dispatch: Dispatch<Action>) {
             ),
           1000,
         );
+
+        const dto = JSON.parse(json);
+        const event = TimerStartedEvent.create(dto);
         dispatch(timerStarted(event));
       },
     );
 
     const offTimerStoppedEvent = window.activitySampling.onTimerStoppedEvent(
-      (event: TimerStoppedEventDto) => {
+      (json) => {
         clearInterval(timeoutId.current);
+
+        const dto = JSON.parse(json);
+        const event = TimerStoppedEvent.create(dto);
         dispatch(timerStopped(event));
       },
     );
 
     const offIntervalElapsedEvent =
-      window.activitySampling.onIntervalElapsedEvent(
-        (event: IntervalElapsedEventDto) => {
-          dispatch(intervalElapsed(event));
-          NotificationGateway.getInstance().hide();
-          NotificationGateway.getInstance().show();
-        },
-      );
+      window.activitySampling.onIntervalElapsedEvent((json) => {
+        NotificationGateway.getInstance().hide();
+        NotificationGateway.getInstance().show();
+
+        const dto = JSON.parse(json);
+        const event = IntervalElapsedEvent.create(dto);
+        dispatch(intervalElapsed(event));
+      });
 
     return () => {
       offTimerStartedEvent();

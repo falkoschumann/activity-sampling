@@ -1,5 +1,6 @@
 // Copyright (c) 2026 Falko Schumann. All rights reserved. MIT license.
 
+import { createCommandStatus } from "@muspellheim/shared";
 import { Temporal } from "@js-temporal/polyfill";
 import { useCallback, useEffect, useReducer, useState } from "react";
 
@@ -16,17 +17,11 @@ import {
   RecentActivitiesQuery,
   RecentActivitiesQueryResult,
 } from "../../shared/domain/recent_activities_query";
-import { CommandStatusDto } from "../../shared/infrastructure/command_status_dto";
-import { LogActivityCommandDto } from "../../shared/infrastructure/log_activity_command_dto";
-import {
-  RecentActivitiesQueryDto,
-  RecentActivitiesQueryResultDto,
-} from "../../shared/infrastructure/recent_activities_query_dto";
-import { SettingsDto } from "../../shared/infrastructure/settings";
 import {
   NotificationClickedEvent,
   NotificationGateway,
 } from "../infrastructure/notification_gateway";
+import { Settings } from "../../shared/domain/settings";
 
 export function useLog() {
   const [state, dispatch] = useReducer(reducer, initialState);
@@ -77,8 +72,9 @@ export function useLog() {
 
   useEffect(() => {
     (async () => {
-      const dto = await window.activitySampling.loadSettings();
-      const settings = SettingsDto.create(dto).validate();
+      const json = await window.activitySampling.loadSettings();
+      const dto = JSON.parse(json);
+      const settings = Settings.create(dto);
       setCategories(settings.categories);
     })();
   }, []);
@@ -142,17 +138,17 @@ export function useLog() {
 
 async function logActivity(command: LogActivityCommand) {
   NotificationGateway.getInstance().hide();
-  const statusDto = await window.activitySampling.logActivity(
-    LogActivityCommandDto.fromModel(command),
-  );
-  return CommandStatusDto.create(statusDto).validate();
+  let json = JSON.stringify(command);
+  json = await window.activitySampling.logActivity(json);
+  const dto = JSON.parse(json);
+  return createCommandStatus(dto);
 }
 
 async function queryRecentActivities(query: RecentActivitiesQuery) {
-  const resultDto = await window.activitySampling.queryRecentActivities(
-    RecentActivitiesQueryDto.fromModel(query),
-  );
-  const result = RecentActivitiesQueryResultDto.create(resultDto).validate();
+  let json = JSON.stringify(query);
+  json = await window.activitySampling.queryRecentActivities(json);
+  const dto = JSON.parse(json);
+  const result = RecentActivitiesQueryResult.create(dto);
   if (result.workingDays[0]?.activities[0] != null) {
     const activity = result.workingDays[0].activities[0];
     NotificationGateway.getInstance().setCurrentActivity(activity);

@@ -3,41 +3,31 @@
 export type Unsubscriber = () => void;
 
 export interface ActivitySampling {
-  logActivity(command: LogActivityCommandDto): Promise<CommandStatusDto>;
+  logActivity(command: string): Promise<string>;
 
-  exportTimesheet(
-    command: ExportTimesheetCommandDto,
-  ): Promise<CommandStatusDto>;
+  exportTimesheet(command: string): Promise<string>;
 
-  queryRecentActivities(
-    query: RecentActivitiesQueryDto,
-  ): Promise<RecentActivitiesQueryResultDto>;
+  queryRecentActivities(query: string): Promise<string>;
 
-  queryReport(query: ReportQueryDto): Promise<ReportQueryResultDto>;
+  queryReport(query: string): Promise<string>;
 
-  queryStatistics(query: StatisticsQueryDto): Promise<StatisticsQueryResultDto>;
+  queryStatistics(query: string): Promise<string>;
 
-  queryTimesheet(query: TimesheetQueryDto): Promise<TimesheetQueryResultDto>;
+  queryTimesheet(query: string): Promise<string>;
 
-  queryEstimate(query: EstimateQueryDto): Promise<EstimateQueryResultDto>;
+  queryEstimate(query: string): Promise<string>;
 
-  queryBurnUp(query: BurnUpQueryDto): Promise<BurnUpQueryResultDto>;
+  queryBurnUp(query: string): Promise<string>;
 
-  onTimerStartedEvent: (
-    callback: (event: TimerStartedEventDto) => void,
-  ) => Unsubscriber;
+  onTimerStartedEvent: (callback: (event: string) => void) => Unsubscriber;
 
-  onTimerStoppedEvent: (
-    callback: (event: TimerStoppedEventDto) => void,
-  ) => Unsubscriber;
+  onTimerStoppedEvent: (callback: (event: string) => void) => Unsubscriber;
 
-  onIntervalElapsedEvent: (
-    callback: (event: IntervalElapsedEventDto) => void,
-  ) => Unsubscriber;
+  onIntervalElapsedEvent: (callback: (event: string) => void) => Unsubscriber;
 
-  loadSettings(): Promise<SettingsDto>;
+  loadSettings(): Promise<string>;
 
-  storeSettings(settings: SettingsDto): Promise<void>;
+  storeSettings(settings: string): Promise<void>;
 
   showOpenDialog(options: OpenDialogOptions): Promise<OpenDialogReturnValue>;
 }

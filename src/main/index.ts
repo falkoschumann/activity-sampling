@@ -27,11 +27,6 @@ import { EventStore } from "./infrastructure/event_store";
 import { HolidayRepository } from "./infrastructure/holiday_repository";
 import { VacationRepository } from "./infrastructure/vacation_repository";
 import { TimesheetExporter } from "./infrastructure/timesheet_exporter";
-import { CommandStatusDto } from "../shared/infrastructure/command_status_dto";
-import {
-  BurnUpQueryDto,
-  BurnUpQueryResultDto,
-} from "../shared/infrastructure/burn_up_query_dto";
 import {
   EXPORT_TIMESHEET_CHANNEL,
   INTERVAL_ELAPSED_CHANNEL,
@@ -48,37 +43,19 @@ import {
   TIMER_STARTED_CHANNEL,
   TIMER_STOPPED_CHANNEL,
 } from "../shared/infrastructure/channels";
-import {
-  EstimateQueryDto,
-  EstimateQueryResultDto,
-} from "../shared/infrastructure/estimate_query_dto";
-import { LogActivityCommandDto } from "../shared/infrastructure/log_activity_command_dto";
-import { ExportTimesheetCommandDto } from "../shared/infrastructure/export_timesheet_command_dto";
-import {
-  RecentActivitiesQueryDto,
-  RecentActivitiesQueryResultDto,
-} from "../shared/infrastructure/recent_activities_query_dto";
-import {
-  ReportQueryDto,
-  ReportQueryResultDto,
-} from "../shared/infrastructure/report_query_dto";
-import { SettingsDto } from "../shared/infrastructure/settings";
-import {
-  StatisticsQueryDto,
-  StatisticsQueryResultDto,
-} from "../shared/infrastructure/statistics_query_dto";
-import { IntervalElapsedEventDto } from "../shared/infrastructure/interval_elapsed_event_dto";
-import { TimerStartedEventDto } from "../shared/infrastructure/timer_started_event_dto";
-import { TimerStoppedEventDto } from "../shared/infrastructure/timer_stopped_event_dto";
-import {
-  TimesheetQueryDto,
-  TimesheetQueryResultDto,
-} from "../shared/infrastructure/timesheet_query_dto";
 import { chooseDataDirectory, openWindow } from "./ui/actions";
 import { createMenu } from "./ui/menu";
 import { SettingsProvider } from "./infrastructure/settings_provider";
 import type { StartTimerCommand } from "../shared/domain/start_timer_command";
 import type { StopTimerCommand } from "../shared/domain/stop_timer_command";
+import { LogActivityCommand } from "../shared/domain/log_activity_command";
+import { ExportTimesheetCommand } from "../shared/domain/export_timesheet_command";
+import { RecentActivitiesQuery } from "../shared/domain/recent_activities_query";
+import { ReportQuery } from "../shared/domain/report_query";
+import { StatisticsQuery } from "../shared/domain/statistics_query";
+import { TimesheetQuery } from "../shared/domain/timesheet_query";
+import { EstimateQuery } from "../shared/domain/estimate_query";
+import { BurnUpQuery, BurnUpQueryResult } from "../shared/domain/burn_up_query";
 
 let settings = Settings.create();
 const settingsProvider = SettingsProvider.create();
@@ -210,94 +187,79 @@ async function installDevTools() {
 }
 
 function createRendererToMainChannels() {
-  ipcMain.handle(
-    LOG_ACTIVITY_CHANNEL,
-    async (_event, commandDto: LogActivityCommandDto) => {
-      const command = LogActivityCommandDto.create(commandDto).validate();
-      const status = await logActivityCommandHandler.handle(command);
-      return CommandStatusDto.fromModel(status);
-    },
-  );
-  ipcMain.handle(
-    EXPORT_TIMESHEET_CHANNEL,
-    async (_event, commandDto: ExportTimesheetCommandDto) => {
-      const result = await dialog.showSaveDialog({
-        title: "Export timesheet file",
-        properties: ["showOverwriteConfirmation", "createDirectory"],
-        defaultPath: "timesheets.csv",
-      });
-      const fileName = result.filePath;
-      if (fileName == null) {
-        return;
-      }
-      const command = ExportTimesheetCommandDto.create({
-        ...commandDto,
-        fileName,
-      }).validate();
-      const status = await exportTimesheetCommandHandler.handle(command);
-      return CommandStatusDto.fromModel(status);
-    },
-  );
-  ipcMain.handle(
-    QUERY_RECENT_ACTIVITIES_CHANNEL,
-    async (_event, queryDto: RecentActivitiesQueryDto) => {
-      const query = RecentActivitiesQueryDto.create(queryDto).validate();
-      const result = await recentActivitiesQueryHandler.handle(query);
-      return RecentActivitiesQueryResultDto.fromModel(result);
-    },
-  );
-  ipcMain.handle(
-    QUERY_REPORT_CHANNEL,
-    async (_event, queryDto: ReportQueryDto) => {
-      const query = ReportQueryDto.create(queryDto).validate();
-      const result = await reportQueryHandler.handle(query);
-      return ReportQueryResultDto.fromModel(result);
-    },
-  );
-  ipcMain.handle(
-    QUERY_STATISTICS_CHANNEL,
-    async (_event, queryDto: StatisticsQueryDto) => {
-      const query = StatisticsQueryDto.create(queryDto).validate();
-      const result = await statisticsQueryHandler.handle(query);
-      return StatisticsQueryResultDto.fromModel(result);
-    },
-  );
-  ipcMain.handle(
-    QUERY_TIMESHEET_CHANNEL,
-    async (_event, queryDto: TimesheetQueryDto) => {
-      const query = TimesheetQueryDto.create(queryDto).validate();
-      const result = await timesheetQueryHandler.handle(query);
-      return TimesheetQueryResultDto.fromModel(result);
-    },
-  );
-  ipcMain.handle(
-    QUERY_ESTIMATE_CHANNEL,
-    async (_event, queryDto: EstimateQueryDto) => {
-      const query = EstimateQueryDto.create(queryDto).validate();
-      const result = await estimateQueryHandler.handle(query);
-      return EstimateQueryResultDto.fromModel(result);
-    },
-  );
-  ipcMain.handle(
-    QUERY_BURN_UP_CHANNEL,
-    async (_event, queryDto: BurnUpQueryDto) => {
-      const query = BurnUpQueryDto.create(queryDto).validate();
-      const result = await burnUpQueryHandler.handle(query);
-      return BurnUpQueryResultDto.fromModel(result);
-    },
-  );
-  ipcMain.handle(LOAD_SETTINGS_CHANNEL, async (_event) => {
-    const settings = await settingsProvider.load();
-    return SettingsDto.fromModel(settings!);
+  ipcMain.handle(LOG_ACTIVITY_CHANNEL, async (_event, json: string) => {
+    const dto = JSON.parse(json);
+    const command = LogActivityCommand.create(dto);
+    const status = await logActivityCommandHandler.handle(command);
+    return JSON.stringify(status);
+  });
+  ipcMain.handle(EXPORT_TIMESHEET_CHANNEL, async (_event, json: string) => {
+    const dto = JSON.parse(json);
+    const result = await dialog.showSaveDialog({
+      title: "Export timesheet file",
+      properties: ["showOverwriteConfirmation", "createDirectory"],
+      defaultPath: "timesheets.csv",
+    });
+    const fileName = result.filePath;
+    if (fileName == null) {
+      return;
+    }
+    const command = ExportTimesheetCommand.create({
+      ...dto,
+      fileName,
+    });
+    const status = await exportTimesheetCommandHandler.handle(command);
+    return JSON.stringify(status);
   });
   ipcMain.handle(
-    STORE_SETTINGS_CHANNEL,
-    async (_event, settings: SettingsDto) => {
-      const model = SettingsDto.create(settings).validate();
-      await settingsProvider.store(model);
-      applySettings(model);
+    QUERY_RECENT_ACTIVITIES_CHANNEL,
+    async (_event, json: string) => {
+      const dto = JSON.parse(json);
+      const query = RecentActivitiesQuery.create(dto);
+      const result = await recentActivitiesQueryHandler.handle(query);
+      return JSON.stringify(result);
     },
   );
+  ipcMain.handle(QUERY_REPORT_CHANNEL, async (_event, json: string) => {
+    const dto = JSON.parse(json);
+    const query = ReportQuery.create(dto);
+    const result = await reportQueryHandler.handle(query);
+    return JSON.stringify(result);
+  });
+  ipcMain.handle(QUERY_STATISTICS_CHANNEL, async (_event, json: string) => {
+    const dto = JSON.parse(json);
+    const query = StatisticsQuery.create(dto);
+    const result = await statisticsQueryHandler.handle(query);
+    return JSON.stringify(result);
+  });
+  ipcMain.handle(QUERY_TIMESHEET_CHANNEL, async (_event, json: string) => {
+    const dto = JSON.parse(json);
+    const query = TimesheetQuery.create(dto);
+    const result = await timesheetQueryHandler.handle(query);
+    return JSON.stringify(result);
+  });
+  ipcMain.handle(QUERY_ESTIMATE_CHANNEL, async (_event, json: string) => {
+    const dto = JSON.parse(json);
+    const query = EstimateQuery.create(dto);
+    const result = await estimateQueryHandler.handle(query);
+    return JSON.stringify(result);
+  });
+  ipcMain.handle(QUERY_BURN_UP_CHANNEL, async (_event, json: string) => {
+    const dto = JSON.parse(json);
+    const query = BurnUpQuery.create(dto);
+    const result = await burnUpQueryHandler.handle(query);
+    return BurnUpQueryResult.create(result);
+  });
+  ipcMain.handle(LOAD_SETTINGS_CHANNEL, async (_event) => {
+    const settings = await settingsProvider.load();
+    return JSON.stringify(settings);
+  });
+  ipcMain.handle(STORE_SETTINGS_CHANNEL, async (_event, json: string) => {
+    const dto = JSON.parse(json);
+    const model = Settings.create(dto);
+    await settingsProvider.store(model);
+    applySettings(model);
+  });
   ipcMain.handle(
     SHOW_OPEN_DIALOG_CHANNEL,
     async (_event, options: Electron.OpenDialogOptions) =>
@@ -339,13 +301,13 @@ function createMainToLogWindowChannels(window: BrowserWindow) {
   startTimerCommandHandler.addEventListener(TimerStartedEvent.TYPE, (event) =>
     window.webContents.send(
       TIMER_STARTED_CHANNEL,
-      TimerStartedEventDto.fromModel(event as TimerStartedEvent),
+      TimerStartedEvent.create(event as TimerStartedEvent),
     ),
   );
   stopTimerCommandHandler.addEventListener(TimerStoppedEvent.TYPE, (event) =>
     window.webContents.send(
       TIMER_STOPPED_CHANNEL,
-      TimerStoppedEventDto.fromModel(event as TimerStoppedEvent),
+      TimerStoppedEvent.create(event as TimerStoppedEvent),
     ),
   );
   startTimerCommandHandler.addEventListener(
@@ -353,7 +315,7 @@ function createMainToLogWindowChannels(window: BrowserWindow) {
     (event) =>
       window.webContents.send(
         INTERVAL_ELAPSED_CHANNEL,
-        IntervalElapsedEventDto.fromModel(event as IntervalElapsedEvent),
+        IntervalElapsedEvent.create(event as IntervalElapsedEvent),
       ),
   );
 }

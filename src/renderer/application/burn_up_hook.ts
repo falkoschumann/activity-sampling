@@ -6,10 +6,6 @@ import {
   BurnUpQuery,
   BurnUpQueryResult,
 } from "../../shared/domain/burn_up_query";
-import {
-  BurnUpQueryDto,
-  BurnUpQueryResultDto,
-} from "../../shared/infrastructure/burn_up_query_dto";
 
 export function useBurnUp(query: BurnUpQuery) {
   const [result, setResult] = useState(BurnUpQueryResult.create());
@@ -25,8 +21,8 @@ export function useBurnUp(query: BurnUpQuery) {
 }
 
 async function queryBurnUp(query: BurnUpQuery) {
-  const resultDto = await window.activitySampling.queryBurnUp(
-    BurnUpQueryDto.fromModel(query),
-  );
-  return BurnUpQueryResultDto.create(resultDto).validate();
+  let json = JSON.stringify(query);
+  json = await window.activitySampling.queryBurnUp(json);
+  const dto = JSON.parse(json);
+  return BurnUpQueryResult.create(dto);
 }

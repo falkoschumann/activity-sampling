@@ -7,10 +7,6 @@ import {
   type ReportQuery,
   ReportQueryResult,
 } from "../../shared/domain/report_query";
-import {
-  ReportQueryDto,
-  ReportQueryResultDto,
-} from "../../shared/infrastructure/report_query_dto";
 
 export function useReport(query: ReportQuery) {
   const [result, setResult] = useState(ReportQueryResult.create());
@@ -30,8 +26,8 @@ export function useReport(query: ReportQuery) {
 }
 
 async function queryReport(query: ReportQuery) {
-  const resultDto = await window.activitySampling.queryReport(
-    ReportQueryDto.fromModel(query),
-  );
-  return ReportQueryResultDto.create(resultDto).validate();
+  let json = JSON.stringify(query);
+  json = await window.activitySampling.queryReport(json);
+  const dto = JSON.parse(json);
+  return ReportQueryResult.create(dto);
 }

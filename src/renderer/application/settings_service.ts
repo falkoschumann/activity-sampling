@@ -1,10 +1,9 @@
 // Copyright (c) 2026 Falko Schumann. All rights reserved. MIT license.
 
+import { Temporal } from "@js-temporal/polyfill";
 import { useEffect, useState } from "react";
 
 import { Settings } from "../../shared/domain/settings";
-import { SettingsDto } from "../../shared/infrastructure/settings";
-import { Temporal } from "@js-temporal/polyfill";
 
 export function useSettings() {
   const [dataDir, setDataDir] = useState("");
@@ -12,8 +11,9 @@ export function useSettings() {
   const [categories, setCategories] = useState("");
 
   async function load() {
-    const dto = await window.activitySampling.loadSettings();
-    const settings = SettingsDto.create(dto).validate();
+    const json = await window.activitySampling.loadSettings();
+    const dto = JSON.parse(json);
+    const settings = Settings.create(dto);
     setDataDir(settings.dataDir);
     setCapacity(settings.capacity.total("hours"));
     setCategories(settings.categories.join(", "));
@@ -25,8 +25,8 @@ export function useSettings() {
       capacity: Temporal.Duration.from({ hours: capacity }),
       categories: categories.split(",").map((c) => c.trim()),
     });
-    const dto = SettingsDto.fromModel(settings);
-    await window.activitySampling.storeSettings(dto);
+    const json = JSON.stringify(settings);
+    await window.activitySampling.storeSettings(json);
   }
 
   useEffect(() => {

@@ -23,85 +23,36 @@ import {
   TIMER_STARTED_CHANNEL,
   TIMER_STOPPED_CHANNEL,
 } from "../shared/infrastructure/channels";
-import type { CommandStatusDto } from "../shared/infrastructure/command_status_dto.ts";
-import {
-  type BurnUpQueryDto,
-  BurnUpQueryResultDto,
-} from "../shared/infrastructure/burn_up_query_dto";
-import type { ExportTimesheetCommandDto } from "../shared/infrastructure/export_timesheet_command_dto.ts";
-import type { LogActivityCommandDto } from "../shared/infrastructure/log_activity_command_dto.ts";
-import {
-  type RecentActivitiesQueryDto,
-  RecentActivitiesQueryResultDto,
-} from "../shared/infrastructure/recent_activities_query_dto";
-import type {
-  ReportQueryDto,
-  ReportQueryResultDto,
-} from "../shared/infrastructure/report_query_dto";
-import type { SettingsDto } from "../shared/infrastructure/settings";
-import {
-  StatisticsQueryDto,
-  StatisticsQueryResultDto,
-} from "../shared/infrastructure/statistics_query_dto";
-import type { IntervalElapsedEventDto } from "../shared/infrastructure/interval_elapsed_event_dto";
-import type { TimerStartedEventDto } from "../shared/infrastructure/timer_started_event_dto";
-import type { TimerStoppedEventDto } from "../shared/infrastructure/timer_stopped_event_dto";
-import type {
-  TimesheetQueryDto,
-  TimesheetQueryResultDto,
-} from "../shared/infrastructure/timesheet_query_dto";
 
 // TODO map between DTOs and domain objects
 
 contextBridge.exposeInMainWorld("activitySampling", {
-  logActivity: async (
-    command: LogActivityCommandDto,
-  ): Promise<CommandStatusDto> => {
-    return ipcRenderer.invoke(LOG_ACTIVITY_CHANNEL, command);
-  },
+  logActivity: async (command: string): Promise<string> =>
+    ipcRenderer.invoke(LOG_ACTIVITY_CHANNEL, command),
 
-  exportTimesheet: async (
-    command: ExportTimesheetCommandDto,
-  ): Promise<CommandStatusDto> => {
-    return ipcRenderer.invoke(EXPORT_TIMESHEET_CHANNEL, command);
-  },
+  exportTimesheet: async (command: string): Promise<string> =>
+    ipcRenderer.invoke(EXPORT_TIMESHEET_CHANNEL, command),
 
-  queryRecentActivities: async (
-    query: RecentActivitiesQueryDto,
-  ): Promise<RecentActivitiesQueryResultDto> => {
-    return ipcRenderer.invoke(QUERY_RECENT_ACTIVITIES_CHANNEL, query);
-  },
+  queryRecentActivities: async (query: string): Promise<string> =>
+    ipcRenderer.invoke(QUERY_RECENT_ACTIVITIES_CHANNEL, query),
 
-  queryReport: async (query: ReportQueryDto): Promise<ReportQueryResultDto> => {
-    return ipcRenderer.invoke(QUERY_REPORT_CHANNEL, query);
-  },
+  queryReport: async (query: string): Promise<string> =>
+    ipcRenderer.invoke(QUERY_REPORT_CHANNEL, query),
 
-  queryStatistics: async (
-    query: StatisticsQueryDto,
-  ): Promise<StatisticsQueryResultDto> => {
-    return ipcRenderer.invoke(QUERY_STATISTICS_CHANNEL, query);
-  },
+  queryStatistics: async (query: string): Promise<string> =>
+    ipcRenderer.invoke(QUERY_STATISTICS_CHANNEL, query),
 
-  queryTimesheet: async (
-    query: TimesheetQueryDto,
-  ): Promise<TimesheetQueryResultDto> => {
-    return ipcRenderer.invoke(QUERY_TIMESHEET_CHANNEL, query);
-  },
+  queryTimesheet: async (query: string): Promise<string> =>
+    ipcRenderer.invoke(QUERY_TIMESHEET_CHANNEL, query),
 
-  queryEstimate: async (
-    query: StatisticsQueryDto,
-  ): Promise<StatisticsQueryResultDto> => {
-    return ipcRenderer.invoke(QUERY_ESTIMATE_CHANNEL, query);
-  },
+  queryEstimate: async (query: string): Promise<string> =>
+    ipcRenderer.invoke(QUERY_ESTIMATE_CHANNEL, query),
 
-  queryBurnUp: async (query: BurnUpQueryDto): Promise<BurnUpQueryResultDto> => {
-    return ipcRenderer.invoke(QUERY_BURN_UP_CHANNEL, query);
-  },
+  queryBurnUp: async (query: string): Promise<string> =>
+    ipcRenderer.invoke(QUERY_BURN_UP_CHANNEL, query),
 
-  onTimerStartedEvent: (
-    eventHandler: (event: TimerStartedEventDto) => void,
-  ) => {
-    function listener(_event: unknown, args: TimerStartedEventDto) {
+  onTimerStartedEvent: (eventHandler: (event: string) => void) => {
+    function listener(_event: unknown, args: string) {
       eventHandler(args);
     }
 
@@ -109,10 +60,8 @@ contextBridge.exposeInMainWorld("activitySampling", {
     return () => ipcRenderer.off(TIMER_STARTED_CHANNEL, listener);
   },
 
-  onTimerStoppedEvent: (
-    eventHandler: (event: TimerStoppedEventDto) => void,
-  ) => {
-    function listener(_event: unknown, args: TimerStoppedEventDto) {
+  onTimerStoppedEvent: (eventHandler: (event: string) => void) => {
+    function listener(_event: unknown, args: string) {
       eventHandler(args);
     }
 
@@ -120,10 +69,8 @@ contextBridge.exposeInMainWorld("activitySampling", {
     return () => ipcRenderer.off(TIMER_STOPPED_CHANNEL, listener);
   },
 
-  onIntervalElapsedEvent: (
-    eventListener: (event: IntervalElapsedEventDto) => void,
-  ) => {
-    function listener(_event: unknown, args: IntervalElapsedEventDto) {
+  onIntervalElapsedEvent: (eventListener: (event: string) => void) => {
+    function listener(_event: unknown, args: string) {
       eventListener(args);
     }
 
@@ -131,13 +78,11 @@ contextBridge.exposeInMainWorld("activitySampling", {
     return () => ipcRenderer.off(INTERVAL_ELAPSED_CHANNEL, listener);
   },
 
-  loadSettings: async (): Promise<SettingsDto> => {
-    return ipcRenderer.invoke(LOAD_SETTINGS_CHANNEL);
-  },
+  loadSettings: async (): Promise<string> =>
+    ipcRenderer.invoke(LOAD_SETTINGS_CHANNEL),
 
-  storeSettings: async (settings: SettingsDto): Promise<void> => {
-    return ipcRenderer.invoke(STORE_SETTINGS_CHANNEL, settings);
-  },
+  storeSettings: async (settings: string): Promise<void> =>
+    ipcRenderer.invoke(STORE_SETTINGS_CHANNEL, settings),
 
   showOpenDialog: async (
     options: OpenDialogOptions,

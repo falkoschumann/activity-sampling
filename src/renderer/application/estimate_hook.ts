@@ -6,10 +6,6 @@ import {
   type EstimateQuery,
   EstimateQueryResult,
 } from "../../shared/domain/estimate_query";
-import {
-  EstimateQueryDto,
-  EstimateQueryResultDto,
-} from "../../shared/infrastructure/estimate_query_dto";
 
 export function useEstimate(query: EstimateQuery): EstimateQueryResult {
   const [result, setResult] = useState(EstimateQueryResult.create());
@@ -25,8 +21,8 @@ export function useEstimate(query: EstimateQuery): EstimateQueryResult {
 }
 
 async function queryEstimate(query: EstimateQuery) {
-  const resultDto = await window.activitySampling.queryEstimate(
-    EstimateQueryDto.fromModel(query),
-  );
-  return EstimateQueryResultDto.create(resultDto).validate();
+  let json = JSON.stringify(query);
+  json = await window.activitySampling.queryEstimate(json);
+  const dto = JSON.parse(json);
+  return EstimateQueryResult.create(dto);
 }

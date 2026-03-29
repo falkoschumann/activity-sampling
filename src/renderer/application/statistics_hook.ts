@@ -6,10 +6,6 @@ import {
   type StatisticsQuery,
   StatisticsQueryResult,
 } from "../../shared/domain/statistics_query";
-import {
-  StatisticsQueryDto,
-  StatisticsQueryResultDto,
-} from "../../shared/infrastructure/statistics_query_dto";
 
 export function useStatistics(query: StatisticsQuery) {
   const [result, setResult] = useState(StatisticsQueryResult.create());
@@ -25,8 +21,8 @@ export function useStatistics(query: StatisticsQuery) {
 }
 
 async function queryStatistics(query: StatisticsQuery) {
-  const resultDto = await window.activitySampling.queryStatistics(
-    StatisticsQueryDto.fromModel(query),
-  );
-  return StatisticsQueryResultDto.create(resultDto).validate();
+  let json = JSON.stringify(query);
+  json = await window.activitySampling.queryStatistics(json);
+  const dto = JSON.parse(json);
+  return StatisticsQueryResult.create(dto);
 }
