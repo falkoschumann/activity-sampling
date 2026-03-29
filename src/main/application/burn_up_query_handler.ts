@@ -8,7 +8,7 @@ import {
   BurnUpQueryResult,
 } from "../../shared/domain/burn_up_query";
 import { projectBurnUp } from "../domain/burn_up_projection";
-import { ActivityLoggedEventDto } from "../infrastructure/events";
+import { ActivityLoggedEventDto } from "../infrastructure/activity_logged_event_dto";
 import type { EventStore } from "../infrastructure/event_store";
 
 export class BurnUpQueryHandler {

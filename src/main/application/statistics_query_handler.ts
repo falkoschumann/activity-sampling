@@ -8,7 +8,7 @@ import type {
   StatisticsQueryResult,
 } from "../../shared/domain/statistics_query";
 import { projectStatistics } from "../domain/statistics_projection";
-import { ActivityLoggedEventDto } from "../infrastructure/events";
+import { ActivityLoggedEventDto } from "../infrastructure/activity_logged_event_dto";
 import type { EventStore } from "../infrastructure/event_store";
 
 export class StatisticsQueryHandler {

@@ -7,7 +7,7 @@ import stream from "node:stream";
 import { ConfigurableResponses, OutputTracker } from "@muspellheim/shared";
 import { parse, stringify } from "csv";
 import { stringify as syncStringify } from "csv-stringify/sync";
-import type { ActivityLoggedEventDto } from "./events";
+import type { ActivityLoggedEventDto } from "./activity_logged_event_dto";
 
 const RECORDED_EVENT = "recorded";
 

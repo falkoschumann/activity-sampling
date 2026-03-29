@@ -9,7 +9,7 @@ import {
   EstimateQuery,
   type EstimateQueryResult,
 } from "../../../src/shared/domain/estimate_query";
-import { ActivityLoggedEventDto } from "../../../src/main/infrastructure/events";
+import { ActivityLoggedEventDto } from "../../../src/main/infrastructure/activity_logged_event_dto";
 import { EventStore } from "../../../src/main/infrastructure/event_store";
 
 describe("Estimate", () => {

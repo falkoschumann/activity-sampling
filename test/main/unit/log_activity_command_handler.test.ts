@@ -5,7 +5,7 @@ import { describe, expect, it } from "vitest";
 
 import { LogActivityCommandHandler } from "../../../src/main/application/log_activity_command_handler";
 import { LogActivityCommand } from "../../../src/shared/domain/log_activity_command";
-import { ActivityLoggedEventDto } from "../../../src/main/infrastructure/events";
+import { ActivityLoggedEventDto } from "../../../src/main/infrastructure/activity_logged_event_dto";
 import { EventStore } from "../../../src/main/infrastructure/event_store";
 
 describe("Log activity", () => {

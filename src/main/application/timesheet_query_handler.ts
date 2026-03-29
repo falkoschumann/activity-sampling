@@ -8,7 +8,7 @@ import type {
   TimesheetQueryResult,
 } from "../../shared/domain/timesheet_query";
 import { projectTimesheet } from "../domain/timesheet_projection";
-import { ActivityLoggedEventDto } from "../infrastructure/events";
+import { ActivityLoggedEventDto } from "../infrastructure/activity_logged_event_dto";
 import type { EventStore } from "../infrastructure/event_store";
 import { HolidayRepository } from "../infrastructure/holiday_repository";
 import { VacationRepository } from "../infrastructure/vacation_repository";

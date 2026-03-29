@@ -6,7 +6,6 @@ import { Temporal } from "@js-temporal/polyfill";
 import { describe, expect, it } from "vitest";
 
 import { Settings } from "../../../src/shared/domain/settings";
-import { SettingsDto } from "../../../src/shared/infrastructure/settings";
 import { SettingsProvider } from "../../../src/main/infrastructure/settings_provider";
 
 const NON_EXISTING_FILE = path.resolve(
@@ -110,7 +109,7 @@ describe("Settings provider", () => {
       it("should return configurable responses", async () => {
         const gateway = SettingsProvider.createNull({
           readFileResponses: [
-            SettingsDto.create({
+            Settings.create({
               dataDir: "data-dir",
               capacity: "PT20H",
               categories: ["category 1", "category 2"],

@@ -8,7 +8,7 @@ import type {
   RecentActivitiesQueryResult,
 } from "../../shared/domain/recent_activities_query";
 import { projectRecentActivities } from "../domain/recent_activities_projection";
-import { ActivityLoggedEventDto } from "../infrastructure/events";
+import { ActivityLoggedEventDto } from "../infrastructure/activity_logged_event_dto";
 import type { EventStore } from "../infrastructure/event_store";
 
 export class RecentActivitiesQueryHandler {

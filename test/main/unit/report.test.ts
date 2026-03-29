@@ -7,7 +7,7 @@ import {
   ReportScope,
 } from "../../../src/shared/domain/report_query";
 import { Clock } from "../../../src/shared/domain/temporal";
-import { ActivityLoggedEventDto } from "../../../src/main/infrastructure/events";
+import { ActivityLoggedEventDto } from "../../../src/main/infrastructure/activity_logged_event_dto";
 import { EventStore } from "../../../src/main/infrastructure/event_store";
 import { ReportQueryHandler } from "../../../src/main/application/report_query_handler";
 

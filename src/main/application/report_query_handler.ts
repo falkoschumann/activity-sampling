@@ -7,7 +7,7 @@ import type {
   ReportQueryResult,
 } from "../../shared/domain/report_query";
 import { projectReport } from "../domain/report_projection";
-import { ActivityLoggedEventDto } from "../infrastructure/events";
+import { ActivityLoggedEventDto } from "../infrastructure/activity_logged_event_dto";
 import type { EventStore } from "../infrastructure/event_store";
 import type { Clock } from "../../shared/domain/temporal";
 

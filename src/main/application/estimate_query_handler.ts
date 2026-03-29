@@ -8,7 +8,7 @@ import type {
   EstimateQueryResult,
 } from "../../shared/domain/estimate_query";
 import { projectEstimate } from "../domain/estimate_projection";
-import { ActivityLoggedEventDto } from "../infrastructure/events";
+import { ActivityLoggedEventDto } from "../infrastructure/activity_logged_event_dto";
 import type { EventStore } from "../infrastructure/event_store";
 
 export class EstimateQueryHandler {

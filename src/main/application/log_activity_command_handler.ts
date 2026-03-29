@@ -3,7 +3,7 @@
 import { type CommandStatus, Success } from "@muspellheim/shared";
 
 import { LogActivityCommand } from "../../shared/domain/log_activity_command";
-import { ActivityLoggedEventDto } from "../infrastructure/events";
+import { ActivityLoggedEventDto } from "../infrastructure/activity_logged_event_dto";
 import type { EventStore } from "../infrastructure/event_store.ts";
 
 export class LogActivityCommandHandler {
