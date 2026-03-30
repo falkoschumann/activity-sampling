@@ -38,3 +38,6 @@ updates:
       - dependency-name: "eslint-plugin-headers"
         update-types:
           - "version-update:semver-patch"
+      - dependency-name: "typescript"
+        update-types:
+          - "version-update:semver-major"
