@@ -15,13 +15,13 @@ import { VacationRepository } from "../infrastructure/vacation_repository";
 
 export class TimesheetQueryHandler {
   static create({
-    capacity,
+    capacity = "PT30M",
     eventStore,
     holidayRepository,
     vacationRepository,
     clock,
   }: {
-    capacity: Temporal.Duration;
+    capacity?: Temporal.DurationLike | string;
     eventStore: EventStore;
     holidayRepository: HolidayRepository;
     vacationRepository: VacationRepository;
@@ -44,17 +44,17 @@ export class TimesheetQueryHandler {
   readonly #clock: Clock;
 
   private constructor(
-    capacity: Temporal.Duration,
+    capacity: Temporal.DurationLike | string,
     eventStore: EventStore,
     holidayRepository: HolidayRepository,
     vacationRepository: VacationRepository,
     clock: Clock,
   ) {
+    this.capacity = Temporal.Duration.from(capacity);
     this.#eventStore = eventStore;
     this.#holidayRepository = holidayRepository;
     this.#vacationRepository = vacationRepository;
     this.#clock = clock;
-    this.capacity = capacity;
   }
 
   async handle(query: TimesheetQuery): Promise<TimesheetQueryResult> {

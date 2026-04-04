@@ -6,24 +6,16 @@ import path from "node:path";
 import { ConfigurableResponses, OutputTracker } from "@muspellheim/shared";
 import Ajv from "ajv";
 import addFormats from "ajv-formats";
-import { app } from "electron";
 
 import { Settings } from "../../shared/domain/settings";
 
 const STORED_EVENT = "stored";
 
-export interface SettingsConfiguration {
-  readonly fileName: string;
-}
-
 export class SettingsProvider extends EventTarget {
-  static create(
-    configuration: SettingsConfiguration = {
-      // TODO move app.getPath to entry layer of main process
-      fileName: path.join(app.getPath("userData"), "settings.json"),
-    },
-  ): SettingsProvider {
-    return new SettingsProvider(configuration, fsPromise);
+  static create({
+    fileName = "data/settings.json",
+  }: { fileName?: string } = {}): SettingsProvider {
+    return new SettingsProvider(fileName, fsPromise);
   }
 
   static createNull({
@@ -32,7 +24,7 @@ export class SettingsProvider extends EventTarget {
     readFileResponses?: (Settings | null | Error)[];
   } = {}): SettingsProvider {
     return new SettingsProvider(
-      { fileName: "null-settings.json" },
+      "null-settings.json",
       new FsPromiseStub(readFileResponses) as unknown as typeof fsPromise,
     );
   }
@@ -40,9 +32,9 @@ export class SettingsProvider extends EventTarget {
   readonly #fileName: string;
   readonly #fs: typeof fsPromise;
 
-  constructor(configuration: SettingsConfiguration, fs: typeof fsPromise) {
+  private constructor(fileName: string, fs: typeof fsPromise) {
     super();
-    this.#fileName = configuration.fileName;
+    this.#fileName = fileName;
     this.#fs = fs;
   }
 

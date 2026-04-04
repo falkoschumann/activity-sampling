@@ -12,17 +12,13 @@ import { stringify } from "csv/sync";
 
 import { Vacation } from "../domain/calendar";
 
-export interface VacationConfiguration {
-  readonly fileName: string;
-}
-
 export class VacationRepository {
-  static create(
-    configuration: VacationConfiguration = {
-      fileName: "data/vacation.csv",
-    },
-  ): VacationRepository {
-    return new VacationRepository(configuration, fsPromise);
+  static create({
+    fileName = "data/vacation.csv",
+  }: {
+    fileName?: string;
+  } = {}): VacationRepository {
+    return new VacationRepository(fileName, fsPromise);
   }
 
   static createNull({
@@ -31,7 +27,7 @@ export class VacationRepository {
     readFileResponses?: (VacationDto[] | null | Error)[];
   } = {}): VacationRepository {
     return new VacationRepository(
-      { fileName: "null-holidays.csv" },
+      "null-holidays.csv",
       new FsPromiseStub(readFileResponses) as unknown as typeof fsPromise,
     );
   }
@@ -40,8 +36,8 @@ export class VacationRepository {
 
   readonly #fs: typeof fsPromise;
 
-  constructor(configuration: VacationConfiguration, fs: typeof fsPromise) {
-    this.fileName = configuration.fileName;
+  private constructor(fileName: string, fs: typeof fsPromise) {
+    this.fileName = fileName;
     this.#fs = fs;
   }
 

@@ -11,24 +11,18 @@ import type { ActivityLoggedEventDto } from "./activity_logged_event_dto";
 
 const RECORDED_EVENT = "recorded";
 
-export interface EventStoreConfiguration {
-  readonly fileName: string;
-}
-
 export class EventStore extends EventTarget {
-  static create(
-    configuration: EventStoreConfiguration = {
-      fileName: "data/activity-log.csv",
-    },
-  ): EventStore {
-    return new EventStore(configuration, fsPromise);
+  static create({
+    fileName = "data/activity-log.csv",
+  }: { fileName?: string } = {}): EventStore {
+    return new EventStore(fileName, fsPromise);
   }
 
   static createNull({
     events,
   }: { events?: ActivityLoggedEventDto[] } = {}): EventStore {
     return new EventStore(
-      { fileName: "null-activity-log.csv" },
+      "null-activity-log.csv",
       new FsPromiseStub(events) as unknown as typeof fsPromise,
     );
   }
@@ -37,9 +31,9 @@ export class EventStore extends EventTarget {
 
   readonly #fs: typeof fsPromise;
 
-  constructor(configuration: EventStoreConfiguration, fs: typeof fsPromise) {
+  private constructor(fileName: string, fs: typeof fsPromise) {
     super();
-    this.fileName = configuration.fileName;
+    this.fileName = fileName;
     this.#fs = fs;
   }
 

@@ -12,17 +12,11 @@ import { stringify } from "csv/sync";
 import { Holiday } from "../domain/calendar";
 import path from "node:path";
 
-export interface HolidayConfiguration {
-  readonly fileName: string;
-}
-
 export class HolidayRepository {
-  static create(
-    configuration: HolidayConfiguration = {
-      fileName: "data/holidays.csv",
-    },
-  ): HolidayRepository {
-    return new HolidayRepository(configuration, fsPromise);
+  static create({
+    fileName = "data/holidays.csv",
+  }: { fileName?: string } = {}): HolidayRepository {
+    return new HolidayRepository(fileName, fsPromise);
   }
 
   static createNull({
@@ -31,7 +25,7 @@ export class HolidayRepository {
     readFileResponses?: (HolidayDto[] | null | Error)[];
   } = {}): HolidayRepository {
     return new HolidayRepository(
-      { fileName: "null-holidays.csv" },
+      "null-holidays.csv",
       new FsPromiseStub(readFileResponses) as unknown as typeof fsPromise,
     );
   }
@@ -40,8 +34,8 @@ export class HolidayRepository {
 
   readonly #fs: typeof fsPromise;
 
-  constructor(configuration: HolidayConfiguration, fs: typeof fsPromise) {
-    this.fileName = configuration.fileName;
+  private constructor(fileName: string, fs: typeof fsPromise) {
+    this.fileName = fileName;
     this.#fs = fs;
   }
 

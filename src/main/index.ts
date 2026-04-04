@@ -1,5 +1,7 @@
 // Copyright (c) 2026 Falko Schumann. All rights reserved. MIT license.
 
+import path from "node:path";
+
 import { shell } from "electron/common";
 import { app, BrowserWindow, dialog, ipcMain, Menu } from "electron/main";
 import {
@@ -57,8 +59,12 @@ import { TimesheetQuery } from "../shared/domain/timesheet_query";
 import { EstimateQuery } from "../shared/domain/estimate_query";
 import { BurnUpQuery, BurnUpQueryResult } from "../shared/domain/burn_up_query";
 
-let settings = Settings.create();
-const settingsProvider = SettingsProvider.create();
+const isProduction = app.isPackaged;
+
+const fileName = isProduction
+  ? path.join(app.getPath("userData"), "settings.json")
+  : undefined;
+const settingsProvider = SettingsProvider.create({ fileName });
 const eventStore = EventStore.create();
 const holidayRepository = HolidayRepository.create();
 const vacationRepository = VacationRepository.create();
@@ -95,7 +101,6 @@ const burnUpQueryHandler = BurnUpQueryHandler.create({
   clock,
 });
 const timesheetQueryHandler = TimesheetQueryHandler.create({
-  capacity: settings.capacity,
   eventStore,
   holidayRepository,
   vacationRepository,
@@ -104,8 +109,6 @@ const timesheetQueryHandler = TimesheetQueryHandler.create({
 const exportTimesheetCommandHandler = ExportTimesheetCommandHandler.create({
   timesheetExporter,
 });
-
-const isProduction = app.isPackaged;
 
 app.whenReady().then(async () => {
   await initializeApplication();
@@ -148,7 +151,8 @@ app.on("activate", function () {
 });
 
 async function initializeApplication() {
-  settings = await settingsProvider.load();
+  let settings = await settingsProvider.load();
+  // TODO verify this check for first start up
   if (settings.dataDir !== Settings.create().dataDir) {
     applySettings(settings);
     return;
@@ -281,6 +285,7 @@ function createWindow() {
     stopTimerCommandHandler.handle(command);
 
   const onDataDirectoryChanged = async (dataDir: string) => {
+    let settings = await settingsProvider.load();
     settings = { ...settings, dataDir };
     await settingsProvider.store(settings);
     applySettings(settings);
