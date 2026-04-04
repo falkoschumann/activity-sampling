@@ -4,10 +4,7 @@ import path from "node:path";
 
 import { shell } from "electron/common";
 import { app, BrowserWindow, dialog, ipcMain, Menu } from "electron/main";
-import {
-  installExtension,
-  REACT_DEVELOPER_TOOLS,
-} from "electron-devtools-installer";
+import { installExtension, REACT_DEVELOPER_TOOLS } from "electron-devtools-installer";
 
 import { StartTimerCommandHandler } from "./application/start_timer_command_handler";
 import { StopTimerCommandHandler } from "./application/stop_timer_command_handler";
@@ -43,7 +40,7 @@ import {
   SHOW_OPEN_DIALOG_CHANNEL,
   STORE_SETTINGS_CHANNEL,
   TIMER_STARTED_CHANNEL,
-  TIMER_STOPPED_CHANNEL,
+  TIMER_STOPPED_CHANNEL
 } from "../shared/infrastructure/channels";
 import { chooseDataDirectory, openWindow } from "./ui/actions";
 import { createMenu } from "./ui/menu";
@@ -58,6 +55,7 @@ import { StatisticsQuery } from "../shared/domain/statistics_query";
 import { TimesheetQuery } from "../shared/domain/timesheet_query";
 import { EstimateQuery } from "../shared/domain/estimate_query";
 import { BurnUpQuery, BurnUpQueryResult } from "../shared/domain/burn_up_query";
+import { CurrentIntervalQueryHandler } from "./application/current_interval_query_handler";
 
 const isProduction = app.isPackaged;
 
@@ -74,11 +72,10 @@ const clock = Clock.systemDefaultZone();
 const timerState = TimerState.create();
 const startTimerCommandHandler = StartTimerCommandHandler.create({
   timerState,
-  clock,
 });
-const stopTimerCommandHandler = StopTimerCommandHandler.create({
+const stopTimerCommandHandler = StopTimerCommandHandler.create();
+const currentIntervalQueryHandler = CurrentIntervalQueryHandler.create({
   timerState,
-  clock,
 });
 const logActivityCommandHandler = LogActivityCommandHandler.create({
   eventStore,
@@ -152,7 +149,6 @@ app.on("activate", function () {
 
 async function initializeApplication() {
   let settings = await settingsProvider.load();
-  // TODO verify this check for first start up
   if (settings.dataDir !== Settings.create().dataDir) {
     applySettings(settings);
     return;
@@ -315,7 +311,7 @@ function createMainToLogWindowChannels(window: BrowserWindow) {
       TimerStoppedEvent.create(event as TimerStoppedEvent),
     ),
   );
-  startTimerCommandHandler.addEventListener(
+  currentIntervalQueryHandler.addEventListener(
     IntervalElapsedEvent.TYPE,
     (event) =>
       window.webContents.send(

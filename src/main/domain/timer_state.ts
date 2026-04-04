@@ -4,23 +4,16 @@ import { Temporal } from "@js-temporal/polyfill";
 
 export class TimerState {
   static create({
-    intervalId,
     currentInterval,
   }: {
-    intervalId?: ReturnType<typeof globalThis.setInterval>;
     currentInterval?: Temporal.DurationLike | string;
   } = {}) {
-    return new TimerState(intervalId, currentInterval);
+    return new TimerState(currentInterval);
   }
 
-  intervalId?: ReturnType<typeof globalThis.setInterval>;
   currentInterval?: Temporal.DurationLike;
 
-  private constructor(
-    intervalId?: ReturnType<typeof globalThis.setInterval>,
-    currentInterval?: Temporal.DurationLike | string,
-  ) {
-    this.intervalId = intervalId;
+  private constructor(currentInterval?: Temporal.DurationLike | string) {
     this.currentInterval =
       currentInterval != null
         ? Temporal.Duration.from(currentInterval)

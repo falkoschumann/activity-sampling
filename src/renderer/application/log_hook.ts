@@ -113,13 +113,13 @@ export function useLog() {
     }
 
     NotificationGateway.getInstance().addEventListener(
-      NotificationClickedEvent.TYPE,
+      "notificationClicked",
       handleEvent,
     );
 
     return () =>
       NotificationGateway.getInstance().removeEventListener(
-        NotificationClickedEvent.TYPE,
+        "notificationClicked",
         handleEvent,
       );
   }, [handleQueryRecentActivities, state.countdown.interval]);

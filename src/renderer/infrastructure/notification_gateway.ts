@@ -10,13 +10,8 @@ export class NotificationClickedEvent extends Event {
   static create(
     eventInitDict: NotificationClickedEventInit,
   ): NotificationClickedEvent {
-    return new NotificationClickedEvent(
-      NotificationClickedEvent.TYPE,
-      eventInitDict,
-    );
+    return new NotificationClickedEvent("notificationClicked", eventInitDict);
   }
-
-  static TYPE = "notificationClicked";
 
   activity?: ActivityLoggedEvent;
 
@@ -25,6 +20,10 @@ export class NotificationClickedEvent extends Event {
     this.activity = eventInitDict.activity;
   }
 }
+
+type EventMap = {
+  notificationClicked: NotificationClickedEvent;
+};
 
 export class NotificationGateway extends EventTarget {
   static #instance: NotificationGateway;
@@ -61,5 +60,21 @@ export class NotificationGateway extends EventTarget {
 
   hide() {
     this.#notification?.close();
+  }
+
+  override addEventListener<K extends keyof EventMap>(
+    type: K,
+    callback: (event: EventMap[K]) => void,
+    options?: AddEventListenerOptions | boolean,
+  ) {
+    super.addEventListener(type, callback, options);
+  }
+
+  override removeEventListener<K extends keyof EventMap>(
+    type: K,
+    callback: (event: EventMap[K]) => void,
+    options?: EventListenerOptions | boolean,
+  ) {
+    super.removeEventListener(type, callback, options);
   }
 }
