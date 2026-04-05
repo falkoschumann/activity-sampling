@@ -4,7 +4,10 @@ import path from "node:path";
 
 import { shell } from "electron/common";
 import { app, BrowserWindow, dialog, ipcMain, Menu } from "electron/main";
-import { installExtension, REACT_DEVELOPER_TOOLS } from "electron-devtools-installer";
+import {
+  installExtension,
+  REACT_DEVELOPER_TOOLS,
+} from "electron-devtools-installer";
 
 import { StartTimerCommandHandler } from "./application/start_timer_command_handler";
 import { StopTimerCommandHandler } from "./application/stop_timer_command_handler";
@@ -40,7 +43,7 @@ import {
   SHOW_OPEN_DIALOG_CHANNEL,
   STORE_SETTINGS_CHANNEL,
   TIMER_STARTED_CHANNEL,
-  TIMER_STOPPED_CHANNEL
+  TIMER_STOPPED_CHANNEL,
 } from "../shared/infrastructure/channels";
 import { chooseDataDirectory, openWindow } from "./ui/actions";
 import { createMenu } from "./ui/menu";
