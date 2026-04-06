@@ -1,6 +1,6 @@
 // Copyright (c) 2026 Falko Schumann. All rights reserved. MIT license.
 
-import { ActivityLoggedEvent } from "../../shared/domain/activity_logged_event";
+import { LoggedActivity } from "../../shared/domain/logged_activity";
 import {
   StatisticsQuery,
   StatisticsQueryResult,
@@ -13,7 +13,7 @@ import {
 } from "./activities";
 
 export async function projectStatistics(
-  replay: AsyncGenerator<ActivityLoggedEvent>,
+  replay: AsyncGenerator<LoggedActivity>,
   query: StatisticsQuery,
 ): Promise<StatisticsQueryResult> {
   const activitiesProjection = new ActivitiesProjection(query.categories);

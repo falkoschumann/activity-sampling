@@ -4,7 +4,7 @@ import { Temporal } from "@js-temporal/polyfill";
 import { describe, expect, it } from "vitest";
 
 import { projectReport } from "../../../src/main/domain/report_projection";
-import { ActivityLoggedEvent } from "../../../src/shared/domain/activity_logged_event";
+import { LoggedActivity } from "../../../src/shared/domain/logged_activity";
 import {
   ReportEntry,
   ReportQuery,
@@ -32,18 +32,18 @@ describe("Report projection", () => {
 
   it("should summarize hours worked on clients", async () => {
     const replay = createAsyncGenerator([
-      ActivityLoggedEvent.createTestInstance({
+      LoggedActivity.createTestInstance({
         dateTime: "2025-06-25T17:00",
         client: "Client 2",
         duration: "PT7H",
       }),
-      ActivityLoggedEvent.createTestInstance({
+      LoggedActivity.createTestInstance({
         dateTime: "2025-06-26T17:00",
         client: "Client 1",
         task: "Task 1",
         duration: "PT5H",
       }),
-      ActivityLoggedEvent.createTestInstance({
+      LoggedActivity.createTestInstance({
         dateTime: "2025-06-27T17:00",
         client: "Client 1",
         task: "Task 2",
@@ -81,17 +81,17 @@ describe("Report projection", () => {
 
   it("should sort by client when scope is clients", async () => {
     const replay = createAsyncGenerator([
-      ActivityLoggedEvent.createTestInstance({
+      LoggedActivity.createTestInstance({
         dateTime: "2025-12-08T17:00",
         client: "Client 3",
         duration: "PT7H",
       }),
-      ActivityLoggedEvent.createTestInstance({
+      LoggedActivity.createTestInstance({
         dateTime: "2025-12-09T17:00",
         client: "Client 2",
         duration: "PT5H",
       }),
-      ActivityLoggedEvent.createTestInstance({
+      LoggedActivity.createTestInstance({
         dateTime: "2025-12-10T17:00",
         client: "Client 1",
         duration: "PT3H",
@@ -135,17 +135,17 @@ describe("Report projection", () => {
 
   it("should summarize hours worked on projects", async () => {
     const replay = createAsyncGenerator([
-      ActivityLoggedEvent.createTestInstance({
+      LoggedActivity.createTestInstance({
         dateTime: "2025-12-08T17:00",
         project: "Project 1",
         duration: "PT3H",
       }),
-      ActivityLoggedEvent.createTestInstance({
+      LoggedActivity.createTestInstance({
         dateTime: "2025-12-09T17:00",
         project: "Project 2",
         duration: "PT5H",
       }),
-      ActivityLoggedEvent.createTestInstance({
+      LoggedActivity.createTestInstance({
         dateTime: "2025-12-10T17:00",
         project: "Project 2",
         duration: "PT7H",
@@ -184,31 +184,31 @@ describe("Report projection", () => {
 
   it("should aggregate clients for same project when scope is projects", async () => {
     const replay = createAsyncGenerator([
-      ActivityLoggedEvent.createTestInstance({
+      LoggedActivity.createTestInstance({
         dateTime: "2025-06-02T17:00",
         client: "Client 2",
         project: "Project 2",
         duration: "PT8H",
       }),
-      ActivityLoggedEvent.createTestInstance({
+      LoggedActivity.createTestInstance({
         dateTime: "2025-06-03T17:00",
         client: "Client 1",
         project: "Project 1",
         duration: "PT9H",
       }),
-      ActivityLoggedEvent.createTestInstance({
+      LoggedActivity.createTestInstance({
         dateTime: "2025-06-04T17:00",
         client: "Client 2",
         project: "Project 2",
         duration: "PT8H",
       }),
-      ActivityLoggedEvent.createTestInstance({
+      LoggedActivity.createTestInstance({
         dateTime: "2025-06-05T17:00",
         client: "Client 1",
         project: "Project 1",
         duration: "PT9H",
       }),
-      ActivityLoggedEvent.createTestInstance({
+      LoggedActivity.createTestInstance({
         dateTime: "2025-06-06T17:00",
         client: "Client 1",
         project: "Project 2",
@@ -248,17 +248,17 @@ describe("Report projection", () => {
 
   it("should sort by project when scope is projects", async () => {
     const replay = createAsyncGenerator([
-      ActivityLoggedEvent.createTestInstance({
+      LoggedActivity.createTestInstance({
         dateTime: "2025-12-08T17:00",
         project: "Project 3",
         duration: "PT3H",
       }),
-      ActivityLoggedEvent.createTestInstance({
+      LoggedActivity.createTestInstance({
         dateTime: "2025-12-09T17:00",
         project: "Project 2",
         duration: "PT5H",
       }),
-      ActivityLoggedEvent.createTestInstance({
+      LoggedActivity.createTestInstance({
         dateTime: "2025-12-10T17:00",
         project: "Project 1",
         duration: "PT7H",
@@ -305,17 +305,17 @@ describe("Report projection", () => {
 
   it("should summarize hours worked on tasks", async () => {
     const replay = createAsyncGenerator([
-      ActivityLoggedEvent.createTestInstance({
+      LoggedActivity.createTestInstance({
         dateTime: "2025-06-25T17:00",
         task: "Task 2",
         duration: "PT7H",
       }),
-      ActivityLoggedEvent.createTestInstance({
+      LoggedActivity.createTestInstance({
         dateTime: "2025-06-26T17:00",
         task: "Task 1",
         duration: "PT5H",
       }),
-      ActivityLoggedEvent.createTestInstance({
+      LoggedActivity.createTestInstance({
         dateTime: "2025-06-27T17:00",
         task: "Task 1",
         duration: "PT3H",
@@ -356,18 +356,18 @@ describe("Report projection", () => {
 
   it("should aggregate categories for same task when scope is tasks", async () => {
     const replay = createAsyncGenerator([
-      ActivityLoggedEvent.createTestInstance({
+      LoggedActivity.createTestInstance({
         dateTime: "2025-06-25T17:00",
         task: "Task 2",
         duration: "PT7H",
       }),
-      ActivityLoggedEvent.createTestInstance({
+      LoggedActivity.createTestInstance({
         dateTime: "2025-06-26T17:00",
         task: "Task 1",
         category: "Feature",
         duration: "PT5H",
       }),
-      ActivityLoggedEvent.createTestInstance({
+      LoggedActivity.createTestInstance({
         dateTime: "2025-06-27T17:00",
         task: "Task 1",
         category: "Rework",
@@ -410,35 +410,35 @@ describe("Report projection", () => {
 
   it("should sort by task, project and client when scope is tasks", async () => {
     const replay = createAsyncGenerator([
-      ActivityLoggedEvent.createTestInstance({
+      LoggedActivity.createTestInstance({
         dateTime: "2025-12-01T17:00",
         client: "Client 2",
         project: "Project 2",
         task: "Task 2",
         duration: "PT1H",
       }),
-      ActivityLoggedEvent.createTestInstance({
+      LoggedActivity.createTestInstance({
         dateTime: "2025-12-02T17:00",
         client: "Client 2",
         project: "Project 2",
         task: "Task 1",
         duration: "PT2H",
       }),
-      ActivityLoggedEvent.createTestInstance({
+      LoggedActivity.createTestInstance({
         dateTime: "2025-12-03T17:00",
         client: "Client 1",
         project: "Project 2",
         task: "Task 1",
         duration: "PT3H",
       }),
-      ActivityLoggedEvent.createTestInstance({
+      LoggedActivity.createTestInstance({
         dateTime: "2025-12-04T17:00",
         client: "Client 1",
         project: "Project 1",
         task: "Task 2",
         duration: "PT5H",
       }),
-      ActivityLoggedEvent.createTestInstance({
+      LoggedActivity.createTestInstance({
         dateTime: "2025-12-05T17:00",
         client: "Client 1",
         project: "Project 1",
@@ -508,17 +508,17 @@ describe("Report projection", () => {
 
   it("should summarize hours worked on categories", async () => {
     const replay = createAsyncGenerator([
-      ActivityLoggedEvent.createTestInstance({
+      LoggedActivity.createTestInstance({
         dateTime: "2025-06-25T17:00",
         category: "Rework",
         duration: "PT7H",
       }),
-      ActivityLoggedEvent.createTestInstance({
+      LoggedActivity.createTestInstance({
         dateTime: "2025-06-26T17:00",
         category: "Feature",
         duration: "PT5H",
       }),
-      ActivityLoggedEvent.createTestInstance({
+      LoggedActivity.createTestInstance({
         dateTime: "2025-06-27T17:00",
         category: "Feature",
         duration: "PT3H",
@@ -555,16 +555,16 @@ describe("Report projection", () => {
 
   it("should combine all task without category when scope is categories", async () => {
     const replay = createAsyncGenerator([
-      ActivityLoggedEvent.createTestInstance({
+      LoggedActivity.createTestInstance({
         dateTime: "2025-06-25T17:00",
         category: "Rework",
         duration: "PT7H",
       }),
-      ActivityLoggedEvent.createTestInstance({
+      LoggedActivity.createTestInstance({
         dateTime: "2025-06-26T17:00",
         duration: "PT5H",
       }),
-      ActivityLoggedEvent.createTestInstance({
+      LoggedActivity.createTestInstance({
         dateTime: "2025-06-27T17:00",
         duration: "PT3H",
       }),
@@ -600,17 +600,17 @@ describe("Report projection", () => {
 
   it("should sort by category when scope is categories", async () => {
     const replay = createAsyncGenerator([
-      ActivityLoggedEvent.createTestInstance({
+      LoggedActivity.createTestInstance({
         dateTime: "2025-12-08T17:00",
         category: "Category 3",
         duration: "PT7H",
       }),
-      ActivityLoggedEvent.createTestInstance({
+      LoggedActivity.createTestInstance({
         dateTime: "2025-12-09T17:00",
         category: "Category 2",
         duration: "PT5H",
       }),
-      ActivityLoggedEvent.createTestInstance({
+      LoggedActivity.createTestInstance({
         dateTime: "2025-12-10T17:00",
         category: "Category 1",
         duration: "PT3H",
@@ -654,13 +654,13 @@ describe("Report projection", () => {
 
   it("should sort by date", async () => {
     const replay = createAsyncGenerator([
-      ActivityLoggedEvent.createTestInstance({
+      LoggedActivity.createTestInstance({
         dateTime: "2025-12-12T12:00",
       }),
-      ActivityLoggedEvent.createTestInstance({
+      LoggedActivity.createTestInstance({
         dateTime: "2025-12-11T12:00",
       }),
-      ActivityLoggedEvent.createTestInstance({
+      LoggedActivity.createTestInstance({
         dateTime: "2025-12-10T12:00",
       }),
     ]);
@@ -689,15 +689,15 @@ describe("Report projection", () => {
   it("should summarize hours worked in a custom period", async () => {
     const replay = createAsyncGenerator([
       // before the period
-      ActivityLoggedEvent.createTestInstance({ dateTime: "2025-09-14T17:00" }),
+      LoggedActivity.createTestInstance({ dateTime: "2025-09-14T17:00" }),
       // start of the period
-      ActivityLoggedEvent.createTestInstance({ dateTime: "2025-09-15T17:00" }),
+      LoggedActivity.createTestInstance({ dateTime: "2025-09-15T17:00" }),
       // middle of the period
-      ActivityLoggedEvent.createTestInstance({ dateTime: "2025-09-17T17:00" }),
+      LoggedActivity.createTestInstance({ dateTime: "2025-09-17T17:00" }),
       // end of the period
-      ActivityLoggedEvent.createTestInstance({ dateTime: "2025-09-21T17:00" }),
+      LoggedActivity.createTestInstance({ dateTime: "2025-09-21T17:00" }),
       // after the period
-      ActivityLoggedEvent.createTestInstance({ dateTime: "2025-09-22T17:00" }),
+      LoggedActivity.createTestInstance({ dateTime: "2025-09-22T17:00" }),
     ]);
 
     const result = await projectReport(

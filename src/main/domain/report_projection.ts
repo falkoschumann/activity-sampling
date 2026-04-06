@@ -2,7 +2,7 @@
 
 import { Temporal } from "@js-temporal/polyfill";
 
-import { ActivityLoggedEvent } from "../../shared/domain/activity_logged_event";
+import { LoggedActivity } from "../../shared/domain/logged_activity";
 import {
   ReportEntry,
   ReportQuery,
@@ -13,7 +13,7 @@ import { normalizeDuration } from "../../shared/domain/temporal";
 import { filterEvents, TotalHoursProjection } from "./activities";
 
 export async function projectReport(
-  replay: AsyncGenerator<ActivityLoggedEvent>,
+  replay: AsyncGenerator<LoggedActivity>,
   query: ReportQuery,
 ): Promise<ReportQueryResult> {
   let projection;
@@ -45,7 +45,7 @@ export async function projectReport(
 class ClientReportProjection {
   #entries: ReportEntry[] = [];
 
-  update(event: ActivityLoggedEvent) {
+  update(event: LoggedActivity) {
     const index = this.#entries.findIndex(
       (entry) => entry.client === event.client,
     );
@@ -73,7 +73,7 @@ class ClientReportProjection {
 class ProjectReportProjection {
   #entries: ReportEntry[] = [];
 
-  update(event: ActivityLoggedEvent) {
+  update(event: LoggedActivity) {
     const index = this.#entries.findIndex(
       (entry) => entry.project === event.project,
     );
@@ -106,7 +106,7 @@ class ProjectReportProjection {
 class TaskReportProjection {
   #entries: ReportEntry[] = [];
 
-  update(event: ActivityLoggedEvent) {
+  update(event: LoggedActivity) {
     const index = this.#entries.findIndex(
       (entry) =>
         entry.task === event.task &&
@@ -156,7 +156,7 @@ class TaskReportProjection {
 class CategoryReportProjection {
   #entries: ReportEntry[] = [];
 
-  update(event: ActivityLoggedEvent) {
+  update(event: LoggedActivity) {
     const index = this.#entries.findIndex(
       (entry) => entry.category === (event.category ?? "N/A"),
     );
@@ -183,7 +183,7 @@ class CategoryReportProjection {
 
 function updateEntry(
   entry: ReportEntry,
-  event: ActivityLoggedEvent,
+  event: LoggedActivity,
   groupBy?: "client" | "category",
 ): ReportEntry {
   const date = event.dateTime.toPlainDate();

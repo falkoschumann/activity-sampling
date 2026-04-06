@@ -9,11 +9,11 @@ import {
   TimeSummary,
   WorkingDay,
 } from "../../shared/domain/recent_activities_query";
-import { ActivityLoggedEvent } from "../../shared/domain/activity_logged_event";
+import { LoggedActivity } from "../../shared/domain/logged_activity";
 import { filterEvents } from "./activities";
 
 export async function projectRecentActivities(
-  replay: AsyncGenerator<ActivityLoggedEvent>,
+  replay: AsyncGenerator<LoggedActivity>,
   query: RecentActivitiesQuery,
 ): Promise<RecentActivitiesQueryResult> {
   const today = query.today
@@ -36,9 +36,9 @@ export async function projectRecentActivities(
 class RecentActivitiesProjection {
   #workingDays: WorkingDay[] = [];
   #date?: Temporal.PlainDate;
-  #activities!: ActivityLoggedEvent[];
+  #activities!: LoggedActivity[];
 
-  update(event: ActivityLoggedEvent) {
+  update(event: LoggedActivity) {
     const activityDate = event.dateTime.toPlainDate();
     if (this.#date == null || !activityDate.equals(this.#date)) {
       this.#createWorkingDay();
@@ -46,7 +46,7 @@ class RecentActivitiesProjection {
       this.#activities = [];
     }
     this.#activities.push(
-      ActivityLoggedEvent.create({
+      LoggedActivity.create({
         dateTime: event.dateTime,
         duration: event.duration,
         client: event.client,
@@ -101,7 +101,7 @@ class TimeSummaryProjection {
     this.#monthEnd = this.#monthStart.add("P1M").subtract("P1D");
   }
 
-  update(event: ActivityLoggedEvent) {
+  update(event: LoggedActivity) {
     const date = event.dateTime.toPlainDate();
     const hours = event.duration;
     if (date.equals(this.#today)) {

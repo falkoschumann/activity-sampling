@@ -4,7 +4,7 @@ import { Temporal } from "@js-temporal/polyfill";
 import Ajv from "ajv";
 import addFormats from "ajv-formats";
 
-import { ActivityLoggedEvent } from "../../shared/domain/activity_logged_event";
+import { LoggedActivity } from "../../shared/domain/logged_activity";
 
 const ACTIVITY_LOGGED_EVENT_SCHEMA = {
   type: "object",
@@ -109,9 +109,9 @@ export class ActivityLoggedEventDto {
     this.category = category;
   }
 
-  validate(timeZone: Temporal.TimeZoneLike): ActivityLoggedEvent {
+  validate(timeZone: Temporal.TimeZoneLike): LoggedActivity {
     // TODO handle time zone in projection
-    return ActivityLoggedEvent.create({
+    return LoggedActivity.create({
       dateTime: Temporal.Instant.from(this.timestamp).toZonedDateTimeISO(
         timeZone,
       ),

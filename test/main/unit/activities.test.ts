@@ -4,7 +4,7 @@ import { Temporal } from "@js-temporal/polyfill";
 import { describe, expect, it } from "vitest";
 
 import { createAsyncGenerator } from "../common/tools";
-import { ActivityLoggedEvent } from "../../../src/shared/domain/activity_logged_event";
+import { LoggedActivity } from "../../../src/shared/domain/logged_activity";
 import {
   ActivitiesProjection,
   Activity,
@@ -25,13 +25,13 @@ describe("Activities", () => {
       const projection = new ActivitiesProjection();
 
       projection.update(
-        ActivityLoggedEvent.createTestInstance({
+        LoggedActivity.createTestInstance({
           dateTime: "2025-12-01T12:00",
           duration: "PT4H",
         }),
       );
       projection.update(
-        ActivityLoggedEvent.createTestInstance({
+        LoggedActivity.createTestInstance({
           dateTime: "2025-12-02T10:00",
           duration: "PT2H",
         }),
@@ -50,14 +50,14 @@ describe("Activities", () => {
       const projection = new ActivitiesProjection();
 
       projection.update(
-        ActivityLoggedEvent.createTestInstance({
+        LoggedActivity.createTestInstance({
           dateTime: "2025-12-01T12:00",
           task: "Task A",
           duration: "PT4H",
         }),
       );
       projection.update(
-        ActivityLoggedEvent.createTestInstance({
+        LoggedActivity.createTestInstance({
           dateTime: "2025-12-02T10:00",
           task: "Task B",
           duration: "PT2H",
@@ -84,21 +84,21 @@ describe("Activities", () => {
       const projection = new ActivitiesProjection(["Development", "Design"]);
 
       projection.update(
-        ActivityLoggedEvent.createTestInstance({
+        LoggedActivity.createTestInstance({
           category: "Design",
           dateTime: "2025-12-03T09:00",
           duration: "PT3H",
         }),
       );
       projection.update(
-        ActivityLoggedEvent.createTestInstance({
+        LoggedActivity.createTestInstance({
           category: "Development",
           dateTime: "2025-12-01T12:00",
           duration: "PT4H",
         }),
       );
       projection.update(
-        ActivityLoggedEvent.createTestInstance({
+        LoggedActivity.createTestInstance({
           category: "Testing",
           dateTime: "2025-12-02T10:00",
           duration: "PT2H",
@@ -118,14 +118,14 @@ describe("Activities", () => {
       const projection = new ActivitiesProjection([""]);
 
       projection.update(
-        ActivityLoggedEvent.createTestInstance({
+        LoggedActivity.createTestInstance({
           category: "Development",
           dateTime: "2025-12-01T12:00",
           duration: "PT4H",
         }),
       );
       projection.update(
-        ActivityLoggedEvent.createTestInstance({
+        LoggedActivity.createTestInstance({
           dateTime: "2025-12-02T10:00",
           duration: "PT2H",
         }),
@@ -144,14 +144,14 @@ describe("Activities", () => {
       const projection = new ActivitiesProjection([]);
 
       projection.update(
-        ActivityLoggedEvent.createTestInstance({
+        LoggedActivity.createTestInstance({
           category: "Development",
           dateTime: "2025-12-01T12:00",
           duration: "PT4H",
         }),
       );
       projection.update(
-        ActivityLoggedEvent.createTestInstance({
+        LoggedActivity.createTestInstance({
           dateTime: "2025-12-02T10:00",
           duration: "PT2H",
         }),
@@ -178,22 +178,22 @@ describe("Activities", () => {
       const projection = new CategoriesProjection();
 
       projection.update(
-        ActivityLoggedEvent.createTestInstance({
+        LoggedActivity.createTestInstance({
           category: "Development",
         }),
       );
       projection.update(
-        ActivityLoggedEvent.createTestInstance({
+        LoggedActivity.createTestInstance({
           category: "Testing",
         }),
       );
       projection.update(
-        ActivityLoggedEvent.createTestInstance({
+        LoggedActivity.createTestInstance({
           category: "Design",
         }),
       );
       projection.update(
-        ActivityLoggedEvent.createTestInstance({
+        LoggedActivity.createTestInstance({
           category: "Development",
         }),
       );
@@ -204,14 +204,14 @@ describe("Activities", () => {
     it("should handle no category", () => {
       const projection = new CategoriesProjection();
 
-      projection.update(ActivityLoggedEvent.createTestInstance());
+      projection.update(LoggedActivity.createTestInstance());
       projection.update(
-        ActivityLoggedEvent.createTestInstance({
+        LoggedActivity.createTestInstance({
           category: "Design",
         }),
       );
       projection.update(
-        ActivityLoggedEvent.createTestInstance({
+        LoggedActivity.createTestInstance({
           category: "Development",
         }),
       );
@@ -233,13 +233,13 @@ describe("Activities", () => {
       const projection = new TotalHoursProjection();
 
       projection.update(
-        ActivityLoggedEvent.createTestInstance({ duration: "PT2H" }),
+        LoggedActivity.createTestInstance({ duration: "PT2H" }),
       );
       projection.update(
-        ActivityLoggedEvent.createTestInstance({ duration: "PT3H30M" }),
+        LoggedActivity.createTestInstance({ duration: "PT3H30M" }),
       );
       projection.update(
-        ActivityLoggedEvent.createTestInstance({ duration: "PT1H15M" }),
+        LoggedActivity.createTestInstance({ duration: "PT1H15M" }),
       );
 
       expect(projection.get()).toEqual<Temporal.Duration>(
@@ -258,19 +258,19 @@ describe("Activities", () => {
     });
 
     it("should filter events by date range", async () => {
-      const before = ActivityLoggedEvent.createTestInstance({
+      const before = LoggedActivity.createTestInstance({
         dateTime: "2025-12-08T10:00:00",
       });
-      const start = ActivityLoggedEvent.createTestInstance({
+      const start = LoggedActivity.createTestInstance({
         dateTime: "2025-12-09T10:00:00",
       });
-      const middle = ActivityLoggedEvent.createTestInstance({
+      const middle = LoggedActivity.createTestInstance({
         dateTime: "2025-12-10T10:00:00",
       });
-      const end = ActivityLoggedEvent.createTestInstance({
+      const end = LoggedActivity.createTestInstance({
         dateTime: "2025-12-11T10:00:00",
       });
-      const after = ActivityLoggedEvent.createTestInstance({
+      const after = LoggedActivity.createTestInstance({
         dateTime: "2025-12-12T10:00:00",
       });
       const replay = createAsyncGenerator([before, start, middle, end, after]);
@@ -278,7 +278,7 @@ describe("Activities", () => {
       const generator = filterEvents(replay, "2025-12-09", "2025-12-11");
 
       const events = await Array.fromAsync(generator);
-      expect(events).toEqual<ActivityLoggedEvent[]>([start, middle, end]);
+      expect(events).toEqual<LoggedActivity[]>([start, middle, end]);
     });
   });
 });

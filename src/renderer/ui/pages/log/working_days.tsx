@@ -5,7 +5,7 @@ import { memo } from "react";
 
 import { FormatStyle, formatTime } from "../../../../shared/domain/temporal";
 import type { WorkingDay } from "../../../../shared/domain/recent_activities_query";
-import type { ActivityLoggedEvent } from "../../../../shared/domain/activity_logged_event";
+import type { LoggedActivity } from "../../../../shared/domain/logged_activity";
 import type { ActivityTemplate } from "../../../domain/log";
 
 const MemoizedWorkingDaysComponent = memo(WorkingDaysComponent);
@@ -30,7 +30,7 @@ function WorkingDayComponent({
   onSelect,
 }: {
   date: Temporal.PlainDate;
-  activities: ActivityLoggedEvent[];
+  activities: LoggedActivity[];
   onSelect: (activity: ActivityTemplate) => void;
 }) {
   return (

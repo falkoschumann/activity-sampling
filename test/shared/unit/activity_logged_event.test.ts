@@ -2,18 +2,16 @@
 
 import { describe, expect, it } from "vitest";
 
-import { ActivityLoggedEvent } from "../../../src/shared/domain/activity_logged_event";
+import { LoggedActivity } from "../../../src/shared/domain/logged_activity";
 
 describe("Activity logged event", () => {
   it("should map command", () => {
-    const command = ActivityLoggedEvent.createTestInstance();
+    const command = LoggedActivity.createTestInstance();
 
     const json = JSON.stringify(command);
     const dto = JSON.parse(json);
-    const model = ActivityLoggedEvent.create(dto);
+    const model = LoggedActivity.create(dto);
 
-    expect(model).toEqual<ActivityLoggedEvent>(
-      ActivityLoggedEvent.createTestInstance(),
-    );
+    expect(model).toEqual<LoggedActivity>(LoggedActivity.createTestInstance());
   });
 });

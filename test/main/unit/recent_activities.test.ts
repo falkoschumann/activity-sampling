@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 
 import { Clock } from "../../../src/shared/domain/temporal";
 import { RecentActivitiesQueryHandler } from "../../../src/main/application/recent_activities_query_handler";
-import { ActivityLoggedEvent } from "../../../src/shared/domain/activity_logged_event";
+import { LoggedActivity } from "../../../src/shared/domain/logged_activity";
 import {
   RecentActivitiesQuery,
   TimeSummary,
@@ -60,10 +60,10 @@ describe("Recent Activities", () => {
         WorkingDay.create({
           date: "2025-06-05",
           activities: [
-            ActivityLoggedEvent.createTestInstance({
+            LoggedActivity.createTestInstance({
               dateTime: "2025-06-05T11:00",
             }),
-            ActivityLoggedEvent.createTestInstance({
+            LoggedActivity.createTestInstance({
               dateTime: "2025-06-05T10:30",
             }),
           ],
@@ -71,7 +71,7 @@ describe("Recent Activities", () => {
         WorkingDay.create({
           date: "2025-06-04",
           activities: [
-            ActivityLoggedEvent.createTestInstance({
+            LoggedActivity.createTestInstance({
               dateTime: "2025-06-04T16:00",
             }),
           ],
@@ -79,7 +79,7 @@ describe("Recent Activities", () => {
         WorkingDay.create({
           date: "2025-05-06",
           activities: [
-            ActivityLoggedEvent.createTestInstance({
+            LoggedActivity.createTestInstance({
               dateTime: "2025-05-06T16:00",
             }),
           ],

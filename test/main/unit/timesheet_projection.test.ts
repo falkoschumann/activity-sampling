@@ -5,7 +5,7 @@ import { describe, expect, it } from "vitest";
 
 import { projectTimesheet } from "../../../src/main/domain/timesheet_projection";
 import { Holiday, Vacation } from "../../../src/main/domain/calendar";
-import { ActivityLoggedEvent } from "../../../src/shared/domain/activity_logged_event";
+import { LoggedActivity } from "../../../src/shared/domain/logged_activity";
 import {
   Capacity,
   TimesheetEntry,
@@ -41,43 +41,43 @@ describe("Timesheet projection", () => {
   it("should summarize hours worked", async () => {
     const replay = createAsyncGenerator([
       // last sunday, excluded because last week
-      ActivityLoggedEvent.createTestInstance({
+      LoggedActivity.createTestInstance({
         dateTime: "2025-06-01T12:00",
       }),
       // monday, same task
-      ActivityLoggedEvent.createTestInstance({
+      LoggedActivity.createTestInstance({
         dateTime: "2025-06-02T12:00",
       }),
-      ActivityLoggedEvent.createTestInstance({
+      LoggedActivity.createTestInstance({
         dateTime: "2025-06-02T12:30",
       }),
       // tuesday, different tasks
-      ActivityLoggedEvent.createTestInstance({
+      LoggedActivity.createTestInstance({
         dateTime: "2025-06-03T12:00",
       }),
-      ActivityLoggedEvent.createTestInstance({
+      LoggedActivity.createTestInstance({
         dateTime: "2025-06-03T12:30",
         task: "Other task",
       }),
       // wednesday, different projects
-      ActivityLoggedEvent.createTestInstance({
+      LoggedActivity.createTestInstance({
         dateTime: "2025-06-04T12:00",
       }),
-      ActivityLoggedEvent.createTestInstance({
+      LoggedActivity.createTestInstance({
         dateTime: "2025-06-04T12:30",
         project: "Other project",
       }),
       // thursday, different clients
-      ActivityLoggedEvent.createTestInstance({
+      LoggedActivity.createTestInstance({
         dateTime: "2025-06-05T12:00",
       }),
-      ActivityLoggedEvent.createTestInstance({
+      LoggedActivity.createTestInstance({
         dateTime: "2025-06-05T12:30",
         client: "Other client",
       }),
       // friday to sunday, no activities logged
       // next monday, excluded because next week
-      ActivityLoggedEvent.createTestInstance({
+      LoggedActivity.createTestInstance({
         dateTime: "2025-06-09T12:00",
       }),
     ]);
@@ -128,9 +128,9 @@ describe("Timesheet projection", () => {
 
   it("should summarize the total hours worked", async () => {
     const replay = createAsyncGenerator([
-      ActivityLoggedEvent.createTestInstance({ dateTime: "2025-06-02T12:00" }),
-      ActivityLoggedEvent.createTestInstance({ dateTime: "2025-06-02T12:30" }),
-      ActivityLoggedEvent.createTestInstance({ dateTime: "2025-06-02T13:00" }),
+      LoggedActivity.createTestInstance({ dateTime: "2025-06-02T12:00" }),
+      LoggedActivity.createTestInstance({ dateTime: "2025-06-02T12:30" }),
+      LoggedActivity.createTestInstance({ dateTime: "2025-06-02T13:00" }),
     ]);
 
     const result = await projectTimesheet(
@@ -150,19 +150,19 @@ describe("Timesheet projection", () => {
   it("should return the offset 0 when capacity is reached", async () => {
     // query a week on thursday
     const replay = createAsyncGenerator([
-      ActivityLoggedEvent.createTestInstance({
+      LoggedActivity.createTestInstance({
         dateTime: "2025-06-09T16:00",
         duration: "PT8H",
       }),
-      ActivityLoggedEvent.createTestInstance({
+      LoggedActivity.createTestInstance({
         dateTime: "2025-06-10T16:00",
         duration: "PT8H",
       }),
-      ActivityLoggedEvent.createTestInstance({
+      LoggedActivity.createTestInstance({
         dateTime: "2025-06-11T16:00",
         duration: "PT8H",
       }),
-      ActivityLoggedEvent.createTestInstance({
+      LoggedActivity.createTestInstance({
         dateTime: "2025-06-12T16:00",
         duration: "PT8H",
       }),
@@ -187,19 +187,19 @@ describe("Timesheet projection", () => {
 
   it("should return a negative offset when hours is behind of the capacity", async () => {
     const replay = createAsyncGenerator([
-      ActivityLoggedEvent.createTestInstance({
+      LoggedActivity.createTestInstance({
         dateTime: "2025-06-09T16:00",
         duration: "PT8H",
       }),
-      ActivityLoggedEvent.createTestInstance({
+      LoggedActivity.createTestInstance({
         dateTime: "2025-06-10T16:00",
         duration: "PT6H",
       }),
-      ActivityLoggedEvent.createTestInstance({
+      LoggedActivity.createTestInstance({
         dateTime: "2025-06-11T16:00",
         duration: "PT6H",
       }),
-      ActivityLoggedEvent.createTestInstance({
+      LoggedActivity.createTestInstance({
         dateTime: "2025-06-12T16:00",
         duration: "PT6H",
       }),
@@ -221,19 +221,19 @@ describe("Timesheet projection", () => {
 
   it("should return a positive offset when hours is ahead of the capacity", async () => {
     const replay = createAsyncGenerator([
-      ActivityLoggedEvent.createTestInstance({
+      LoggedActivity.createTestInstance({
         dateTime: "2025-06-09T16:00",
         duration: "PT8H",
       }),
-      ActivityLoggedEvent.createTestInstance({
+      LoggedActivity.createTestInstance({
         dateTime: "2025-06-10T16:00",
         duration: "PT10H",
       }),
-      ActivityLoggedEvent.createTestInstance({
+      LoggedActivity.createTestInstance({
         dateTime: "2025-06-11T16:00",
         duration: "PT10H",
       }),
-      ActivityLoggedEvent.createTestInstance({
+      LoggedActivity.createTestInstance({
         dateTime: "2025-06-12T16:00",
         duration: "PT10H",
       }),
@@ -256,19 +256,19 @@ describe("Timesheet projection", () => {
   it("should return the offset for capacity in the future", async () => {
     // query a week on thursday
     const replay = createAsyncGenerator([
-      ActivityLoggedEvent.createTestInstance({
+      LoggedActivity.createTestInstance({
         dateTime: "2025-06-09T16:00",
         duration: "PT8H",
       }),
-      ActivityLoggedEvent.createTestInstance({
+      LoggedActivity.createTestInstance({
         dateTime: "2025-06-10T16:00",
         duration: "PT8H",
       }),
-      ActivityLoggedEvent.createTestInstance({
+      LoggedActivity.createTestInstance({
         dateTime: "2025-06-11T16:00",
         duration: "PT8H",
       }),
-      ActivityLoggedEvent.createTestInstance({
+      LoggedActivity.createTestInstance({
         dateTime: "2025-06-12T16:00",
         duration: "PT8H",
       }),
@@ -293,15 +293,15 @@ describe("Timesheet projection", () => {
 
   it("should take holidays into account", async () => {
     const replay = createAsyncGenerator([
-      ActivityLoggedEvent.createTestInstance({
+      LoggedActivity.createTestInstance({
         dateTime: "2025-06-10T16:00",
         duration: "PT8H",
       }),
-      ActivityLoggedEvent.createTestInstance({
+      LoggedActivity.createTestInstance({
         dateTime: "2025-06-11T16:00",
         duration: "PT8H",
       }),
-      ActivityLoggedEvent.createTestInstance({
+      LoggedActivity.createTestInstance({
         dateTime: "2025-06-12T16:00",
         duration: "PT8H",
       }),
@@ -328,15 +328,15 @@ describe("Timesheet projection", () => {
 
   it("should take vacation into account", async () => {
     const replay = createAsyncGenerator([
-      ActivityLoggedEvent.createTestInstance({
+      LoggedActivity.createTestInstance({
         dateTime: "2025-09-08T16:00",
         duration: "PT8H",
       }),
-      ActivityLoggedEvent.createTestInstance({
+      LoggedActivity.createTestInstance({
         dateTime: "2025-09-09T16:00",
         duration: "PT8H",
       }),
-      ActivityLoggedEvent.createTestInstance({
+      LoggedActivity.createTestInstance({
         dateTime: "2025-09-11T16:00",
         duration: "PT8H",
       }),

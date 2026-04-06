@@ -2,7 +2,7 @@
 
 import { Temporal } from "@js-temporal/polyfill";
 
-import { ActivityLoggedEvent } from "./activity_logged_event";
+import { LoggedActivity } from "./logged_activity";
 
 // TODO replace ActivityLoggedEvent with domain object
 
@@ -77,31 +77,31 @@ export class WorkingDay {
     activities,
   }: {
     date: Temporal.PlainDateLike | string;
-    activities: ActivityLoggedEvent[];
+    activities: LoggedActivity[];
   }): WorkingDay {
     return new WorkingDay(date, activities);
   }
 
   static createTestInstance({
     date = "2026-03-29T13:07",
-    activities = [ActivityLoggedEvent.createTestInstance()],
+    activities = [LoggedActivity.createTestInstance()],
   }: {
     date?: Temporal.PlainDateLike | string;
-    activities?: ActivityLoggedEvent[];
+    activities?: LoggedActivity[];
   } = {}): WorkingDay {
     return new WorkingDay(date, activities);
   }
 
   readonly date: Temporal.PlainDate;
-  readonly activities: ActivityLoggedEvent[];
+  readonly activities: LoggedActivity[];
 
   private constructor(
     date: Temporal.PlainDateLike | string,
-    activities: ActivityLoggedEvent[],
+    activities: LoggedActivity[],
   ) {
     this.date = Temporal.PlainDate.from(date);
     this.activities = activities.map((activity) =>
-      ActivityLoggedEvent.create(activity),
+      LoggedActivity.create(activity),
     );
   }
 }

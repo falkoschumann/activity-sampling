@@ -1,9 +1,9 @@
 // Copyright (c) 2026 Falko Schumann. All rights reserved. MIT license.
 
-import type { ActivityLoggedEvent } from "../../shared/domain/activity_logged_event";
+import type { LoggedActivity } from "../../shared/domain/logged_activity";
 
 interface NotificationClickedEventInit extends EventInit {
-  activity?: ActivityLoggedEvent;
+  activity?: LoggedActivity;
 }
 
 export class NotificationClickedEvent extends Event {
@@ -13,7 +13,7 @@ export class NotificationClickedEvent extends Event {
     return new NotificationClickedEvent("notificationClicked", eventInitDict);
   }
 
-  activity?: ActivityLoggedEvent;
+  activity?: LoggedActivity;
 
   constructor(type: string, eventInitDict: NotificationClickedEventInit) {
     super(type);
@@ -37,9 +37,9 @@ export class NotificationGateway extends EventTarget {
 
   #notification?: Notification;
 
-  #currentActivity?: ActivityLoggedEvent;
+  #currentActivity?: LoggedActivity;
 
-  setCurrentActivity(activity: ActivityLoggedEvent) {
+  setCurrentActivity(activity: LoggedActivity) {
     this.#currentActivity = activity;
   }
 

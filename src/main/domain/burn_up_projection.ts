@@ -2,7 +2,7 @@
 
 import { Temporal } from "@js-temporal/polyfill";
 
-import { ActivityLoggedEvent } from "../../shared/domain/activity_logged_event";
+import { LoggedActivity } from "../../shared/domain/logged_activity";
 import {
   BurnUpData,
   type BurnUpQuery,
@@ -16,7 +16,7 @@ import {
 } from "./activities";
 
 export async function projectBurnUp(
-  replay: AsyncGenerator<ActivityLoggedEvent>,
+  replay: AsyncGenerator<LoggedActivity>,
   query: BurnUpQuery,
 ): Promise<BurnUpQueryResult> {
   const { activities, categories } = await projectActivities(replay, query);
@@ -27,7 +27,7 @@ export async function projectBurnUp(
 }
 
 async function projectActivities(
-  replay: AsyncGenerator<ActivityLoggedEvent>,
+  replay: AsyncGenerator<LoggedActivity>,
   query: BurnUpQuery,
 ) {
   const activitiesProjection = new ActivitiesProjection(query.categories);

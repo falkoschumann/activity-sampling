@@ -4,7 +4,7 @@ import { Temporal } from "@js-temporal/polyfill";
 
 import { Calendar, type Holiday, Vacation } from "./calendar";
 import { normalizeDuration } from "../../shared/domain/temporal";
-import { ActivityLoggedEvent } from "../../shared/domain/activity_logged_event";
+import { LoggedActivity } from "../../shared/domain/logged_activity";
 import {
   TimesheetEntry,
   TimesheetQuery,
@@ -13,7 +13,7 @@ import {
 import { filterEvents, TotalHoursProjection } from "./activities";
 
 export async function projectTimesheet(
-  replay: AsyncGenerator<ActivityLoggedEvent>,
+  replay: AsyncGenerator<LoggedActivity>,
   query: TimesheetQuery,
   options?: {
     capacity?: Temporal.Duration;
@@ -47,7 +47,7 @@ export async function projectTimesheet(
 class TimesheetProjection {
   #entries: TimesheetEntry[] = [];
 
-  update(event: ActivityLoggedEvent) {
+  update(event: LoggedActivity) {
     const date = event.dateTime.toPlainDate();
     const index = this.#entries.findIndex(
       (entry) =>

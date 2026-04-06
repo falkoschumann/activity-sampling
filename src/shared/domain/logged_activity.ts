@@ -2,8 +2,7 @@
 
 import { Temporal } from "@js-temporal/polyfill";
 
-export class ActivityLoggedEvent {
-  // TODO rename ActivityLoggedEvent to LoggedActivity
+export class LoggedActivity {
   // TODO remove duration?
 
   static create({
@@ -22,8 +21,8 @@ export class ActivityLoggedEvent {
     task: string;
     notes?: string;
     category?: string;
-  }): ActivityLoggedEvent {
-    return new ActivityLoggedEvent(
+  }): LoggedActivity {
+    return new LoggedActivity(
       dateTime,
       duration,
       client,
@@ -50,8 +49,8 @@ export class ActivityLoggedEvent {
     task?: string;
     notes?: string;
     category?: string;
-  } = {}): ActivityLoggedEvent {
-    return ActivityLoggedEvent.create({
+  } = {}): LoggedActivity {
+    return LoggedActivity.create({
       dateTime,
       duration,
       client,

@@ -2,7 +2,7 @@
 
 import { Temporal } from "@js-temporal/polyfill";
 
-import { ActivityLoggedEvent } from "../../shared/domain/activity_logged_event";
+import { LoggedActivity } from "../../shared/domain/logged_activity";
 import { normalizeDuration } from "../../shared/domain/temporal";
 
 export class Activity {
@@ -74,7 +74,7 @@ export class ActivitiesProjection {
     this.#categories = categories;
   }
 
-  update(event: ActivityLoggedEvent) {
+  update(event: LoggedActivity) {
     if (!this.#isSelectedCategory(event.category)) {
       return;
     }
@@ -98,7 +98,7 @@ export class ActivitiesProjection {
     );
   }
 
-  #findIndexOfActivity(event: ActivityLoggedEvent) {
+  #findIndexOfActivity(event: LoggedActivity) {
     return this.#activities.findIndex(
       (activity) =>
         activity.client === event.client &&
@@ -107,7 +107,7 @@ export class ActivitiesProjection {
     );
   }
 
-  #addActivity(date: Temporal.PlainDate, event: ActivityLoggedEvent) {
+  #addActivity(date: Temporal.PlainDate, event: LoggedActivity) {
     const activity = Activity.create({
       start: date,
       finish: date,
@@ -122,7 +122,7 @@ export class ActivitiesProjection {
   private updateActivity(
     index: number,
     date: Temporal.PlainDate,
-    event: ActivityLoggedEvent,
+    event: LoggedActivity,
   ) {
     const activity = this.#activities[index]!;
     let start = activity.start;
@@ -146,7 +146,7 @@ export class ActivitiesProjection {
 export class CategoriesProjection {
   #categories: string[] = [];
 
-  update(event: ActivityLoggedEvent) {
+  update(event: LoggedActivity) {
     if (this.#categories.includes(event.category ?? "")) {
       return;
     }
@@ -162,7 +162,7 @@ export class CategoriesProjection {
 export class TotalHoursProjection {
   #totalHours = Temporal.Duration.from("PT0S");
 
-  update(event: ActivityLoggedEvent) {
+  update(event: LoggedActivity) {
     this.#totalHours = this.#totalHours.add(event.duration);
   }
 
@@ -172,10 +172,10 @@ export class TotalHoursProjection {
 }
 
 export async function* filterEvents(
-  replay: AsyncGenerator<ActivityLoggedEvent>,
+  replay: AsyncGenerator<LoggedActivity>,
   from?: Temporal.PlainDate | Temporal.PlainDateLike | string,
   to?: Temporal.PlainDate | Temporal.PlainDateLike | string,
-): AsyncGenerator<ActivityLoggedEvent> {
+): AsyncGenerator<LoggedActivity> {
   for await (const event of replay) {
     if (isDateInPeriod(event.dateTime.toPlainDate(), from, to)) {
       yield event;

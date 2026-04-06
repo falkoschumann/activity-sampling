@@ -1,6 +1,6 @@
 // Copyright (c) 2026 Falko Schumann. All rights reserved. MIT license.
 
-import { ActivityLoggedEvent } from "../../shared/domain/activity_logged_event";
+import { LoggedActivity } from "../../shared/domain/logged_activity";
 import {
   EstimateEntry,
   EstimateQuery,
@@ -13,7 +13,7 @@ import {
 } from "./activities";
 
 export async function projectEstimate(
-  replay: AsyncGenerator<ActivityLoggedEvent>,
+  replay: AsyncGenerator<LoggedActivity>,
   query: EstimateQuery,
 ): Promise<EstimateQueryResult> {
   const activitiesProjection = new ActivitiesProjection(query.categories);
