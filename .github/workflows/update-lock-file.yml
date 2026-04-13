@@ -18,6 +18,9 @@ jobs:
     steps:
       - name: Checkout source code
         uses: actions/checkout@v6
+        with:
+          ref: ${{ github.head_ref }}
+          token: ${{ secrets.GITHUB_TOKEN }}
       - name: Set up Bun
         uses: oven-sh/setup-bun@v2
         with:
