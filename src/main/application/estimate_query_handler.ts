@@ -1,14 +1,11 @@
 // Copyright (c) 2026 Falko Schumann. All rights reserved. MIT license.
 
-import { Temporal } from "@js-temporal/polyfill";
-
-import type { Clock } from "../../shared/domain/temporal";
 import type {
   EstimateQuery,
   EstimateQueryResult,
 } from "../../shared/domain/estimate_query";
-import { projectEstimate } from "../domain/estimate_projection";
-import { ActivityLoggedEventDto } from "../infrastructure/activity_logged_event_dto";
+import type { Clock } from "../../shared/domain/temporal";
+import { EstimateProjection } from "../domain/estimate_projection";
 import type { EventStore } from "../infrastructure/event_store";
 
 export class EstimateQueryHandler {
@@ -31,19 +28,15 @@ export class EstimateQueryHandler {
   }
 
   async handle(query: EstimateQuery): Promise<EstimateQueryResult> {
-    // TODO handle time zone in projection
-    // TODO join ActivityLoggedEvent and ActivityLoggedEventDto to ActivityLoggedEvent
+    const replay = this.#eventStore.replay();
     const timeZone = query.timeZone || this.#clock.zone;
-    const replay = replayTyped(this.#eventStore.replay(), timeZone);
-    return projectEstimate(replay, query);
-  }
-}
-
-async function* replayTyped(
-  events: AsyncGenerator,
-  timeZone: Temporal.TimeZoneLike,
-) {
-  for await (const e of events) {
-    yield ActivityLoggedEventDto.fromJson(e).validate(timeZone);
+    const projection = EstimateProjection.create({
+      query,
+      timeZone,
+    });
+    for await (const event of replay) {
+      projection.update(event);
+    }
+    return projection.get();
   }
 }

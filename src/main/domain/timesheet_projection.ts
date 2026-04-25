@@ -2,53 +2,139 @@
 
 import { Temporal } from "@js-temporal/polyfill";
 
-import { Calendar, type Holiday, Vacation } from "./calendar";
-import { normalizeDuration } from "../../shared/domain/temporal";
-import { LoggedActivity } from "../../shared/domain/logged_activity";
+import {
+  isTimestampInPeriod,
+  normalizeDuration,
+} from "../../shared/domain/temporal";
 import {
   TimesheetEntry,
   TimesheetQuery,
   TimesheetQueryResult,
 } from "../../shared/domain/timesheet_query";
-import { filterEvents, TotalHoursProjection } from "./activities";
+import type { ActivityLoggedEvent } from "./activity_logged_event";
+import { Calendar, type Holiday, Vacation } from "./calendar";
+import type { Projection } from "./projection";
+import { TotalHoursProjection } from "./total_hours_projection";
 
-export async function projectTimesheet(
-  replay: AsyncGenerator<LoggedActivity>,
-  query: TimesheetQuery,
-  options?: {
+export class TimesheetProjection implements Projection<TimesheetQueryResult> {
+  static create({
+    query,
+    today = Temporal.Now.plainDateISO("Europe/Berlin"),
+    timeZone = "Europe/Berlin",
+    capacity = Temporal.Duration.from("PT40H"),
+    holidays = [],
+    vacations = [],
+  }: {
+    query: TimesheetQuery;
+    today?: Temporal.PlainDate;
+    timeZone?: Temporal.TimeZoneLike;
     capacity?: Temporal.Duration;
     holidays?: Holiday[];
     vacations?: Vacation[];
-  },
-): Promise<TimesheetQueryResult> {
-  const timesheetProjection = new TimesheetProjection();
-  const totalHoursProjection = new TotalHoursProjection();
-  for await (const event of filterEvents(replay, query.from, query.to)) {
-    timesheetProjection.update(event);
-    totalHoursProjection.update(event);
+  }) {
+    return new TimesheetProjection(
+      query,
+      today,
+      timeZone,
+      capacity,
+      holidays,
+      vacations,
+    );
   }
-  const totalHours = totalHoursProjection.get();
-  const today = query.today
-    ? query.today
-    : Temporal.Now.plainDateISO(query.timeZone);
-  const capacity = determineCapacity({
-    ...query,
-    today,
-    totalHours,
-    ...options,
-  });
-  return {
-    entries: timesheetProjection.get(),
-    totalHours,
-    capacity,
-  };
+
+  readonly #query;
+  readonly #today;
+  readonly #timeZone;
+  readonly #capacity;
+  readonly #holidays;
+  readonly #vacations;
+  readonly #timesheetEntryProjection;
+  readonly #totalHoursProjection;
+
+  private constructor(
+    query: TimesheetQuery,
+    today: Temporal.PlainDate,
+    timeZone: Temporal.TimeZoneLike,
+    capacity: Temporal.Duration,
+    holidays: Holiday[],
+    vacations: Vacation[],
+  ) {
+    this.#query = query;
+    this.#today = query.today || today;
+    this.#timeZone = timeZone;
+    this.#capacity = capacity;
+    this.#holidays = holidays;
+    this.#vacations = vacations;
+    this.#timesheetEntryProjection = TimesheetEntryProjection.create({
+      timeZone,
+    });
+    this.#totalHoursProjection = TotalHoursProjection.create();
+  }
+
+  update(event: ActivityLoggedEvent) {
+    if (
+      !isTimestampInPeriod(
+        event.timestamp,
+        this.#timeZone,
+        this.#query.from,
+        this.#query.to,
+      )
+    ) {
+      return;
+    }
+
+    this.#timesheetEntryProjection.update(event);
+    this.#totalHoursProjection.update(event);
+  }
+
+  get(): TimesheetQueryResult {
+    const entries = this.#timesheetEntryProjection.get();
+    const totalHours = this.#totalHoursProjection.get();
+    const capacity = this.#determineCapacity(totalHours);
+    return TimesheetQueryResult.create({ entries, totalHours, capacity });
+  }
+
+  #determineCapacity(totalHours: Temporal.Duration) {
+    const calendar = Calendar.create({
+      holidays: this.#holidays,
+      vacations: this.#vacations,
+      capacity: this.#capacity,
+    });
+    let end: Temporal.PlainDate;
+    const { from, to } = this.#query;
+    if (Temporal.PlainDate.compare(this.#today, from) < 0) {
+      end = from;
+    } else if (Temporal.PlainDate.compare(this.#today, to) > 0) {
+      end = to;
+    } else {
+      end = this.#today;
+    }
+    const businessDays = calendar.countWorkingHours(from, end);
+    const offset = totalHours.subtract(businessDays);
+    return {
+      hours: calendar.countWorkingHours(from, to),
+      offset: normalizeDuration(offset),
+    };
+  }
 }
 
-class TimesheetProjection {
-  #entries: TimesheetEntry[] = [];
+class TimesheetEntryProjection {
+  static create({ timeZone }: { timeZone: Temporal.TimeZoneLike }) {
+    return new TimesheetEntryProjection(timeZone);
+  }
 
-  update(event: LoggedActivity) {
-    const date = event.dateTime.toPlainDate();
+  readonly #timeZone;
+  #entries: TimesheetEntry[];
+
+  private constructor(timeZone: Temporal.TimeZoneLike) {
+    this.#timeZone = timeZone;
+    this.#entries = [];
+  }
+
+  update(event: ActivityLoggedEvent) {
+    const date = event.timestamp
+      .toZonedDateTimeISO(this.#timeZone)
+      .toPlainDate();
     const index = this.#entries.findIndex(
       (entry) =>
         Temporal.PlainDate.compare(entry.date, date.toString()) === 0 &&
@@ -91,38 +177,4 @@ class TimesheetProjection {
       return entry1.task.localeCompare(entry2.task);
     });
   }
-}
-
-function determineCapacity({
-  from,
-  to,
-  today,
-  totalHours,
-  capacity = Temporal.Duration.from("PT40H"),
-  holidays = [],
-  vacations = [],
-}: {
-  from: Temporal.PlainDate;
-  to: Temporal.PlainDate;
-  today: Temporal.PlainDate;
-  totalHours: Temporal.Duration;
-  capacity?: Temporal.Duration;
-  holidays?: Holiday[];
-  vacations?: Vacation[];
-}) {
-  const calendar = Calendar.create({ holidays, vacations, capacity });
-  let end: Temporal.PlainDate;
-  if (Temporal.PlainDate.compare(today, from) < 0) {
-    end = from;
-  } else if (Temporal.PlainDate.compare(today, to) > 0) {
-    end = to;
-  } else {
-    end = today;
-  }
-  const businessDays = calendar.countWorkingHours(from, end);
-  const offset = totalHours.subtract(businessDays);
-  return {
-    hours: calendar.countWorkingHours(from, to),
-    offset: normalizeDuration(offset),
-  };
 }

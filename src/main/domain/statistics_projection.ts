@@ -1,58 +1,79 @@
 // Copyright (c) 2026 Falko Schumann. All rights reserved. MIT license.
 
-import { LoggedActivity } from "../../shared/domain/logged_activity";
+import { Temporal } from "@js-temporal/polyfill";
+
 import {
   StatisticsQuery,
   StatisticsQueryResult,
   StatisticsScope,
 } from "../../shared/domain/statistics_query";
-import {
-  ActivitiesProjection,
-  Activity,
-  CategoriesProjection,
-} from "./activities";
+import { ActivitiesProjection, Activity } from "./activities_projection";
+import type { ActivityLoggedEvent } from "./activity_logged_event";
+import { CategoriesProjection } from "./categories_projection";
+import type { Projection } from "./projection";
 
-export async function projectStatistics(
-  replay: AsyncGenerator<LoggedActivity>,
-  query: StatisticsQuery,
-): Promise<StatisticsQueryResult> {
-  const activitiesProjection = new ActivitiesProjection(query.categories);
-  const categoriesProjection = new CategoriesProjection();
-  for await (const event of replay) {
-    activitiesProjection.update(event);
-    categoriesProjection.update(event);
-  }
-  const activities = activitiesProjection.get();
-
-  let result;
-  switch (query.scope) {
-    case StatisticsScope.WORKING_HOURS:
-      result = await createWorkingHoursStatistics(activities);
-      break;
-    case StatisticsScope.CYCLE_TIMES:
-      result = await createCycleTimesStatistics(activities);
-      break;
+export class StatisticsProjection implements Projection<StatisticsQueryResult> {
+  static create({
+    query,
+    timeZone,
+  }: {
+    query: StatisticsQuery;
+    timeZone: Temporal.TimeZoneLike;
+  }) {
+    return new StatisticsProjection(query, timeZone);
   }
 
-  const histogram = createHistogram(
-    result.xAxisLabel,
-    result.days,
-    query.scope,
-  );
-  const median = createMedian(result.days);
+  readonly #query;
+  readonly #activitiesProjection;
+  readonly #categoriesProjection;
 
-  return {
-    histogram,
-    median,
-    categories: categoriesProjection.get(),
-    totalCount: result.totalCount,
-  };
+  private constructor(query: StatisticsQuery, timeZone: Temporal.TimeZoneLike) {
+    this.#query = query;
+    this.#activitiesProjection = ActivitiesProjection.create({
+      categories: query.categories,
+      timeZone,
+    });
+    this.#categoriesProjection = CategoriesProjection.create();
+  }
+
+  update(event: ActivityLoggedEvent) {
+    this.#activitiesProjection.update(event);
+    this.#categoriesProjection.update(event);
+  }
+
+  get() {
+    const activities = this.#activitiesProjection.get();
+
+    let result;
+    switch (this.#query.scope) {
+      case StatisticsScope.WORKING_HOURS:
+        result = createWorkingHoursStatistics(activities);
+        break;
+      case StatisticsScope.CYCLE_TIMES:
+        result = createCycleTimesStatistics(activities);
+        break;
+    }
+
+    const histogram = createHistogram(
+      result.xAxisLabel,
+      result.days,
+      this.#query.scope,
+    );
+    const median = createMedian(result.days);
+
+    return StatisticsQueryResult.create({
+      histogram,
+      median,
+      categories: this.#categoriesProjection.get(),
+      totalCount: result.totalCount,
+    });
+  }
 }
 
-async function createWorkingHoursStatistics(activities: Activity[]) {
+function createWorkingHoursStatistics(activities: Activity[]) {
   let totalCount = 0;
   let days: number[] = [];
-  for await (const activity of activities) {
+  for (const activity of activities) {
     totalCount++;
     const workDays = activity.hours.total("hours") / 8;
     days.push(workDays);
@@ -61,7 +82,7 @@ async function createWorkingHoursStatistics(activities: Activity[]) {
   return { xAxisLabel: "Duration (days)", days, totalCount };
 }
 
-async function createCycleTimesStatistics(activities: Activity[]) {
+function createCycleTimesStatistics(activities: Activity[]) {
   let totalCount = 0;
   let days: number[] = [];
   for (const activity of activities) {

@@ -3,30 +3,26 @@
 import { Temporal } from "@js-temporal/polyfill";
 import { describe, expect, it } from "vitest";
 
-import { projectTimesheet } from "../../../src/main/domain/timesheet_projection";
-import { Holiday, Vacation } from "../../../src/main/domain/calendar";
-import { LoggedActivity } from "../../../src/shared/domain/logged_activity";
+import { TimesheetProjection } from "../../../src/main/domain/timesheet_projection";
 import {
   Capacity,
   TimesheetEntry,
   TimesheetQuery,
   TimesheetQueryResult,
 } from "../../../src/shared/domain/timesheet_query";
-import { createAsyncGenerator } from "../common/tools";
+import { Holiday, Vacation } from "../../../src/main/domain/calendar";
+import { ActivityLoggedEvent } from "../../../src/main/domain/activity_logged_event";
 
 describe("Timesheet projection", () => {
   it("should return an empty result when no activities are logged", async () => {
-    const replay = createAsyncGenerator([]);
-
-    const result = await projectTimesheet(
-      replay,
-      TimesheetQuery.create({
+    const projection = TimesheetProjection.create({
+      query: TimesheetQuery.create({
         from: "2025-09-15",
         to: "2025-09-21",
       }),
-    );
+    });
 
-    expect(result).toEqual<TimesheetQueryResult>(
+    expect(projection.get()).toEqual<TimesheetQueryResult>(
       TimesheetQueryResult.create({
         entries: [],
         totalHours: "PT0S",
@@ -39,59 +35,76 @@ describe("Timesheet projection", () => {
   });
 
   it("should summarize hours worked", async () => {
-    const replay = createAsyncGenerator([
-      // last sunday, excluded because last week
-      LoggedActivity.createTestInstance({
-        dateTime: "2025-06-01T12:00",
-      }),
-      // monday, same task
-      LoggedActivity.createTestInstance({
-        dateTime: "2025-06-02T12:00",
-      }),
-      LoggedActivity.createTestInstance({
-        dateTime: "2025-06-02T12:30",
-      }),
-      // tuesday, different tasks
-      LoggedActivity.createTestInstance({
-        dateTime: "2025-06-03T12:00",
-      }),
-      LoggedActivity.createTestInstance({
-        dateTime: "2025-06-03T12:30",
-        task: "Other task",
-      }),
-      // wednesday, different projects
-      LoggedActivity.createTestInstance({
-        dateTime: "2025-06-04T12:00",
-      }),
-      LoggedActivity.createTestInstance({
-        dateTime: "2025-06-04T12:30",
-        project: "Other project",
-      }),
-      // thursday, different clients
-      LoggedActivity.createTestInstance({
-        dateTime: "2025-06-05T12:00",
-      }),
-      LoggedActivity.createTestInstance({
-        dateTime: "2025-06-05T12:30",
-        client: "Other client",
-      }),
-      // friday to sunday, no activities logged
-      // next monday, excluded because next week
-      LoggedActivity.createTestInstance({
-        dateTime: "2025-06-09T12:00",
-      }),
-    ]);
-
-    const result = await projectTimesheet(
-      replay,
-      TimesheetQuery.create({
+    const projection = TimesheetProjection.create({
+      query: TimesheetQuery.create({
         from: "2025-06-02",
         to: "2025-06-08",
         today: "2025-11-19",
       }),
+    });
+
+    // last sunday, excluded because last week
+    projection.update(
+      ActivityLoggedEvent.createTestInstance({
+        timestamp: "2025-06-01T10:00:00Z",
+      }),
+    );
+    // monday, same task
+    projection.update(
+      ActivityLoggedEvent.createTestInstance({
+        timestamp: "2025-06-02T10:00:00Z",
+      }),
+    );
+    projection.update(
+      ActivityLoggedEvent.createTestInstance({
+        timestamp: "2025-06-02T10:30:00Z",
+      }),
+    );
+    // tuesday, different tasks
+    projection.update(
+      ActivityLoggedEvent.createTestInstance({
+        timestamp: "2025-06-03T10:00:00Z",
+      }),
+    );
+    projection.update(
+      ActivityLoggedEvent.createTestInstance({
+        timestamp: "2025-06-03T10:30:00Z",
+        task: "Other task",
+      }),
+    );
+    // wednesday, different projects
+    projection.update(
+      ActivityLoggedEvent.createTestInstance({
+        timestamp: "2025-06-04T10:00:00Z",
+      }),
+    );
+    projection.update(
+      ActivityLoggedEvent.createTestInstance({
+        timestamp: "2025-06-04T10:30:00Z",
+        project: "Other project",
+      }),
+    );
+    // thursday, different clients
+    projection.update(
+      ActivityLoggedEvent.createTestInstance({
+        timestamp: "2025-06-05T10:00:00Z",
+      }),
+    );
+    projection.update(
+      ActivityLoggedEvent.createTestInstance({
+        timestamp: "2025-06-05T10:30:00Z",
+        client: "Other client",
+      }),
+    );
+    // friday to sunday, no activities logged
+    // next monday, excluded because next week
+    projection.update(
+      ActivityLoggedEvent.createTestInstance({
+        timestamp: "2025-06-09T10:00:00Z",
+      }),
     );
 
-    expect(result.entries).toEqual<TimesheetEntry[]>([
+    expect(projection.get().entries).toEqual<TimesheetEntry[]>([
       TimesheetEntry.createTestInstance({
         date: "2025-06-02",
         hours: "PT1H",
@@ -127,232 +140,265 @@ describe("Timesheet projection", () => {
   });
 
   it("should summarize the total hours worked", async () => {
-    const replay = createAsyncGenerator([
-      LoggedActivity.createTestInstance({ dateTime: "2025-06-02T12:00" }),
-      LoggedActivity.createTestInstance({ dateTime: "2025-06-02T12:30" }),
-      LoggedActivity.createTestInstance({ dateTime: "2025-06-02T13:00" }),
-    ]);
-
-    const result = await projectTimesheet(
-      replay,
-      TimesheetQuery.create({
+    const projection = TimesheetProjection.create({
+      query: TimesheetQuery.create({
         from: "2025-06-02",
         to: "2025-06-08",
         today: "2025-11-19",
       }),
+    });
+
+    projection.update(
+      ActivityLoggedEvent.createTestInstance({
+        timestamp: "2025-06-02T10:00:00Z",
+      }),
+    );
+    projection.update(
+      ActivityLoggedEvent.createTestInstance({
+        timestamp: "2025-06-02T10:30:00Z",
+      }),
+    );
+    projection.update(
+      ActivityLoggedEvent.createTestInstance({
+        timestamp: "2025-06-02T11:00:00Z",
+      }),
     );
 
-    expect(result.totalHours).toEqual<Temporal.Duration>(
+    expect(projection.get().totalHours).toEqual<Temporal.Duration>(
       Temporal.Duration.from("PT1H30M"),
     );
   });
 
   it("should return the offset 0 when capacity is reached", async () => {
-    // query a week on thursday
-    const replay = createAsyncGenerator([
-      LoggedActivity.createTestInstance({
-        dateTime: "2025-06-09T16:00",
-        duration: "PT8H",
-      }),
-      LoggedActivity.createTestInstance({
-        dateTime: "2025-06-10T16:00",
-        duration: "PT8H",
-      }),
-      LoggedActivity.createTestInstance({
-        dateTime: "2025-06-11T16:00",
-        duration: "PT8H",
-      }),
-      LoggedActivity.createTestInstance({
-        dateTime: "2025-06-12T16:00",
-        duration: "PT8H",
-      }),
-    ]);
-
-    const result = await projectTimesheet(
-      replay,
-      TimesheetQuery.create({
+    const projection = TimesheetProjection.create({
+      query: TimesheetQuery.create({
         from: "2025-06-09",
         to: "2025-06-15",
         today: "2025-06-12",
       }),
+    });
+
+    // query a week on thursday
+    projection.update(
+      ActivityLoggedEvent.createTestInstance({
+        timestamp: "2025-06-09T14:00:00Z",
+        duration: "PT8H",
+      }),
+    );
+    projection.update(
+      ActivityLoggedEvent.createTestInstance({
+        timestamp: "2025-06-10T14:00:00Z",
+        duration: "PT8H",
+      }),
+    );
+    projection.update(
+      ActivityLoggedEvent.createTestInstance({
+        timestamp: "2025-06-11T14:00:00Z",
+        duration: "PT8H",
+      }),
+    );
+    projection.update(
+      ActivityLoggedEvent.createTestInstance({
+        timestamp: "2025-06-12T14:00:00Z",
+        duration: "PT8H",
+      }),
     );
 
-    expect(result.totalHours).toEqual<Temporal.Duration>(
+    expect(projection.get().totalHours).toEqual<Temporal.Duration>(
       Temporal.Duration.from("PT32H"),
     );
-    expect(result.capacity).toEqual<Capacity>(
+    expect(projection.get().capacity).toEqual<Capacity>(
       Capacity.create({ hours: "PT40H", offset: "PT0S" }),
     );
   });
 
   it("should return a negative offset when hours is behind of the capacity", async () => {
-    const replay = createAsyncGenerator([
-      LoggedActivity.createTestInstance({
-        dateTime: "2025-06-09T16:00",
-        duration: "PT8H",
-      }),
-      LoggedActivity.createTestInstance({
-        dateTime: "2025-06-10T16:00",
-        duration: "PT6H",
-      }),
-      LoggedActivity.createTestInstance({
-        dateTime: "2025-06-11T16:00",
-        duration: "PT6H",
-      }),
-      LoggedActivity.createTestInstance({
-        dateTime: "2025-06-12T16:00",
-        duration: "PT6H",
-      }),
-    ]);
-
-    const result = await projectTimesheet(
-      replay,
-      TimesheetQuery.create({
+    const projection = TimesheetProjection.create({
+      query: TimesheetQuery.create({
         from: "2025-06-09",
         to: "2025-06-15",
         today: "2025-06-12",
       }),
+    });
+
+    projection.update(
+      ActivityLoggedEvent.createTestInstance({
+        timestamp: "2025-06-09T14:00:00Z",
+        duration: "PT8H",
+      }),
+    );
+    projection.update(
+      ActivityLoggedEvent.createTestInstance({
+        timestamp: "2025-06-10T14:00:00Z",
+        duration: "PT6H",
+      }),
+    );
+    projection.update(
+      ActivityLoggedEvent.createTestInstance({
+        timestamp: "2025-06-11T14:00:00Z",
+        duration: "PT6H",
+      }),
+    );
+    projection.update(
+      ActivityLoggedEvent.createTestInstance({
+        timestamp: "2025-06-12T14:00:00Z",
+        duration: "PT6H",
+      }),
     );
 
-    expect(result.capacity).toEqual<Capacity>(
+    expect(projection.get().capacity).toEqual<Capacity>(
       Capacity.create({ hours: "PT40H", offset: "-PT6H" }),
     );
   });
 
   it("should return a positive offset when hours is ahead of the capacity", async () => {
-    const replay = createAsyncGenerator([
-      LoggedActivity.createTestInstance({
-        dateTime: "2025-06-09T16:00",
-        duration: "PT8H",
-      }),
-      LoggedActivity.createTestInstance({
-        dateTime: "2025-06-10T16:00",
-        duration: "PT10H",
-      }),
-      LoggedActivity.createTestInstance({
-        dateTime: "2025-06-11T16:00",
-        duration: "PT10H",
-      }),
-      LoggedActivity.createTestInstance({
-        dateTime: "2025-06-12T16:00",
-        duration: "PT10H",
-      }),
-    ]);
-
-    const result = await projectTimesheet(
-      replay,
-      TimesheetQuery.create({
+    const projection = TimesheetProjection.create({
+      query: TimesheetQuery.create({
         from: "2025-06-09",
         to: "2025-06-15",
         today: "2025-06-12",
       }),
+    });
+
+    projection.update(
+      ActivityLoggedEvent.createTestInstance({
+        timestamp: "2025-06-09T14:00:00Z",
+        duration: "PT8H",
+      }),
+    );
+    projection.update(
+      ActivityLoggedEvent.createTestInstance({
+        timestamp: "2025-06-10T14:00:00Z",
+        duration: "PT10H",
+      }),
+    );
+    projection.update(
+      ActivityLoggedEvent.createTestInstance({
+        timestamp: "2025-06-11T14:00:00Z",
+        duration: "PT10H",
+      }),
+    );
+    projection.update(
+      ActivityLoggedEvent.createTestInstance({
+        timestamp: "2025-06-12T14:00:00Z",
+        duration: "PT10H",
+      }),
     );
 
-    expect(result.capacity).toEqual<Capacity>(
+    expect(projection.get().capacity).toEqual<Capacity>(
       Capacity.create({ hours: "PT40H", offset: "PT6H" }),
     );
   });
 
   it("should return the offset for capacity in the future", async () => {
-    // query a week on thursday
-    const replay = createAsyncGenerator([
-      LoggedActivity.createTestInstance({
-        dateTime: "2025-06-09T16:00",
-        duration: "PT8H",
-      }),
-      LoggedActivity.createTestInstance({
-        dateTime: "2025-06-10T16:00",
-        duration: "PT8H",
-      }),
-      LoggedActivity.createTestInstance({
-        dateTime: "2025-06-11T16:00",
-        duration: "PT8H",
-      }),
-      LoggedActivity.createTestInstance({
-        dateTime: "2025-06-12T16:00",
-        duration: "PT8H",
-      }),
-    ]);
-
-    const result = await projectTimesheet(
-      replay,
-      TimesheetQuery.create({
+    const projection = TimesheetProjection.create({
+      query: TimesheetQuery.create({
         from: "2025-06-09",
         to: "2025-06-15",
         today: "2025-06-03",
       }),
+    });
+
+    // query a week on thursday
+    projection.update(
+      ActivityLoggedEvent.createTestInstance({
+        timestamp: "2025-06-09T14:00:00Z",
+        duration: "PT8H",
+      }),
+    );
+    projection.update(
+      ActivityLoggedEvent.createTestInstance({
+        timestamp: "2025-06-10T14:00:00Z",
+        duration: "PT8H",
+      }),
+    );
+    projection.update(
+      ActivityLoggedEvent.createTestInstance({
+        timestamp: "2025-06-11T14:00:00Z",
+        duration: "PT8H",
+      }),
+    );
+    projection.update(
+      ActivityLoggedEvent.createTestInstance({
+        timestamp: "2025-06-12T14:00:00Z",
+        duration: "PT8H",
+      }),
     );
 
-    expect(result.totalHours).toEqual<Temporal.Duration>(
+    expect(projection.get().totalHours).toEqual<Temporal.Duration>(
       Temporal.Duration.from("PT32H"),
     );
-    expect(result.capacity).toEqual<Capacity>(
+    expect(projection.get().capacity).toEqual<Capacity>(
       Capacity.create({ hours: "PT40H", offset: "PT24h" }),
     );
   });
 
   it("should take holidays into account", async () => {
-    const replay = createAsyncGenerator([
-      LoggedActivity.createTestInstance({
-        dateTime: "2025-06-10T16:00",
-        duration: "PT8H",
-      }),
-      LoggedActivity.createTestInstance({
-        dateTime: "2025-06-11T16:00",
-        duration: "PT8H",
-      }),
-      LoggedActivity.createTestInstance({
-        dateTime: "2025-06-12T16:00",
-        duration: "PT8H",
-      }),
-    ]);
-
-    const result = await projectTimesheet(
-      replay,
-      TimesheetQuery.create({
+    const projection = TimesheetProjection.create({
+      query: TimesheetQuery.create({
         from: "2025-06-09",
         to: "2025-06-15",
         today: "2025-06-12",
       }),
-      {
-        holidays: [
-          Holiday.create({ date: "2025-06-09", title: "Pfingstmontag" }),
-        ],
-      },
+      holidays: [
+        Holiday.create({ date: "2025-06-09", title: "Pfingstmontag" }),
+      ],
+    });
+
+    projection.update(
+      ActivityLoggedEvent.createTestInstance({
+        timestamp: "2025-06-10T14:00:00Z",
+        duration: "PT8H",
+      }),
+    );
+    projection.update(
+      ActivityLoggedEvent.createTestInstance({
+        timestamp: "2025-06-11T14:00:00Z",
+        duration: "PT8H",
+      }),
+    );
+    projection.update(
+      ActivityLoggedEvent.createTestInstance({
+        timestamp: "2025-06-12T14:00:00Z",
+        duration: "PT8H",
+      }),
     );
 
-    expect(result.capacity).toEqual<Capacity>(
+    expect(projection.get().capacity).toEqual<Capacity>(
       Capacity.create({ hours: "PT32H", offset: "PT0S" }),
     );
   });
 
   it("should take vacation into account", async () => {
-    const replay = createAsyncGenerator([
-      LoggedActivity.createTestInstance({
-        dateTime: "2025-09-08T16:00",
-        duration: "PT8H",
-      }),
-      LoggedActivity.createTestInstance({
-        dateTime: "2025-09-09T16:00",
-        duration: "PT8H",
-      }),
-      LoggedActivity.createTestInstance({
-        dateTime: "2025-09-11T16:00",
-        duration: "PT8H",
-      }),
-    ]);
-
-    const result = await projectTimesheet(
-      replay,
-      TimesheetQuery.create({
+    const projection = TimesheetProjection.create({
+      query: TimesheetQuery.create({
         from: "2025-09-08",
         to: "2025-09-14",
         today: "2025-09-11",
       }),
-      { vacations: [Vacation.create({ date: "2025-09-10" })] },
+      vacations: [Vacation.create({ date: "2025-09-10" })],
+    });
+
+    projection.update(
+      ActivityLoggedEvent.createTestInstance({
+        timestamp: "2025-09-08T14:00:00Z",
+        duration: "PT8H",
+      }),
+    );
+    projection.update(
+      ActivityLoggedEvent.createTestInstance({
+        timestamp: "2025-09-09T14:00:00Z",
+        duration: "PT8H",
+      }),
+    );
+    projection.update(
+      ActivityLoggedEvent.createTestInstance({
+        timestamp: "2025-09-11T14:00:00Z",
+        duration: "PT8H",
+      }),
     );
 
-    expect(result.capacity).toEqual<Capacity>(
+    expect(projection.get().capacity).toEqual<Capacity>(
       Capacity.create({ hours: "PT32H", offset: "PT0S" }),
     );
   });

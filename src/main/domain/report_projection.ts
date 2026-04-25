@@ -2,55 +2,106 @@
 
 import { Temporal } from "@js-temporal/polyfill";
 
-import { LoggedActivity } from "../../shared/domain/logged_activity";
 import {
   ReportEntry,
   ReportQuery,
   ReportQueryResult,
   ReportScope,
 } from "../../shared/domain/report_query";
-import { normalizeDuration } from "../../shared/domain/temporal";
-import { filterEvents, TotalHoursProjection } from "./activities";
+import {
+  isTimestampInPeriod,
+  normalizeDuration,
+} from "../../shared/domain/temporal";
+import type { ActivityLoggedEvent } from "./activity_logged_event";
+import type { Projection } from "./projection";
+import { TotalHoursProjection } from "./total_hours_projection";
 
-export async function projectReport(
-  replay: AsyncGenerator<LoggedActivity>,
-  query: ReportQuery,
-): Promise<ReportQueryResult> {
-  let projection;
-  const totalHoursProjection = new TotalHoursProjection();
-  switch (query.scope) {
-    case ReportScope.CLIENTS:
-      projection = new ClientReportProjection();
-      break;
-    case ReportScope.PROJECTS:
-      projection = new ProjectReportProjection();
-      break;
-    case ReportScope.TASKS:
-      projection = new TaskReportProjection();
-      break;
-    case ReportScope.CATEGORIES:
-      projection = new CategoryReportProjection();
-      break;
+export class ReportProjection implements Projection<ReportQueryResult> {
+  static create({
+    query,
+    timeZone = "Europe/Berlin",
+  }: {
+    query: ReportQuery;
+    timeZone?: Temporal.TimeZoneLike;
+  }) {
+    return new ReportProjection(query, timeZone);
   }
-  for await (const event of filterEvents(replay, query.from, query.to)) {
-    projection.update(event);
-    totalHoursProjection.update(event);
+
+  readonly #query;
+  readonly #timeZone;
+  readonly #reportEntryProjection;
+  readonly #totalHoursProjection;
+
+  private constructor(query: ReportQuery, timeZone: Temporal.TimeZoneLike) {
+    this.#query = query;
+    this.#timeZone = timeZone;
+    switch (query.scope) {
+      case ReportScope.CLIENTS:
+        this.#reportEntryProjection = ClientReportProjection.create({
+          timeZone,
+        });
+        break;
+      case ReportScope.PROJECTS:
+        this.#reportEntryProjection = ProjectReportProjection.create({
+          timeZone,
+        });
+        break;
+      case ReportScope.TASKS:
+        this.#reportEntryProjection = TaskReportProjection.create({ timeZone });
+        break;
+      case ReportScope.CATEGORIES:
+        this.#reportEntryProjection = CategoryReportProjection.create({
+          timeZone,
+        });
+        break;
+    }
+    this.#totalHoursProjection = TotalHoursProjection.create();
   }
-  return {
-    entries: projection.get(),
-    totalHours: totalHoursProjection.get(),
-  };
+
+  update(event: ActivityLoggedEvent) {
+    if (
+      !isTimestampInPeriod(
+        event.timestamp,
+        this.#timeZone,
+        this.#query.from,
+        this.#query.to,
+      )
+    ) {
+      return;
+    }
+
+    this.#reportEntryProjection.update(event);
+    this.#totalHoursProjection.update(event);
+  }
+
+  get(): ReportQueryResult {
+    const entries = this.#reportEntryProjection.get();
+    const totalHours = this.#totalHoursProjection.get();
+    return ReportQueryResult.create({ entries, totalHours });
+  }
 }
 
-class ClientReportProjection {
-  #entries: ReportEntry[] = [];
+class ClientReportProjection implements Projection<ReportEntry[]> {
+  static create({ timeZone }: { timeZone: Temporal.TimeZoneLike }) {
+    return new ClientReportProjection(timeZone);
+  }
 
-  update(event: LoggedActivity) {
+  readonly #timeZone;
+  #entries: ReportEntry[];
+
+  private constructor(timeZone: Temporal.TimeZoneLike) {
+    this.#timeZone = timeZone;
+    this.#entries = [];
+  }
+
+  update(event: ActivityLoggedEvent) {
     const index = this.#entries.findIndex(
       (entry) => entry.client === event.client,
     );
     if (index == -1) {
-      const date = event.dateTime.toPlainDate();
+      const date = event.timestamp
+        .toZonedDateTimeISO(this.#timeZone)
+        .toPlainDate();
       this.#entries.push(
         ReportEntry.create({
           start: date,
@@ -61,7 +112,11 @@ class ClientReportProjection {
         }),
       );
     } else {
-      this.#entries[index] = updateEntry(this.#entries[index]!, event);
+      this.#entries[index] = updateEntry(
+        this.#entries[index]!,
+        event,
+        this.#timeZone,
+      );
     }
   }
 
@@ -70,15 +125,27 @@ class ClientReportProjection {
   }
 }
 
-class ProjectReportProjection {
-  #entries: ReportEntry[] = [];
+class ProjectReportProjection implements Projection<ReportEntry[]> {
+  static create({ timeZone }: { timeZone: Temporal.TimeZoneLike }) {
+    return new ProjectReportProjection(timeZone);
+  }
 
-  update(event: LoggedActivity) {
+  #timeZone;
+  #entries: ReportEntry[];
+
+  private constructor(timeZone: Temporal.TimeZoneLike) {
+    this.#timeZone = timeZone;
+    this.#entries = [];
+  }
+
+  update(event: ActivityLoggedEvent) {
     const index = this.#entries.findIndex(
       (entry) => entry.project === event.project,
     );
     if (index == -1) {
-      const date = event.dateTime.toPlainDate();
+      const date = event.timestamp
+        .toZonedDateTimeISO(this.#timeZone)
+        .toPlainDate();
       this.#entries.push(
         ReportEntry.create({
           start: date,
@@ -93,6 +160,7 @@ class ProjectReportProjection {
       this.#entries[index] = updateEntry(
         this.#entries[index]!,
         event,
+        this.#timeZone,
         "client",
       );
     }
@@ -103,10 +171,20 @@ class ProjectReportProjection {
   }
 }
 
-class TaskReportProjection {
-  #entries: ReportEntry[] = [];
+class TaskReportProjection implements Projection<ReportEntry[]> {
+  static create({ timeZone }: { timeZone: Temporal.TimeZoneLike }) {
+    return new TaskReportProjection(timeZone);
+  }
 
-  update(event: LoggedActivity) {
+  #timeZone;
+  #entries: ReportEntry[];
+
+  private constructor(timeZone: Temporal.TimeZoneLike) {
+    this.#timeZone = timeZone;
+    this.#entries = [];
+  }
+
+  update(event: ActivityLoggedEvent) {
     const index = this.#entries.findIndex(
       (entry) =>
         entry.task === event.task &&
@@ -114,7 +192,9 @@ class TaskReportProjection {
         entry.client === event.client,
     );
     if (index == -1) {
-      const date = event.dateTime.toPlainDate();
+      const date = event.timestamp
+        .toZonedDateTimeISO(this.#timeZone)
+        .toPlainDate();
       this.#entries.push(
         ReportEntry.create({
           start: date,
@@ -131,6 +211,7 @@ class TaskReportProjection {
       this.#entries[index] = updateEntry(
         this.#entries[index]!,
         event,
+        this.#timeZone,
         "category",
       );
     }
@@ -153,15 +234,27 @@ class TaskReportProjection {
   }
 }
 
-class CategoryReportProjection {
-  #entries: ReportEntry[] = [];
+class CategoryReportProjection implements Projection<ReportEntry[]> {
+  static create({ timeZone }: { timeZone: Temporal.TimeZoneLike }) {
+    return new CategoryReportProjection(timeZone);
+  }
 
-  update(event: LoggedActivity) {
+  #timeZone;
+  #entries: ReportEntry[];
+
+  private constructor(timeZone: Temporal.TimeZoneLike) {
+    this.#timeZone = timeZone;
+    this.#entries = [];
+  }
+
+  update(event: ActivityLoggedEvent) {
     const index = this.#entries.findIndex(
       (entry) => entry.category === (event.category ?? "N/A"),
     );
     if (index == -1) {
-      const date = event.dateTime.toPlainDate();
+      const date = event.timestamp
+        .toZonedDateTimeISO(this.#timeZone)
+        .toPlainDate();
       this.#entries.push(
         ReportEntry.create({
           start: date,
@@ -172,7 +265,11 @@ class CategoryReportProjection {
         }),
       );
     } else {
-      this.#entries[index] = updateEntry(this.#entries[index]!, event);
+      this.#entries[index] = updateEntry(
+        this.#entries[index]!,
+        event,
+        this.#timeZone,
+      );
     }
   }
 
@@ -183,10 +280,11 @@ class CategoryReportProjection {
 
 function updateEntry(
   entry: ReportEntry,
-  event: LoggedActivity,
+  event: ActivityLoggedEvent,
+  timeZone: Temporal.TimeZoneLike,
   groupBy?: "client" | "category",
 ): ReportEntry {
-  const date = event.dateTime.toPlainDate();
+  const date = event.timestamp.toZonedDateTimeISO(timeZone).toPlainDate();
   const start =
     Temporal.PlainDate.compare(date, entry.start) < 0 ? date : entry.start;
   const finish =

@@ -1,31 +1,32 @@
 // Copyright (c) 2026 Falko Schumann. All rights reserved. MIT license.
 
 import { describe, expect, it } from "vitest";
+
+import { ReportQueryHandler } from "../../../src/main/application/report_query_handler";
 import {
   ReportEntry,
   ReportQueryResult,
   ReportScope,
 } from "../../../src/shared/domain/report_query";
 import { Clock } from "../../../src/shared/domain/temporal";
-import { ActivityLoggedEventDto } from "../../../src/main/infrastructure/activity_logged_event_dto";
+import { ActivityLoggedEvent } from "../../../src/main/domain/activity_logged_event";
 import { EventStore } from "../../../src/main/infrastructure/event_store";
-import { ReportQueryHandler } from "../../../src/main/application/report_query_handler";
 
 describe("Report", () => {
   it("should return report", async () => {
     const { handler } = configure({
       events: [
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2025-06-25T15:00:00Z",
           client: "Client 2",
           duration: "PT7H",
         }),
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2025-06-26T15:00:00Z",
           client: "Client 1",
           duration: "PT5H",
         }),
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2025-06-27T15:00:00Z",
           client: "Client 1",
           duration: "PT3H",
@@ -63,7 +64,7 @@ function configure({
   events,
   fixedInstant,
 }: {
-  events?: ActivityLoggedEventDto[];
+  events?: ActivityLoggedEvent[];
   fixedInstant?: string;
 } = {}) {
   const eventStore = EventStore.createNull({ events });

@@ -5,11 +5,14 @@ import path from "node:path";
 import stream from "node:stream";
 
 import { ConfigurableResponses, OutputTracker } from "@muspellheim/shared";
+import Ajv from "ajv";
+import addFormats from "ajv-formats";
 import { parse, stringify } from "csv";
+import type { Options as ParseOptions } from "csv-parse";
+import type { Options as StringifyOptions } from "csv-stringify";
 import { stringify as syncStringify } from "csv-stringify/sync";
-import type { ActivityLoggedEventDto } from "./activity_logged_event_dto";
 
-const RECORDED_EVENT = "recorded";
+import { ActivityLoggedEvent } from "../domain/activity_logged_event";
 
 export class EventStore extends EventTarget {
   static create({
@@ -20,7 +23,7 @@ export class EventStore extends EventTarget {
 
   static createNull({
     events,
-  }: { events?: ActivityLoggedEventDto[] } = {}): EventStore {
+  }: { events?: ActivityLoggedEvent[] } = {}): EventStore {
     return new EventStore(
       "null-activity-log.csv",
       new FsPromiseStub(events) as unknown as typeof fsPromise,
@@ -37,23 +40,14 @@ export class EventStore extends EventTarget {
     this.#fs = fs;
   }
 
-  async record(event: ActivityLoggedEventDto) {
+  async record(event: ActivityLoggedEvent) {
     const dirName = path.resolve(path.dirname(this.fileName));
     await this.#fs.mkdir(dirName, { recursive: true });
 
     const existsFile = await this.#existsFile(this.fileName);
     const stringifier = stringify({
+      ...STRINGIFY_CONFIGURATION,
       header: !existsFile,
-      record_delimiter: "\r\n",
-      columns: [
-        { key: "timestamp", header: "Timestamp" },
-        { key: "duration", header: "Duration" },
-        { key: "client", header: "Client" },
-        { key: "project", header: "Project" },
-        { key: "task", header: "Task" },
-        { key: "notes", header: "Notes" },
-        { key: "category", header: "Category" },
-      ],
     });
     const file = await this.#fs.open(this.fileName, "a");
     const stream = file.createWriteStream();
@@ -68,38 +62,19 @@ export class EventStore extends EventTarget {
     return OutputTracker.create(this, RECORDED_EVENT);
   }
 
-  async *replay(): AsyncGenerator<ActivityLoggedEventDto> {
+  async *replay(): AsyncGenerator<ActivityLoggedEvent> {
     try {
       const file = await this.#fs.open(this.fileName, "r");
-      const parser = file.createReadStream().pipe(
-        parse({
-          cast: (value, context) =>
-            value == "" && !context.quoting ? undefined : value,
-          columns: (header) =>
-            header.map((column) => {
-              switch (column) {
-                case "Timestamp":
-                  return "timestamp";
-                case "Duration":
-                  return "duration";
-                case "Client":
-                  return "client";
-                case "Project":
-                  return "project";
-                case "Task":
-                  return "task";
-                case "Notes":
-                  return "notes";
-                case "Category":
-                  return "category";
-                default:
-                  return column;
-              }
-            }),
-        }),
-      );
+      const parser = file.createReadStream().pipe(parse(PARSE_CONFIGURATION));
       for await (const record of parser) {
-        yield record;
+        const valid = ajv.validate(ACTIVITY_LOGGED_EVENT_SCHEMA, record);
+        if (!valid) {
+          // TODO write test
+          const errors = JSON.stringify(ajv.errors, null, 2);
+          throw new TypeError(`Invalid activity logged event data:\n${errors}`);
+        }
+
+        yield ActivityLoggedEvent.create(record);
       }
       parser.end();
     } catch (error) {
@@ -125,6 +100,75 @@ export class EventStore extends EventTarget {
     }
   }
 }
+
+const RECORDED_EVENT = "recorded";
+
+const PARSE_CONFIGURATION: ParseOptions = {
+  cast: (value, context) =>
+    value == "" && !context.quoting ? undefined : value,
+  columns: (header) =>
+    header.map((column) => {
+      switch (column) {
+        case "Timestamp":
+          return "timestamp";
+        case "Duration":
+          return "duration";
+        case "Client":
+          return "client";
+        case "Project":
+          return "project";
+        case "Task":
+          return "task";
+        case "Notes":
+          return "notes";
+        case "Category":
+          return "category";
+        default:
+          return column;
+      }
+    }),
+};
+
+const STRINGIFY_CONFIGURATION: StringifyOptions = {
+  header: true,
+  record_delimiter: "\r\n",
+  columns: [
+    { key: "timestamp", header: "Timestamp" },
+    { key: "duration", header: "Duration" },
+    { key: "client", header: "Client" },
+    { key: "project", header: "Project" },
+    { key: "task", header: "Task" },
+    { key: "notes", header: "Notes" },
+    { key: "category", header: "Category" },
+  ],
+  cast: {
+    object: (value, context) => {
+      if (context.column === "timestamp" || context.column === "duration") {
+        return value.toString();
+      } else {
+        return JSON.stringify(value);
+      }
+    },
+  },
+};
+
+const ACTIVITY_LOGGED_EVENT_SCHEMA = {
+  type: "object",
+  properties: {
+    timestamp: { type: "string", format: "iso-date-time" },
+    duration: { type: "string", format: "duration" },
+    client: { type: "string" },
+    project: { type: "string" },
+    task: { type: "string" },
+    notes: { type: "string" },
+    category: { type: "string" },
+  },
+  required: ["timestamp", "duration", "client", "project", "task"],
+  additionalProperties: false,
+};
+
+const ajv = new Ajv({ allErrors: true });
+addFormats(ajv);
 
 class FsPromiseStub {
   readonly createReadStreamResponses: ConfigurableResponses;
@@ -156,7 +200,10 @@ class FileHandleStub {
     const readable = new stream.PassThrough();
     setTimeout(() => {
       const events = this.#createReadStreamResponses.next();
-      const record = syncStringify(events as unknown[], { header: true });
+      const record = syncStringify(
+        events as unknown[],
+        STRINGIFY_CONFIGURATION,
+      );
       readable.emit("data", record);
       readable.emit("end");
     }, 0);

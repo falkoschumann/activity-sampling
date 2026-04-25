@@ -2,44 +2,53 @@
 
 import { Temporal } from "@js-temporal/polyfill";
 
-import { LoggedActivity } from "../../shared/domain/logged_activity";
 import {
   BurnUpData,
   type BurnUpQuery,
   BurnUpQueryResult,
 } from "../../shared/domain/burn_up_query";
-import {
-  ActivitiesProjection,
-  Activity,
-  CategoriesProjection,
-  filterEvents,
-} from "./activities";
+import { ActivitiesProjection, Activity } from "./activities_projection";
+import type { ActivityLoggedEvent } from "./activity_logged_event";
+import { CategoriesProjection } from "./categories_projection";
+import type { Projection } from "./projection";
 
-export async function projectBurnUp(
-  replay: AsyncGenerator<LoggedActivity>,
-  query: BurnUpQuery,
-): Promise<BurnUpQueryResult> {
-  const { activities, categories } = await projectActivities(replay, query);
-  const throughputs = determineThroughputs(activities);
-  const data = fillPeriod(throughputs, query.from, query.to);
-  const totalThroughput = determineTotalThroughput(data);
-  return BurnUpQueryResult.create({ data, totalThroughput, categories });
-}
-
-async function projectActivities(
-  replay: AsyncGenerator<LoggedActivity>,
-  query: BurnUpQuery,
-) {
-  const activitiesProjection = new ActivitiesProjection(query.categories);
-  const categoriesProjection = new CategoriesProjection();
-  for await (const event of filterEvents(replay, query.from, query.to)) {
-    activitiesProjection.update(event);
-    categoriesProjection.update(event);
+export class BurnUpProjection implements Projection<BurnUpQueryResult> {
+  static create({
+    query,
+    timeZone = "Europe/Berlin",
+  }: {
+    query: BurnUpQuery;
+    timeZone?: Temporal.TimeZoneLike;
+  }) {
+    return new BurnUpProjection(query, timeZone);
   }
-  return {
-    activities: activitiesProjection.get(),
-    categories: categoriesProjection.get(),
-  };
+
+  readonly #query;
+  readonly #activitiesProjection;
+  readonly #categoriesProjection;
+
+  private constructor(query: BurnUpQuery, timeZone: Temporal.TimeZoneLike) {
+    this.#query = query;
+    this.#activitiesProjection = ActivitiesProjection.create({
+      categories: query.categories,
+      timeZone,
+    });
+    this.#categoriesProjection = CategoriesProjection.create();
+  }
+
+  update(event: ActivityLoggedEvent) {
+    this.#activitiesProjection.update(event);
+    this.#categoriesProjection.update(event);
+  }
+
+  get(): BurnUpQueryResult {
+    const activities = this.#activitiesProjection.get();
+    const categories = this.#categoriesProjection.get();
+    const throughputs = determineThroughputs(activities);
+    const data = fillPeriod(throughputs, this.#query.from, this.#query.to);
+    const totalThroughput = determineTotalThroughput(data);
+    return BurnUpQueryResult.create({ data, totalThroughput, categories });
+  }
 }
 
 function determineThroughputs(activities: Activity[]) {

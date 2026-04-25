@@ -2,7 +2,10 @@
 
 import { Temporal } from "@js-temporal/polyfill";
 
-import { normalizeDuration } from "../../shared/domain/temporal";
+import {
+  isTimestampInPeriod,
+  normalizeDuration,
+} from "../../shared/domain/temporal";
 import {
   type RecentActivitiesQuery,
   RecentActivitiesQueryResult,
@@ -10,44 +13,73 @@ import {
   WorkingDay,
 } from "../../shared/domain/recent_activities_query";
 import { LoggedActivity } from "../../shared/domain/logged_activity";
-import { filterEvents } from "./activities";
+import type { Projection } from "./projection";
+import type { ActivityLoggedEvent } from "./activity_logged_event";
 
-export async function projectRecentActivities(
-  replay: AsyncGenerator<LoggedActivity>,
-  query: RecentActivitiesQuery,
-): Promise<RecentActivitiesQueryResult> {
-  const today = query.today
-    ? query.today
-    : Temporal.Now.plainDateISO(query.timeZone);
-  const from = today.subtract({ days: 30 });
-  const to = today.with({ day: today.daysInMonth });
-  const recentActivitiesProjection = new RecentActivitiesProjection();
-  const timeSummaryProjection = new TimeSummaryProjection(today);
-  for await (const event of filterEvents(replay, from, to)) {
-    recentActivitiesProjection.update(event);
-    timeSummaryProjection.update(event);
+export class RecentActivitiesProjection implements Projection<RecentActivitiesQueryResult> {
+  static create({
+    query,
+    today = Temporal.Now.plainDateISO("Europe/Berlin"),
+    timeZone = "Europe/Berlin",
+  }: {
+    query: RecentActivitiesQuery;
+    today?: Temporal.PlainDate;
+    timeZone?: Temporal.TimeZoneLike;
+  }) {
+    return new RecentActivitiesProjection(query, today, timeZone);
   }
-  return {
-    workingDays: recentActivitiesProjection.get(),
-    timeSummary: timeSummaryProjection.get(),
-  };
-}
 
-class RecentActivitiesProjection {
-  #workingDays: WorkingDay[] = [];
+  readonly #timeZone;
+  readonly #from;
+  readonly #to;
+  readonly #timeSummaryProjection;
+
+  #workingDays: WorkingDay[];
   #date?: Temporal.PlainDate;
   #activities!: LoggedActivity[];
 
-  update(event: LoggedActivity) {
-    const activityDate = event.dateTime.toPlainDate();
-    if (this.#date == null || !activityDate.equals(this.#date)) {
+  private constructor(
+    query: RecentActivitiesQuery,
+    today: Temporal.PlainDate,
+    timeZone: Temporal.TimeZoneLike,
+  ) {
+    today = query.today || today;
+    this.#timeZone = timeZone;
+    this.#from = today.subtract({ days: 30 });
+    this.#to = today.with({ day: today.daysInMonth });
+    this.#timeSummaryProjection = TimeSummaryProjection.create({
+      today,
+      timeZone,
+    });
+    this.#workingDays = [];
+  }
+
+  update(event: ActivityLoggedEvent) {
+    if (
+      !isTimestampInPeriod(
+        event.timestamp,
+        this.#timeZone,
+        this.#from,
+        this.#to,
+      )
+    ) {
+      return;
+    }
+
+    const activityDateTime = event.timestamp
+      .toZonedDateTimeISO(this.#timeZone)
+      .toPlainDateTime();
+    if (
+      this.#date == null ||
+      !activityDateTime.toPlainDate().equals(this.#date)
+    ) {
       this.#createWorkingDay();
-      this.#date = activityDate;
+      this.#date = activityDateTime.toPlainDate();
       this.#activities = [];
     }
     this.#activities.push(
       LoggedActivity.create({
-        dateTime: event.dateTime,
+        dateTime: activityDateTime,
         duration: event.duration,
         client: event.client,
         project: event.project,
@@ -56,11 +88,14 @@ class RecentActivitiesProjection {
         category: event.category,
       }),
     );
+    this.#timeSummaryProjection.update(event);
   }
 
-  get() {
+  get(): RecentActivitiesQueryResult {
     this.#createWorkingDay();
-    return this.#workingDays.reverse();
+    const workingDays = this.#workingDays.reverse();
+    const timeSummary = this.#timeSummaryProjection.get();
+    return RecentActivitiesQueryResult.create({ workingDays, timeSummary });
   }
 
   #createWorkingDay() {
@@ -80,29 +115,50 @@ class RecentActivitiesProjection {
 }
 
 class TimeSummaryProjection {
+  static create({
+    today,
+    timeZone,
+  }: {
+    today: Temporal.PlainDate | string;
+    timeZone: Temporal.TimeZoneLike;
+  }) {
+    return new TimeSummaryProjection(today, timeZone);
+  }
+
   readonly #today: Temporal.PlainDate;
   readonly #yesterday: Temporal.PlainDate;
   readonly #weekStart: Temporal.PlainDate;
   readonly #weekEnd: Temporal.PlainDate;
   readonly #monthStart: Temporal.PlainDate;
   readonly #monthEnd: Temporal.PlainDate;
+  readonly #timeZone: Temporal.TimeZoneLike;
 
-  #hoursToday = Temporal.Duration.from("PT0S");
-  #hoursYesterday = Temporal.Duration.from("PT0S");
-  #hoursThisWeek = Temporal.Duration.from("PT0S");
-  #hoursThisMonth = Temporal.Duration.from("PT0S");
+  #hoursToday;
+  #hoursYesterday;
+  #hoursThisWeek;
+  #hoursThisMonth;
 
-  constructor(today: Temporal.PlainDate) {
-    this.#today = today;
-    this.#yesterday = today.subtract("P1D");
-    this.#weekStart = today.subtract({ days: today.dayOfWeek - 1 });
+  private constructor(
+    today: Temporal.PlainDate | string,
+    timeZone: Temporal.TimeZoneLike,
+  ) {
+    this.#today = Temporal.PlainDate.from(today);
+    this.#yesterday = this.#today.subtract("P1D");
+    this.#weekStart = this.#today.subtract({ days: this.#today.dayOfWeek - 1 });
     this.#weekEnd = this.#weekStart.add("P6D");
-    this.#monthStart = today.with({ day: 1 });
+    this.#monthStart = this.#today.with({ day: 1 });
     this.#monthEnd = this.#monthStart.add("P1M").subtract("P1D");
+    this.#timeZone = timeZone;
+    this.#hoursToday = Temporal.Duration.from("PT0S");
+    this.#hoursYesterday = Temporal.Duration.from("PT0S");
+    this.#hoursThisWeek = Temporal.Duration.from("PT0S");
+    this.#hoursThisMonth = Temporal.Duration.from("PT0S");
   }
 
-  update(event: LoggedActivity) {
-    const date = event.dateTime.toPlainDate();
+  update(event: ActivityLoggedEvent) {
+    const date = event.timestamp
+      .toZonedDateTimeISO(this.#timeZone)
+      .toPlainDate();
     const hours = event.duration;
     if (date.equals(this.#today)) {
       this.#hoursToday = this.#hoursToday.add(hours);

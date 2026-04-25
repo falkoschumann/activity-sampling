@@ -2,7 +2,6 @@
 
 import { describe, expect, it } from "vitest";
 
-import { Clock } from "../../../src/shared/domain/temporal";
 import { RecentActivitiesQueryHandler } from "../../../src/main/application/recent_activities_query_handler";
 import { LoggedActivity } from "../../../src/shared/domain/logged_activity";
 import {
@@ -10,7 +9,8 @@ import {
   TimeSummary,
   WorkingDay,
 } from "../../../src/shared/domain/recent_activities_query";
-import { ActivityLoggedEventDto } from "../../../src/main/infrastructure/activity_logged_event_dto";
+import { Clock } from "../../../src/shared/domain/temporal";
+import { ActivityLoggedEvent } from "../../../src/main/domain/activity_logged_event";
 import { EventStore } from "../../../src/main/infrastructure/event_store";
 
 describe("Recent Activities", () => {
@@ -28,25 +28,25 @@ describe("Recent Activities", () => {
     it("should group activities by day for the last 30 days", async () => {
       const events = [
         // is not included, because older than 30 days
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2025-05-05T14:00:00Z",
         }),
         // 2 activities on different days
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2025-05-06T14:00:00Z",
         }),
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2025-06-04T14:00:00Z",
         }),
         // 2 activities on the same day
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2025-06-05T08:30:00Z",
         }),
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2025-06-05T09:00:00Z",
         }),
         // is not included, because it is in the next month
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2025-07-01T10:30:00Z",
         }),
       ];
@@ -86,22 +86,6 @@ describe("Recent Activities", () => {
         }),
       ]);
     });
-
-    it("should throw an error when event is not parseable", async () => {
-      const events = [
-        ActivityLoggedEventDto.createTestInstance({
-          timestamp: "invalid-timestamp",
-        }),
-      ];
-      const { handler } = configure({
-        events,
-        fixedInstant: "2025-06-05T10:00:00Z",
-      });
-
-      const result = handler.handle(RecentActivitiesQuery.create());
-
-      await expect(result).rejects.toThrowError(TypeError);
-    });
   });
 
   describe("Summarize hours worked today, yesterday, this week and this month", () => {
@@ -125,52 +109,52 @@ describe("Recent Activities", () => {
     it("should summarize hours worked for a month with 30 days", async () => {
       const events = [
         // the last day of last month is not included
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2025-05-31T14:00:00Z",
         }),
         // start of this month
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2025-06-01T14:00:00Z",
         }),
         // end of last week
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2025-06-01T10:00:00Z",
         }),
         // start of this week
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2025-06-02T10:00:00Z",
         }),
         // the day before yesterday
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2025-06-03T10:00:00Z",
         }),
         // yesterday
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2025-06-04T10:00:00Z",
         }),
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2025-06-04T10:30:00Z",
         }),
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2025-06-04T11:00:00Z",
         }),
         // today
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2025-06-05T09:00:00Z",
         }),
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2025-06-05T09:30:00Z",
         }),
         // tomorrow
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2025-06-06T08:30:00Z",
         }),
         // last day of this month
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2025-06-30T08:30:00Z",
         }),
         // first day of next month is not included
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2025-07-01T10:30:00Z",
         }),
       ];
@@ -193,35 +177,35 @@ describe("Recent Activities", () => {
     it("should summarize hours worked for a month with 31 days", async () => {
       const events = [
         // the last day of last month is not included
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2025-11-30T10:00:00Z",
         }),
         // first day in month
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2025-12-06T10:00:00Z",
         }),
         // first day in week
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2025-12-08T10:00:00Z",
         }),
         // yesterday
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2025-12-12T10:00:00Z",
         }),
         // today
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2025-12-13T10:00:00Z",
         }),
         // last day in week
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2025-12-14T10:00:00Z",
         }),
         // last day in month
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2025-12-31T10:00:00Z",
         }),
         // first day of next month is not included
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2026-01-01T10:00:00Z",
         }),
       ];
@@ -244,35 +228,35 @@ describe("Recent Activities", () => {
     it("should summarize hours worked for a month with 28 days", async () => {
       const events = [
         // the last day of last month is not included
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2025-01-30T10:00:00Z",
         }),
         // first day in month
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2025-02-06T10:00:00Z",
         }),
         // first day in week
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2025-02-10T10:00:00Z",
         }),
         // yesterday
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2025-02-12T10:00:00Z",
         }),
         // today
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2025-02-13T10:00:00Z",
         }),
         // last day in week
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2025-02-16T10:00:00Z",
         }),
         // last day in month
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2025-02-28T10:00:00Z",
         }),
         // first day of next month is not included
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2026-03-01T10:00:00Z",
         }),
       ];
@@ -298,7 +282,7 @@ function configure({
   events,
   fixedInstant,
 }: {
-  events?: ActivityLoggedEventDto[];
+  events?: ActivityLoggedEvent[];
   fixedInstant?: string;
 }) {
   const eventStore = EventStore.createNull({ events });

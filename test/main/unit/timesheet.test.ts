@@ -2,6 +2,8 @@
 
 import { describe, expect, it } from "vitest";
 
+import { TimesheetQueryHandler } from "../../../src/main/application/timesheet_query_handler";
+import { Settings } from "../../../src/shared/domain/settings";
 import { Clock } from "../../../src/shared/domain/temporal";
 import {
   Capacity,
@@ -9,9 +11,8 @@ import {
   TimesheetQuery,
   TimesheetQueryResult,
 } from "../../../src/shared/domain/timesheet_query";
-import { Settings } from "../../../src/shared/domain/settings";
+import { ActivityLoggedEvent } from "../../../src/main/domain/activity_logged_event";
 import { EventStore } from "../../../src/main/infrastructure/event_store";
-import { ActivityLoggedEventDto } from "../../../src/main/infrastructure/activity_logged_event_dto";
 import {
   HolidayDto,
   HolidayRepository,
@@ -20,17 +21,16 @@ import {
   VacationDto,
   VacationRepository,
 } from "../../../src/main/infrastructure/vacation_repository";
-import { TimesheetQueryHandler } from "../../../src/main/application/timesheet_query_handler";
 
 describe("Timesheet", () => {
   it("should return timesheet", async () => {
     const { handler } = configure({
       events: [
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2025-06-10T15:00:00Z",
           duration: "PT8H",
         }),
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2025-06-11T15:00:00Z",
           duration: "PT8H",
         }),
@@ -77,7 +77,7 @@ function configure({
   vacations,
   fixedInstant,
 }: {
-  events?: ActivityLoggedEventDto[];
+  events?: ActivityLoggedEvent[];
   holidays?: HolidayDto[];
   vacations?: VacationDto[];
   fixedInstant?: string;

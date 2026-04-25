@@ -5,7 +5,7 @@ import { describe, expect, it } from "vitest";
 
 import { LogActivityCommandHandler } from "../../../src/main/application/log_activity_command_handler";
 import { LogActivityCommand } from "../../../src/shared/domain/log_activity_command";
-import { ActivityLoggedEventDto } from "../../../src/main/infrastructure/activity_logged_event_dto";
+import { ActivityLoggedEvent } from "../../../src/main/domain/activity_logged_event";
 import { EventStore } from "../../../src/main/infrastructure/event_store";
 
 describe("Log activity", () => {
@@ -19,8 +19,8 @@ describe("Log activity", () => {
       );
 
       expect(status).toEqual<CommandStatus>(new Success());
-      expect(recordEvents.data).toEqual<ActivityLoggedEventDto[]>([
-        ActivityLoggedEventDto.createTestInstance(),
+      expect(recordEvents.data).toEqual<ActivityLoggedEvent[]>([
+        ActivityLoggedEvent.createTestInstance(),
       ]);
     });
 
@@ -36,8 +36,8 @@ describe("Log activity", () => {
       );
 
       expect(status).toEqual<CommandStatus>(new Success());
-      expect(recordEvents.data).toEqual<ActivityLoggedEventDto[]>([
-        ActivityLoggedEventDto.createTestInstance({
+      expect(recordEvents.data).toEqual<ActivityLoggedEvent[]>([
+        ActivityLoggedEvent.createTestInstance({
           notes: "my notes",
           category: "my category",
         }),
@@ -49,7 +49,7 @@ describe("Log activity", () => {
 function configure({
   events,
 }: {
-  events?: ActivityLoggedEventDto[];
+  events?: ActivityLoggedEvent[];
 } = {}) {
   const eventStore = EventStore.createNull({ events });
   const handler = LogActivityCommandHandler.create({ eventStore });

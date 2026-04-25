@@ -1,9 +1,8 @@
 // Copyright (c) 2026 Falko Schumann. All rights reserved. MIT license.
 
 import { Temporal } from "@js-temporal/polyfill";
-
-import { LoggedActivity } from "../../shared/domain/logged_activity";
 import { normalizeDuration } from "../../shared/domain/temporal";
+import type { ActivityLoggedEvent } from "./activity_logged_event";
 
 export class Activity {
   static create({
@@ -67,19 +66,33 @@ export class Activity {
 }
 
 export class ActivitiesProjection {
+  static create({
+    categories = [],
+    timeZone = "Europe/Berlin",
+  }: {
+    categories?: string[];
+    timeZone?: Temporal.TimeZoneLike;
+  }): ActivitiesProjection {
+    return new ActivitiesProjection(timeZone, categories);
+  }
+
+  readonly #timeZone;
   readonly #categories: string[];
   #activities: Activity[] = [];
 
-  constructor(categories: string[] = []) {
+  private constructor(timeZone: Temporal.TimeZoneLike, categories: string[]) {
+    this.#timeZone = timeZone;
     this.#categories = categories;
   }
 
-  update(event: LoggedActivity) {
+  update(event: ActivityLoggedEvent) {
     if (!this.#isSelectedCategory(event.category)) {
       return;
     }
 
-    const date = event.dateTime.toPlainDate();
+    const date = event.timestamp
+      .toZonedDateTimeISO(this.#timeZone)
+      .toPlainDate();
     const index = this.#findIndexOfActivity(event);
     if (index === -1) {
       this.#addActivity(date, event);
@@ -98,7 +111,7 @@ export class ActivitiesProjection {
     );
   }
 
-  #findIndexOfActivity(event: LoggedActivity) {
+  #findIndexOfActivity(event: ActivityLoggedEvent) {
     return this.#activities.findIndex(
       (activity) =>
         activity.client === event.client &&
@@ -107,7 +120,7 @@ export class ActivitiesProjection {
     );
   }
 
-  #addActivity(date: Temporal.PlainDate, event: LoggedActivity) {
+  #addActivity(date: Temporal.PlainDate, event: ActivityLoggedEvent) {
     const activity = Activity.create({
       start: date,
       finish: date,
@@ -122,7 +135,7 @@ export class ActivitiesProjection {
   private updateActivity(
     index: number,
     date: Temporal.PlainDate,
-    event: LoggedActivity,
+    event: ActivityLoggedEvent,
   ) {
     const activity = this.#activities[index]!;
     let start = activity.start;
@@ -141,58 +154,4 @@ export class ActivitiesProjection {
       hours: normalizeDuration(hours),
     });
   }
-}
-
-export class CategoriesProjection {
-  #categories: string[] = [];
-
-  update(event: LoggedActivity) {
-    if (this.#categories.includes(event.category ?? "")) {
-      return;
-    }
-
-    this.#categories.push(event.category ?? "");
-  }
-
-  get() {
-    return this.#categories.sort();
-  }
-}
-
-export class TotalHoursProjection {
-  #totalHours = Temporal.Duration.from("PT0S");
-
-  update(event: LoggedActivity) {
-    this.#totalHours = this.#totalHours.add(event.duration);
-  }
-
-  get() {
-    return normalizeDuration(this.#totalHours);
-  }
-}
-
-export async function* filterEvents(
-  replay: AsyncGenerator<LoggedActivity>,
-  from?: Temporal.PlainDate | Temporal.PlainDateLike | string,
-  to?: Temporal.PlainDate | Temporal.PlainDateLike | string,
-): AsyncGenerator<LoggedActivity> {
-  for await (const event of replay) {
-    if (isDateInPeriod(event.dateTime.toPlainDate(), from, to)) {
-      yield event;
-    }
-  }
-}
-
-function isDateInPeriod(
-  date: Temporal.PlainDate | Temporal.PlainDateLike | string,
-  from?: Temporal.PlainDate | Temporal.PlainDateLike | string,
-  to?: Temporal.PlainDate | Temporal.PlainDateLike | string,
-) {
-  if (from && Temporal.PlainDate.compare(date, from) < 0) {
-    return false;
-  }
-  if (to && Temporal.PlainDate.compare(date, to) > 0) {
-    return false;
-  }
-  return true;
 }

@@ -2,14 +2,14 @@
 
 import { describe, expect, it } from "vitest";
 
-import { Clock } from "../../../src/shared/domain/temporal";
-import { BurnUpQueryHandler } from "../../../src/main/application/burn_up_query_handler";
 import {
   BurnUpData,
   BurnUpQuery,
   BurnUpQueryResult,
 } from "../../../src/shared/domain/burn_up_query";
-import { ActivityLoggedEventDto } from "../../../src/main/infrastructure/activity_logged_event_dto";
+import { Clock } from "../../../src/shared/domain/temporal";
+import { ActivityLoggedEvent } from "../../../src/main/domain/activity_logged_event";
+import { BurnUpQueryHandler } from "../../../src/main/application/burn_up_query_handler";
 import { EventStore } from "../../../src/main/infrastructure/event_store";
 
 describe("Burn-up", () => {
@@ -29,61 +29,61 @@ describe("Burn-up", () => {
 
     it("should return data for a given period", async () => {
       const events = [
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2021-10-12T16:00:00Z",
           task: "task-1",
           category: "category-3",
         }),
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2021-10-13T16:00:00Z",
           task: "task-2",
           category: "category-2",
         }),
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2021-10-14T16:00:00Z",
           task: "task-3",
           category: "category-1",
         }),
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2021-10-15T16:00:00Z",
           task: "task-4",
           category: "category-1",
         }),
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2021-10-18T12:00:00Z",
           task: "task-5",
           category: "category-1",
         }),
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2021-10-18T16:00:00Z",
           task: "task-6",
           category: "category-2",
         }),
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2021-10-19T12:00:00Z",
           task: "task-7",
         }),
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2021-10-19T16:00:00Z",
           task: "task-8",
           category: "category-2",
         }),
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2021-10-20T16:00:00Z",
           task: "task-9",
           category: "category-2",
         }),
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2021-10-21T16:00:00Z",
           task: "task-10",
           category: "category-3",
         }),
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2021-10-22T12:00:00Z",
           task: "task-11",
           category: "category-1",
         }),
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2021-10-22T16:00:00Z",
           task: "task-12",
           category: "category-3",
@@ -179,61 +179,61 @@ describe("Burn-up", () => {
 
     it("should return data for a given period", async () => {
       const events = [
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2021-10-12T16:00:00Z",
           task: "task-1",
           category: "category-3",
         }),
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2021-10-13T16:00:00Z",
           task: "task-2",
           category: "category-2",
         }),
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2021-10-14T16:00:00Z",
           task: "task-3",
           category: "category-1",
         }),
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2021-10-15T16:00:00Z",
           task: "task-4",
           category: "category-1",
         }),
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2021-10-18T12:00:00Z",
           task: "task-5",
           category: "category-1",
         }),
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2021-10-18T16:00:00Z",
           task: "task-6",
           category: "category-2",
         }),
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2021-10-19T12:00:00Z",
           task: "task-7",
         }),
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2021-10-19T16:00:00Z",
           task: "task-8",
           category: "category-2",
         }),
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2021-10-20T16:00:00Z",
           task: "task-9",
           category: "category-2",
         }),
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2021-10-21T16:00:00Z",
           task: "task-10",
           category: "category-3",
         }),
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2021-10-22T12:00:00Z",
           task: "task-11",
           category: "category-1",
         }),
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2021-10-22T16:00:00Z",
           task: "task-12",
           category: "category-3",
@@ -268,61 +268,61 @@ describe("Burn-up", () => {
 
     it("should return data for a given period", async () => {
       const events = [
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2021-10-12T16:00:00Z",
           task: "task-1",
           category: "category-3",
         }),
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2021-10-13T16:00:00Z",
           task: "task-2",
           category: "category-2",
         }),
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2021-10-14T16:00:00Z",
           task: "task-3",
           category: "category-1",
         }),
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2021-10-15T16:00:00Z",
           task: "task-4",
           category: "category-1",
         }),
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2021-10-18T12:00:00Z",
           task: "task-5",
           category: "category-1",
         }),
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2021-10-18T16:00:00Z",
           task: "task-6",
           category: "category-2",
         }),
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2021-10-19T12:00:00Z",
           task: "task-7",
         }),
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2021-10-19T16:00:00Z",
           task: "task-8",
           category: "category-2",
         }),
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2021-10-20T16:00:00Z",
           task: "task-9",
           category: "category-2",
         }),
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2021-10-21T16:00:00Z",
           task: "task-10",
           category: "category-3",
         }),
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2021-10-22T12:00:00Z",
           task: "task-11",
           category: "category-1",
         }),
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2021-10-22T16:00:00Z",
           task: "task-12",
           category: "category-3",
@@ -424,17 +424,17 @@ describe("Burn-up", () => {
 
     it("should filter by categories", async () => {
       const events = [
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2021-10-12T16:00:00Z",
           task: "task-1",
           category: "category-1",
         }),
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2021-10-13T16:00:00Z",
           task: "task-2",
           category: "category-2",
         }),
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2021-10-14T16:00:00Z",
           task: "task-1",
           category: "category-2",
@@ -477,7 +477,7 @@ describe("Burn-up", () => {
   });
 });
 
-function configure({ events }: { events: ActivityLoggedEventDto[] }) {
+function configure({ events }: { events: ActivityLoggedEvent[] }) {
   const eventStore = EventStore.createNull({ events });
   const clock = Clock.systemDefaultZone();
   const handler = BurnUpQueryHandler.create({ eventStore, clock });

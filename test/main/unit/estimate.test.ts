@@ -2,14 +2,14 @@
 
 import { describe, expect, it } from "vitest";
 
-import { Clock } from "../../../src/shared/domain/temporal";
 import { EstimateQueryHandler } from "../../../src/main/application/estimate_query_handler";
+import { Clock } from "../../../src/shared/domain/temporal";
 import {
   EstimateEntry,
   EstimateQuery,
   type EstimateQueryResult,
 } from "../../../src/shared/domain/estimate_query";
-import { ActivityLoggedEventDto } from "../../../src/main/infrastructure/activity_logged_event_dto";
+import { ActivityLoggedEvent } from "../../../src/main/domain/activity_logged_event";
 import { EventStore } from "../../../src/main/infrastructure/event_store";
 
 describe("Estimate", () => {
@@ -24,32 +24,32 @@ describe("Estimate", () => {
 
     it("should calculate the probability of cycle times", async () => {
       const events = [
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2025-11-03T09:00:00Z",
           task: "Task A",
           category: "Category 3",
         }),
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2025-11-03T09:00:00Z",
           task: "Task B",
           category: "Category 2",
         }),
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2025-11-03T09:00:00Z",
           task: "Task C",
           category: "Category 1",
         }),
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2025-11-04T09:00:00Z",
           task: "Task C",
           category: "Category 1",
         }),
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2025-11-05T09:00:00Z",
           task: "Task D",
           category: "Category 3",
         }),
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2025-11-03T09:00:00Z",
           task: "Task D",
           category: "Category 3",
@@ -87,17 +87,17 @@ describe("Estimate", () => {
 
     it("should join the cycle time of an activity with multiple categories", async () => {
       const events = [
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2025-11-03T09:00:00Z",
           task: "Task A",
           category: "Category 1",
         }),
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2025-11-03T09:00:00Z",
           task: "Task B",
           category: "Category 2",
         }),
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2025-11-04T09:00:00Z",
           task: "Task A",
           category: "Category 2",
@@ -131,22 +131,22 @@ describe("Estimate", () => {
   describe("Filter tasks by category", () => {
     it("should filter activities by category", async () => {
       const events = [
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2025-11-03T09:00:00Z",
           task: "Task A",
           category: "Category A",
         }),
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2025-11-03T09:00:00Z",
           task: "Task B",
           category: "Category A",
         }),
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2025-11-04T09:00:00Z",
           task: "Task C",
           category: "Category B",
         }),
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2025-11-05T09:00:00Z",
           task: "Task A",
           category: "Category B",
@@ -174,20 +174,20 @@ describe("Estimate", () => {
 
     it("should filter activities without a category", async () => {
       const events = [
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2025-11-03T09:00:00Z",
           task: "Task A",
         }),
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2025-11-03T09:00:00Z",
           task: "Task B",
         }),
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2025-11-04T09:00:00Z",
           task: "Task C",
           category: "Testing Category",
         }),
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2025-11-05T09:00:00Z",
           task: "Task A",
           category: "Testing Category",
@@ -215,17 +215,17 @@ describe("Estimate", () => {
 
     it("should filter activities with and without category", async () => {
       const events = [
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2025-11-03T09:00:00Z",
           task: "Task A",
           category: "Category A",
         }),
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2025-11-03T09:00:00Z",
           task: "Task B",
           category: "Category B",
         }),
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2025-11-04T09:00:00Z",
           task: "Task C",
         }),
@@ -252,17 +252,17 @@ describe("Estimate", () => {
 
     it("should do not filter by category when an empty array is given", async () => {
       const events = [
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2025-11-03T09:00:00Z",
           task: "Task A",
           category: "Category A",
         }),
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2025-11-03T09:00:00Z",
           task: "Task B",
           category: "Category B",
         }),
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2025-11-04T09:00:00Z",
           task: "Task C",
         }),
@@ -289,7 +289,7 @@ describe("Estimate", () => {
   });
 });
 
-function configure({ events }: { events: ActivityLoggedEventDto[] }) {
+function configure({ events }: { events: ActivityLoggedEvent[] }) {
   const eventStore = EventStore.createNull({ events });
   const clock = Clock.systemDefaultZone();
   const handler = EstimateQueryHandler.create({ eventStore, clock });

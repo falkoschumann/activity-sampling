@@ -1,34 +1,53 @@
 // Copyright (c) 2026 Falko Schumann. All rights reserved. MIT license.
 
-import { LoggedActivity } from "../../shared/domain/logged_activity";
+import { Temporal } from "@js-temporal/polyfill";
+
 import {
   EstimateEntry,
   EstimateQuery,
   EstimateQueryResult,
 } from "../../shared/domain/estimate_query";
-import {
-  ActivitiesProjection,
-  Activity,
-  CategoriesProjection,
-} from "./activities";
+import { ActivitiesProjection, Activity } from "./activities_projection";
+import type { ActivityLoggedEvent } from "./activity_logged_event";
+import { CategoriesProjection } from "./categories_projection";
+import type { Projection } from "./projection";
 
-export async function projectEstimate(
-  replay: AsyncGenerator<LoggedActivity>,
-  query: EstimateQuery,
-): Promise<EstimateQueryResult> {
-  const activitiesProjection = new ActivitiesProjection(query.categories);
-  const categoriesProjection = new CategoriesProjection();
-  for await (const event of replay) {
-    activitiesProjection.update(event);
-    categoriesProjection.update(event);
+export class EstimateProjection implements Projection<EstimateQueryResult> {
+  static create({
+    query,
+    timeZone,
+  }: {
+    query: EstimateQuery;
+    timeZone: Temporal.TimeZoneLike;
+  }) {
+    return new EstimateProjection(query, timeZone);
   }
-  const activities = activitiesProjection.get();
-  const cycleTimes = determineCycleTimes(activities);
-  return EstimateQueryResult.create({
-    cycleTimes,
-    categories: categoriesProjection.get(),
-    totalCount: activities.length,
-  });
+
+  readonly #activitiesProjection;
+  readonly #categoriesProjection;
+
+  private constructor(query: EstimateQuery, timeZone: Temporal.TimeZoneLike) {
+    this.#activitiesProjection = ActivitiesProjection.create({
+      categories: query.categories,
+      timeZone,
+    });
+    this.#categoriesProjection = CategoriesProjection.create();
+  }
+
+  update(event: ActivityLoggedEvent) {
+    this.#activitiesProjection.update(event);
+    this.#categoriesProjection.update(event);
+  }
+
+  get(): EstimateQueryResult {
+    const activities = this.#activitiesProjection.get();
+    const cycleTimes = determineCycleTimes(activities);
+    return EstimateQueryResult.create({
+      cycleTimes,
+      categories: this.#categoriesProjection.get(),
+      totalCount: activities.length,
+    });
+  }
 }
 
 function determineCycleTimes(activities: Activity[]) {

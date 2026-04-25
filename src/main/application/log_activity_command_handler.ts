@@ -3,7 +3,7 @@
 import { type CommandStatus, Success } from "@muspellheim/shared";
 
 import { LogActivityCommand } from "../../shared/domain/log_activity_command";
-import { ActivityLoggedEventDto } from "../infrastructure/activity_logged_event_dto";
+import { ActivityLoggedEvent } from "../domain/activity_logged_event";
 import type { EventStore } from "../infrastructure/event_store.ts";
 
 export class LogActivityCommandHandler {
@@ -18,10 +18,10 @@ export class LogActivityCommandHandler {
   }
 
   async handle(command: LogActivityCommand): Promise<CommandStatus> {
-    const event = ActivityLoggedEventDto.create({
+    const event = ActivityLoggedEvent.create({
       ...command,
-      timestamp: command.timestamp.toString({ smallestUnit: "seconds" }),
-      duration: command.duration.toString(),
+      timestamp: command.timestamp.round("seconds"),
+      duration: command.duration.round("minutes"),
     });
     await this.#eventStore.record(event);
     return new Success();

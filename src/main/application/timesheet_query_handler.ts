@@ -7,8 +7,7 @@ import type {
   TimesheetQuery,
   TimesheetQueryResult,
 } from "../../shared/domain/timesheet_query";
-import { projectTimesheet } from "../domain/timesheet_projection";
-import { ActivityLoggedEventDto } from "../infrastructure/activity_logged_event_dto";
+import { TimesheetProjection } from "../domain/timesheet_projection";
 import type { EventStore } from "../infrastructure/event_store";
 import { HolidayRepository } from "../infrastructure/holiday_repository";
 import { VacationRepository } from "../infrastructure/vacation_repository";
@@ -58,14 +57,12 @@ export class TimesheetQueryHandler {
   }
 
   async handle(query: TimesheetQuery): Promise<TimesheetQueryResult> {
-    // TODO handle time zone in projection
-    // TODO join ActivityLoggedEvent and ActivityLoggedEventDto to ActivityLoggedEvent
+    const replay = this.#eventStore.replay();
     const timeZone = query.timeZone || this.#clock.zone;
     const today = this.#clock
       .instant()
       .toZonedDateTimeISO(timeZone ?? this.#clock.zone)
       .toPlainDate();
-    const replay = replayTyped(this.#eventStore.replay(), timeZone);
     const holidays = await this.#holidayRepository.findAllByDate(
       query.from,
       query.to,
@@ -74,23 +71,17 @@ export class TimesheetQueryHandler {
       query.from,
       query.to,
     );
-    return projectTimesheet(
-      replay,
-      { ...query, today: query.today ?? today },
-      {
-        holidays,
-        vacations,
-        capacity: this.capacity,
-      },
-    );
-  }
-}
-
-async function* replayTyped(
-  events: AsyncGenerator,
-  timeZone: Temporal.TimeZoneLike,
-) {
-  for await (const e of events) {
-    yield ActivityLoggedEventDto.fromJson(e).validate(timeZone);
+    const projection = TimesheetProjection.create({
+      query,
+      today,
+      timeZone,
+      capacity: this.capacity,
+      holidays,
+      vacations,
+    });
+    for await (const event of replay) {
+      projection.update(event);
+    }
+    return projection.get();
   }
 }

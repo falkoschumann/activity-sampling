@@ -6,6 +6,8 @@ import addFormats from "ajv-formats";
 
 import { LoggedActivity } from "../../shared/domain/logged_activity";
 
+// TODO merge model and DTO
+
 const ACTIVITY_LOGGED_EVENT_SCHEMA = {
   type: "object",
   properties: {

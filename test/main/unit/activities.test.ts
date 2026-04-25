@@ -3,36 +3,32 @@
 import { Temporal } from "@js-temporal/polyfill";
 import { describe, expect, it } from "vitest";
 
-import { createAsyncGenerator } from "../common/tools";
-import { LoggedActivity } from "../../../src/shared/domain/logged_activity";
 import {
   ActivitiesProjection,
   Activity,
-  CategoriesProjection,
-  filterEvents,
-  TotalHoursProjection,
-} from "../../../src/main/domain/activities";
+} from "../../../src/main/domain/activities_projection";
+import { ActivityLoggedEvent } from "../../../src/main/domain/activity_logged_event";
 
 describe("Activities", () => {
   describe("Activities projection", () => {
     it("should return empty array when no event is logged", () => {
-      const projection = new ActivitiesProjection();
+      const projection = ActivitiesProjection.create({});
 
       expect(projection.get()).toEqual([]);
     });
 
     it("should join same activities", () => {
-      const projection = new ActivitiesProjection();
+      const projection = ActivitiesProjection.create({});
 
       projection.update(
-        LoggedActivity.createTestInstance({
-          dateTime: "2025-12-01T12:00",
+        ActivityLoggedEvent.createTestInstance({
+          timestamp: "2025-12-01T11:00:00Z",
           duration: "PT4H",
         }),
       );
       projection.update(
-        LoggedActivity.createTestInstance({
-          dateTime: "2025-12-02T10:00",
+        ActivityLoggedEvent.createTestInstance({
+          timestamp: "2025-12-02T09:00:00Z",
           duration: "PT2H",
         }),
       );
@@ -47,18 +43,18 @@ describe("Activities", () => {
     });
 
     it("should aggregate different activities", () => {
-      const projection = new ActivitiesProjection();
+      const projection = ActivitiesProjection.create({});
 
       projection.update(
-        LoggedActivity.createTestInstance({
-          dateTime: "2025-12-01T12:00",
+        ActivityLoggedEvent.createTestInstance({
+          timestamp: "2025-12-01T11:00:00Z",
           task: "Task A",
           duration: "PT4H",
         }),
       );
       projection.update(
-        LoggedActivity.createTestInstance({
-          dateTime: "2025-12-02T10:00",
+        ActivityLoggedEvent.createTestInstance({
+          timestamp: "2025-12-02T09:00:00Z",
           task: "Task B",
           duration: "PT2H",
         }),
@@ -81,26 +77,28 @@ describe("Activities", () => {
     });
 
     it("should filter activities by categories", () => {
-      const projection = new ActivitiesProjection(["Development", "Design"]);
+      const projection = ActivitiesProjection.create({
+        categories: ["Development", "Design"],
+      });
 
       projection.update(
-        LoggedActivity.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           category: "Design",
-          dateTime: "2025-12-03T09:00",
+          timestamp: "2025-12-03T08:00:00Z",
           duration: "PT3H",
         }),
       );
       projection.update(
-        LoggedActivity.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           category: "Development",
-          dateTime: "2025-12-01T12:00",
+          timestamp: "2025-12-01T11:00:00Z",
           duration: "PT4H",
         }),
       );
       projection.update(
-        LoggedActivity.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           category: "Testing",
-          dateTime: "2025-12-02T10:00",
+          timestamp: "2025-12-02T09:00:00Z",
           duration: "PT2H",
         }),
       );
@@ -115,18 +113,18 @@ describe("Activities", () => {
     });
 
     it("should handle empty string as no category", () => {
-      const projection = new ActivitiesProjection([""]);
+      const projection = ActivitiesProjection.create({ categories: [""] });
 
       projection.update(
-        LoggedActivity.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           category: "Development",
-          dateTime: "2025-12-01T12:00",
+          timestamp: "2025-12-01T11:00:00Z",
           duration: "PT4H",
         }),
       );
       projection.update(
-        LoggedActivity.createTestInstance({
-          dateTime: "2025-12-02T10:00",
+        ActivityLoggedEvent.createTestInstance({
+          timestamp: "2025-12-02T09:00:00Z",
           duration: "PT2H",
         }),
       );
@@ -141,18 +139,18 @@ describe("Activities", () => {
     });
 
     it("should handle empty category array as no filter", () => {
-      const projection = new ActivitiesProjection([]);
+      const projection = ActivitiesProjection.create({ categories: [] });
 
       projection.update(
-        LoggedActivity.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           category: "Development",
-          dateTime: "2025-12-01T12:00",
+          timestamp: "2025-12-01T11:00:00Z",
           duration: "PT4H",
         }),
       );
       projection.update(
-        LoggedActivity.createTestInstance({
-          dateTime: "2025-12-02T10:00",
+        ActivityLoggedEvent.createTestInstance({
+          timestamp: "2025-12-02T09:00:00Z",
           duration: "PT2H",
         }),
       );
@@ -164,121 +162,6 @@ describe("Activities", () => {
           hours: Temporal.Duration.from("PT6H"),
         }),
       ]);
-    });
-  });
-
-  describe("Categories projection", () => {
-    it("should return empty array when no event is logged", () => {
-      const projection = new CategoriesProjection();
-
-      expect(projection.get()).toEqual([]);
-    });
-
-    it("should accumulate unique categories", () => {
-      const projection = new CategoriesProjection();
-
-      projection.update(
-        LoggedActivity.createTestInstance({
-          category: "Development",
-        }),
-      );
-      projection.update(
-        LoggedActivity.createTestInstance({
-          category: "Testing",
-        }),
-      );
-      projection.update(
-        LoggedActivity.createTestInstance({
-          category: "Design",
-        }),
-      );
-      projection.update(
-        LoggedActivity.createTestInstance({
-          category: "Development",
-        }),
-      );
-
-      expect(projection.get()).toEqual(["Design", "Development", "Testing"]);
-    });
-
-    it("should handle no category", () => {
-      const projection = new CategoriesProjection();
-
-      projection.update(LoggedActivity.createTestInstance());
-      projection.update(
-        LoggedActivity.createTestInstance({
-          category: "Design",
-        }),
-      );
-      projection.update(
-        LoggedActivity.createTestInstance({
-          category: "Development",
-        }),
-      );
-
-      expect(projection.get()).toEqual(["", "Design", "Development"]);
-    });
-  });
-
-  describe("Total hours projection", () => {
-    it("should return zero when no event is logged", () => {
-      const projection = new TotalHoursProjection();
-
-      expect(projection.get()).toEqual<Temporal.Duration>(
-        Temporal.Duration.from("PT0H"),
-      );
-    });
-
-    it("should accumulate total hours from logged activities", () => {
-      const projection = new TotalHoursProjection();
-
-      projection.update(
-        LoggedActivity.createTestInstance({ duration: "PT2H" }),
-      );
-      projection.update(
-        LoggedActivity.createTestInstance({ duration: "PT3H30M" }),
-      );
-      projection.update(
-        LoggedActivity.createTestInstance({ duration: "PT1H15M" }),
-      );
-
-      expect(projection.get()).toEqual<Temporal.Duration>(
-        Temporal.Duration.from("PT6H45M"),
-      );
-    });
-  });
-
-  describe("Filter events", () => {
-    it("should emit nothing when no event is logged", async () => {
-      const replay = createAsyncGenerator([]);
-
-      const events = await Array.fromAsync(replay);
-
-      expect(events).toEqual([]);
-    });
-
-    it("should filter events by date range", async () => {
-      const before = LoggedActivity.createTestInstance({
-        dateTime: "2025-12-08T10:00:00",
-      });
-      const start = LoggedActivity.createTestInstance({
-        dateTime: "2025-12-09T10:00:00",
-      });
-      const middle = LoggedActivity.createTestInstance({
-        dateTime: "2025-12-10T10:00:00",
-      });
-      const end = LoggedActivity.createTestInstance({
-        dateTime: "2025-12-11T10:00:00",
-      });
-      const after = LoggedActivity.createTestInstance({
-        dateTime: "2025-12-12T10:00:00",
-      });
-      const replay = createAsyncGenerator([before, start, middle, end, after]);
-
-      const generator = filterEvents(replay, "2025-12-09", "2025-12-11");
-
-      const events = await Array.fromAsync(generator);
-      expect(events).toEqual<LoggedActivity[]>([start, middle, end]);
     });
   });
 });

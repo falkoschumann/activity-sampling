@@ -2,7 +2,6 @@
 
 import { describe, expect, it } from "vitest";
 
-import { Clock } from "../../../src/shared/domain/temporal";
 import { StatisticsQueryHandler } from "../../../src/main/application/statistics_query_handler";
 import {
   Histogram,
@@ -10,7 +9,8 @@ import {
   StatisticsQueryResult,
   StatisticsScope,
 } from "../../../src/shared/domain/statistics_query";
-import { ActivityLoggedEventDto } from "../../../src/main/infrastructure/activity_logged_event_dto";
+import { ActivityLoggedEvent } from "../../../src/main/domain/activity_logged_event";
+import { Clock } from "../../../src/shared/domain/temporal";
 import { EventStore } from "../../../src/main/infrastructure/event_store";
 
 describe("Statistics", () => {
@@ -32,19 +32,19 @@ describe("Statistics", () => {
 
     it("should return histogram for working hours", async () => {
       const events = [
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2025-10-13T11:00:00Z",
           task: "Task A",
           duration: "PT24H",
           category: "Category 2",
         }),
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2025-10-14T13:00:00Z",
           task: "Task B",
           duration: "PT40H",
           category: "Category 1",
         }),
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2025-10-15T13:00:00Z",
           task: "Task C",
           duration: "PT40H",
@@ -67,17 +67,17 @@ describe("Statistics", () => {
 
     it("should determine frequencies per bin with 3 tasks", async () => {
       const events = [
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           task: "Task A",
           duration: "PT24H", // 3 person days
           category: "Category 2",
         }),
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           task: "Task B",
           duration: "PT40H", // 5 person days
           category: "Category 2",
         }),
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           task: "Task C",
           duration: "PT16H", // 2 person days
           category: "Category 1",
@@ -110,22 +110,22 @@ describe("Statistics", () => {
 
     it("should determine frequencies per bin with even number of tasks", async () => {
       const events = [
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           task: "Task A",
           duration: "PT24H", // 3 person days
           category: "Category 2",
         }),
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           task: "Task B",
           duration: "PT40H", // 5 person days
           category: "Category 1",
         }),
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           task: "Task C",
           duration: "PT32H", // 4 person days
           category: "Category 1",
         }),
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           task: "Task D",
           duration: "PT4H", // 0.5 person days
           category: "Category 2",
@@ -158,27 +158,27 @@ describe("Statistics", () => {
 
     it("should determine frequencies per bin with odd number of tasks", async () => {
       const events = [
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           task: "Task A",
           duration: "PT24H", // 3 person days
           category: "Category 3",
         }),
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           task: "Task B",
           duration: "PT40H", // 5 person days
           category: "Category 2",
         }),
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           task: "Task C",
           duration: "PT32H", // 4 person days
           category: "Category 1",
         }),
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           task: "Task D",
           duration: "PT8H", // 1 person days
           category: "Category 3",
         }),
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           task: "Task E",
           duration: "PT16H", // 2 person days
           category: "Category 2",
@@ -228,27 +228,27 @@ describe("Statistics", () => {
 
     it("should return histogram for cycle time", async () => {
       const events = [
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2025-08-13T12:00:00Z",
           task: "Task A",
           category: "Category 1",
         }),
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2025-08-13T12:00:00Z",
           task: "Task B",
           category: "Category 2",
         }),
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2025-08-15T12:00:00Z",
           task: "Task C",
           category: "Category 1",
         }),
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2025-08-16T12:00:00Z",
           task: "Task A",
           category: "Category 1",
         }),
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2025-08-18T12:00:00Z",
           task: "Task B",
           category: "Category 2",
@@ -270,37 +270,37 @@ describe("Statistics", () => {
 
     it("should filter by category when category is provided", async () => {
       const events = [
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2025-08-16T12:00:00Z",
           task: "Task A",
           category: "Category A",
         }),
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2025-08-13T12:00:00Z",
           task: "Task A",
           category: "Category A",
         }),
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2025-08-13T12:00:00Z",
           task: "Task B",
           category: "Category A",
         }),
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2025-08-13T14:00:00Z",
           task: "Task B",
           category: "Category B",
         }),
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2025-08-15T12:00:00Z",
           task: "Task C",
           category: "Category A",
         }),
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2025-08-15T14:00:00Z",
           task: "Task C",
           category: "Category B",
         }),
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2025-08-18T12:00:00Z",
           task: "Task B",
           category: "Category A",
@@ -352,19 +352,19 @@ describe("Statistics", () => {
 
     it("should return median for working hours", async () => {
       const events = [
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2025-10-13T11:00:00Z",
           task: "Task A",
           duration: "PT24H",
           category: "Category 2",
         }),
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2025-10-14T13:00:00Z",
           task: "Task B",
           duration: "PT40H",
           category: "Category 1",
         }),
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2025-10-15T13:00:00Z",
           task: "Task C",
           duration: "PT40H",
@@ -406,27 +406,27 @@ describe("Statistics", () => {
 
     it("should return median for cycle time", async () => {
       const events = [
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2025-08-13T12:00:00Z",
           task: "Task A",
           category: "Category 1",
         }),
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2025-08-13T12:00:00Z",
           task: "Task B",
           category: "Category 2",
         }),
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2025-08-15T12:00:00Z",
           task: "Task C",
           category: "Category 1",
         }),
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2025-08-16T12:00:00Z",
           task: "Task A",
           category: "Category 1",
         }),
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2025-08-18T12:00:00Z",
           task: "Task B",
           category: "Category 2",
@@ -451,22 +451,22 @@ describe("Statistics", () => {
   describe("Filter statistic data by category", () => {
     it("should filter by category when category is provided", async () => {
       const events = [
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           task: "Task A",
           duration: "PT24H", // 3 person days
           category: "Category A",
         }),
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           task: "Task A",
           duration: "PT16H", // 2 person days
           category: "Category B",
         }),
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           task: "Task B",
           duration: "PT40H", // 5 person days
           category: "Category A",
         }),
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           task: "Task C",
           duration: "PT16H", // 2 person days
           category: "Category A",
@@ -500,20 +500,20 @@ describe("Statistics", () => {
 
     it("should filter by activities without a category", async () => {
       const events = [
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2025-11-03T08:00:00Z",
           task: "Task A",
         }),
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2025-11-03T08:00:00Z",
           task: "Task B",
         }),
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2025-11-04T08:00:00Z",
           task: "Task C",
           category: "Testing Category",
         }),
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2025-11-05T08:00:00Z",
           task: "Task A",
           category: "Testing Category",
@@ -547,17 +547,17 @@ describe("Statistics", () => {
 
     it("should filter by no category and a category", async () => {
       const events = [
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2025-11-03T08:00:00Z",
           task: "Task A",
           category: "Category A",
         }),
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2025-11-03T08:00:00Z",
           task: "Task B",
           category: "Category B",
         }),
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2025-11-04T08:00:00Z",
           task: "Task C",
         }),
@@ -590,17 +590,17 @@ describe("Statistics", () => {
 
     it("should do not filter when query categories is an empty array", async () => {
       const events = [
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2025-11-03T08:00:00Z",
           task: "Task A",
           category: "Category A",
         }),
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2025-11-03T08:00:00Z",
           task: "Task B",
           category: "Category B",
         }),
-        ActivityLoggedEventDto.createTestInstance({
+        ActivityLoggedEvent.createTestInstance({
           timestamp: "2025-11-04T08:00:00Z",
           task: "Task C",
         }),
@@ -633,7 +633,7 @@ describe("Statistics", () => {
   });
 });
 
-function configure({ events }: { events?: ActivityLoggedEventDto[] }) {
+function configure({ events }: { events?: ActivityLoggedEvent[] }) {
   const eventStore = EventStore.createNull({ events });
   const clock = Clock.fixed("1970-01-01T00:00:00Z", "Europe/Berlin");
   const handler = StatisticsQueryHandler.create({ eventStore, clock });

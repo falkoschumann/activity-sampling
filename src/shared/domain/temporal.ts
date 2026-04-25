@@ -59,6 +59,30 @@ class OffsetClock extends Clock {
   }
 }
 
+// TODO refactor parameter object
+export function isTimestampInPeriod(
+  timestamp: Temporal.Instant | string,
+  timeZone: Temporal.TimeZoneLike,
+  from?: Temporal.PlainDate | Temporal.PlainDateLike | string,
+  to?: Temporal.PlainDate | Temporal.PlainDateLike | string,
+) {
+  timestamp = Temporal.Instant.from(timestamp);
+  const date = timestamp.toZonedDateTimeISO(timeZone).toPlainDate();
+  return isDateInPeriod(date, from, to);
+}
+
+// TODO refactor parameter object
+export function isDateInPeriod(
+  date: Temporal.PlainDate | Temporal.PlainDateLike | string,
+  from?: Temporal.PlainDate | Temporal.PlainDateLike | string,
+  to?: Temporal.PlainDate | Temporal.PlainDateLike | string,
+) {
+  return (
+    (from == null || Temporal.PlainDate.compare(date, from) >= 0) &&
+    (to == null || Temporal.PlainDate.compare(date, to) <= 0)
+  );
+}
+
 export function normalizeDuration(
   duration: Temporal.Duration | Temporal.DurationLike | string,
   smallestUnit: DurationType = "milliseconds",
