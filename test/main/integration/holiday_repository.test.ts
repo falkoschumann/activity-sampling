@@ -7,10 +7,7 @@ import { Temporal } from "@js-temporal/polyfill";
 import { beforeEach, describe, expect, it } from "vitest";
 
 import { Holiday } from "../../../src/main/domain/calendar";
-import {
-  HolidayDto,
-  HolidayRepository,
-} from "../../../src/main/infrastructure/holiday_repository";
+import { HolidayRepository } from "../../../src/main/infrastructure/holiday_repository";
 
 const NON_EXISTING_FILE = path.resolve(
   import.meta.dirname,
@@ -153,7 +150,7 @@ describe("Holiday repository", () => {
       it("should return configurable responses", async () => {
         const repository = HolidayRepository.createNull({
           readFileResponses: [
-            [HolidayDto.create({ date: "2025-06-09", title: "Pfingstmontag" })],
+            [Holiday.create({ date: "2025-06-09", title: "Pfingstmontag" })],
           ],
         });
 
@@ -180,15 +177,14 @@ describe("Holiday repository", () => {
   });
 });
 
-describe("Holiday DTO", () => {
-  describe("Validate", () => {
-    it("should throw a type error when DTO is not valid", () => {
-      const dto = {
-        date: "2025-13-01",
-        title: "Test",
-      };
+describe("Holiday", () => {
+  it("should map model", () => {
+    const command = Holiday.createTestInstance();
 
-      expect(() => HolidayDto.fromJson(dto)).toThrow(TypeError);
-    });
+    const json = JSON.stringify(command);
+    const dto = JSON.parse(json);
+    const model = Holiday.create(dto);
+
+    expect(model).toEqual<Holiday>(Holiday.createTestInstance());
   });
 });

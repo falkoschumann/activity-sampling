@@ -7,10 +7,7 @@ import { Temporal } from "@js-temporal/polyfill";
 import { beforeEach, describe, expect, it } from "vitest";
 
 import { Vacation } from "../../../src/main/domain/calendar";
-import {
-  VacationDto,
-  VacationRepository,
-} from "../../../src/main/infrastructure/vacation_repository";
+import { VacationRepository } from "../../../src/main/infrastructure/vacation_repository";
 
 const NON_EXISTING_FILE = path.resolve(
   import.meta.dirname,
@@ -133,7 +130,7 @@ describe("Vacation repository", () => {
 
       it("should return configurable responses", async () => {
         const repository = VacationRepository.createNull({
-          readFileResponses: [[VacationDto.create({ date: "2025-09-10" })]],
+          readFileResponses: [[Vacation.create({ date: "2025-09-10" })]],
         });
 
         const vacations = await repository.findAllByDate(
@@ -159,14 +156,14 @@ describe("Vacation repository", () => {
   });
 });
 
-describe("Vacation DTO", () => {
-  describe("Validate", () => {
-    it("should throw a type error when DTO is not valid", () => {
-      const dto = {
-        date: "2025-13-01",
-      };
+describe("Vacation", () => {
+  it("should map model", () => {
+    const command = Vacation.createTestInstance();
 
-      expect(() => VacationDto.fromJson(dto)).toThrow(TypeError);
-    });
+    const json = JSON.stringify(command);
+    const dto = JSON.parse(json);
+    const model = Vacation.create(dto);
+
+    expect(model).toEqual<Vacation>(Vacation.createTestInstance());
   });
 });

@@ -16,8 +16,8 @@ export default defineConfig({
       provider: "istanbul",
       reporter: ["text", "html", "cobertura", "json"],
       thresholds: {
-        statements: 70, // TODO increase statements coverage
-        branches: 80, // TODO increase branches coverage
+        statements: 80, // TODO increase statements coverage
+        branches: 85, // TODO increase branches coverage
       },
     },
     outputFile: "coverage/junit.xml",

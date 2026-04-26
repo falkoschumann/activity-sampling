@@ -4,7 +4,7 @@ import { type CommandStatus, Success } from "@muspellheim/shared";
 
 import type { ExportTimesheetCommand } from "../../shared/domain/export_timesheet_command";
 import {
-  TimesheetDto,
+  Timesheet,
   type TimesheetExporter,
 } from "../infrastructure/timesheet_exporter";
 
@@ -25,8 +25,8 @@ export class ExportTimesheetCommandHandler {
 
   async handle(command: ExportTimesheetCommand): Promise<CommandStatus> {
     const timesheets = command.timesheets.map((entry) =>
-      TimesheetDto.create({
-        date: entry.date.toString(),
+      Timesheet.create({
+        date: entry.date,
         client: entry.client,
         project: entry.project,
         task: entry.task,

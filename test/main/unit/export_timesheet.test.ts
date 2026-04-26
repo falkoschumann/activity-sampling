@@ -6,7 +6,7 @@ import { describe, expect, it } from "vitest";
 import { ExportTimesheetCommandHandler } from "../../../src/main/application/export_timesheet_command_handler";
 import { ExportTimesheetCommand } from "../../../src/shared/domain/export_timesheet_command";
 import {
-  TimesheetDto,
+  Timesheet,
   TimesheetExporter,
 } from "../../../src/main/infrastructure/timesheet_exporter";
 import { TimesheetEntry } from "../../../src/shared/domain/timesheet_query";
@@ -25,8 +25,8 @@ describe("Export timesheet", () => {
       );
 
       expect(result).toEqual(new Success());
-      expect(exported.data).toEqual<TimesheetDto[][]>([
-        [TimesheetDto.createTestInstance({ firstName: "", lastName: "" })],
+      expect(exported.data).toEqual<Timesheet[][]>([
+        [Timesheet.createTestInstance({ firstName: "", lastName: "" })],
       ]);
     });
   });

@@ -67,13 +67,7 @@ export class EventStore extends EventTarget {
       const file = await this.#fs.open(this.fileName, "r");
       const parser = file.createReadStream().pipe(parse(PARSE_CONFIGURATION));
       for await (const record of parser) {
-        const valid = ajv.validate(ACTIVITY_LOGGED_EVENT_SCHEMA, record);
-        if (!valid) {
-          // TODO write test
-          const errors = JSON.stringify(ajv.errors, null, 2);
-          throw new TypeError(`Invalid activity logged event data:\n${errors}`);
-        }
-
+        validateRecord(record);
         yield ActivityLoggedEvent.create(record);
       }
       parser.end();
@@ -152,7 +146,7 @@ const STRINGIFY_CONFIGURATION: StringifyOptions = {
   },
 };
 
-const ACTIVITY_LOGGED_EVENT_SCHEMA = {
+const SCHEMA = {
   type: "object",
   properties: {
     timestamp: { type: "string", format: "iso-date-time" },
@@ -169,6 +163,14 @@ const ACTIVITY_LOGGED_EVENT_SCHEMA = {
 
 const ajv = new Ajv({ allErrors: true });
 addFormats(ajv);
+
+function validateRecord(record: unknown) {
+  const valid = ajv.validate(SCHEMA, record);
+  if (!valid) {
+    const errors = JSON.stringify(ajv.errors, null, 2);
+    throw new TypeError(`Invalid activity logged event data:\n${errors}`);
+  }
+}
 
 class FsPromiseStub {
   readonly createReadStreamResponses: ConfigurableResponses;

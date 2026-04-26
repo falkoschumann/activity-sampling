@@ -8,7 +8,9 @@ import { ConfigurableResponses } from "@muspellheim/shared";
 import Ajv from "ajv";
 import addFormats from "ajv-formats";
 import { parse } from "csv";
+import type { Options as ParseOptions } from "csv-parse";
 import { stringify } from "csv/sync";
+import type { Options as StringifyOptions } from "csv-stringify";
 
 import { Vacation } from "../domain/calendar";
 
@@ -24,7 +26,7 @@ export class VacationRepository {
   static createNull({
     readFileResponses = [],
   }: {
-    readFileResponses?: (VacationDto[] | null | Error)[];
+    readFileResponses?: (Vacation[] | null | Error)[];
   } = {}): VacationRepository {
     return new VacationRepository(
       "null-holidays.csv",
@@ -44,24 +46,11 @@ export class VacationRepository {
   async findAll(): Promise<Vacation[]> {
     try {
       const fileContent = await this.#fs.readFile(this.fileName);
-      const records = parse(fileContent, {
-        cast: (value, context) =>
-          value == "" && !context.quoting ? undefined : value,
-        columns: (header) =>
-          header.map((column) => {
-            switch (column) {
-              case "Date":
-                return "date";
-              case "Duration":
-                return "duration";
-              default:
-                return column;
-            }
-          }),
-      });
+      const records = parse(fileContent, PARSE_CONFIGURATION);
       const vacations: Vacation[] = [];
       for await (const record of records) {
-        const vacation = VacationDto.fromJson(record).validate();
+        validateRecord(record);
+        const vacation = Vacation.create(record);
         vacations.push(vacation);
       }
       return vacations;
@@ -100,25 +89,49 @@ export class VacationRepository {
         merged.push(vacation);
       }
     }
-    const mergedDtos = merged.map((vacation) =>
-      VacationDto.fromModel(vacation),
-    );
 
     const dirName = path.resolve(path.dirname(this.fileName));
     await this.#fs.mkdir(dirName, { recursive: true });
-    const stringifier = stringify(mergedDtos, {
-      header: true,
-      record_delimiter: "\r\n",
-      columns: [
-        { key: "date", header: "Date" },
-        { key: "duration", header: "Duration" },
-      ],
-    });
+    const stringifier = stringify(merged, STRINGIFY_CONFIGURATION);
     await this.#fs.writeFile(this.fileName, stringifier);
   }
 }
 
-const schema = {
+const PARSE_CONFIGURATION: ParseOptions = {
+  cast: (value, context) =>
+    value == "" && !context.quoting ? undefined : value,
+  columns: (header) =>
+    header.map((column) => {
+      switch (column) {
+        case "Date":
+          return "date";
+        case "Duration":
+          return "duration";
+        default:
+          return column;
+      }
+    }),
+};
+
+const STRINGIFY_CONFIGURATION: StringifyOptions = {
+  header: true,
+  record_delimiter: "\r\n",
+  columns: [
+    { key: "date", header: "Date" },
+    { key: "duration", header: "Duration" },
+  ],
+  cast: {
+    object: (value, context) => {
+      if (context.column === "date" || context.column === "duration") {
+        return value.toString();
+      } else {
+        return JSON.stringify(value);
+      }
+    },
+  },
+};
+
+const SCHEMA = {
   type: "object",
   properties: {
     date: { type: "string", format: "date" },
@@ -128,55 +141,23 @@ const schema = {
   additionalProperties: false,
 };
 
-export class VacationDto {
-  static create({
-    date,
-    duration,
-  }: {
-    date: string;
-    duration?: string;
-  }): VacationDto {
-    return new VacationDto(date, duration);
-  }
+const ajv = new Ajv({ allErrors: true });
+addFormats(ajv);
 
-  static fromModel(model: Vacation): VacationDto {
-    return VacationDto.create({
-      date: model.date.toString(),
-      duration: model.duration?.toString(),
-    });
-  }
-
-  static fromJson(json: unknown): VacationDto {
-    const ajv = new Ajv();
-    addFormats(ajv);
-    const valid = ajv.validate(schema, json);
-    if (valid) {
-      return VacationDto.create(json as VacationDto);
-    }
-
+function validateRecord(record: unknown) {
+  const ajv = new Ajv();
+  addFormats(ajv);
+  const valid = ajv.validate(SCHEMA, record);
+  if (!valid) {
     const errors = JSON.stringify(ajv.errors, null, 2);
     throw new TypeError(`Invalid vacation data:\n${errors}`);
-  }
-
-  readonly date: string;
-  readonly duration?: string;
-
-  private constructor(date: string, duration?: string) {
-    this.date = date;
-    this.duration = duration;
-  }
-
-  validate(): Vacation {
-    return Vacation.create(this);
   }
 }
 
 class FsPromiseStub {
-  readonly #readFileResponses: ConfigurableResponses<
-    VacationDto[] | null | Error
-  >;
+  readonly #readFileResponses: ConfigurableResponses<Vacation[] | null | Error>;
 
-  constructor(readFileResponses: (VacationDto[] | null | Error)[]) {
+  constructor(readFileResponses: (Vacation[] | null | Error)[]) {
     this.#readFileResponses = ConfigurableResponses.create(
       readFileResponses,
       "read file",
@@ -192,7 +173,7 @@ class FsPromiseStub {
       throw response;
     }
 
-    const s = stringify(response, { header: true });
+    const s = stringify(response, STRINGIFY_CONFIGURATION);
     return Promise.resolve(s);
   }
 }

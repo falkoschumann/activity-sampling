@@ -4,7 +4,9 @@ import path from "node:path";
 import fsPromise from "node:fs/promises";
 
 import { OutputTracker } from "@muspellheim/shared";
+import { Temporal } from "@js-temporal/polyfill";
 import { stringify } from "csv/sync";
+import type { Options as StringifyOptions } from "csv-stringify";
 
 export class TimesheetExporter extends EventTarget {
   static create(): TimesheetExporter {
@@ -24,25 +26,12 @@ export class TimesheetExporter extends EventTarget {
     this.#fs = fs;
   }
 
-  async exportTimesheet(timesheets: TimesheetDto[], fileName: string) {
+  async exportTimesheet(timesheets: Timesheet[], fileName: string) {
     const dirName = path.resolve(path.dirname(fileName));
     await this.#fs.mkdir(dirName, { recursive: true });
 
-    const fileContent = stringify(timesheets, {
-      header: true,
-      record_delimiter: "\r\n",
-      columns: [
-        { key: "date", header: "Date" },
-        { key: "client", header: "Client" },
-        { key: "project", header: "Project" },
-        { key: "task", header: "Task" },
-        { key: "notes", header: "Notes" },
-        { key: "hours", header: "Hours" },
-        { key: "firstName", header: "First name" },
-        { key: "lastName", header: "Last name" },
-      ],
-    });
-    this.#fs.writeFile(fileName, fileContent);
+    const fileContent = stringify(timesheets, STRINGIFY_CONFIGURATION);
+    await this.#fs.writeFile(fileName, fileContent);
 
     this.dispatchEvent(new CustomEvent("exported", { detail: timesheets }));
   }
@@ -52,7 +41,7 @@ export class TimesheetExporter extends EventTarget {
   }
 }
 
-export class TimesheetDto {
+export class Timesheet {
   static create({
     date,
     client,
@@ -63,7 +52,7 @@ export class TimesheetDto {
     firstName,
     lastName,
   }: {
-    date: string;
+    date: Temporal.PlainDate | string;
     client: string;
     project: string;
     task: string;
@@ -71,8 +60,8 @@ export class TimesheetDto {
     hours: number;
     firstName: string;
     lastName: string;
-  }): TimesheetDto {
-    return new TimesheetDto(
+  }): Timesheet {
+    return new Timesheet(
       date,
       client,
       project,
@@ -94,7 +83,7 @@ export class TimesheetDto {
     firstName = "John",
     lastName = "Doe",
   }: {
-    date?: string;
+    date?: Temporal.PlainDate | string;
     client?: string;
     project?: string;
     task?: string;
@@ -102,8 +91,8 @@ export class TimesheetDto {
     hours?: number;
     firstName?: string;
     lastName?: string;
-  } = {}): TimesheetDto {
-    return TimesheetDto.create({
+  } = {}): Timesheet {
+    return Timesheet.create({
       date,
       client,
       project,
@@ -115,7 +104,7 @@ export class TimesheetDto {
     });
   }
 
-  readonly date: string;
+  readonly date: Temporal.PlainDate;
   readonly client: string;
   readonly project: string;
   readonly task: string;
@@ -125,7 +114,7 @@ export class TimesheetDto {
   readonly lastName: string;
 
   constructor(
-    date: string,
+    date: Temporal.PlainDate | string,
     client: string,
     project: string,
     task: string,
@@ -134,7 +123,7 @@ export class TimesheetDto {
     lastName: string,
     notes?: string,
   ) {
-    this.date = date;
+    this.date = Temporal.PlainDate.from(date);
     this.client = client;
     this.project = project;
     this.task = task;
@@ -144,6 +133,30 @@ export class TimesheetDto {
     this.lastName = lastName;
   }
 }
+
+const STRINGIFY_CONFIGURATION: StringifyOptions = {
+  header: true,
+  record_delimiter: "\r\n",
+  columns: [
+    { key: "date", header: "Date" },
+    { key: "client", header: "Client" },
+    { key: "project", header: "Project" },
+    { key: "task", header: "Task" },
+    { key: "notes", header: "Notes" },
+    { key: "hours", header: "Hours" },
+    { key: "firstName", header: "First name" },
+    { key: "lastName", header: "Last name" },
+  ],
+  cast: {
+    object: (value, context) => {
+      if (context.column === "date") {
+        return value.toString();
+      } else {
+        return JSON.stringify(value);
+      }
+    },
+  },
+};
 
 class FsPromiseStub {
   async mkdir() {}

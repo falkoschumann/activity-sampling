@@ -16,6 +16,18 @@ export class Holiday {
     return new Holiday(date, title, duration);
   }
 
+  static createTestInstance({
+    date = "2026-04-26",
+    title = "Test holiday",
+    duration,
+  }: {
+    date?: Temporal.PlainDateLike | string;
+    title?: string;
+    duration?: Temporal.DurationLike | string;
+  } = {}): Holiday {
+    return Holiday.create({ date, title, duration });
+  }
+
   date: Temporal.PlainDate;
   title: string;
   duration?: Temporal.Duration;
@@ -42,6 +54,16 @@ export class Vacation {
     duration?: Temporal.DurationLike | string;
   }): Vacation {
     return new Vacation(date, duration);
+  }
+
+  static createTestInstance({
+    date = "2026-04-26",
+    duration,
+  }: {
+    date?: Temporal.PlainDateLike | string;
+    duration?: Temporal.DurationLike | string;
+  } = {}): Vacation {
+    return Vacation.create({ date, duration });
   }
 
   date: Temporal.PlainDate;

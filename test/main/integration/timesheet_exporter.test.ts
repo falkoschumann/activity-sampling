@@ -6,7 +6,7 @@ import fsPromise from "node:fs/promises";
 import { describe, expect, it } from "vitest";
 
 import {
-  TimesheetDto,
+  Timesheet,
   TimesheetExporter,
 } from "../../../src/main/infrastructure/timesheet_exporter";
 
@@ -20,7 +20,7 @@ describe("Timesheet export", () => {
     await fsPromise.rm(TEST_FILE, { force: true });
     const exporter = TimesheetExporter.create();
 
-    const timesheets = [TimesheetDto.createTestInstance()];
+    const timesheets = [Timesheet.createTestInstance()];
     await exporter.exportTimesheet(timesheets, TEST_FILE);
   });
 
@@ -29,12 +29,12 @@ describe("Timesheet export", () => {
       const exporter = TimesheetExporter.createNull();
       const exported = exporter.trackExported();
 
-      const timesheets = [TimesheetDto.createTestInstance()];
+      const timesheets = [Timesheet.createTestInstance()];
       const fileName = "export/null-timesheets.csv";
       await exporter.exportTimesheet(timesheets, fileName);
 
-      expect(exported.data).toEqual<TimesheetDto[][]>([
-        [TimesheetDto.createTestInstance()],
+      expect(exported.data).toEqual<Timesheet[][]>([
+        [Timesheet.createTestInstance()],
       ]);
     });
   });

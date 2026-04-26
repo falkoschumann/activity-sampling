@@ -42,7 +42,8 @@ export class SettingsProvider extends EventTarget {
     try {
       const fileContent = await this.#fs.readFile(this.#fileName, "utf-8");
       const json = JSON.parse(fileContent);
-      const dto = SettingsDto.fromJson(json);
+      validateJson(json);
+      const dto = Settings.create(json);
       return Settings.create(dto);
     } catch (error) {
       if ((error as NodeJS.ErrnoException).code === "ENOENT") {
@@ -68,10 +69,7 @@ export class SettingsProvider extends EventTarget {
   }
 }
 
-const ajv = new Ajv();
-addFormats(ajv);
-
-const schema = {
+const SCHEMA = {
   type: "object",
   properties: {
     dataDir: { type: "string" },
@@ -79,48 +77,16 @@ const schema = {
   },
 };
 
-class SettingsDto {
-  static create({
-    dataDir,
-    capacity,
-    categories,
-  }: {
-    dataDir: string;
-    capacity: string;
-    categories: string[];
-  }): SettingsDto {
-    return new SettingsDto(dataDir, capacity, categories);
-  }
+const ajv = new Ajv();
+addFormats(ajv);
 
-  static fromModel(model: Settings): SettingsDto {
-    return SettingsDto.create({
-      dataDir: model.dataDir,
-      capacity: model.capacity.toString(),
-      categories: model.categories,
-    });
-  }
-
-  static fromJson(json: unknown): SettingsDto {
-    const valid = ajv.validate(schema, json);
-    if (valid) {
-      return SettingsDto.create(json as SettingsDto);
-    }
-
-    throw new TypeError("Invalid settings data.", { cause: ajv.errors });
-  }
-
-  readonly dataDir: string;
-  readonly capacity: string;
-  readonly categories: string[];
-
-  private constructor(dataDir: string, capacity: string, categories: string[]) {
-    this.dataDir = dataDir;
-    this.capacity = capacity;
-    this.categories = categories;
-  }
-
-  validate(): Settings {
-    return Settings.create(this);
+function validateJson(record: unknown) {
+  const ajv = new Ajv();
+  addFormats(ajv);
+  const valid = ajv.validate(SCHEMA, record);
+  if (!valid) {
+    const errors = JSON.stringify(ajv.errors, null, 2);
+    throw new TypeError(`Invalid settings data:\n${errors}`);
   }
 }
 

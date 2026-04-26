@@ -11,6 +11,8 @@ import { stringify } from "csv/sync";
 
 import { Holiday } from "../domain/calendar";
 import path from "node:path";
+import type { Options as ParseOptions } from "csv-parse";
+import type { Options as StringifyOptions } from "csv-stringify";
 
 export class HolidayRepository {
   static create({
@@ -22,7 +24,7 @@ export class HolidayRepository {
   static createNull({
     readFileResponses = [],
   }: {
-    readFileResponses?: (HolidayDto[] | null | Error)[];
+    readFileResponses?: (Holiday[] | null | Error)[];
   } = {}): HolidayRepository {
     return new HolidayRepository(
       "null-holidays.csv",
@@ -42,26 +44,11 @@ export class HolidayRepository {
   async findAll(): Promise<Holiday[]> {
     try {
       const fileContent = await this.#fs.readFile(this.fileName);
-      const records = parse(fileContent, {
-        cast: (value, context) =>
-          value == "" && !context.quoting ? undefined : value,
-        columns: (header) =>
-          header.map((column) => {
-            switch (column) {
-              case "Date":
-                return "date";
-              case "Title":
-                return "title";
-              case "Duration":
-                return "duration";
-              default:
-                return column;
-            }
-          }),
-      });
+      const records = parse(fileContent, PARSE_CONFIGURATION);
       const holidays: Holiday[] = [];
       for await (const record of records) {
-        const holiday = HolidayDto.fromJson(record).validate();
+        validateRecord(record);
+        const holiday = Holiday.create(record);
         holidays.push(holiday);
       }
       return holidays;
@@ -100,24 +87,52 @@ export class HolidayRepository {
         merged.push(holiday);
       }
     }
-    const mergedDtos = merged.map((holiday) => HolidayDto.fromModel(holiday));
 
     const dirName = path.resolve(path.dirname(this.fileName));
     await this.#fs.mkdir(dirName, { recursive: true });
-    const stringifier = stringify(mergedDtos, {
-      header: true,
-      record_delimiter: "\r\n",
-      columns: [
-        { key: "date", header: "Date" },
-        { key: "title", header: "Title" },
-        { key: "duration", header: "Duration" },
-      ],
-    });
+    const stringifier = stringify(merged, STRINGIFY_CONFIGURATION);
     await this.#fs.writeFile(this.fileName, stringifier);
   }
 }
 
-const schema = {
+const PARSE_CONFIGURATION: ParseOptions = {
+  cast: (value, context) =>
+    value == "" && !context.quoting ? undefined : value,
+  columns: (header) =>
+    header.map((column) => {
+      switch (column) {
+        case "Date":
+          return "date";
+        case "Title":
+          return "title";
+        case "Duration":
+          return "duration";
+        default:
+          return column;
+      }
+    }),
+};
+
+const STRINGIFY_CONFIGURATION: StringifyOptions = {
+  header: true,
+  record_delimiter: "\r\n",
+  columns: [
+    { key: "date", header: "Date" },
+    { key: "title", header: "Title" },
+    { key: "duration", header: "Duration" },
+  ],
+  cast: {
+    object: (value, context) => {
+      if (context.column === "date" || context.column === "duration") {
+        return value.toString();
+      } else {
+        return JSON.stringify(value);
+      }
+    },
+  },
+};
+
+const SCHEMA = {
   type: "object",
   properties: {
     title: { type: "string" },
@@ -128,60 +143,23 @@ const schema = {
   additionalProperties: false,
 };
 
-export class HolidayDto {
-  static create({
-    date,
-    title,
-    duration,
-  }: {
-    date: string;
-    title: string;
-    duration?: string;
-  }): HolidayDto {
-    return new HolidayDto(date, title, duration);
-  }
+const ajv = new Ajv({ allErrors: true });
+addFormats(ajv);
 
-  static fromModel(model: Holiday): HolidayDto {
-    return HolidayDto.create({
-      date: model.date.toString(),
-      title: model.title,
-      duration: model.duration?.toString(),
-    });
-  }
-
-  static fromJson(json: unknown): HolidayDto {
-    const ajv = new Ajv();
-    addFormats(ajv);
-    const valid = ajv.validate(schema, json);
-    if (valid) {
-      return HolidayDto.create(json as HolidayDto);
-    }
-
+function validateRecord(record: unknown) {
+  const ajv = new Ajv();
+  addFormats(ajv);
+  const valid = ajv.validate(SCHEMA, record);
+  if (!valid) {
     const errors = JSON.stringify(ajv.errors, null, 2);
     throw new TypeError(`Invalid holiday data:\n${errors}`);
-  }
-
-  readonly date: string;
-  readonly title: string;
-  readonly duration?: string;
-
-  private constructor(date: string, title: string, duration?: string) {
-    this.date = date;
-    this.title = title;
-    this.duration = duration;
-  }
-
-  validate(): Holiday {
-    return Holiday.create(this);
   }
 }
 
 class FsPromiseStub {
-  readonly #readFileResponses: ConfigurableResponses<
-    HolidayDto[] | null | Error
-  >;
+  readonly #readFileResponses: ConfigurableResponses<Holiday[] | null | Error>;
 
-  constructor(readFileResponses: (HolidayDto[] | null | Error)[]) {
+  constructor(readFileResponses: (Holiday[] | null | Error)[]) {
     this.#readFileResponses = ConfigurableResponses.create(
       readFileResponses,
       "read file",
@@ -197,7 +175,7 @@ class FsPromiseStub {
       throw response;
     }
 
-    const s = stringify(response, { header: true });
+    const s = stringify(response, STRINGIFY_CONFIGURATION);
     return Promise.resolve(s);
   }
 }

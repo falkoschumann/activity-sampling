@@ -13,15 +13,10 @@ import {
   TimesheetQueryResult,
 } from "../../../src/shared/domain/timesheet_query";
 import { ActivityLoggedEvent } from "../../../src/main/domain/activity_logged_event";
+import { Holiday, Vacation } from "../../../src/main/domain/calendar";
 import { EventStore } from "../../../src/main/infrastructure/event_store";
-import {
-  HolidayDto,
-  HolidayRepository,
-} from "../../../src/main/infrastructure/holiday_repository";
-import {
-  VacationDto,
-  VacationRepository,
-} from "../../../src/main/infrastructure/vacation_repository";
+import { HolidayRepository } from "../../../src/main/infrastructure/holiday_repository";
+import { VacationRepository } from "../../../src/main/infrastructure/vacation_repository";
 
 describe("Timesheet", () => {
   describe("Summarize hours worked on tasks", () => {
@@ -198,7 +193,7 @@ describe("Timesheet", () => {
           }),
         ],
         holidays: [
-          HolidayDto.create({ date: "2025-06-10", title: "Pfingstmontag" }),
+          Holiday.create({ date: "2025-06-10", title: "Pfingstmontag" }),
         ],
         vacations: [],
         fixedInstant: "2025-06-11T15:00:00Z",
@@ -409,7 +404,7 @@ describe("Timesheet", () => {
           }),
         ],
         holidays: [
-          HolidayDto.create({ date: "2025-06-09", title: "Pfingstmontag" }),
+          Holiday.create({ date: "2025-06-09", title: "Pfingstmontag" }),
         ],
         vacations: [],
       });
@@ -446,7 +441,7 @@ describe("Timesheet", () => {
           }),
         ],
         holidays: [],
-        vacations: [VacationDto.create({ date: "2025-09-10" })],
+        vacations: [Vacation.create({ date: "2025-09-10" })],
       });
 
       const result = await handler.handle(
@@ -471,8 +466,8 @@ function configure({
   fixedInstant,
 }: {
   events?: ActivityLoggedEvent[];
-  holidays?: HolidayDto[];
-  vacations?: VacationDto[];
+  holidays?: Holiday[];
+  vacations?: Vacation[];
   fixedInstant?: string;
 } = {}) {
   const eventStore = EventStore.createNull({ events });
