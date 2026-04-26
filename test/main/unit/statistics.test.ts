@@ -22,12 +22,14 @@ describe("Statistics", () => {
         scope: StatisticsScope.WORKING_HOURS,
       });
 
-      expect(result.histogram).toEqual<Histogram>({
-        binEdges: [],
-        frequencies: [],
-        xAxisLabel: "Duration (days)",
-        yAxisLabel: "Number of Tasks",
-      });
+      expect(result.histogram).toEqual<Histogram>(
+        Histogram.create({
+          binEdges: [],
+          frequencies: [],
+          xAxisLabel: "Duration (days)",
+          yAxisLabel: "Number of Tasks",
+        }),
+      );
     });
 
     it("should return histogram for working hours", async () => {
@@ -57,12 +59,14 @@ describe("Statistics", () => {
         scope: StatisticsScope.WORKING_HOURS,
       });
 
-      expect(result.histogram).toEqual<Histogram>({
-        binEdges: ["0", "0.5", "1", "2", "3", "5"],
-        frequencies: [0, 0, 0, 1, 2],
-        xAxisLabel: "Duration (days)",
-        yAxisLabel: "Number of Tasks",
-      });
+      expect(result.histogram).toEqual<Histogram>(
+        Histogram.create({
+          binEdges: ["0", "0.5", "1", "2", "3", "5"],
+          frequencies: [0, 0, 0, 1, 2],
+          xAxisLabel: "Duration (days)",
+          yAxisLabel: "Number of Tasks",
+        }),
+      );
     });
 
     it("should determine frequencies per bin with 3 tasks", async () => {
@@ -89,23 +93,25 @@ describe("Statistics", () => {
         scope: StatisticsScope.WORKING_HOURS,
       });
 
-      expect(result).toEqual<StatisticsQueryResult>({
-        histogram: {
-          binEdges: ["0", "0.5", "1", "2", "3", "5"],
-          frequencies: [0, 0, 1, 1, 1],
-          xAxisLabel: "Duration (days)",
-          yAxisLabel: "Number of Tasks",
-        },
-        median: {
-          edge0: 0,
-          edge25: 2,
-          edge50: 3,
-          edge75: 4,
-          edge100: 5,
-        },
-        categories: ["Category 1", "Category 2"],
-        totalCount: 3,
-      });
+      expect(result).toEqual<StatisticsQueryResult>(
+        StatisticsQueryResult.create({
+          histogram: {
+            binEdges: ["0", "0.5", "1", "2", "3", "5"],
+            frequencies: [0, 0, 1, 1, 1],
+            xAxisLabel: "Duration (days)",
+            yAxisLabel: "Number of Tasks",
+          },
+          median: {
+            edge0: 0,
+            edge25: 2,
+            edge50: 3,
+            edge75: 4,
+            edge100: 5,
+          },
+          categories: ["Category 1", "Category 2"],
+          totalCount: 3,
+        }),
+      );
     });
 
     it("should determine frequencies per bin with even number of tasks", async () => {
@@ -137,23 +143,25 @@ describe("Statistics", () => {
         scope: StatisticsScope.WORKING_HOURS,
       });
 
-      expect(result).toEqual<StatisticsQueryResult>({
-        histogram: {
-          binEdges: ["0", "0.5", "1", "2", "3", "5"],
-          frequencies: [1, 0, 0, 1, 2],
-          xAxisLabel: "Duration (days)",
-          yAxisLabel: "Number of Tasks",
-        },
-        median: {
-          edge0: 0,
-          edge25: 0.5,
-          edge50: 3.5,
-          edge75: 4,
-          edge100: 5,
-        },
-        categories: ["Category 1", "Category 2"],
-        totalCount: 4,
-      });
+      expect(result).toEqual<StatisticsQueryResult>(
+        StatisticsQueryResult.create({
+          histogram: {
+            binEdges: ["0", "0.5", "1", "2", "3", "5"],
+            frequencies: [1, 0, 0, 1, 2],
+            xAxisLabel: "Duration (days)",
+            yAxisLabel: "Number of Tasks",
+          },
+          median: {
+            edge0: 0,
+            edge25: 0.5,
+            edge50: 3.5,
+            edge75: 4,
+            edge100: 5,
+          },
+          categories: ["Category 1", "Category 2"],
+          totalCount: 4,
+        }),
+      );
     });
 
     it("should determine frequencies per bin with odd number of tasks", async () => {
@@ -190,23 +198,25 @@ describe("Statistics", () => {
         scope: StatisticsScope.WORKING_HOURS,
       });
 
-      expect(result).toEqual<StatisticsQueryResult>({
-        histogram: {
-          binEdges: ["0", "0.5", "1", "2", "3", "5"],
-          frequencies: [0, 1, 1, 1, 2],
-          xAxisLabel: "Duration (days)",
-          yAxisLabel: "Number of Tasks",
-        },
-        median: {
-          edge0: 0,
-          edge25: 1.5,
-          edge50: 3,
-          edge75: 3.5,
-          edge100: 5,
-        },
-        categories: ["Category 1", "Category 2", "Category 3"],
-        totalCount: 5,
-      });
+      expect(result).toEqual<StatisticsQueryResult>(
+        StatisticsQueryResult.create({
+          histogram: {
+            binEdges: ["0", "0.5", "1", "2", "3", "5"],
+            frequencies: [0, 1, 1, 1, 2],
+            xAxisLabel: "Duration (days)",
+            yAxisLabel: "Number of Tasks",
+          },
+          median: {
+            edge0: 0,
+            edge25: 1.5,
+            edge50: 3,
+            edge75: 3.5,
+            edge100: 5,
+          },
+          categories: ["Category 1", "Category 2", "Category 3"],
+          totalCount: 5,
+        }),
+      );
     });
   });
 
@@ -218,12 +228,14 @@ describe("Statistics", () => {
         scope: StatisticsScope.CYCLE_TIMES,
       });
 
-      expect(result.histogram).toEqual<Histogram>({
-        binEdges: [],
-        frequencies: [],
-        xAxisLabel: "Cycle time (days)",
-        yAxisLabel: "Number of Tasks",
-      });
+      expect(result.histogram).toEqual<Histogram>(
+        Histogram.create({
+          binEdges: [],
+          frequencies: [],
+          xAxisLabel: "Cycle time (days)",
+          yAxisLabel: "Number of Tasks",
+        }),
+      );
     });
 
     it("should return histogram for cycle time", async () => {
@@ -260,12 +272,14 @@ describe("Statistics", () => {
         scope: StatisticsScope.CYCLE_TIMES,
       });
 
-      expect(result.histogram).toEqual<Histogram>({
-        binEdges: ["0", "1", "2", "3", "5", "8"],
-        frequencies: [1, 0, 0, 1, 1],
-        xAxisLabel: "Cycle time (days)",
-        yAxisLabel: "Number of Tasks",
-      });
+      expect(result.histogram).toEqual<Histogram>(
+        Histogram.create({
+          binEdges: ["0", "1", "2", "3", "5", "8"],
+          frequencies: [1, 0, 0, 1, 1],
+          xAxisLabel: "Cycle time (days)",
+          yAxisLabel: "Number of Tasks",
+        }),
+      );
     });
 
     it("should filter by category when category is provided", async () => {
@@ -313,23 +327,25 @@ describe("Statistics", () => {
         categories: ["Category A"],
       });
 
-      expect(result).toEqual<StatisticsQueryResult>({
-        histogram: {
-          binEdges: ["0", "1", "2", "3", "5", "8"],
-          frequencies: [1, 0, 0, 1, 1],
-          xAxisLabel: "Cycle time (days)",
-          yAxisLabel: "Number of Tasks",
-        },
-        median: {
-          edge0: 0,
-          edge25: 1,
-          edge50: 4,
-          edge75: 5,
-          edge100: 6,
-        },
-        categories: ["Category A", "Category B"],
-        totalCount: 3,
-      });
+      expect(result).toEqual<StatisticsQueryResult>(
+        StatisticsQueryResult.create({
+          histogram: {
+            binEdges: ["0", "1", "2", "3", "5", "8"],
+            frequencies: [1, 0, 0, 1, 1],
+            xAxisLabel: "Cycle time (days)",
+            yAxisLabel: "Number of Tasks",
+          },
+          median: {
+            edge0: 0,
+            edge25: 1,
+            edge50: 4,
+            edge75: 5,
+            edge100: 6,
+          },
+          categories: ["Category A", "Category B"],
+          totalCount: 3,
+        }),
+      );
     });
   });
 
@@ -341,13 +357,15 @@ describe("Statistics", () => {
         scope: StatisticsScope.WORKING_HOURS,
       });
 
-      expect(result.median).toEqual<Median>({
-        edge0: 0,
-        edge25: 0,
-        edge50: 0,
-        edge75: 0,
-        edge100: 0,
-      });
+      expect(result.median).toEqual<Median>(
+        Median.create({
+          edge0: 0,
+          edge25: 0,
+          edge50: 0,
+          edge75: 0,
+          edge100: 0,
+        }),
+      );
     });
 
     it("should return median for working hours", async () => {
@@ -377,13 +395,15 @@ describe("Statistics", () => {
         scope: StatisticsScope.WORKING_HOURS,
       });
 
-      expect(result.median).toEqual<Median>({
-        edge0: 0,
-        edge25: 3,
-        edge50: 5,
-        edge75: 5,
-        edge100: 5,
-      });
+      expect(result.median).toEqual<Median>(
+        Median.create({
+          edge0: 0,
+          edge25: 3,
+          edge50: 5,
+          edge75: 5,
+          edge100: 5,
+        }),
+      );
     });
   });
 
@@ -395,13 +415,15 @@ describe("Statistics", () => {
         scope: StatisticsScope.CYCLE_TIMES,
       });
 
-      expect(result.median).toEqual<Median>({
-        edge0: 0,
-        edge25: 0,
-        edge50: 0,
-        edge75: 0,
-        edge100: 0,
-      });
+      expect(result.median).toEqual<Median>(
+        Median.create({
+          edge0: 0,
+          edge25: 0,
+          edge50: 0,
+          edge75: 0,
+          edge100: 0,
+        }),
+      );
     });
 
     it("should return median for cycle time", async () => {
@@ -438,13 +460,15 @@ describe("Statistics", () => {
         scope: StatisticsScope.CYCLE_TIMES,
       });
 
-      expect(result.median).toEqual<Median>({
-        edge0: 0,
-        edge25: 1,
-        edge50: 4,
-        edge75: 5,
-        edge100: 6,
-      });
+      expect(result.median).toEqual<Median>(
+        Median.create({
+          edge0: 0,
+          edge25: 1,
+          edge50: 4,
+          edge75: 5,
+          edge100: 6,
+        }),
+      );
     });
   });
 
@@ -479,23 +503,25 @@ describe("Statistics", () => {
         categories: ["Category A"],
       });
 
-      expect(result).toEqual<StatisticsQueryResult>({
-        histogram: {
-          binEdges: ["0", "0.5", "1", "2", "3", "5"],
-          frequencies: [0, 0, 1, 1, 1],
-          xAxisLabel: "Duration (days)",
-          yAxisLabel: "Number of Tasks",
-        },
-        median: {
-          edge0: 0,
-          edge25: 2,
-          edge50: 3,
-          edge75: 4,
-          edge100: 5,
-        },
-        categories: ["Category A", "Category B"],
-        totalCount: 3,
-      });
+      expect(result).toEqual<StatisticsQueryResult>(
+        StatisticsQueryResult.create({
+          histogram: {
+            binEdges: ["0", "0.5", "1", "2", "3", "5"],
+            frequencies: [0, 0, 1, 1, 1],
+            xAxisLabel: "Duration (days)",
+            yAxisLabel: "Number of Tasks",
+          },
+          median: {
+            edge0: 0,
+            edge25: 2,
+            edge50: 3,
+            edge75: 4,
+            edge100: 5,
+          },
+          categories: ["Category A", "Category B"],
+          totalCount: 3,
+        }),
+      );
     });
 
     it("should filter by activities without a category", async () => {
@@ -526,23 +552,25 @@ describe("Statistics", () => {
         categories: [""],
       });
 
-      expect(result).toEqual<StatisticsQueryResult>({
-        histogram: {
-          binEdges: ["0", "1", "2"],
-          frequencies: [2, 0],
-          xAxisLabel: "Cycle time (days)",
-          yAxisLabel: "Number of Tasks",
-        },
-        median: {
-          edge0: 0,
-          edge25: 1,
-          edge50: 1,
-          edge75: 1,
-          edge100: 1,
-        },
-        categories: ["", "Testing Category"],
-        totalCount: 2,
-      });
+      expect(result).toEqual<StatisticsQueryResult>(
+        StatisticsQueryResult.create({
+          histogram: {
+            binEdges: ["0", "1", "2"],
+            frequencies: [2, 0],
+            xAxisLabel: "Cycle time (days)",
+            yAxisLabel: "Number of Tasks",
+          },
+          median: {
+            edge0: 0,
+            edge25: 1,
+            edge50: 1,
+            edge75: 1,
+            edge100: 1,
+          },
+          categories: ["", "Testing Category"],
+          totalCount: 2,
+        }),
+      );
     });
 
     it("should filter by no category and a category", async () => {
@@ -569,23 +597,25 @@ describe("Statistics", () => {
         categories: ["", "Category A"],
       });
 
-      expect(result).toEqual<StatisticsQueryResult>({
-        histogram: {
-          binEdges: ["0", "1", "2"],
-          frequencies: [2, 0],
-          xAxisLabel: "Cycle time (days)",
-          yAxisLabel: "Number of Tasks",
-        },
-        median: {
-          edge0: 0,
-          edge25: 1,
-          edge50: 1,
-          edge75: 1,
-          edge100: 1,
-        },
-        categories: ["", "Category A", "Category B"],
-        totalCount: 2,
-      });
+      expect(result).toEqual<StatisticsQueryResult>(
+        StatisticsQueryResult.create({
+          histogram: {
+            binEdges: ["0", "1", "2"],
+            frequencies: [2, 0],
+            xAxisLabel: "Cycle time (days)",
+            yAxisLabel: "Number of Tasks",
+          },
+          median: {
+            edge0: 0,
+            edge25: 1,
+            edge50: 1,
+            edge75: 1,
+            edge100: 1,
+          },
+          categories: ["", "Category A", "Category B"],
+          totalCount: 2,
+        }),
+      );
     });
 
     it("should do not filter when query categories is an empty array", async () => {
@@ -612,23 +642,25 @@ describe("Statistics", () => {
         categories: [],
       });
 
-      expect(result).toEqual<StatisticsQueryResult>({
-        histogram: {
-          binEdges: ["0", "1", "2"],
-          frequencies: [3, 0],
-          xAxisLabel: "Cycle time (days)",
-          yAxisLabel: "Number of Tasks",
-        },
-        median: {
-          edge0: 0,
-          edge25: 1,
-          edge50: 1,
-          edge75: 1,
-          edge100: 1,
-        },
-        categories: ["", "Category A", "Category B"],
-        totalCount: 3,
-      });
+      expect(result).toEqual<StatisticsQueryResult>(
+        StatisticsQueryResult.create({
+          histogram: {
+            binEdges: ["0", "1", "2"],
+            frequencies: [3, 0],
+            xAxisLabel: "Cycle time (days)",
+            yAxisLabel: "Number of Tasks",
+          },
+          median: {
+            edge0: 0,
+            edge25: 1,
+            edge50: 1,
+            edge75: 1,
+            edge100: 1,
+          },
+          categories: ["", "Category A", "Category B"],
+          totalCount: 3,
+        }),
+      );
     });
   });
 });

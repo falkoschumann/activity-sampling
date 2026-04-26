@@ -25,10 +25,12 @@ describe("Current interval", () => {
 
       const result = await handler.handle(CurrentIntervalQuery.create());
 
-      expect(result).toEqual<CurrentIntervalQueryResult>({
-        timestamp: Temporal.Instant.from("2025-08-28T20:11:00Z"),
-        duration: Temporal.Duration.from("PT20M"),
-      });
+      expect(result).toEqual<CurrentIntervalQueryResult>(
+        CurrentIntervalQueryResult.create({
+          timestamp: Temporal.Instant.from("2025-08-28T20:11:00Z"),
+          duration: Temporal.Duration.from("PT20M"),
+        }),
+      );
     });
 
     it("should emit interval elapsed event", async () => {

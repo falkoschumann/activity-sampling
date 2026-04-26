@@ -49,11 +49,10 @@ describe("Event store", () => {
     const events = await Array.fromAsync(store.replay());
 
     expect(events).toEqual<ActivityLoggedEvent[]>([
-      {
-        ...ActivityLoggedEvent.createTestInstance(),
+      ActivityLoggedEvent.createTestInstance({
         notes: "Test notes",
         category: "Test category",
-      },
+      }),
     ]);
   });
 

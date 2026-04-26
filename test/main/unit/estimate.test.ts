@@ -7,7 +7,7 @@ import { Clock } from "../../../src/shared/domain/temporal";
 import {
   EstimateEntry,
   EstimateQuery,
-  type EstimateQueryResult,
+  EstimateQueryResult,
 } from "../../../src/shared/domain/estimate_query";
 import { ActivityLoggedEvent } from "../../../src/main/domain/activity_logged_event";
 import { EventStore } from "../../../src/main/infrastructure/event_store";
@@ -59,30 +59,32 @@ describe("Estimate", () => {
 
       const result = await handler.handle(EstimateQuery.create({}));
 
-      expect(result).toEqual<EstimateQueryResult>({
-        cycleTimes: [
-          {
-            cycleTime: 1,
-            frequency: 2,
-            probability: 0.5,
-            cumulativeProbability: 0.5,
-          },
-          {
-            cycleTime: 2,
-            frequency: 1,
-            probability: 0.25,
-            cumulativeProbability: 0.75,
-          },
-          {
-            cycleTime: 3,
-            frequency: 1,
-            probability: 0.25,
-            cumulativeProbability: 1.0,
-          },
-        ],
-        categories: ["Category 1", "Category 2", "Category 3"],
-        totalCount: 4,
-      });
+      expect(result).toEqual<EstimateQueryResult>(
+        EstimateQueryResult.create({
+          cycleTimes: [
+            {
+              cycleTime: 1,
+              frequency: 2,
+              probability: 0.5,
+              cumulativeProbability: 0.5,
+            },
+            {
+              cycleTime: 2,
+              frequency: 1,
+              probability: 0.25,
+              cumulativeProbability: 0.75,
+            },
+            {
+              cycleTime: 3,
+              frequency: 1,
+              probability: 0.25,
+              cumulativeProbability: 1.0,
+            },
+          ],
+          categories: ["Category 1", "Category 2", "Category 3"],
+          totalCount: 4,
+        }),
+      );
     });
 
     it("should join the cycle time of an activity with multiple categories", async () => {
@@ -107,24 +109,26 @@ describe("Estimate", () => {
 
       const result = await handler.handle(EstimateQuery.create({}));
 
-      expect(result).toEqual<EstimateQueryResult>({
-        cycleTimes: [
-          {
-            cycleTime: 1,
-            frequency: 1,
-            probability: 0.5,
-            cumulativeProbability: 0.5,
-          },
-          {
-            cycleTime: 2,
-            frequency: 1,
-            probability: 0.5,
-            cumulativeProbability: 1.0,
-          },
-        ],
-        categories: ["Category 1", "Category 2"],
-        totalCount: 2,
-      });
+      expect(result).toEqual<EstimateQueryResult>(
+        EstimateQueryResult.create({
+          cycleTimes: [
+            {
+              cycleTime: 1,
+              frequency: 1,
+              probability: 0.5,
+              cumulativeProbability: 0.5,
+            },
+            {
+              cycleTime: 2,
+              frequency: 1,
+              probability: 0.5,
+              cumulativeProbability: 1.0,
+            },
+          ],
+          categories: ["Category 1", "Category 2"],
+          totalCount: 2,
+        }),
+      );
     });
   });
 
@@ -158,18 +162,20 @@ describe("Estimate", () => {
         EstimateQuery.create({ categories: ["Category A"] }),
       );
 
-      expect(result).toEqual<EstimateQueryResult>({
-        cycleTimes: [
-          {
-            cycleTime: 1,
-            frequency: 2,
-            probability: 1.0,
-            cumulativeProbability: 1.0,
-          },
-        ],
-        categories: ["Category A", "Category B"],
-        totalCount: 2,
-      });
+      expect(result).toEqual<EstimateQueryResult>(
+        EstimateQueryResult.create({
+          cycleTimes: [
+            {
+              cycleTime: 1,
+              frequency: 2,
+              probability: 1.0,
+              cumulativeProbability: 1.0,
+            },
+          ],
+          categories: ["Category A", "Category B"],
+          totalCount: 2,
+        }),
+      );
     });
 
     it("should filter activities without a category", async () => {
@@ -199,18 +205,20 @@ describe("Estimate", () => {
         EstimateQuery.create({ categories: [""] }),
       );
 
-      expect(result).toEqual<EstimateQueryResult>({
-        cycleTimes: [
-          {
-            cycleTime: 1,
-            frequency: 2,
-            probability: 1.0,
-            cumulativeProbability: 1.0,
-          },
-        ],
-        categories: ["", "Testing Category"],
-        totalCount: 2,
-      });
+      expect(result).toEqual<EstimateQueryResult>(
+        EstimateQueryResult.create({
+          cycleTimes: [
+            {
+              cycleTime: 1,
+              frequency: 2,
+              probability: 1.0,
+              cumulativeProbability: 1.0,
+            },
+          ],
+          categories: ["", "Testing Category"],
+          totalCount: 2,
+        }),
+      );
     });
 
     it("should filter activities with and without category", async () => {
@@ -236,18 +244,20 @@ describe("Estimate", () => {
         EstimateQuery.create({ categories: ["", "Category A"] }),
       );
 
-      expect(result).toEqual<EstimateQueryResult>({
-        cycleTimes: [
-          {
-            cycleTime: 1,
-            frequency: 2,
-            probability: 1.0,
-            cumulativeProbability: 1.0,
-          },
-        ],
-        categories: ["", "Category A", "Category B"],
-        totalCount: 2,
-      });
+      expect(result).toEqual<EstimateQueryResult>(
+        EstimateQueryResult.create({
+          cycleTimes: [
+            {
+              cycleTime: 1,
+              frequency: 2,
+              probability: 1.0,
+              cumulativeProbability: 1.0,
+            },
+          ],
+          categories: ["", "Category A", "Category B"],
+          totalCount: 2,
+        }),
+      );
     });
 
     it("should do not filter by category when an empty array is given", async () => {
@@ -273,18 +283,20 @@ describe("Estimate", () => {
         EstimateQuery.create({ categories: [] }),
       );
 
-      expect(result).toEqual<EstimateQueryResult>({
-        cycleTimes: [
-          {
-            cycleTime: 1,
-            frequency: 3,
-            probability: 1.0,
-            cumulativeProbability: 1.0,
-          },
-        ],
-        categories: ["", "Category A", "Category B"],
-        totalCount: 3,
-      });
+      expect(result).toEqual<EstimateQueryResult>(
+        EstimateQueryResult.create({
+          cycleTimes: [
+            {
+              cycleTime: 1,
+              frequency: 3,
+              probability: 1.0,
+              cumulativeProbability: 1.0,
+            },
+          ],
+          categories: ["", "Category A", "Category B"],
+          totalCount: 3,
+        }),
+      );
     });
   });
 });
