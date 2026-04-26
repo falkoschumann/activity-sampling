@@ -2,6 +2,8 @@
 
 import type { ActivityLoggedEvent } from "./activity_logged_event";
 
+const NO_CATEGORY = "";
+
 export class CategoriesProjection {
   static create() {
     return new CategoriesProjection();
@@ -12,11 +14,11 @@ export class CategoriesProjection {
   private constructor() {}
 
   update(event: ActivityLoggedEvent) {
-    if (this.#categories.includes(event.category ?? "")) {
+    if (this.#categories.includes(event.category ?? NO_CATEGORY)) {
       return;
     }
 
-    this.#categories.push(event.category ?? "");
+    this.#categories.push(event.category ?? NO_CATEGORY);
   }
 
   get() {
