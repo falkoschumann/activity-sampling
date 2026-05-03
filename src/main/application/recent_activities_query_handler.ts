@@ -1,7 +1,10 @@
 // Copyright (c) 2026 Falko Schumann. All rights reserved. MIT license.
 
 import { Clock } from "../../shared/domain/temporal";
-import type { RecentActivitiesQuery, RecentActivitiesQueryResult } from "../../shared/domain/recent_activities_query";
+import type {
+  RecentActivitiesQuery,
+  RecentActivitiesQueryResult,
+} from "../../shared/domain/recent_activities_query";
 import type { EventStore } from "../infrastructure/event_store";
 import { RecentActivitiesProjection } from "../domain/recent_activities_projection";
 
