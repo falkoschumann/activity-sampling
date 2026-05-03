@@ -20,7 +20,7 @@ export class ExportTimesheetCommand {
     timesheets?: TimesheetEntry[];
     fileName?: string;
   } = {}): ExportTimesheetCommand {
-    return new ExportTimesheetCommand(timesheets, fileName);
+    return ExportTimesheetCommand.create({ timesheets, fileName });
   }
 
   readonly timesheets: TimesheetEntry[];

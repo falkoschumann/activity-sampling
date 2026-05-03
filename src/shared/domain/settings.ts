@@ -24,7 +24,7 @@ export class Settings {
     capacity?: Temporal.DurationLike | string;
     categories?: string[];
   } = {}): Settings {
-    return new Settings(dataDir, capacity, categories);
+    return Settings.create({ dataDir, capacity, categories });
   }
 
   readonly dataDir: string;

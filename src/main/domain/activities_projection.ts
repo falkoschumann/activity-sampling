@@ -38,7 +38,7 @@ export class Activity {
     task?: string;
     hours: Temporal.DurationLike | string;
   }): Activity {
-    return new Activity(start, finish, client, project, task, hours);
+    return Activity.create({ start, finish, client, project, task, hours });
   }
 
   readonly start: Temporal.PlainDate;

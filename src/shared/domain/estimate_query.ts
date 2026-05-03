@@ -20,7 +20,7 @@ export class EstimateQuery {
     categories?: string[];
     timeZone?: Temporal.TimeZoneLike;
   } = {}) {
-    return new EstimateQuery(categories, timeZone);
+    return EstimateQuery.create({ categories, timeZone });
   }
 
   readonly categories?: string[];

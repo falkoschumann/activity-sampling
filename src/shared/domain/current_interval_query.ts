@@ -30,7 +30,7 @@ export class CurrentIntervalQueryResult {
     timestamp?: Temporal.Instant | string;
     duration?: Temporal.DurationLike | string;
   } = {}): CurrentIntervalQueryResult {
-    return new CurrentIntervalQueryResult(timestamp, duration);
+    return CurrentIntervalQueryResult.create({ timestamp, duration });
   }
 
   readonly timestamp?: Temporal.Instant;

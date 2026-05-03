@@ -89,7 +89,7 @@ export class WorkingDay {
     date?: Temporal.PlainDateLike | string;
     activities?: LoggedActivity[];
   } = {}): WorkingDay {
-    return new WorkingDay(date, activities);
+    return WorkingDay.create({ date, activities });
   }
 
   readonly date: Temporal.PlainDate;
