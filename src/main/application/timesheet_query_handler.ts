@@ -2,7 +2,7 @@
 
 import { Temporal } from "@js-temporal/polyfill";
 
-import type { Clock } from "../../shared/domain/temporal";
+import { Clock } from "../../shared/domain/temporal";
 import type {
   TimesheetQuery,
   TimesheetQueryResult,
@@ -18,13 +18,13 @@ export class TimesheetQueryHandler {
     eventStore,
     holidayRepository,
     vacationRepository,
-    clock,
+    clock = Clock.systemDefaultZone(),
   }: {
     capacity?: Temporal.DurationLike | string;
     eventStore: EventStore;
     holidayRepository: HolidayRepository;
     vacationRepository: VacationRepository;
-    clock: Clock;
+    clock?: Clock;
   }) {
     return new TimesheetQueryHandler(
       capacity,

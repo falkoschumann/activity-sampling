@@ -4,17 +4,17 @@ import {
   type BurnUpQuery,
   BurnUpQueryResult,
 } from "../../shared/domain/burn_up_query";
-import type { Clock } from "../../shared/domain/temporal";
+import { Clock } from "../../shared/domain/temporal";
 import { BurnUpProjection } from "../domain/burn_up_projection";
 import type { EventStore } from "../infrastructure/event_store";
 
 export class BurnUpQueryHandler {
   static create({
     eventStore,
-    clock,
+    clock = Clock.systemDefaultZone(),
   }: {
     eventStore: EventStore;
-    clock: Clock;
+    clock?: Clock;
   }) {
     return new BurnUpQueryHandler(eventStore, clock);
   }

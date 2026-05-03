@@ -4,17 +4,17 @@ import type {
   ReportQuery,
   ReportQueryResult,
 } from "../../shared/domain/report_query";
-import type { Clock } from "../../shared/domain/temporal";
+import { Clock } from "../../shared/domain/temporal";
 import { ReportProjection } from "../domain/report_projection";
 import type { EventStore } from "../infrastructure/event_store";
 
 export class ReportQueryHandler {
   static create({
     eventStore,
-    clock,
+    clock = Clock.systemDefaultZone(),
   }: {
     eventStore: EventStore;
-    clock: Clock;
+    clock?: Clock;
   }) {
     return new ReportQueryHandler(eventStore, clock);
   }

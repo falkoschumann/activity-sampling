@@ -14,7 +14,6 @@ import { StopTimerCommandHandler } from "./application/stop_timer_command_handle
 import { LogActivityCommandHandler } from "./application/log_activity_command_handler";
 import { ExportTimesheetCommandHandler } from "./application/export_timesheet_command_handler";
 import { RecentActivitiesQueryHandler } from "./application/recent_activities_query_handler";
-import { Clock } from "../shared/domain/temporal";
 import { ReportQueryHandler } from "./application/report_query_handler";
 import { StatisticsQueryHandler } from "./application/statistics_query_handler";
 import { EstimateQueryHandler } from "./application/estimate_query_handler";
@@ -70,7 +69,6 @@ const eventStore = EventStore.create();
 const holidayRepository = HolidayRepository.create();
 const vacationRepository = VacationRepository.create();
 const timesheetExporter = TimesheetExporter.create();
-const clock = Clock.systemDefaultZone();
 
 const timerState = TimerState.create();
 const startTimerCommandHandler = StartTimerCommandHandler.create({
@@ -85,26 +83,15 @@ const logActivityCommandHandler = LogActivityCommandHandler.create({
 });
 const recentActivitiesQueryHandler = RecentActivitiesQueryHandler.create({
   eventStore,
-  clock,
 });
-const reportQueryHandler = ReportQueryHandler.create({ eventStore, clock });
-const statisticsQueryHandler = StatisticsQueryHandler.create({
-  eventStore,
-  clock,
-});
-const estimateQueryHandler = EstimateQueryHandler.create({
-  eventStore,
-  clock,
-});
-const burnUpQueryHandler = BurnUpQueryHandler.create({
-  eventStore,
-  clock,
-});
+const reportQueryHandler = ReportQueryHandler.create({ eventStore });
+const statisticsQueryHandler = StatisticsQueryHandler.create({ eventStore });
+const estimateQueryHandler = EstimateQueryHandler.create({ eventStore });
+const burnUpQueryHandler = BurnUpQueryHandler.create({ eventStore });
 const timesheetQueryHandler = TimesheetQueryHandler.create({
   eventStore,
   holidayRepository,
   vacationRepository,
-  clock,
 });
 const exportTimesheetCommandHandler = ExportTimesheetCommandHandler.create({
   timesheetExporter,

@@ -4,17 +4,17 @@ import type {
   StatisticsQuery,
   StatisticsQueryResult,
 } from "../../shared/domain/statistics_query";
-import type { Clock } from "../../shared/domain/temporal";
+import { Clock } from "../../shared/domain/temporal";
 import { StatisticsProjection } from "../domain/statistics_projection";
 import type { EventStore } from "../infrastructure/event_store";
 
 export class StatisticsQueryHandler {
   static create({
     eventStore,
-    clock,
+    clock = Clock.systemDefaultZone(),
   }: {
     eventStore: EventStore;
-    clock: Clock;
+    clock?: Clock;
   }) {
     return new StatisticsQueryHandler(eventStore, clock);
   }

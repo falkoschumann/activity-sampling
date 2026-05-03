@@ -4,17 +4,17 @@ import type {
   EstimateQuery,
   EstimateQueryResult,
 } from "../../shared/domain/estimate_query";
-import type { Clock } from "../../shared/domain/temporal";
+import { Clock } from "../../shared/domain/temporal";
 import { EstimateProjection } from "../domain/estimate_projection";
 import type { EventStore } from "../infrastructure/event_store";
 
 export class EstimateQueryHandler {
   static create({
     eventStore,
-    clock,
+    clock = Clock.systemDefaultZone(),
   }: {
     eventStore: EventStore;
-    clock: Clock;
+    clock?: Clock;
   }) {
     return new EstimateQueryHandler(eventStore, clock);
   }
