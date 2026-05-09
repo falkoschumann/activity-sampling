@@ -2,14 +2,17 @@
 
 import { Temporal } from "@js-temporal/polyfill";
 
-export interface IntervalElapsedEventInit {
-  readonly timestamp: Temporal.Instant | string;
-  readonly interval: Temporal.DurationLike | string;
-}
+export const INTERVAL_ELAPSED_EVENT = "intervalElapsed";
 
 export class IntervalElapsedEvent extends Event {
-  static create(eventInitDict: IntervalElapsedEventInit): IntervalElapsedEvent {
-    return new IntervalElapsedEvent(IntervalElapsedEvent.TYPE, eventInitDict);
+  static create({
+    timestamp,
+    interval,
+  }: {
+    timestamp: Temporal.Instant | string;
+    interval: Temporal.DurationLike | string;
+  }) {
+    return new IntervalElapsedEvent(timestamp, interval);
   }
 
   static createTestInstance({
@@ -18,18 +21,19 @@ export class IntervalElapsedEvent extends Event {
   }: {
     timestamp?: Temporal.Instant | string;
     interval?: Temporal.DurationLike | string;
-  } = {}): IntervalElapsedEvent {
+  } = {}) {
     return IntervalElapsedEvent.create({ timestamp, interval });
   }
-
-  static readonly TYPE = "intervalElapsed";
 
   readonly timestamp: Temporal.Instant;
   readonly interval: Temporal.Duration;
 
-  private constructor(type: string, eventInitDict: IntervalElapsedEventInit) {
-    super(type);
-    this.timestamp = Temporal.Instant.from(eventInitDict.timestamp);
-    this.interval = Temporal.Duration.from(eventInitDict.interval);
+  private constructor(
+    timestamp: Temporal.Instant | string,
+    interval: Temporal.DurationLike | string,
+  ) {
+    super(INTERVAL_ELAPSED_EVENT);
+    this.timestamp = Temporal.Instant.from(timestamp);
+    this.interval = Temporal.Duration.from(interval);
   }
 }

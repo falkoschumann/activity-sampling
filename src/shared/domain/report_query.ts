@@ -13,7 +13,7 @@ export class ReportQuery {
     from?: Temporal.PlainDateLike | string;
     to?: Temporal.PlainDateLike | string;
     timeZone?: Temporal.TimeZoneLike;
-  }): ReportQuery {
+  }) {
     return new ReportQuery(scope, from, to, timeZone);
   }
 
@@ -27,7 +27,7 @@ export class ReportQuery {
     from?: Temporal.PlainDateLike | string;
     to?: Temporal.PlainDateLike | string;
     timeZone?: Temporal.TimeZoneLike;
-  } = {}): ReportQuery {
+  } = {}) {
     return ReportQuery.create({ scope, from, to, timeZone });
   }
 
@@ -65,7 +65,7 @@ export class ReportQueryResult {
   }: {
     entries?: ReportEntry[];
     totalHours?: Temporal.DurationLike | string;
-  } = {}): ReportQueryResult {
+  } = {}) {
     return new ReportQueryResult(entries, totalHours);
   }
 
@@ -75,7 +75,7 @@ export class ReportQueryResult {
   }: {
     entries?: ReportEntry[];
     totalHours?: Temporal.DurationLike | string;
-  } = {}): ReportQueryResult {
+  } = {}) {
     return ReportQueryResult.create({ entries, totalHours });
   }
 
@@ -110,7 +110,7 @@ export class ReportEntry {
     category?: string;
     hours: Temporal.DurationLike | string;
     cycleTime: number;
-  }): ReportEntry {
+  }) {
     return new ReportEntry(
       start,
       finish,
@@ -132,7 +132,16 @@ export class ReportEntry {
     category,
     hours = Temporal.Duration.from("PT8H"),
     cycleTime = 1,
-  }: Partial<ReportEntry> = {}): ReportEntry {
+  }: {
+    start?: Temporal.PlainDateLike | string;
+    finish?: Temporal.PlainDateLike | string;
+    client?: string;
+    project?: string;
+    task?: string;
+    category?: string;
+    hours?: Temporal.DurationLike | string;
+    cycleTime?: number;
+  } = {}) {
     return ReportEntry.create({
       start,
       finish,

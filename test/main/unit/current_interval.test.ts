@@ -1,6 +1,7 @@
 // Copyright (c) 2026 Falko Schumann. All rights reserved. MIT license.
 
 import { Temporal } from "@js-temporal/polyfill";
+import { EventTracker } from "@muspellheim/shared";
 import { describe, expect, it } from "vitest";
 
 import { CurrentIntervalQueryHandler } from "../../../src/main/application/current_interval_query_handler";
@@ -11,7 +12,7 @@ import {
 import { TimerState } from "../../../src/main/domain/timer_state";
 import { IntervalElapsedEvent } from "../../../src/shared/domain/interval_elapsed_event";
 import { StartTimerCommand } from "../../../src/shared/domain/start_timer_command";
-import { EventTracker } from "@muspellheim/shared";
+import { INTERVAL_ELAPSED_CHANNEL } from "../../../src/shared/infrastructure/channels";
 
 describe("Current interval", () => {
   describe("Notify the user when an interval is elapsed", () => {
@@ -42,7 +43,7 @@ describe("Current interval", () => {
       });
       const trackedEvents = EventTracker.create(
         handler,
-        IntervalElapsedEvent.TYPE,
+        INTERVAL_ELAPSED_CHANNEL,
       );
       await handler.handle(StartTimerCommand.create({ interval: "PT20M" }));
 

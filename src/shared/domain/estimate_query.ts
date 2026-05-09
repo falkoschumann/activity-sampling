@@ -83,7 +83,7 @@ export class EstimateEntry {
     frequency: number;
     probability: number;
     cumulativeProbability: number;
-  }): EstimateEntry {
+  }) {
     return new EstimateEntry(
       cycleTime,
       frequency,
@@ -102,7 +102,7 @@ export class EstimateEntry {
     frequency?: number;
     probability?: number;
     cumulativeProbability?: number;
-  } = {}): EstimateEntry {
+  } = {}) {
     return EstimateEntry.create({
       cycleTime,
       frequency,

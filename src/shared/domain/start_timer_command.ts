@@ -3,11 +3,7 @@
 import { Temporal } from "@js-temporal/polyfill";
 
 export class StartTimerCommand {
-  static create({
-    interval,
-  }: {
-    interval: Temporal.DurationLike | string;
-  }): StartTimerCommand {
+  static create({ interval }: { interval: Temporal.DurationLike | string }) {
     return new StartTimerCommand(interval);
   }
 

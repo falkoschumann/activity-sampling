@@ -5,7 +5,6 @@ import { type Dispatch, useEffect, useRef } from "react";
 
 import { IntervalElapsedEvent } from "../../shared/domain/interval_elapsed_event";
 import { TimerStartedEvent } from "../../shared/domain/timer_started_event";
-import { TimerStoppedEvent } from "../../shared/domain/timer_stopped_event";
 import {
   type Action,
   intervalElapsed,
@@ -40,12 +39,10 @@ export function useCurrentInterval(dispatch: Dispatch<Action>) {
     );
 
     const offTimerStoppedEvent = window.activitySampling.onTimerStoppedEvent(
-      (json) => {
+      () => {
         clearInterval(timeoutId.current);
 
-        const dto = JSON.parse(json);
-        const event = TimerStoppedEvent.create(dto);
-        dispatch(timerStopped(event));
+        dispatch(timerStopped());
       },
     );
 

@@ -19,7 +19,7 @@ export class LogActivityCommand {
     task: string;
     notes?: string;
     category?: string;
-  }): LogActivityCommand {
+  }) {
     return new LogActivityCommand(
       timestamp,
       duration,
@@ -47,7 +47,7 @@ export class LogActivityCommand {
     task?: string;
     notes?: string;
     category?: string;
-  } = {}): LogActivityCommand {
+  } = {}) {
     return LogActivityCommand.create({
       timestamp,
       duration,

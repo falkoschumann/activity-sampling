@@ -81,14 +81,10 @@ export function timerTicked(
 
 const TIMER_STOPPED_ACTION = "timerStopped";
 
-interface TimerStoppedPayload {
-  timestamp: Temporal.Instant | string;
-}
-
-export function timerStopped(
-  payload: TimerStoppedPayload,
-): FluxStandardActionAuto<typeof TIMER_STOPPED_ACTION, TimerStoppedPayload> {
-  return { type: TIMER_STOPPED_ACTION, payload };
+export function timerStopped(): FluxStandardActionAuto<
+  typeof TIMER_STOPPED_ACTION
+> {
+  return { type: TIMER_STOPPED_ACTION };
 }
 
 const INTERVAL_ELAPSED_ACTION = "intervalElapsed";

@@ -2,14 +2,17 @@
 
 import { Temporal } from "@js-temporal/polyfill";
 
-export interface TimerStartedEventInit {
-  readonly timestamp: Temporal.Instant | string;
-  readonly interval: Temporal.DurationLike | string;
-}
+export const TIMER_STARTED_EVENT = "timerStarted";
 
 export class TimerStartedEvent extends Event {
-  static create(eventInitDict: TimerStartedEventInit): TimerStartedEvent {
-    return new TimerStartedEvent(TimerStartedEvent.TYPE, eventInitDict);
+  static create({
+    timestamp,
+    interval,
+  }: {
+    timestamp: Temporal.Instant | string;
+    interval: Temporal.DurationLike | string;
+  }) {
+    return new TimerStartedEvent(timestamp, interval);
   }
 
   static createTestInstance({
@@ -18,18 +21,19 @@ export class TimerStartedEvent extends Event {
   }: {
     timestamp?: Temporal.Instant | string;
     interval?: Temporal.DurationLike | string;
-  } = {}): TimerStartedEvent {
+  } = {}) {
     return TimerStartedEvent.create({ timestamp, interval });
   }
-
-  static readonly TYPE = "timerStarted";
 
   readonly timestamp: Temporal.Instant;
   readonly interval: Temporal.Duration;
 
-  private constructor(type: string, eventInitDict: TimerStartedEventInit) {
-    super(type);
-    this.timestamp = Temporal.Instant.from(eventInitDict.timestamp);
-    this.interval = Temporal.Duration.from(eventInitDict.interval);
+  private constructor(
+    timestamp: Temporal.Instant | string,
+    interval: Temporal.DurationLike | string,
+  ) {
+    super(TIMER_STARTED_EVENT);
+    this.timestamp = Temporal.Instant.from(timestamp);
+    this.interval = Temporal.Duration.from(interval);
   }
 }

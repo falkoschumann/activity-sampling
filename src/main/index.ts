@@ -21,9 +21,18 @@ import { BurnUpQueryHandler } from "./application/burn_up_query_handler";
 import { TimesheetQueryHandler } from "./application/timesheet_query_handler";
 import { Settings } from "../shared/domain/settings";
 import { TimerState } from "./domain/timer_state";
-import { IntervalElapsedEvent } from "../shared/domain/interval_elapsed_event";
-import { TimerStartedEvent } from "../shared/domain/timer_started_event";
-import { TimerStoppedEvent } from "../shared/domain/timer_stopped_event";
+import {
+  INTERVAL_ELAPSED_EVENT,
+  IntervalElapsedEvent,
+} from "../shared/domain/interval_elapsed_event";
+import {
+  TIMER_STARTED_EVENT,
+  TimerStartedEvent,
+} from "../shared/domain/timer_started_event";
+import {
+  TIMER_STOPPED_EVENT,
+  TimerStoppedEvent,
+} from "../shared/domain/timer_stopped_event";
 import { EventStore } from "./infrastructure/event_store";
 import { HolidayRepository } from "./infrastructure/holiday_repository";
 import { VacationRepository } from "./infrastructure/vacation_repository";
@@ -289,20 +298,20 @@ function createWindow() {
 }
 
 function createMainToLogWindowChannels(window: BrowserWindow) {
-  startTimerCommandHandler.addEventListener(TimerStartedEvent.TYPE, (event) =>
+  startTimerCommandHandler.addEventListener(TIMER_STARTED_EVENT, (event) =>
     window.webContents.send(
       TIMER_STARTED_CHANNEL,
       TimerStartedEvent.create(event as TimerStartedEvent),
     ),
   );
-  stopTimerCommandHandler.addEventListener(TimerStoppedEvent.TYPE, (event) =>
+  stopTimerCommandHandler.addEventListener(TIMER_STOPPED_EVENT, (event) =>
     window.webContents.send(
       TIMER_STOPPED_CHANNEL,
       TimerStoppedEvent.create(event as TimerStoppedEvent),
     ),
   );
   currentIntervalQueryHandler.addEventListener(
-    IntervalElapsedEvent.TYPE,
+    INTERVAL_ELAPSED_EVENT,
     (event) =>
       window.webContents.send(
         INTERVAL_ELAPSED_CHANNEL,

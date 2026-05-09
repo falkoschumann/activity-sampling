@@ -3,11 +3,11 @@
 import { Temporal } from "@js-temporal/polyfill";
 
 export class CurrentIntervalQuery {
-  static create(_options?: never): CurrentIntervalQuery {
+  static create(_options?: never) {
     return new CurrentIntervalQuery();
   }
 
-  static createTestInstance(options?: never): CurrentIntervalQuery {
+  static createTestInstance(options?: never) {
     return CurrentIntervalQuery.create(options);
   }
 }
@@ -19,7 +19,7 @@ export class CurrentIntervalQueryResult {
   }: {
     timestamp?: Temporal.Instant | string;
     duration?: Temporal.DurationLike | string;
-  } = {}): CurrentIntervalQueryResult {
+  } = {}) {
     return new CurrentIntervalQueryResult(timestamp, duration);
   }
 
@@ -29,7 +29,7 @@ export class CurrentIntervalQueryResult {
   }: {
     timestamp?: Temporal.Instant | string;
     duration?: Temporal.DurationLike | string;
-  } = {}): CurrentIntervalQueryResult {
+  } = {}) {
     return CurrentIntervalQueryResult.create({ timestamp, duration });
   }
 

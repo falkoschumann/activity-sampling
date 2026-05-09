@@ -1,30 +1,17 @@
 // Copyright (c) 2026 Falko Schumann. All rights reserved. MIT license.
 
-import { Temporal } from "@js-temporal/polyfill";
-
-export interface TimerStoppedEventInit {
-  readonly timestamp: Temporal.Instant | string;
-}
+export const TIMER_STOPPED_EVENT = "timerStopped";
 
 export class TimerStoppedEvent extends Event {
-  static create(eventInitDict: TimerStoppedEventInit): TimerStoppedEvent {
-    return new TimerStoppedEvent(TimerStoppedEvent.TYPE, eventInitDict);
+  static create(_options = {}) {
+    return new TimerStoppedEvent();
   }
 
-  static createTestInstance({
-    timestamp = "2026-03-29T14:54:00Z",
-  }: {
-    timestamp?: Temporal.Instant | string;
-  } = {}): TimerStoppedEvent {
-    return TimerStoppedEvent.create({ timestamp });
+  static createTestInstance() {
+    return TimerStoppedEvent.create();
   }
 
-  static readonly TYPE = "timerStopped";
-
-  readonly timestamp: Temporal.Instant;
-
-  private constructor(type: string, eventInitDict: TimerStoppedEventInit) {
-    super(type);
-    this.timestamp = Temporal.Instant.from(eventInitDict.timestamp);
+  private constructor() {
+    super(TIMER_STOPPED_EVENT);
   }
 }

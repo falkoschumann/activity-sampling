@@ -11,7 +11,7 @@ export class StatisticsQuery {
     scope: StatisticsScope;
     categories?: string[];
     timeZone?: Temporal.TimeZoneLike;
-  }): StatisticsQuery {
+  }) {
     return new StatisticsQuery(scope, categories, timeZone);
   }
 
@@ -23,7 +23,7 @@ export class StatisticsQuery {
     scope?: StatisticsScope;
     categories?: string[];
     timeZone?: Temporal.TimeZoneLike;
-  } = {}): StatisticsQuery {
+  } = {}) {
     return StatisticsQuery.create({ scope, categories, timeZone });
   }
 
@@ -61,7 +61,7 @@ export class StatisticsQueryResult {
     median?: Median;
     categories?: string[];
     totalCount?: number;
-  } = {}): StatisticsQueryResult {
+  } = {}) {
     return new StatisticsQueryResult(
       Histogram.create(histogram),
       Median.create(median),
@@ -80,7 +80,7 @@ export class StatisticsQueryResult {
     median?: Median;
     categories?: string[];
     totalCount?: number;
-  } = {}): StatisticsQueryResult {
+  } = {}) {
     return StatisticsQueryResult.create({
       histogram,
       median,

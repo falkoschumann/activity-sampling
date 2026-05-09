@@ -316,10 +316,7 @@ describe("Timer", () => {
         },
       };
 
-      state = reducer(
-        state,
-        timerStopped({ timestamp: "2025-10-07T18:22:00Z" }),
-      );
+      state = reducer(state, timerStopped());
 
       expect(state).toEqual<State>({
         ...initialState,
@@ -360,10 +357,7 @@ describe("Timer", () => {
         },
       };
 
-      state = reducer(
-        state,
-        timerStopped({ timestamp: "2025-10-07T18:22:00Z" }),
-      );
+      state = reducer(state, timerStopped());
 
       expect(state).toEqual<State>({
         ...initialState,

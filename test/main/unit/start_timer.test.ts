@@ -6,7 +6,10 @@ import { describe, expect, it } from "vitest";
 
 import { StartTimerCommandHandler } from "../../../src/main/application/start_timer_command_handler";
 import { StartTimerCommand } from "../../../src/shared/domain/start_timer_command";
-import { TimerStartedEvent } from "../../../src/shared/domain/timer_started_event";
+import {
+  TIMER_STARTED_EVENT,
+  TimerStartedEvent,
+} from "../../../src/shared/domain/timer_started_event";
 import { TimerState } from "../../../src/main/domain/timer_state";
 
 describe("Start timer", () => {
@@ -17,10 +20,7 @@ describe("Start timer", () => {
         timerState,
         fixedInstant: "2025-08-28T19:41:00Z",
       });
-      const trackedEvents = EventTracker.create(
-        handler,
-        TimerStartedEvent.TYPE,
-      );
+      const trackedEvents = EventTracker.create(handler, TIMER_STARTED_EVENT);
 
       handler.handle(StartTimerCommand.create({ interval: "PT30M" }));
 

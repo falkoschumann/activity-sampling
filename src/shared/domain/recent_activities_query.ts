@@ -13,7 +13,7 @@ export class RecentActivitiesQuery {
   }: {
     today?: Temporal.PlainDateLike | string;
     timeZone?: Temporal.TimeZoneLike;
-  } = {}): RecentActivitiesQuery {
+  } = {}) {
     return new RecentActivitiesQuery(today, timeZone);
   }
 
@@ -23,7 +23,7 @@ export class RecentActivitiesQuery {
   }: {
     today?: Temporal.PlainDateLike | string;
     timeZone?: Temporal.TimeZoneLike;
-  } = {}): RecentActivitiesQuery {
+  } = {}) {
     return RecentActivitiesQuery.create({ today, timeZone });
   }
 
@@ -46,7 +46,7 @@ export class RecentActivitiesQueryResult {
   }: {
     workingDays?: WorkingDay[];
     timeSummary?: TimeSummary;
-  } = {}): RecentActivitiesQueryResult {
+  } = {}) {
     return new RecentActivitiesQueryResult(workingDays, timeSummary);
   }
 
@@ -56,7 +56,7 @@ export class RecentActivitiesQueryResult {
   }: {
     workingDays?: WorkingDay[];
     timeSummary?: TimeSummary;
-  } = {}): RecentActivitiesQueryResult {
+  } = {}) {
     return RecentActivitiesQueryResult.create({ workingDays, timeSummary });
   }
 
@@ -78,7 +78,7 @@ export class WorkingDay {
   }: {
     date: Temporal.PlainDateLike | string;
     activities: LoggedActivity[];
-  }): WorkingDay {
+  }) {
     return new WorkingDay(date, activities);
   }
 
@@ -88,7 +88,7 @@ export class WorkingDay {
   }: {
     date?: Temporal.PlainDateLike | string;
     activities?: LoggedActivity[];
-  } = {}): WorkingDay {
+  } = {}) {
     return WorkingDay.create({ date, activities });
   }
 
@@ -117,7 +117,7 @@ export class TimeSummary {
     hoursYesterday?: Temporal.DurationLike | string;
     hoursThisWeek?: Temporal.DurationLike | string;
     hoursThisMonth?: Temporal.DurationLike | string;
-  } = {}): TimeSummary {
+  } = {}) {
     return new TimeSummary(
       hoursToday,
       hoursYesterday,
@@ -136,7 +136,7 @@ export class TimeSummary {
     hoursYesterday?: Temporal.DurationLike | string;
     hoursThisWeek?: Temporal.DurationLike | string;
     hoursThisMonth?: Temporal.DurationLike | string;
-  } = {}): TimeSummary {
+  } = {}) {
     return TimeSummary.create({
       hoursToday,
       hoursYesterday,

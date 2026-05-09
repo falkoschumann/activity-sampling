@@ -13,7 +13,7 @@ export class TimesheetQuery {
     to: Temporal.PlainDateLike | string;
     today?: Temporal.PlainDateLike | string;
     timeZone?: Temporal.TimeZoneLike;
-  }): TimesheetQuery {
+  }) {
     return new TimesheetQuery(from, to, today, timeZone);
   }
 
@@ -27,7 +27,7 @@ export class TimesheetQuery {
     to?: Temporal.PlainDateLike | string;
     today?: Temporal.PlainDateLike | string;
     timeZone?: Temporal.TimeZoneLike;
-  } = {}): TimesheetQuery {
+  } = {}) {
     return TimesheetQuery.create({ from, to, today, timeZone });
   }
 
@@ -58,7 +58,7 @@ export class TimesheetQueryResult {
     entries?: TimesheetEntry[];
     totalHours?: Temporal.DurationLike | string;
     capacity?: Capacity;
-  } = {}): TimesheetQueryResult {
+  } = {}) {
     return new TimesheetQueryResult(entries, totalHours, capacity);
   }
 
@@ -70,7 +70,7 @@ export class TimesheetQueryResult {
     entries?: TimesheetEntry[];
     totalHours?: Temporal.DurationLike | string;
     capacity?: Capacity;
-  } = {}): TimesheetQueryResult {
+  } = {}) {
     return TimesheetQueryResult.create({ entries, totalHours, capacity });
   }
 
@@ -102,7 +102,7 @@ export class TimesheetEntry {
     project: string;
     task: string;
     hours: Temporal.DurationLike | string;
-  }): TimesheetEntry {
+  }) {
     return new TimesheetEntry(date, client, project, task, hours);
   }
 
@@ -118,7 +118,7 @@ export class TimesheetEntry {
     project?: string;
     task?: string;
     hours?: Temporal.DurationLike | string;
-  } = {}): TimesheetEntry {
+  } = {}) {
     return TimesheetEntry.create({ date, client, project, task, hours });
   }
 
@@ -150,7 +150,7 @@ export class Capacity {
   }: {
     hours?: Temporal.DurationLike | string;
     offset?: Temporal.DurationLike | string;
-  } = {}): Capacity {
+  } = {}) {
     return new Capacity(hours, offset);
   }
 
@@ -160,7 +160,7 @@ export class Capacity {
   }: {
     hours?: Temporal.DurationLike | string;
     offset?: Temporal.DurationLike | string;
-  } = {}): Capacity {
+  } = {}) {
     return Capacity.create({ hours, offset });
   }
 

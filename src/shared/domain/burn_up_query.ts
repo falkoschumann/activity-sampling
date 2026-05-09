@@ -13,7 +13,7 @@ export class BurnUpQuery {
     to: Temporal.PlainDateLike | string;
     categories?: string[];
     timeZone?: Temporal.TimeZoneLike;
-  }): BurnUpQuery {
+  }) {
     return new BurnUpQuery(from, to, categories, timeZone);
   }
 
@@ -27,7 +27,7 @@ export class BurnUpQuery {
     to?: Temporal.PlainDateLike | string;
     categories?: string[];
     timeZone?: Temporal.TimeZoneLike;
-  } = {}): BurnUpQuery {
+  } = {}) {
     return BurnUpQuery.create({ from, to, categories, timeZone });
   }
 
@@ -58,7 +58,7 @@ export class BurnUpQueryResult {
     data?: BurnUpData[];
     totalThroughput?: number;
     categories?: string[];
-  } = {}): BurnUpQueryResult {
+  } = {}) {
     return new BurnUpQueryResult(data, totalThroughput, categories);
   }
 
@@ -70,7 +70,7 @@ export class BurnUpQueryResult {
     data?: BurnUpData[];
     totalThroughput?: number;
     categories?: string[];
-  } = {}): BurnUpQueryResult {
+  } = {}) {
     return BurnUpQueryResult.create({ data, totalThroughput, categories });
   }
 
@@ -98,7 +98,7 @@ export class BurnUpData {
     date: Temporal.PlainDate | string;
     throughput: number;
     cumulativeThroughput: number;
-  }): BurnUpData {
+  }) {
     return new BurnUpData(date, throughput, cumulativeThroughput);
   }
 
@@ -110,7 +110,7 @@ export class BurnUpData {
     date?: Temporal.PlainDate | string;
     throughput?: number;
     cumulativeThroughput?: number;
-  } = {}): BurnUpData {
+  } = {}) {
     return BurnUpData.create({ date, throughput, cumulativeThroughput });
   }
 

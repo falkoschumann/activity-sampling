@@ -9,7 +9,7 @@ export class ExportTimesheetCommand {
   }: {
     timesheets: TimesheetEntry[];
     fileName: string;
-  }): ExportTimesheetCommand {
+  }) {
     return new ExportTimesheetCommand(timesheets, fileName);
   }
 
@@ -19,7 +19,7 @@ export class ExportTimesheetCommand {
   }: {
     timesheets?: TimesheetEntry[];
     fileName?: string;
-  } = {}): ExportTimesheetCommand {
+  } = {}) {
     return ExportTimesheetCommand.create({ timesheets, fileName });
   }
 
