@@ -6,9 +6,7 @@ import { LogActivityCommand } from "../../../src/shared/domain/log_activity_comm
 
 describe("Log activity command", () => {
   it("should map command", () => {
-    const command = LogActivityCommand.createTestInstance();
-
-    const json = JSON.stringify(command);
+    const json = JSON.stringify(LogActivityCommand.createTestInstance());
     const dto = JSON.parse(json);
     const model = LogActivityCommand.create(dto);
 

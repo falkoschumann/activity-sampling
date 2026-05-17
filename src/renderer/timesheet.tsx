@@ -4,11 +4,17 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "bootstrap";
 
-import TimesheetPage from "./ui/pages/timesheet";
 import "./ui/assets/style.scss";
+import { MessageHandlerContext } from "./ui/components/message_handler_context";
+import TimesheetPage from "./ui/pages/timesheet";
+import { MessageHandlerImpl } from "./message_handler";
+
+const messageHandler = MessageHandlerImpl.create();
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <TimesheetPage />
+    <MessageHandlerContext value={messageHandler}>
+      <TimesheetPage />
+    </MessageHandlerContext>
   </StrictMode>,
 );

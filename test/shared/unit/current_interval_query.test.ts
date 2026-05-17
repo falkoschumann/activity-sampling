@@ -9,9 +9,7 @@ import {
 
 describe("Current interval query", () => {
   it("should map query", () => {
-    const query = CurrentIntervalQuery.createTestInstance();
-
-    const json = JSON.stringify(query);
+    const json = JSON.stringify(CurrentIntervalQuery.createTestInstance());
     const dto = JSON.parse(json);
     const model = CurrentIntervalQuery.create(dto);
 
@@ -21,9 +19,7 @@ describe("Current interval query", () => {
   });
 
   it("should map an empty query result", () => {
-    const query = CurrentIntervalQueryResult.create();
-
-    const json = JSON.stringify(query);
+    const json = JSON.stringify(CurrentIntervalQueryResult.create());
     const dto = JSON.parse(json);
     const model = CurrentIntervalQueryResult.create(dto);
 
@@ -33,9 +29,9 @@ describe("Current interval query", () => {
   });
 
   it("should map query result", () => {
-    const query = CurrentIntervalQueryResult.createTestInstance();
-
-    const json = JSON.stringify(query);
+    const json = JSON.stringify(
+      CurrentIntervalQueryResult.createTestInstance(),
+    );
     const dto = JSON.parse(json);
     const model = CurrentIntervalQueryResult.create(dto);
 

@@ -9,9 +9,7 @@ import {
 
 describe("Statistics query", () => {
   it("should map query", () => {
-    const query = StatisticsQuery.createTestInstance();
-
-    const json = JSON.stringify(query);
+    const json = JSON.stringify(StatisticsQuery.createTestInstance());
     const dto = JSON.parse(json);
     const model = StatisticsQuery.create(dto);
 
@@ -21,9 +19,7 @@ describe("Statistics query", () => {
   });
 
   it("should map an empty query result", () => {
-    const query = StatisticsQueryResult.create();
-
-    const json = JSON.stringify(query);
+    const json = JSON.stringify(StatisticsQueryResult.create());
     const dto = JSON.parse(json);
     const model = StatisticsQueryResult.create(dto);
 
@@ -33,9 +29,7 @@ describe("Statistics query", () => {
   });
 
   it("should map query result", () => {
-    const query = StatisticsQueryResult.createTestInstance();
-
-    const json = JSON.stringify(query);
+    const json = JSON.stringify(StatisticsQueryResult.createTestInstance());
     const dto = JSON.parse(json);
     const model = StatisticsQueryResult.create(dto);
 

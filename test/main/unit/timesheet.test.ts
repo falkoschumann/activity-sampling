@@ -4,7 +4,6 @@ import { Temporal } from "@js-temporal/polyfill";
 import { describe, expect, it } from "vitest";
 
 import { TimesheetQueryHandler } from "../../../src/main/application/timesheet_query_handler";
-import { Settings } from "../../../src/shared/domain/settings";
 import { Clock } from "../../../src/shared/domain/temporal";
 import {
   Capacity,
@@ -482,7 +481,7 @@ function configure({
     "Europe/Berlin",
   );
   const handler = TimesheetQueryHandler.create({
-    capacity: Settings.create().capacity,
+    capacity: Temporal.Duration.from("PT40H"),
     eventStore,
     holidayRepository,
     vacationRepository,

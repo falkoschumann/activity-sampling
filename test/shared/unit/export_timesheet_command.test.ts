@@ -6,9 +6,7 @@ import { ExportTimesheetCommand } from "../../../src/shared/domain/export_timesh
 
 describe("Export timesheet command", () => {
   it("should map command", () => {
-    const command = ExportTimesheetCommand.createTestInstance();
-
-    const json = JSON.stringify(command);
+    const json = JSON.stringify(ExportTimesheetCommand.createTestInstance());
     const dto = JSON.parse(json);
     const model = ExportTimesheetCommand.create(dto);
 

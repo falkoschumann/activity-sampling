@@ -6,9 +6,7 @@ import { StartTimerCommand } from "../../../src/shared/domain/start_timer_comman
 
 describe("Start timer command", () => {
   it("should map command", () => {
-    const command = StartTimerCommand.createTestInstance();
-
-    const json = JSON.stringify(command);
+    const json = JSON.stringify(StartTimerCommand.createTestInstance());
     const dto = JSON.parse(json);
     const model = StartTimerCommand.create(dto);
 

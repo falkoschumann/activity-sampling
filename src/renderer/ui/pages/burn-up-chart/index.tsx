@@ -1,18 +1,33 @@
 // Copyright (c) 2026 Falko Schumann. All rights reserved. MIT license.
 
-import { useReducer } from "react";
+import { useEffect, useReducer, useState } from "react";
 
-import { useBurnUp } from "../../../application/burn_up_hook";
+import { BurnUpQuery, BurnUpQueryResult } from "../../../../shared/domain/burn_up_query";
 import * as period from "../../../domain/period";
-import * as category from "../../../domain/category";
 import CategoryComponent from "../../components/category";
+import { useMessageHandler } from "../../components/message_handler_context";
 import { PeriodComponent } from "../../components/period_component";
 import BurnUpChartComponent from "./burn_up_chart";
 import TotalThroughputComponent from "./total_throughput";
 
 export default function BurnUpChartPage() {
-  const [state, dispatch] = useReducer(reducer, { unit: period.PeriodUnit.MONTH }, init);
-  const burnUp = useBurnUp(state);
+  const [state, dispatch] = useReducer(period.reducer, { unit: period.PeriodUnit.MONTH }, period.init);
+  const [categories, setCategories] = useState<string[]>([]);
+  const [result, setResult] = useState(BurnUpQueryResult.create());
+  const messageHandler = useMessageHandler();
+
+  useEffect(() => {
+    (async function () {
+      const result = await messageHandler.queryBurnUp(
+        BurnUpQuery.create({
+          from: state.from,
+          to: state.to,
+          categories,
+        }),
+      );
+      setResult(result);
+    })();
+  }, [messageHandler, categories, state.from, state.to]);
 
   return (
     <>
@@ -37,9 +52,9 @@ export default function BurnUpChartPage() {
           <div className="btn-toolbar py-2 gap-2" role="toolbar" aria-label="Toolbar with query parameters">
             <div className="btn-group btn-group-sm" role="group" aria-label="Select category">
               <CategoryComponent
-                categories={burnUp.categories}
-                value={state.categories}
-                onChange={(categories) => dispatch(category.setCategories({ categories }))}
+                categories={result.categories}
+                value={categories}
+                onChange={(categories) => setCategories(categories)}
               />
             </div>
           </div>
@@ -47,25 +62,9 @@ export default function BurnUpChartPage() {
       </aside>
       <main className="container my-4" style={{ paddingTop: "6rem" }}>
         <h2>Burn-up Chart</h2>
-        <BurnUpChartComponent data={burnUp.data} />
-        <TotalThroughputComponent totalThroughput={burnUp.totalThroughput} unit={state.unit} />
+        <BurnUpChartComponent data={result.data} />
+        <TotalThroughputComponent totalThroughput={result.totalThroughput} unit={state.unit} />
       </main>
     </>
   );
-}
-
-type State = period.State & category.State;
-type Action = period.Action | category.Action;
-
-function init({ unit }: { unit: period.PeriodUnitType }): State {
-  return {
-    ...period.init({ unit }),
-    ...category.init(),
-  };
-}
-
-function reducer(state: State, action: Action): period.State & category.State {
-  state = period.reducer(state, action as period.Action) as State;
-  state = category.reducer(state, action as category.Action) as State;
-  return state;
 }

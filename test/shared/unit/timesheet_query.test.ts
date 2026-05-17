@@ -9,9 +9,7 @@ import {
 
 describe("Timesheet query", () => {
   it("should map query", () => {
-    const query = TimesheetQuery.createTestInstance();
-
-    const json = JSON.stringify(query);
+    const json = JSON.stringify(TimesheetQuery.createTestInstance());
     const dto = JSON.parse(json);
     const model = TimesheetQuery.create(dto);
 
@@ -19,9 +17,7 @@ describe("Timesheet query", () => {
   });
 
   it("should map an empty query result", () => {
-    const query = TimesheetQueryResult.create();
-
-    const json = JSON.stringify(query);
+    const json = JSON.stringify(TimesheetQueryResult.create());
     const dto = JSON.parse(json);
     const model = TimesheetQueryResult.create(dto);
 
@@ -29,9 +25,7 @@ describe("Timesheet query", () => {
   });
 
   it("should map query result", () => {
-    const query = TimesheetQueryResult.createTestInstance();
-
-    const json = JSON.stringify(query);
+    const json = JSON.stringify(TimesheetQueryResult.createTestInstance());
     const dto = JSON.parse(json);
     const model = TimesheetQueryResult.create(dto);
 

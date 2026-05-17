@@ -9,53 +9,17 @@ import {
   REACT_DEVELOPER_TOOLS,
 } from "electron-devtools-installer";
 
-import { StartTimerCommandHandler } from "./application/start_timer_command_handler";
-import { StopTimerCommandHandler } from "./application/stop_timer_command_handler";
+import { CurrentIntervalQueryHandler } from "./application/current_interval_query_handler";
+import { BurnUpQueryHandler } from "./application/burn_up_query_handler";
+import { EstimateQueryHandler } from "./application/estimate_query_handler";
 import { LogActivityCommandHandler } from "./application/log_activity_command_handler";
 import { ExportTimesheetCommandHandler } from "./application/export_timesheet_command_handler";
 import { RecentActivitiesQueryHandler } from "./application/recent_activities_query_handler";
 import { ReportQueryHandler } from "./application/report_query_handler";
+import { StartTimerCommandHandler } from "./application/start_timer_command_handler";
 import { StatisticsQueryHandler } from "./application/statistics_query_handler";
-import { EstimateQueryHandler } from "./application/estimate_query_handler";
-import { BurnUpQueryHandler } from "./application/burn_up_query_handler";
+import { StopTimerCommandHandler } from "./application/stop_timer_command_handler";
 import { TimesheetQueryHandler } from "./application/timesheet_query_handler";
-import { Settings } from "../shared/domain/settings";
-import { TimerState } from "./domain/timer_state";
-import {
-  INTERVAL_ELAPSED_EVENT,
-  IntervalElapsedEvent,
-} from "../shared/domain/interval_elapsed_event";
-import {
-  TIMER_STARTED_EVENT,
-  TimerStartedEvent,
-} from "../shared/domain/timer_started_event";
-import {
-  TIMER_STOPPED_EVENT,
-  TimerStoppedEvent,
-} from "../shared/domain/timer_stopped_event";
-import { EventStore } from "./infrastructure/event_store";
-import { HolidayRepository } from "./infrastructure/holiday_repository";
-import { VacationRepository } from "./infrastructure/vacation_repository";
-import { TimesheetExporter } from "./infrastructure/timesheet_exporter";
-import {
-  EXPORT_TIMESHEET_CHANNEL,
-  INTERVAL_ELAPSED_CHANNEL,
-  LOAD_SETTINGS_CHANNEL,
-  LOG_ACTIVITY_CHANNEL,
-  QUERY_BURN_UP_CHANNEL,
-  QUERY_ESTIMATE_CHANNEL,
-  QUERY_RECENT_ACTIVITIES_CHANNEL,
-  QUERY_REPORT_CHANNEL,
-  QUERY_STATISTICS_CHANNEL,
-  QUERY_TIMESHEET_CHANNEL,
-  SHOW_OPEN_DIALOG_CHANNEL,
-  STORE_SETTINGS_CHANNEL,
-  TIMER_STARTED_CHANNEL,
-  TIMER_STOPPED_CHANNEL,
-} from "../shared/infrastructure/channels";
-import { chooseDataDirectory, openWindow } from "./ui/actions";
-import { createMenu } from "./ui/menu";
-import { SettingsProvider } from "./infrastructure/settings_provider";
 import type { StartTimerCommand } from "../shared/domain/start_timer_command";
 import type { StopTimerCommand } from "../shared/domain/stop_timer_command";
 import { LogActivityCommand } from "../shared/domain/log_activity_command";
@@ -66,7 +30,35 @@ import { StatisticsQuery } from "../shared/domain/statistics_query";
 import { TimesheetQuery } from "../shared/domain/timesheet_query";
 import { EstimateQuery } from "../shared/domain/estimate_query";
 import { BurnUpQuery, BurnUpQueryResult } from "../shared/domain/burn_up_query";
-import { CurrentIntervalQueryHandler } from "./application/current_interval_query_handler";
+import { INTERVAL_ELAPSED_EVENT } from "../shared/domain/interval_elapsed_event";
+import { TIMER_STARTED_EVENT } from "../shared/domain/timer_started_event";
+import { TIMER_STOPPED_EVENT } from "../shared/domain/timer_stopped_event";
+import { Settings } from "./domain/settings";
+import { TimerState } from "./domain/timer_state";
+import { EventStore } from "./infrastructure/event_store";
+import { HolidayRepository } from "./infrastructure/holiday_repository";
+import { SettingsProvider } from "./infrastructure/settings_provider";
+import { Timer } from "./infrastructure/timer";
+import { TimesheetExporter } from "./infrastructure/timesheet_exporter";
+import {
+  EXPORT_TIMESHEET_CHANNEL,
+  INTERVAL_ELAPSED_CHANNEL,
+  LOG_ACTIVITY_CHANNEL,
+  QUERY_BURN_UP_CHANNEL,
+  QUERY_ESTIMATE_CHANNEL,
+  QUERY_RECENT_ACTIVITIES_CHANNEL,
+  QUERY_REPORT_CHANNEL,
+  QUERY_SETTINGS_CHANNEL,
+  QUERY_STATISTICS_CHANNEL,
+  QUERY_TIMESHEET_CHANNEL,
+  SHOW_OPEN_DIALOG_CHANNEL,
+  TIMER_STARTED_CHANNEL,
+  TIMER_STOPPED_CHANNEL,
+  UPDATE_SETTINGS_CHANNEL,
+} from "../shared/infrastructure/channels";
+import { VacationRepository } from "./infrastructure/vacation_repository";
+import { chooseDataDirectory, openWindow } from "./ui/actions";
+import { createMenu } from "./ui/menu";
 
 const isProduction = app.isPackaged;
 
@@ -80,18 +72,22 @@ const vacationRepository = VacationRepository.create();
 const timesheetExporter = TimesheetExporter.create();
 
 const timerState = TimerState.create();
+const timer = Timer.create();
 const startTimerCommandHandler = StartTimerCommandHandler.create({
   timerState,
+  timer,
 });
-const stopTimerCommandHandler = StopTimerCommandHandler.create();
+const stopTimerCommandHandler = StopTimerCommandHandler.create({ timer });
 const currentIntervalQueryHandler = CurrentIntervalQueryHandler.create({
   timerState,
+  timer,
 });
 const logActivityCommandHandler = LogActivityCommandHandler.create({
   eventStore,
 });
 const recentActivitiesQueryHandler = RecentActivitiesQueryHandler.create({
   eventStore,
+  settingsProvider,
 });
 const reportQueryHandler = ReportQueryHandler.create({ eventStore });
 const statisticsQueryHandler = StatisticsQueryHandler.create({ eventStore });
@@ -249,11 +245,11 @@ function createRendererToMainChannels() {
     const result = await burnUpQueryHandler.handle(query);
     return BurnUpQueryResult.create(result);
   });
-  ipcMain.handle(LOAD_SETTINGS_CHANNEL, async (_event) => {
+  ipcMain.handle(QUERY_SETTINGS_CHANNEL, async (_event) => {
     const settings = await settingsProvider.load();
     return JSON.stringify(settings);
   });
-  ipcMain.handle(STORE_SETTINGS_CHANNEL, async (_event, json: string) => {
+  ipcMain.handle(UPDATE_SETTINGS_CHANNEL, async (_event, json: string) => {
     const dto = JSON.parse(json);
     const model = Settings.create(dto);
     await settingsProvider.store(model);
@@ -299,23 +295,14 @@ function createWindow() {
 
 function createMainToLogWindowChannels(window: BrowserWindow) {
   startTimerCommandHandler.addEventListener(TIMER_STARTED_EVENT, (event) =>
-    window.webContents.send(
-      TIMER_STARTED_CHANNEL,
-      TimerStartedEvent.create(event as TimerStartedEvent),
-    ),
+    window.webContents.send(TIMER_STARTED_CHANNEL, JSON.stringify(event)),
   );
   stopTimerCommandHandler.addEventListener(TIMER_STOPPED_EVENT, (event) =>
-    window.webContents.send(
-      TIMER_STOPPED_CHANNEL,
-      TimerStoppedEvent.create(event as TimerStoppedEvent),
-    ),
+    window.webContents.send(TIMER_STOPPED_CHANNEL, JSON.stringify(event)),
   );
   currentIntervalQueryHandler.addEventListener(
     INTERVAL_ELAPSED_EVENT,
     (event) =>
-      window.webContents.send(
-        INTERVAL_ELAPSED_CHANNEL,
-        IntervalElapsedEvent.create(event as IntervalElapsedEvent),
-      ),
+      window.webContents.send(INTERVAL_ELAPSED_CHANNEL, JSON.stringify(event)),
   );
 }

@@ -6,9 +6,7 @@ import { LoggedActivity } from "../../../src/shared/domain/logged_activity";
 
 describe("Activity logged event", () => {
   it("should map command", () => {
-    const command = LoggedActivity.createTestInstance();
-
-    const json = JSON.stringify(command);
+    const json = JSON.stringify(LoggedActivity.createTestInstance());
     const dto = JSON.parse(json);
     const model = LoggedActivity.create(dto);
 

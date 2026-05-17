@@ -1,20 +1,35 @@
 // Copyright (c) 2026 Falko Schumann. All rights reserved. MIT license.
 
-import { useReducer, useState } from "react";
+import { useEffect, useReducer, useState } from "react";
 
-import { useReport } from "../../../application/report_hook";
-import { ReportScope } from "../../../../shared/domain/report_query";
-import { changePeriod, goToNextPeriod, goToPreviousPeriod, init, PeriodUnit, reducer } from "../../../domain/period";
+import { ReportQuery, ReportQueryResult, ReportScope } from "../../../../shared/domain/report_query";
+import * as period from "../../../domain/period";
+import { useMessageHandler } from "../../components/message_handler_context";
 import { PeriodComponent } from "../../components/period_component";
 import ScopeComponent from "./scope";
 import TimeReportComponent from "./time_report";
 import TotalHoursComponent from "./total_hours";
 
 export default function ReportPage() {
-  const [state, dispatch] = useReducer(reducer, { unit: PeriodUnit.MONTH }, init);
+  const [state, dispatch] = useReducer(period.reducer, { unit: period.PeriodUnit.MONTH }, period.init);
   const [scope, setScope] = useState<ReportScope>(ReportScope.PROJECTS);
+  const [result, setResult] = useState(ReportQueryResult.create());
+  const messageHandler = useMessageHandler();
 
-  const report = useReport({ ...state, scope });
+  useEffect(() => {
+    async function runAsync() {
+      const result = await messageHandler.queryReport(
+        ReportQuery.create({
+          scope,
+          from: state.from,
+          to: state.to,
+        }),
+      );
+      setResult(result);
+    }
+
+    void runAsync();
+  }, [messageHandler, scope, state.from, state.to]);
 
   return (
     <>
@@ -26,26 +41,26 @@ export default function ReportPage() {
             unit={state.unit}
             isCurrent={state.isCurrent}
             units={[
-              PeriodUnit.WEEK,
-              PeriodUnit.MONTH,
-              PeriodUnit.QUARTER,
-              PeriodUnit.HALF_YEAR,
-              PeriodUnit.YEAR,
-              PeriodUnit.ALL_TIME,
+              period.PeriodUnit.WEEK,
+              period.PeriodUnit.MONTH,
+              period.PeriodUnit.QUARTER,
+              period.PeriodUnit.HALF_YEAR,
+              period.PeriodUnit.YEAR,
+              period.PeriodUnit.ALL_TIME,
             ]}
-            onPreviousPeriod={() => dispatch(goToPreviousPeriod({}))}
-            onNextPeriod={() => dispatch(goToNextPeriod({}))}
-            onChangePeriod={(unit) => dispatch(changePeriod({ unit }))}
+            onPreviousPeriod={() => dispatch(period.goToPreviousPeriod({}))}
+            onNextPeriod={() => dispatch(period.goToNextPeriod({}))}
+            onChangePeriod={(unit) => dispatch(period.changePeriod({ unit }))}
           />
           <ScopeComponent scope={scope} onChangeScope={(scope) => setScope(scope)} />
         </div>
       </aside>
       <main className="container-fluid my-4" style={{ paddingTop: "6rem", paddingBottom: "2.5rem" }}>
-        <TimeReportComponent scope={scope} entries={report.entries} />
+        <TimeReportComponent scope={scope} entries={result.entries} />
       </main>
       <footer className="fixed-bottom bg-body-secondary">
         <div className="container-fluid py-2">
-          <TotalHoursComponent totalHours={report.totalHours} />
+          <TotalHoursComponent totalHours={result.totalHours} />
         </div>
       </footer>
     </>

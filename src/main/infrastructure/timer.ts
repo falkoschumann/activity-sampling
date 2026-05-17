@@ -3,7 +3,7 @@
 import { Clock } from "../../shared/domain/temporal";
 import { Temporal } from "@js-temporal/polyfill";
 
-export const intervalElapsedEventType = "intervalElapsed";
+export const INTERVAL_ELAPSED_EVENT = "intervalElapsed";
 
 export class Timer extends EventTarget {
   static create() {
@@ -63,7 +63,7 @@ export class Timer extends EventTarget {
   }
 
   #handleIntervalElapsed() {
-    this.dispatchEvent(new Event(intervalElapsedEventType));
+    this.dispatchEvent(new Event(INTERVAL_ELAPSED_EVENT));
 
     this.#nextTime += this.#intervalMillis;
     if (this.#isRunning) {

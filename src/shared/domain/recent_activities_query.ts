@@ -4,8 +4,6 @@ import { Temporal } from "@js-temporal/polyfill";
 
 import { LoggedActivity } from "./logged_activity";
 
-// TODO replace ActivityLoggedEvent with domain object
-
 export class RecentActivitiesQuery {
   static create({
     today,
@@ -41,29 +39,48 @@ export class RecentActivitiesQuery {
 
 export class RecentActivitiesQueryResult {
   static create({
+    categories = [],
     workingDays = [],
     timeSummary = TimeSummary.create(),
   }: {
+    categories?: string[];
     workingDays?: WorkingDay[];
     timeSummary?: TimeSummary;
   } = {}) {
-    return new RecentActivitiesQueryResult(workingDays, timeSummary);
+    return new RecentActivitiesQueryResult(
+      categories,
+      workingDays,
+      timeSummary,
+    );
   }
 
   static createTestInstance({
+    categories = ["", "Feature", "Rework", "Training"],
     workingDays = [WorkingDay.createTestInstance()],
     timeSummary = TimeSummary.createTestInstance(),
   }: {
+    categories?: string[];
     workingDays?: WorkingDay[];
     timeSummary?: TimeSummary;
   } = {}) {
-    return RecentActivitiesQueryResult.create({ workingDays, timeSummary });
+    return RecentActivitiesQueryResult.create({
+      categories,
+      workingDays,
+      timeSummary,
+    });
   }
 
+  // TODO provide possible categories and do not query settings in UI
+  readonly categories: string[];
   readonly workingDays: WorkingDay[];
   readonly timeSummary: TimeSummary;
 
-  private constructor(workingDays: WorkingDay[], timeSummary: TimeSummary) {
+  private constructor(
+    categories: string[],
+    workingDays: WorkingDay[],
+    timeSummary: TimeSummary,
+  ) {
+    this.categories = categories;
     this.workingDays = workingDays.map((workingDay) =>
       WorkingDay.create(workingDay),
     );

@@ -6,12 +6,15 @@ import { RecentActivitiesQueryHandler } from "../../../src/main/application/rece
 import { LoggedActivity } from "../../../src/shared/domain/logged_activity";
 import {
   RecentActivitiesQuery,
+  RecentActivitiesQueryResult,
   TimeSummary,
   WorkingDay,
 } from "../../../src/shared/domain/recent_activities_query";
 import { Clock } from "../../../src/shared/domain/temporal";
 import { ActivityLoggedEvent } from "../../../src/main/domain/activity_logged_event";
 import { EventStore } from "../../../src/main/infrastructure/event_store";
+import { SettingsProvider } from "../../../src/main/infrastructure/settings_provider";
+import { Settings } from "../../../src/main/domain/settings";
 
 describe("Recent Activities", () => {
   describe("Group activities by working days for the last 30 days", () => {
@@ -85,6 +88,18 @@ describe("Recent Activities", () => {
           ],
         }),
       ]);
+    });
+
+    it("returns the list of possible categories", async () => {
+      const { handler } = configure({
+        events: [],
+      });
+
+      const result = await handler.handle(RecentActivitiesQuery.create());
+
+      expect(result.categories).toEqual<string[]>(
+        RecentActivitiesQueryResult.createTestInstance().categories,
+      );
     });
   });
 
@@ -286,10 +301,17 @@ function configure({
   fixedInstant?: string;
 }) {
   const eventStore = EventStore.createNull({ events });
+  const settingsProvider = SettingsProvider.createNull({
+    readFileResponses: [Settings.createTestInstance()],
+  });
   const clock = Clock.fixed(
     fixedInstant ?? "1970-01-01T00:00:00Z",
     "Europe/Berlin",
   );
-  const handler = RecentActivitiesQueryHandler.create({ eventStore, clock });
+  const handler = RecentActivitiesQueryHandler.create({
+    eventStore,
+    settingsProvider,
+    clock,
+  });
   return { handler };
 }

@@ -9,9 +9,7 @@ import {
 
 describe("Burn-up query", () => {
   it("should map query", () => {
-    const query = BurnUpQuery.createTestInstance();
-
-    const json = JSON.stringify(query);
+    const json = JSON.stringify(BurnUpQuery.createTestInstance());
     const dto = JSON.parse(json);
     const model = BurnUpQuery.create(dto);
 
@@ -19,9 +17,7 @@ describe("Burn-up query", () => {
   });
 
   it("should map an empty query result", () => {
-    const query = BurnUpQueryResult.create();
-
-    const json = JSON.stringify(query);
+    const json = JSON.stringify(BurnUpQueryResult.create());
     const dto = JSON.parse(json);
     const model = BurnUpQueryResult.create(dto);
 
@@ -29,9 +25,7 @@ describe("Burn-up query", () => {
   });
 
   it("should map query result", () => {
-    const query = BurnUpQueryResult.createTestInstance();
-
-    const json = JSON.stringify(query);
+    const json = JSON.stringify(BurnUpQueryResult.createTestInstance());
     const dto = JSON.parse(json);
     const model = BurnUpQueryResult.create(dto);
 

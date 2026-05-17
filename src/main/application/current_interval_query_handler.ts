@@ -7,14 +7,20 @@ import {
 import { IntervalElapsedEvent } from "../../shared/domain/interval_elapsed_event";
 import { Clock } from "../../shared/domain/temporal";
 import type { TimerState } from "../domain/timer_state";
-import { intervalElapsedEventType, Timer } from "../infrastructure/timer";
+import { INTERVAL_ELAPSED_EVENT, Timer } from "../infrastructure/timer";
 
 export class CurrentIntervalQueryHandler extends EventTarget {
-  static create({ timerState }: { timerState: TimerState }) {
+  static create({
+    timerState,
+    timer,
+  }: {
+    timerState: TimerState;
+    timer: Timer;
+  }) {
     return new CurrentIntervalQueryHandler(
       timerState,
+      timer,
       Clock.systemDefaultZone(),
-      Timer.create(),
     );
   }
 
@@ -27,23 +33,23 @@ export class CurrentIntervalQueryHandler extends EventTarget {
   }) {
     return new CurrentIntervalQueryHandler(
       timerState,
-      Clock.fixed(fixedInstant, "Europe/Berlin"),
       Timer.createNull({ fixedInstant }),
+      Clock.fixed(fixedInstant, "Europe/Berlin"),
     );
   }
 
-  #clock: Clock;
   #timer: Timer;
+  #clock: Clock;
 
   #timerState: TimerState;
 
-  private constructor(timerState: TimerState, clock: Clock, timer: Timer) {
+  private constructor(timerState: TimerState, timer: Timer, clock: Clock) {
     super();
     this.#timerState = timerState;
-    this.#clock = clock;
     this.#timer = timer;
+    this.#clock = clock;
 
-    timer.addEventListener(intervalElapsedEventType, () =>
+    timer.addEventListener(INTERVAL_ELAPSED_EVENT, () =>
       this.dispatchEvent(
         IntervalElapsedEvent.create({
           timestamp: this.#clock.instant(),

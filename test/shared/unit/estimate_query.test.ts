@@ -9,9 +9,7 @@ import {
 
 describe("Estimate query", () => {
   it("should map query", () => {
-    const query = EstimateQuery.createTestInstance();
-
-    const json = JSON.stringify(query);
+    const json = JSON.stringify(EstimateQuery.createTestInstance());
     const dto = JSON.parse(json);
     const model = EstimateQuery.create(dto);
 
@@ -19,9 +17,7 @@ describe("Estimate query", () => {
   });
 
   it("should map an empty query result", () => {
-    const query = EstimateQueryResult.create();
-
-    const json = JSON.stringify(query);
+    const json = JSON.stringify(EstimateQueryResult.create());
     const dto = JSON.parse(json);
     const model = EstimateQueryResult.create(dto);
 
@@ -29,9 +25,7 @@ describe("Estimate query", () => {
   });
 
   it("should map query result", () => {
-    const query = EstimateQueryResult.createTestInstance();
-
-    const json = JSON.stringify(query);
+    const json = JSON.stringify(EstimateQueryResult.createTestInstance());
     const dto = JSON.parse(json);
     const model = EstimateQueryResult.create(dto);
 

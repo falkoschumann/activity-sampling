@@ -9,11 +9,17 @@ import { Timer } from "../infrastructure/timer";
 import type { TimerState } from "../domain/timer_state";
 
 export class StartTimerCommandHandler extends EventTarget {
-  static create({ timerState }: { timerState: TimerState }) {
+  static create({
+    timerState,
+    timer,
+  }: {
+    timerState: TimerState;
+    timer: Timer;
+  }) {
     return new StartTimerCommandHandler(
       timerState,
+      timer,
       Clock.systemDefaultZone(),
-      Timer.create(),
     );
   }
 
@@ -26,21 +32,21 @@ export class StartTimerCommandHandler extends EventTarget {
   }) {
     return new StartTimerCommandHandler(
       timerState,
-      Clock.fixed(fixedInstant, "Europe/Berlin"),
       Timer.createNull({ fixedInstant }),
+      Clock.fixed(fixedInstant, "Europe/Berlin"),
     );
   }
 
-  #clock: Clock;
   #timer: Timer;
+  #clock: Clock;
 
   #timerState: TimerState;
 
-  private constructor(timerState: TimerState, clock: Clock, timer: Timer) {
+  private constructor(timerState: TimerState, timer: Timer, clock: Clock) {
     super();
     this.#timerState = timerState;
-    this.#clock = clock;
     this.#timer = timer;
+    this.#clock = clock;
   }
 
   async handle(command: StartTimerCommand): Promise<CommandStatus> {

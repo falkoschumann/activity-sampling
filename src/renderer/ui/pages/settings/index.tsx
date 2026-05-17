@@ -1,28 +1,41 @@
 // Copyright (c) 2026 Falko Schumann. All rights reserved. MIT license.
 
-import type { FormEvent } from "react";
+import { Temporal } from "@js-temporal/polyfill";
+import { type SubmitEvent, useState } from "react";
 
-import { useSettings } from "../../../application/settings_service";
+import { SettingsQueryResult } from "../../../../shared/domain/settings_query";
+import { UpdateSettingsCommand } from "../../../../shared/domain/update_settings_command";
+import { useMessageHandler } from "../../components/message_handler_context";
 
 export default function SettingsPage() {
-  const settings = useSettings();
+  const [result, setResult] = useState(SettingsQueryResult.create());
+  const [dataDir, setDataDir] = useState(result.dataDir);
+  const [capacity, setCapacity] = useState(result.capacity.total("hours"));
+  const [categories, setCategories] = useState(result.categories);
+  const messageHandler = useMessageHandler();
 
   async function handleOpenDataDir() {
-    const result = await window.activitySampling.showOpenDialog({
+    const { canceled, filePaths } = await window.activitySampling.showOpenDialog({
       title: "Choose data directory",
       properties: ["openDirectory", "createDirectory"],
     });
 
-    if (result.canceled || result.filePaths.length === 0) {
+    if (canceled || filePaths.length === 0) {
       return;
     }
 
-    settings.setDataDir(result.filePaths[0]);
+    setResult({ ...result, dataDir: filePaths[0] });
   }
 
-  async function handleSubmit(event: FormEvent) {
+  async function handleSubmit(event: SubmitEvent) {
     event.preventDefault();
-    await settings.store();
+    await messageHandler.updateSettings(
+      UpdateSettingsCommand.create({
+        dataDir,
+        capacity: Temporal.Duration.from({ hours: capacity }),
+        categories,
+      }),
+    );
   }
 
   return (
@@ -37,8 +50,8 @@ export default function SettingsPage() {
               id="dataDir"
               type="string"
               className="form-control"
-              value={settings.dataDir}
-              onChange={(e) => settings.setDataDir(e.target.value)}
+              value={dataDir}
+              onChange={(e) => setDataDir(e.target.value)}
             />
             <button className="btn btn-primary" type="button" onClick={handleOpenDataDir}>
               Choose...
@@ -53,8 +66,8 @@ export default function SettingsPage() {
             id="capacity"
             type="number"
             className="form-control"
-            value={settings.capacity}
-            onChange={(e) => settings.setCapacity(Number(e.target.value))}
+            value={capacity}
+            onChange={(e) => setCapacity(Number(e.target.value))}
           />
         </div>
         <div className="mb-3">
@@ -65,8 +78,8 @@ export default function SettingsPage() {
             id="categories"
             type="text"
             className="form-control"
-            value={settings.categories}
-            onChange={(e) => settings.setCategories(e.target.value)}
+            value={categories}
+            onChange={(e) => setCategories(e.target.value.split(",").map((c) => c.trim()))}
           />
         </div>
         <button type="submit" className="btn btn-primary">

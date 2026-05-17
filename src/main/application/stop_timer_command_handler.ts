@@ -7,8 +7,8 @@ import { TimerStoppedEvent } from "../../shared/domain/timer_stopped_event";
 import { Timer } from "../infrastructure/timer";
 
 export class StopTimerCommandHandler extends EventTarget {
-  static create() {
-    return new StopTimerCommandHandler(Timer.create());
+  static create({ timer }: { timer: Timer }) {
+    return new StopTimerCommandHandler(timer);
   }
 
   static createNull({

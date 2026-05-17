@@ -6,9 +6,7 @@ import { TimerStartedEvent } from "../../../src/shared/domain/timer_started_even
 
 describe("Timer started event", () => {
   it("should map command", () => {
-    const command = TimerStartedEvent.createTestInstance();
-
-    const json = JSON.stringify(command);
+    const json = JSON.stringify(TimerStartedEvent.createTestInstance());
     const dto = JSON.parse(json);
     const model = TimerStartedEvent.create(dto);
 

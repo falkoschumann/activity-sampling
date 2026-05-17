@@ -4,11 +4,17 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "bootstrap";
 
-import SettingsPage from "./ui/pages/settings";
 import "./ui/assets/style.scss";
+import { MessageHandlerContext } from "./ui/components/message_handler_context";
+import SettingsPage from "./ui/pages/settings";
+import { MessageHandlerImpl } from "./message_handler";
+
+const messageHandler = MessageHandlerImpl.create();
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <SettingsPage />
+    <MessageHandlerContext value={messageHandler}>
+      <SettingsPage />
+    </MessageHandlerContext>
   </StrictMode>,
 );

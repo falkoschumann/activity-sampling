@@ -5,7 +5,7 @@ import path from "node:path";
 import { Temporal } from "@js-temporal/polyfill";
 import { describe, expect, it } from "vitest";
 
-import { Settings } from "../../../src/shared/domain/settings";
+import { Settings } from "../../../src/main/domain/settings";
 import { SettingsProvider } from "../../../src/main/infrastructure/settings_provider";
 
 const NON_EXISTING_FILE = path.resolve(

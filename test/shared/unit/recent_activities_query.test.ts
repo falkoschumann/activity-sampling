@@ -9,9 +9,7 @@ import {
 
 describe("Recent activities query", () => {
   it("should map query", () => {
-    const query = RecentActivitiesQuery.createTestInstance();
-
-    const json = JSON.stringify(query);
+    const json = JSON.stringify(RecentActivitiesQuery.createTestInstance());
     const dto = JSON.parse(json);
     const model = RecentActivitiesQuery.create(dto);
 
@@ -21,9 +19,7 @@ describe("Recent activities query", () => {
   });
 
   it("should map an empty query result", () => {
-    const query = RecentActivitiesQueryResult.create();
-
-    const json = JSON.stringify(query);
+    const json = JSON.stringify(RecentActivitiesQueryResult.create());
     const dto = JSON.parse(json);
     const model = RecentActivitiesQueryResult.create(dto);
 
@@ -33,9 +29,9 @@ describe("Recent activities query", () => {
   });
 
   it("should map query result", () => {
-    const query = RecentActivitiesQueryResult.createTestInstance();
-
-    const json = JSON.stringify(query);
+    const json = JSON.stringify(
+      RecentActivitiesQueryResult.createTestInstance(),
+    );
     const dto = JSON.parse(json);
     const model = RecentActivitiesQueryResult.create(dto);
 

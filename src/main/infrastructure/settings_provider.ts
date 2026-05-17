@@ -7,7 +7,7 @@ import { ConfigurableResponses, OutputTracker } from "@muspellheim/shared";
 import Ajv from "ajv";
 import addFormats from "ajv-formats";
 
-import { Settings } from "../../shared/domain/settings";
+import { Settings } from "../domain/settings";
 
 const STORED_EVENT = "stored";
 
