@@ -187,8 +187,11 @@ export function reducer(state: State, action: Action): State {
         ...state,
         form: {
           ...state.form,
-          ...action.payload,
-          notes: action.payload.notes ? action.payload.notes : "",
+          client: action.payload.client,
+          project: action.payload.project,
+          task: action.payload.task,
+          notes: action.payload.notes ?? "",
+          category: action.payload.category ?? "",
           isLogButtonDisabled: isLogButtonDisabled(state),
         },
       };
