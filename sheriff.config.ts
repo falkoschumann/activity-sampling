@@ -46,11 +46,10 @@ export const config: SheriffConfig = {
   depRules: {
     "layer:entry": ["layer:*"],
     "layer:application": ["layer:infrastructure"],
-    "layer:ui": ["layer:application"],
     "layer:*": [sameTag, "layer:domain"],
     "ui:entry": ["ui:*"],
     "ui:page": ["ui:layout"],
-    "ui:*": [sameTag, "ui:component", "layer:domain", "layer:application"],
+    "ui:*": [sameTag, "ui:component", "layer:domain"],
     "component:*": [sameTag, "component:shared"],
   },
 };

@@ -3,8 +3,10 @@
 import { Temporal } from "@js-temporal/polyfill";
 import { useEffect, useReducer, useRef, useState } from "react";
 
-import { LogActivityCommand } from "../../../../shared/domain/log_activity_command";
 import { RecentActivitiesQuery, RecentActivitiesQueryResult } from "../../../../shared/domain/recent_activities_query";
+import { IntervalElapsedEvent } from "../../../../shared/domain/interval_elapsed_event";
+import { LogActivityCommand } from "../../../../shared/domain/log_activity_command";
+import { TimerStartedEvent } from "../../../../shared/domain/timer_started_event";
 import {
   activityLogged,
   activitySelected,
@@ -21,17 +23,33 @@ import { useMessageHandler } from "../../components/message_handler_context";
 import ScrollToTopButton from "../../components/scroll_to_top_button";
 import ActivityFormComponent from "./activity_form";
 import CountdownComponent from "./countdown";
+import { useNotification } from "./notification_hook";
 import TimeSummaryComponent from "./time_summary";
 import WorkingDaysComponent from "./working_days";
-import { TimerStartedEvent } from "../../../../shared/domain/timer_started_event";
-import { NotificationGateway } from "../../../infrastructure/notification_gateway";
-import { IntervalElapsedEvent } from "../../../../shared/domain/interval_elapsed_event";
 
 export default function LogPage() {
   const [state, dispatch] = useReducer(reducer, initialState);
   const [result, setResult] = useState(RecentActivitiesQueryResult.create());
   const messageHandler = useMessageHandler();
   const timeoutId = useRef<ReturnType<typeof globalThis.setInterval>>(undefined);
+  const { show, hide } = useNotification({
+    lastActivity: result.workingDays?.[0]?.activities?.[0],
+    onClicked: (activity) => {
+      if (activity == null) {
+        return;
+      }
+
+      dispatch(
+        activitySelected({
+          client: activity.client,
+          project: activity.project,
+          task: activity.task,
+          notes: activity.notes,
+          category: activity.category,
+        }),
+      );
+    },
+  });
 
   useEffect(() => {
     (async function () {
@@ -61,8 +79,8 @@ export default function LogPage() {
     }
 
     function handleIntervalElapsedEvent(event: IntervalElapsedEvent) {
-      NotificationGateway.getInstance().hide();
-      NotificationGateway.getInstance().show();
+      hide();
+      show();
       dispatch(intervalElapsed(event));
     }
 
@@ -75,7 +93,7 @@ export default function LogPage() {
       messageHandler.removeEventListener("timerStopped", handleTimerStoppedEvent);
       messageHandler.removeEventListener("intervalElapsed", handleIntervalElapsedEvent);
     };
-  }, [messageHandler, timeoutId]);
+  }, [hide, messageHandler, show, timeoutId]);
 
   async function handleQueryRecentActivities(query = RecentActivitiesQuery.create()) {
     const result = await messageHandler.queryRecentActivities(query);
