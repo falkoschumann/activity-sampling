@@ -3,20 +3,53 @@
 import type { CommandStatus } from "@muspellheim/shared";
 import { createContext, useContext } from "react";
 
-import { BurnUpQuery, BurnUpQueryResult } from "../../../shared/domain/burn_up_query";
-import { EstimateQuery, EstimateQueryResult } from "../../../shared/domain/estimate_query";
+import {
+  BurnUpQuery,
+  BurnUpQueryResult,
+} from "../../../shared/domain/burn_up_query";
+import {
+  EstimateQuery,
+  EstimateQueryResult,
+} from "../../../shared/domain/estimate_query";
 import { ExportTimesheetCommand } from "../../../shared/domain/export_timesheet_command";
 import { LogActivityCommand } from "../../../shared/domain/log_activity_command";
-import { RecentActivitiesQuery, RecentActivitiesQueryResult } from "../../../shared/domain/recent_activities_query";
-import { type ReportQuery, ReportQueryResult } from "../../../shared/domain/report_query";
-import { TimesheetQuery, TimesheetQueryResult } from "../../../shared/domain/timesheet_query";
-import { type StatisticsQuery, StatisticsQueryResult } from "../../../shared/domain/statistics_query";
-import { INTERVAL_ELAPSED_EVENT, IntervalElapsedEvent } from "../../../shared/domain/interval_elapsed_event";
-import { TIMER_STARTED_EVENT, TimerStartedEvent } from "../../../shared/domain/timer_started_event";
-import { TIMER_STOPPED_EVENT, TimerStoppedEvent } from "../../../shared/domain/timer_stopped_event";
-import { ACTIVITY_LOGGED_EVENT, ActivityLoggedEvent } from "../../../shared/domain/activity_logged_event";
+import {
+  RecentActivitiesQuery,
+  RecentActivitiesQueryResult,
+} from "../../../shared/domain/recent_activities_query";
+import {
+  type ReportQuery,
+  ReportQueryResult,
+} from "../../../shared/domain/report_query";
+import {
+  TimesheetQuery,
+  TimesheetQueryResult,
+} from "../../../shared/domain/timesheet_query";
+import {
+  type StatisticsQuery,
+  StatisticsQueryResult,
+} from "../../../shared/domain/statistics_query";
+import {
+  INTERVAL_ELAPSED_EVENT,
+  IntervalElapsedEvent,
+} from "../../../shared/domain/interval_elapsed_event";
+import {
+  TIMER_STARTED_EVENT,
+  TimerStartedEvent,
+} from "../../../shared/domain/timer_started_event";
+import {
+  TIMER_STOPPED_EVENT,
+  TimerStoppedEvent,
+} from "../../../shared/domain/timer_stopped_event";
+import {
+  ACTIVITY_LOGGED_EVENT,
+  ActivityLoggedEvent,
+} from "../../../shared/domain/activity_logged_event";
 import type { UpdateSettingsCommand } from "../../../shared/domain/update_settings_command";
-import { SettingsQuery, SettingsQueryResult } from "../../../shared/domain/settings_query"; // TODO Split message handler per window?
+import {
+  SettingsQuery,
+  SettingsQueryResult,
+} from "../../../shared/domain/settings_query"; // TODO Split message handler per window?
 
 // TODO Split message handler per window?
 // TODO Use start timer, stop timer and query current interval
