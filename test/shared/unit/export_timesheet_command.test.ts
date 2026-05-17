@@ -10,8 +10,6 @@ describe("Export timesheet command", () => {
     const dto = JSON.parse(json);
     const model = ExportTimesheetCommand.create(dto);
 
-    expect(model).toEqual<ExportTimesheetCommand>(
-      ExportTimesheetCommand.createTestInstance(),
-    );
+    expect(model).toEqual(ExportTimesheetCommand.createTestInstance());
   });
 });

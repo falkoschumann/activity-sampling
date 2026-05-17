@@ -10,8 +10,6 @@ describe("Interval elapsed event", () => {
     const dto = JSON.parse(json);
     const model = IntervalElapsedEvent.create(dto);
 
-    expect(model).toEqual<IntervalElapsedEvent>(
-      IntervalElapsedEvent.createTestInstance(),
-    );
+    expect(model).toEqual(IntervalElapsedEvent.createTestInstance());
   });
 });

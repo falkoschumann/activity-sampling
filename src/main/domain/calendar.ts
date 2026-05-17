@@ -12,7 +12,7 @@ export class Holiday {
     date: Temporal.PlainDateLike | string;
     title: string;
     duration?: Temporal.DurationLike | string;
-  }): Holiday {
+  }) {
     return new Holiday(date, title, duration);
   }
 
@@ -24,7 +24,7 @@ export class Holiday {
     date?: Temporal.PlainDateLike | string;
     title?: string;
     duration?: Temporal.DurationLike | string;
-  } = {}): Holiday {
+  } = {}) {
     return Holiday.create({ date, title, duration });
   }
 
@@ -52,7 +52,7 @@ export class Vacation {
   }: {
     date: Temporal.PlainDateLike | string;
     duration?: Temporal.DurationLike | string;
-  }): Vacation {
+  }) {
     return new Vacation(date, duration);
   }
 
@@ -62,7 +62,7 @@ export class Vacation {
   }: {
     date?: Temporal.PlainDateLike | string;
     duration?: Temporal.DurationLike | string;
-  } = {}): Vacation {
+  } = {}) {
     return Vacation.create({ date, duration });
   }
 
@@ -91,7 +91,7 @@ export class Calendar {
     vacations?: Vacation[];
     capacity?: Temporal.DurationLike | string;
     businessDays?: number[];
-  } = {}): Calendar {
+  } = {}) {
     return new Calendar(holidays, vacations, capacity, businessDays);
   }
 

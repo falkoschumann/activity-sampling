@@ -13,7 +13,7 @@ describe("Estimate query", () => {
     const dto = JSON.parse(json);
     const model = EstimateQuery.create(dto);
 
-    expect(model).toEqual<EstimateQuery>(EstimateQuery.createTestInstance());
+    expect(model).toEqual(EstimateQuery.createTestInstance());
   });
 
   it("should map an empty query result", () => {
@@ -21,7 +21,7 @@ describe("Estimate query", () => {
     const dto = JSON.parse(json);
     const model = EstimateQueryResult.create(dto);
 
-    expect(model).toEqual<EstimateQueryResult>(EstimateQueryResult.create());
+    expect(model).toEqual(EstimateQueryResult.create());
   });
 
   it("should map query result", () => {
@@ -29,8 +29,6 @@ describe("Estimate query", () => {
     const dto = JSON.parse(json);
     const model = EstimateQueryResult.create(dto);
 
-    expect(model).toEqual<EstimateQueryResult>(
-      EstimateQueryResult.createTestInstance(),
-    );
+    expect(model).toEqual(EstimateQueryResult.createTestInstance());
   });
 });

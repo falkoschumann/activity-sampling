@@ -13,7 +13,7 @@ describe("Report query", () => {
     const dto = JSON.parse(json);
     const model = ReportQuery.create(dto);
 
-    expect(model).toEqual<ReportQuery>(ReportQuery.createTestInstance());
+    expect(model).toEqual(ReportQuery.createTestInstance());
   });
 
   it("should map an empty query result", () => {
@@ -21,7 +21,7 @@ describe("Report query", () => {
     const dto = JSON.parse(json);
     const model = ReportQueryResult.create(dto);
 
-    expect(model).toEqual<ReportQueryResult>(ReportQueryResult.create());
+    expect(model).toEqual(ReportQueryResult.create());
   });
 
   it("should map query result", () => {
@@ -29,8 +29,6 @@ describe("Report query", () => {
     const dto = JSON.parse(json);
     const model = ReportQueryResult.create(dto);
 
-    expect(model).toEqual<ReportQueryResult>(
-      ReportQueryResult.createTestInstance(),
-    );
+    expect(model).toEqual(ReportQueryResult.createTestInstance());
   });
 });

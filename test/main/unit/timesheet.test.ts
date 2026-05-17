@@ -34,7 +34,7 @@ describe("Timesheet", () => {
         }),
       );
 
-      expect(result).toEqual<TimesheetQueryResult>(
+      expect(result).toEqual(
         TimesheetQueryResult.create({
           entries: [],
           totalHours: "PT0S",
@@ -164,9 +164,7 @@ describe("Timesheet", () => {
         }),
       );
 
-      expect(result.totalHours).toEqual<Temporal.Duration>(
-        Temporal.Duration.from("PT1H30M"),
-      );
+      expect(result.totalHours).toEqual(Temporal.Duration.from("PT1H30M"));
     });
   });
 
@@ -205,7 +203,7 @@ describe("Timesheet", () => {
         }),
       );
 
-      expect(result).toEqual<TimesheetQueryResult>(
+      expect(result).toEqual(
         TimesheetQueryResult.create({
           entries: [
             TimesheetEntry.createTestInstance({
@@ -261,10 +259,8 @@ describe("Timesheet", () => {
         }),
       );
 
-      expect(result.totalHours).toEqual<Temporal.Duration>(
-        Temporal.Duration.from("PT32H"),
-      );
-      expect(result.capacity).toEqual<Capacity>(
+      expect(result.totalHours).toEqual(Temporal.Duration.from("PT32H"));
+      expect(result.capacity).toEqual(
         Capacity.create({ hours: "PT40H", offset: "PT0S" }),
       );
     });
@@ -301,7 +297,7 @@ describe("Timesheet", () => {
         }),
       );
 
-      expect(result.capacity).toEqual<Capacity>(
+      expect(result.capacity).toEqual(
         Capacity.create({ hours: "PT40H", offset: "-PT6H" }),
       );
     });
@@ -338,7 +334,7 @@ describe("Timesheet", () => {
         }),
       );
 
-      expect(result.capacity).toEqual<Capacity>(
+      expect(result.capacity).toEqual(
         Capacity.create({ hours: "PT40H", offset: "PT6H" }),
       );
     });
@@ -376,10 +372,8 @@ describe("Timesheet", () => {
         }),
       );
 
-      expect(result.totalHours).toEqual<Temporal.Duration>(
-        Temporal.Duration.from("PT32H"),
-      );
-      expect(result.capacity).toEqual<Capacity>(
+      expect(result.totalHours).toEqual(Temporal.Duration.from("PT32H"));
+      expect(result.capacity).toEqual(
         Capacity.create({ hours: "PT40H", offset: "PT24h" }),
       );
     });
@@ -416,7 +410,7 @@ describe("Timesheet", () => {
         }),
       );
 
-      expect(result.capacity).toEqual<Capacity>(
+      expect(result.capacity).toEqual(
         Capacity.create({ hours: "PT32H", offset: "PT0S" }),
       );
     });
@@ -451,7 +445,7 @@ describe("Timesheet", () => {
         }),
       );
 
-      expect(result.capacity).toEqual<Capacity>(
+      expect(result.capacity).toEqual(
         Capacity.create({ hours: "PT32H", offset: "PT0S" }),
       );
     });

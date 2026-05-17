@@ -23,7 +23,7 @@ describe("Report", () => {
         ReportQuery.create({ scope: ReportScope.CLIENTS }),
       );
 
-      expect(result).toEqual<ReportQueryResult>(
+      expect(result).toEqual(
         ReportQueryResult.create({
           entries: [],
           totalHours: "PT0S",
@@ -58,7 +58,7 @@ describe("Report", () => {
         ReportQuery.create({ scope: ReportScope.CLIENTS }),
       );
 
-      expect(result).toEqual<ReportQueryResult>(
+      expect(result).toEqual(
         ReportQueryResult.create({
           entries: [
             ReportEntry.create({
@@ -106,7 +106,7 @@ describe("Report", () => {
         ReportQuery.create({ scope: ReportScope.CLIENTS }),
       );
 
-      expect(result).toEqual<ReportQueryResult>(
+      expect(result).toEqual(
         ReportQueryResult.create({
           entries: [
             ReportEntry.create({
@@ -155,7 +155,7 @@ describe("Report", () => {
         ReportQuery.create({ scope: ReportScope.CLIENTS }),
       );
 
-      expect(result).toEqual<ReportQueryResult>(
+      expect(result).toEqual(
         ReportQueryResult.create({
           entries: [
             ReportEntry.create({
@@ -180,7 +180,7 @@ describe("Report", () => {
         ReportQuery.create({ scope: ReportScope.PROJECTS }),
       );
 
-      expect(result).toEqual<ReportQueryResult>(
+      expect(result).toEqual(
         ReportQueryResult.create({
           entries: [],
           totalHours: "PT0S",
@@ -213,7 +213,7 @@ describe("Report", () => {
         ReportQuery.create({ scope: ReportScope.PROJECTS }),
       );
 
-      expect(result).toEqual<ReportQueryResult>(
+      expect(result).toEqual(
         ReportQueryResult.create({
           entries: [
             ReportEntry.create({
@@ -278,7 +278,7 @@ describe("Report", () => {
         ReportQuery.create({ scope: ReportScope.PROJECTS }),
       );
 
-      expect(result).toEqual<ReportQueryResult>(
+      expect(result).toEqual(
         ReportQueryResult.create({
           entries: [
             ReportEntry.create({
@@ -328,7 +328,7 @@ describe("Report", () => {
         ReportQuery.create({ scope: ReportScope.PROJECTS }),
       );
 
-      expect(result).toEqual<ReportQueryResult>(
+      expect(result).toEqual(
         ReportQueryResult.create({
           entries: [
             ReportEntry.create({
@@ -370,7 +370,7 @@ describe("Report", () => {
         ReportQuery.create({ scope: ReportScope.TASKS }),
       );
 
-      expect(result).toEqual<ReportQueryResult>(
+      expect(result).toEqual(
         ReportQueryResult.create({
           entries: [],
           totalHours: "PT0S",
@@ -403,7 +403,7 @@ describe("Report", () => {
         ReportQuery.create({ scope: ReportScope.TASKS }),
       );
 
-      expect(result).toEqual<ReportQueryResult>(
+      expect(result).toEqual(
         ReportQueryResult.create({
           entries: [
             ReportEntry.create({
@@ -457,7 +457,7 @@ describe("Report", () => {
         ReportQuery.create({ scope: ReportScope.TASKS }),
       );
 
-      expect(result).toEqual<ReportQueryResult>(
+      expect(result).toEqual(
         ReportQueryResult.create({
           entries: [
             ReportEntry.create({
@@ -530,7 +530,7 @@ describe("Report", () => {
         ReportQuery.create({ scope: ReportScope.TASKS }),
       );
 
-      expect(result).toEqual<ReportQueryResult>(
+      expect(result).toEqual(
         ReportQueryResult.create({
           entries: [
             ReportEntry.create({
@@ -593,7 +593,7 @@ describe("Report", () => {
         ReportQuery.create({ scope: ReportScope.CATEGORIES }),
       );
 
-      expect(result).toEqual<ReportQueryResult>(
+      expect(result).toEqual(
         ReportQueryResult.create({
           entries: [],
           totalHours: "PT0S",
@@ -626,7 +626,7 @@ describe("Report", () => {
         ReportQuery.create({ scope: ReportScope.CATEGORIES }),
       );
 
-      expect(result).toEqual<ReportQueryResult>(
+      expect(result).toEqual(
         ReportQueryResult.create({
           entries: [
             ReportEntry.create({
@@ -672,7 +672,7 @@ describe("Report", () => {
         ReportQuery.create({ scope: ReportScope.CATEGORIES }),
       );
 
-      expect(result).toEqual<ReportQueryResult>(
+      expect(result).toEqual(
         ReportQueryResult.create({
           entries: [
             ReportEntry.create({
@@ -720,7 +720,7 @@ describe("Report", () => {
         ReportQuery.create({ scope: ReportScope.CATEGORIES }),
       );
 
-      expect(result).toEqual<ReportQueryResult>(
+      expect(result).toEqual(
         ReportQueryResult.create({
           entries: [
             ReportEntry.create({
@@ -775,7 +775,7 @@ describe("Report", () => {
 
       const result = await handler.handle({ scope: ReportScope.CLIENTS });
 
-      expect(result).toEqual<ReportQueryResult>(
+      expect(result).toEqual(
         ReportQueryResult.create({
           entries: [
             ReportEntry.create({
@@ -834,9 +834,7 @@ describe("Report", () => {
         }),
       );
 
-      expect(result.totalHours).toEqual<Temporal.Duration>(
-        Temporal.Duration.from("PT1H30M"),
-      );
+      expect(result.totalHours).toEqual(Temporal.Duration.from("PT1H30M"));
     });
   });
 });

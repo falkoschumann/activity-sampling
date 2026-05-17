@@ -13,9 +13,7 @@ describe("Current interval query", () => {
     const dto = JSON.parse(json);
     const model = CurrentIntervalQuery.create(dto);
 
-    expect(model).toEqual<CurrentIntervalQuery>(
-      CurrentIntervalQuery.createTestInstance(),
-    );
+    expect(model).toEqual(CurrentIntervalQuery.createTestInstance());
   });
 
   it("should map an empty query result", () => {
@@ -23,9 +21,7 @@ describe("Current interval query", () => {
     const dto = JSON.parse(json);
     const model = CurrentIntervalQueryResult.create(dto);
 
-    expect(model).toEqual<CurrentIntervalQueryResult>(
-      CurrentIntervalQueryResult.create(),
-    );
+    expect(model).toEqual(CurrentIntervalQueryResult.create());
   });
 
   it("should map query result", () => {
@@ -35,8 +31,6 @@ describe("Current interval query", () => {
     const dto = JSON.parse(json);
     const model = CurrentIntervalQueryResult.create(dto);
 
-    expect(model).toEqual<CurrentIntervalQueryResult>(
-      CurrentIntervalQueryResult.createTestInstance(),
-    );
+    expect(model).toEqual(CurrentIntervalQueryResult.createTestInstance());
   });
 });

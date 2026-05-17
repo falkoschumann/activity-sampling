@@ -10,8 +10,6 @@ describe("Timer started event", () => {
     const dto = JSON.parse(json);
     const model = TimerStartedEvent.create(dto);
 
-    expect(model).toEqual<TimerStartedEvent>(
-      TimerStartedEvent.createTestInstance(),
-    );
+    expect(model).toEqual(TimerStartedEvent.createTestInstance());
   });
 });

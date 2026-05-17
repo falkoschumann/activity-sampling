@@ -17,7 +17,7 @@ import type { Options as StringifyOptions } from "csv-stringify";
 export class HolidayRepository {
   static create({
     fileName = "data/holidays.csv",
-  }: { fileName?: string } = {}): HolidayRepository {
+  }: { fileName?: string } = {}) {
     return new HolidayRepository(fileName, fsPromise);
   }
 
@@ -25,7 +25,7 @@ export class HolidayRepository {
     readFileResponses = [],
   }: {
     readFileResponses?: (Holiday[] | null | Error)[];
-  } = {}): HolidayRepository {
+  } = {}) {
     return new HolidayRepository(
       "null-holidays.csv",
       new FsPromiseStub(readFileResponses) as unknown as typeof fsPromise,

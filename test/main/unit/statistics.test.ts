@@ -22,7 +22,7 @@ describe("Statistics", () => {
         scope: StatisticsScope.WORKING_HOURS,
       });
 
-      expect(result.histogram).toEqual<Histogram>(
+      expect(result.histogram).toEqual(
         Histogram.create({
           binEdges: [],
           frequencies: [],
@@ -59,7 +59,7 @@ describe("Statistics", () => {
         scope: StatisticsScope.WORKING_HOURS,
       });
 
-      expect(result.histogram).toEqual<Histogram>(
+      expect(result.histogram).toEqual(
         Histogram.create({
           binEdges: ["0", "0.5", "1", "2", "3", "5"],
           frequencies: [0, 0, 0, 1, 2],
@@ -93,7 +93,7 @@ describe("Statistics", () => {
         scope: StatisticsScope.WORKING_HOURS,
       });
 
-      expect(result).toEqual<StatisticsQueryResult>(
+      expect(result).toEqual(
         StatisticsQueryResult.create({
           histogram: {
             binEdges: ["0", "0.5", "1", "2", "3", "5"],
@@ -143,7 +143,7 @@ describe("Statistics", () => {
         scope: StatisticsScope.WORKING_HOURS,
       });
 
-      expect(result).toEqual<StatisticsQueryResult>(
+      expect(result).toEqual(
         StatisticsQueryResult.create({
           histogram: {
             binEdges: ["0", "0.5", "1", "2", "3", "5"],
@@ -198,7 +198,7 @@ describe("Statistics", () => {
         scope: StatisticsScope.WORKING_HOURS,
       });
 
-      expect(result).toEqual<StatisticsQueryResult>(
+      expect(result).toEqual(
         StatisticsQueryResult.create({
           histogram: {
             binEdges: ["0", "0.5", "1", "2", "3", "5"],
@@ -228,7 +228,7 @@ describe("Statistics", () => {
         scope: StatisticsScope.CYCLE_TIMES,
       });
 
-      expect(result.histogram).toEqual<Histogram>(
+      expect(result.histogram).toEqual(
         Histogram.create({
           binEdges: [],
           frequencies: [],
@@ -272,7 +272,7 @@ describe("Statistics", () => {
         scope: StatisticsScope.CYCLE_TIMES,
       });
 
-      expect(result.histogram).toEqual<Histogram>(
+      expect(result.histogram).toEqual(
         Histogram.create({
           binEdges: ["0", "1", "2", "3", "5", "8"],
           frequencies: [1, 0, 0, 1, 1],
@@ -327,7 +327,7 @@ describe("Statistics", () => {
         categories: ["Category A"],
       });
 
-      expect(result).toEqual<StatisticsQueryResult>(
+      expect(result).toEqual(
         StatisticsQueryResult.create({
           histogram: {
             binEdges: ["0", "1", "2", "3", "5", "8"],
@@ -357,7 +357,7 @@ describe("Statistics", () => {
         scope: StatisticsScope.WORKING_HOURS,
       });
 
-      expect(result.median).toEqual<Median>(
+      expect(result.median).toEqual(
         Median.create({
           edge0: 0,
           edge25: 0,
@@ -395,7 +395,7 @@ describe("Statistics", () => {
         scope: StatisticsScope.WORKING_HOURS,
       });
 
-      expect(result.median).toEqual<Median>(
+      expect(result.median).toEqual(
         Median.create({
           edge0: 0,
           edge25: 3,
@@ -415,7 +415,7 @@ describe("Statistics", () => {
         scope: StatisticsScope.CYCLE_TIMES,
       });
 
-      expect(result.median).toEqual<Median>(
+      expect(result.median).toEqual(
         Median.create({
           edge0: 0,
           edge25: 0,
@@ -460,7 +460,7 @@ describe("Statistics", () => {
         scope: StatisticsScope.CYCLE_TIMES,
       });
 
-      expect(result.median).toEqual<Median>(
+      expect(result.median).toEqual(
         Median.create({
           edge0: 0,
           edge25: 1,
@@ -503,7 +503,7 @@ describe("Statistics", () => {
         categories: ["Category A"],
       });
 
-      expect(result).toEqual<StatisticsQueryResult>(
+      expect(result).toEqual(
         StatisticsQueryResult.create({
           histogram: {
             binEdges: ["0", "0.5", "1", "2", "3", "5"],
@@ -552,7 +552,7 @@ describe("Statistics", () => {
         categories: [""],
       });
 
-      expect(result).toEqual<StatisticsQueryResult>(
+      expect(result).toEqual(
         StatisticsQueryResult.create({
           histogram: {
             binEdges: ["0", "1", "2"],
@@ -597,7 +597,7 @@ describe("Statistics", () => {
         categories: ["", "Category A"],
       });
 
-      expect(result).toEqual<StatisticsQueryResult>(
+      expect(result).toEqual(
         StatisticsQueryResult.create({
           histogram: {
             binEdges: ["0", "1", "2"],
@@ -642,7 +642,7 @@ describe("Statistics", () => {
         categories: [],
       });
 
-      expect(result).toEqual<StatisticsQueryResult>(
+      expect(result).toEqual(
         StatisticsQueryResult.create({
           histogram: {
             binEdges: ["0", "1", "2"],

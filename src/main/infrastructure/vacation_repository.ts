@@ -19,7 +19,7 @@ export class VacationRepository {
     fileName = "data/vacation.csv",
   }: {
     fileName?: string;
-  } = {}): VacationRepository {
+  } = {}) {
     return new VacationRepository(fileName, fsPromise);
   }
 
@@ -27,7 +27,7 @@ export class VacationRepository {
     readFileResponses = [],
   }: {
     readFileResponses?: (Vacation[] | null | Error)[];
-  } = {}): VacationRepository {
+  } = {}) {
     return new VacationRepository(
       "null-holidays.csv",
       new FsPromiseStub(readFileResponses) as unknown as typeof fsPromise,

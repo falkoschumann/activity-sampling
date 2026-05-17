@@ -34,7 +34,7 @@ describe("Clock", () => {
 
     const now = clock.instant();
 
-    expect(now).toEqual<Temporal.Instant>(Temporal.Instant.from(fixed));
+    expect(now).toEqual(Temporal.Instant.from(fixed));
     expect(clock.zone).toBe("Europe/Berlin");
   });
 
@@ -43,7 +43,7 @@ describe("Clock", () => {
 
     const offset = Clock.offset(clock, Temporal.Duration.from("PT5M"));
 
-    expect(offset.instant()).toEqual<Temporal.Instant>(
+    expect(offset.instant()).toEqual(
       Temporal.Instant.from("2025-08-28T16:00Z"),
     );
   });

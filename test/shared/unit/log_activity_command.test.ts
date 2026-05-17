@@ -10,8 +10,6 @@ describe("Log activity command", () => {
     const dto = JSON.parse(json);
     const model = LogActivityCommand.create(dto);
 
-    expect(model).toEqual<LogActivityCommand>(
-      LogActivityCommand.createTestInstance(),
-    );
+    expect(model).toEqual(LogActivityCommand.createTestInstance());
   });
 });

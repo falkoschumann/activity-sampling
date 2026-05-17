@@ -24,7 +24,7 @@ describe("Start timer", () => {
 
       handler.handle(StartTimerCommand.create({ interval: "PT30M" }));
 
-      expect(timerState).toEqual<TimerState>(
+      expect(timerState).toEqual(
         TimerState.create({ currentInterval: "PT30M" }),
       );
       expect(trackedEvents.events).toEqual<TimerStartedEvent[]>([

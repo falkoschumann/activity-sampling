@@ -48,7 +48,7 @@ describe("Settings provider", () => {
 
       const settings = await gateway.load();
 
-      expect(settings).toEqual<Settings>(
+      expect(settings).toEqual(
         Settings.create({
           dataDir: "other-data",
           capacity: Temporal.Duration.from("PT40H"),
@@ -61,7 +61,7 @@ describe("Settings provider", () => {
 
       const settings = await gateway.load();
 
-      expect(settings).toEqual<Settings>(
+      expect(settings).toEqual(
         Settings.create({
           dataDir: "other-data",
           capacity: Temporal.Duration.from("PT20H"),
@@ -90,7 +90,7 @@ describe("Settings provider", () => {
       await gateway.store(example);
 
       const settings = await gateway.load();
-      expect(settings).toEqual<Settings>(example);
+      expect(settings).toEqual(example);
     });
   });
 
@@ -119,7 +119,7 @@ describe("Settings provider", () => {
 
         const settings = await gateway.load();
 
-        expect(settings).toEqual<Settings>(
+        expect(settings).toEqual(
           Settings.create({
             dataDir: "data-dir",
             capacity: "PT20H",

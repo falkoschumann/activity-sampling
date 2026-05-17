@@ -185,6 +185,6 @@ describe("Holiday", () => {
     const dto = JSON.parse(json);
     const model = Holiday.create(dto);
 
-    expect(model).toEqual<Holiday>(Holiday.createTestInstance());
+    expect(model).toEqual(Holiday.createTestInstance());
   });
 });

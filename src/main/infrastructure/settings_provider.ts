@@ -14,7 +14,7 @@ const STORED_EVENT = "stored";
 export class SettingsProvider extends EventTarget {
   static create({
     fileName = "data/settings.json",
-  }: { fileName?: string } = {}): SettingsProvider {
+  }: { fileName?: string } = {}) {
     return new SettingsProvider(fileName, fsPromise);
   }
 
@@ -22,7 +22,7 @@ export class SettingsProvider extends EventTarget {
     readFileResponses = [],
   }: {
     readFileResponses?: (Settings | null | Error)[];
-  } = {}): SettingsProvider {
+  } = {}) {
     return new SettingsProvider(
       "null-settings.json",
       new FsPromiseStub(readFileResponses) as unknown as typeof fsPromise,

@@ -9,11 +9,11 @@ import { stringify } from "csv/sync";
 import type { Options as StringifyOptions } from "csv-stringify";
 
 export class TimesheetExporter extends EventTarget {
-  static create(): TimesheetExporter {
+  static create() {
     return new TimesheetExporter(fsPromise);
   }
 
-  static createNull(): TimesheetExporter {
+  static createNull() {
     return new TimesheetExporter(
       new FsPromiseStub() as unknown as typeof fsPromise,
     );
@@ -60,7 +60,7 @@ export class Timesheet {
     hours: number;
     firstName: string;
     lastName: string;
-  }): Timesheet {
+  }) {
     return new Timesheet(
       date,
       client,
@@ -91,7 +91,7 @@ export class Timesheet {
     hours?: number;
     firstName?: string;
     lastName?: string;
-  } = {}): Timesheet {
+  } = {}) {
     return Timesheet.create({
       date,
       client,

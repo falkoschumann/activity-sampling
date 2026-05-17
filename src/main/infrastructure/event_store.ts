@@ -17,13 +17,11 @@ import { ActivityLoggedEvent } from "../domain/activity_logged_event";
 export class EventStore extends EventTarget {
   static create({
     fileName = "data/activity-log.csv",
-  }: { fileName?: string } = {}): EventStore {
+  }: { fileName?: string } = {}) {
     return new EventStore(fileName, fsPromise);
   }
 
-  static createNull({
-    events,
-  }: { events?: ActivityLoggedEvent[] } = {}): EventStore {
+  static createNull({ events }: { events?: ActivityLoggedEvent[] } = {}) {
     return new EventStore(
       "null-activity-log.csv",
       new FsPromiseStub(events) as unknown as typeof fsPromise,

@@ -13,9 +13,7 @@ describe("Statistics query", () => {
     const dto = JSON.parse(json);
     const model = StatisticsQuery.create(dto);
 
-    expect(model).toEqual<StatisticsQuery>(
-      StatisticsQuery.createTestInstance(),
-    );
+    expect(model).toEqual(StatisticsQuery.createTestInstance());
   });
 
   it("should map an empty query result", () => {
@@ -23,9 +21,7 @@ describe("Statistics query", () => {
     const dto = JSON.parse(json);
     const model = StatisticsQueryResult.create(dto);
 
-    expect(model).toEqual<StatisticsQueryResult>(
-      StatisticsQueryResult.create(),
-    );
+    expect(model).toEqual(StatisticsQueryResult.create());
   });
 
   it("should map query result", () => {
@@ -33,8 +29,6 @@ describe("Statistics query", () => {
     const dto = JSON.parse(json);
     const model = StatisticsQueryResult.create(dto);
 
-    expect(model).toEqual<StatisticsQueryResult>(
-      StatisticsQueryResult.createTestInstance(),
-    );
+    expect(model).toEqual(StatisticsQueryResult.createTestInstance());
   });
 });

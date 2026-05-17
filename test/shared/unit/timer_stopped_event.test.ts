@@ -10,8 +10,6 @@ describe("Timer stopped event", () => {
     const dto = JSON.parse(json);
     const model = TimerStoppedEvent.create(dto);
 
-    expect(model).toEqual<TimerStoppedEvent>(
-      TimerStoppedEvent.createTestInstance(),
-    );
+    expect(model).toEqual(TimerStoppedEvent.createTestInstance());
   });
 });

@@ -13,9 +13,7 @@ describe("Recent activities query", () => {
     const dto = JSON.parse(json);
     const model = RecentActivitiesQuery.create(dto);
 
-    expect(model).toEqual<RecentActivitiesQuery>(
-      RecentActivitiesQuery.createTestInstance(),
-    );
+    expect(model).toEqual(RecentActivitiesQuery.createTestInstance());
   });
 
   it("should map an empty query result", () => {
@@ -23,9 +21,7 @@ describe("Recent activities query", () => {
     const dto = JSON.parse(json);
     const model = RecentActivitiesQueryResult.create(dto);
 
-    expect(model).toEqual<RecentActivitiesQueryResult>(
-      RecentActivitiesQueryResult.create(),
-    );
+    expect(model).toEqual(RecentActivitiesQueryResult.create());
   });
 
   it("should map query result", () => {
@@ -35,8 +31,6 @@ describe("Recent activities query", () => {
     const dto = JSON.parse(json);
     const model = RecentActivitiesQueryResult.create(dto);
 
-    expect(model).toEqual<RecentActivitiesQueryResult>(
-      RecentActivitiesQueryResult.createTestInstance(),
-    );
+    expect(model).toEqual(RecentActivitiesQueryResult.createTestInstance());
   });
 });

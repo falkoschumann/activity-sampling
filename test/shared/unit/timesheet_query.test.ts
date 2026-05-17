@@ -13,7 +13,7 @@ describe("Timesheet query", () => {
     const dto = JSON.parse(json);
     const model = TimesheetQuery.create(dto);
 
-    expect(model).toEqual<TimesheetQuery>(TimesheetQuery.createTestInstance());
+    expect(model).toEqual(TimesheetQuery.createTestInstance());
   });
 
   it("should map an empty query result", () => {
@@ -21,7 +21,7 @@ describe("Timesheet query", () => {
     const dto = JSON.parse(json);
     const model = TimesheetQueryResult.create(dto);
 
-    expect(model).toEqual<TimesheetQueryResult>(TimesheetQueryResult.create());
+    expect(model).toEqual(TimesheetQueryResult.create());
   });
 
   it("should map query result", () => {
@@ -29,8 +29,6 @@ describe("Timesheet query", () => {
     const dto = JSON.parse(json);
     const model = TimesheetQueryResult.create(dto);
 
-    expect(model).toEqual<TimesheetQueryResult>(
-      TimesheetQueryResult.createTestInstance(),
-    );
+    expect(model).toEqual(TimesheetQueryResult.createTestInstance());
   });
 });

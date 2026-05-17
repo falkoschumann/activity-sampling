@@ -10,8 +10,6 @@ describe("Start timer command", () => {
     const dto = JSON.parse(json);
     const model = StartTimerCommand.create(dto);
 
-    expect(model).toEqual<StartTimerCommand>(
-      StartTimerCommand.createTestInstance(),
-    );
+    expect(model).toEqual(StartTimerCommand.createTestInstance());
   });
 });

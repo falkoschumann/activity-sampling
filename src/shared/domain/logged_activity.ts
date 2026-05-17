@@ -21,7 +21,7 @@ export class LoggedActivity {
     task: string;
     notes?: string;
     category?: string;
-  }): LoggedActivity {
+  }) {
     return new LoggedActivity(
       dateTime,
       duration,
@@ -49,7 +49,7 @@ export class LoggedActivity {
     task?: string;
     notes?: string;
     category?: string;
-  } = {}): LoggedActivity {
+  } = {}) {
     return LoggedActivity.create({
       dateTime,
       duration,

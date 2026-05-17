@@ -11,7 +11,7 @@ export class Settings {
     dataDir?: string;
     capacity?: Temporal.DurationLike | string;
     categories?: string[];
-  } = {}): Settings {
+  } = {}) {
     return new Settings(dataDir, capacity, categories);
   }
 
@@ -23,7 +23,7 @@ export class Settings {
     dataDir?: string;
     capacity?: Temporal.DurationLike | string;
     categories?: string[];
-  } = {}): Settings {
+  } = {}) {
     return Settings.create({ dataDir, capacity, categories });
   }
 

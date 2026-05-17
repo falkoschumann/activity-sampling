@@ -164,6 +164,6 @@ describe("Vacation", () => {
     const dto = JSON.parse(json);
     const model = Vacation.create(dto);
 
-    expect(model).toEqual<Vacation>(Vacation.createTestInstance());
+    expect(model).toEqual(Vacation.createTestInstance());
   });
 });

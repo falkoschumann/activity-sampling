@@ -10,6 +10,6 @@ describe("Activity logged event", () => {
     const dto = JSON.parse(json);
     const model = LoggedActivity.create(dto);
 
-    expect(model).toEqual<LoggedActivity>(LoggedActivity.createTestInstance());
+    expect(model).toEqual(LoggedActivity.createTestInstance());
   });
 });

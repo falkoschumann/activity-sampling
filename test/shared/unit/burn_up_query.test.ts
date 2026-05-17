@@ -13,7 +13,7 @@ describe("Burn-up query", () => {
     const dto = JSON.parse(json);
     const model = BurnUpQuery.create(dto);
 
-    expect(model).toEqual<BurnUpQuery>(BurnUpQuery.createTestInstance());
+    expect(model).toEqual(BurnUpQuery.createTestInstance());
   });
 
   it("should map an empty query result", () => {
@@ -21,7 +21,7 @@ describe("Burn-up query", () => {
     const dto = JSON.parse(json);
     const model = BurnUpQueryResult.create(dto);
 
-    expect(model).toEqual<BurnUpQueryResult>(BurnUpQueryResult.create());
+    expect(model).toEqual(BurnUpQueryResult.create());
   });
 
   it("should map query result", () => {
@@ -29,8 +29,6 @@ describe("Burn-up query", () => {
     const dto = JSON.parse(json);
     const model = BurnUpQueryResult.create(dto);
 
-    expect(model).toEqual<BurnUpQueryResult>(
-      BurnUpQueryResult.createTestInstance(),
-    );
+    expect(model).toEqual(BurnUpQueryResult.createTestInstance());
   });
 });

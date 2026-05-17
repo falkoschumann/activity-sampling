@@ -59,7 +59,7 @@ describe("Estimate", () => {
 
       const result = await handler.handle(EstimateQuery.create({}));
 
-      expect(result).toEqual<EstimateQueryResult>(
+      expect(result).toEqual(
         EstimateQueryResult.create({
           cycleTimes: [
             {
@@ -109,7 +109,7 @@ describe("Estimate", () => {
 
       const result = await handler.handle(EstimateQuery.create({}));
 
-      expect(result).toEqual<EstimateQueryResult>(
+      expect(result).toEqual(
         EstimateQueryResult.create({
           cycleTimes: [
             {
@@ -162,7 +162,7 @@ describe("Estimate", () => {
         EstimateQuery.create({ categories: ["Category A"] }),
       );
 
-      expect(result).toEqual<EstimateQueryResult>(
+      expect(result).toEqual(
         EstimateQueryResult.create({
           cycleTimes: [
             {
@@ -205,7 +205,7 @@ describe("Estimate", () => {
         EstimateQuery.create({ categories: [""] }),
       );
 
-      expect(result).toEqual<EstimateQueryResult>(
+      expect(result).toEqual(
         EstimateQueryResult.create({
           cycleTimes: [
             {
@@ -244,7 +244,7 @@ describe("Estimate", () => {
         EstimateQuery.create({ categories: ["", "Category A"] }),
       );
 
-      expect(result).toEqual<EstimateQueryResult>(
+      expect(result).toEqual(
         EstimateQueryResult.create({
           cycleTimes: [
             {
@@ -283,7 +283,7 @@ describe("Estimate", () => {
         EstimateQuery.create({ categories: [] }),
       );
 
-      expect(result).toEqual<EstimateQueryResult>(
+      expect(result).toEqual(
         EstimateQueryResult.create({
           cycleTimes: [
             {

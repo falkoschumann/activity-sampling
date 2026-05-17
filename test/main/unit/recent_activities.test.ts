@@ -111,7 +111,7 @@ describe("Recent Activities", () => {
 
       const result = await handler.handle(RecentActivitiesQuery.create());
 
-      expect(result.timeSummary).toEqual<TimeSummary>(
+      expect(result.timeSummary).toEqual(
         TimeSummary.create({
           hoursToday: "PT0S",
           hoursYesterday: "PT0S",
@@ -179,7 +179,7 @@ describe("Recent Activities", () => {
         RecentActivitiesQuery.create({ today: "2025-06-05" }),
       );
 
-      expect(result.timeSummary).toEqual<TimeSummary>(
+      expect(result.timeSummary).toEqual(
         TimeSummary.create({
           hoursToday: "PT1H",
           hoursYesterday: "PT1H30M",
@@ -230,7 +230,7 @@ describe("Recent Activities", () => {
         RecentActivitiesQuery.create({ today: "2025-12-13" }),
       );
 
-      expect(result.timeSummary).toEqual<TimeSummary>(
+      expect(result.timeSummary).toEqual(
         TimeSummary.create({
           hoursToday: "PT30M",
           hoursYesterday: "PT30M",
@@ -281,7 +281,7 @@ describe("Recent Activities", () => {
         RecentActivitiesQuery.create({ today: "2025-02-13" }),
       );
 
-      expect(result.timeSummary).toEqual<TimeSummary>(
+      expect(result.timeSummary).toEqual(
         TimeSummary.create({
           hoursToday: "PT30M",
           hoursYesterday: "PT30M",
