@@ -45,13 +45,13 @@ const options: Configuration = {
     createDesktopShortcut: "always",
   },
   mac: {
-    entitlementsInherit: "resources/entitlements.mac.plist",
+    entitlementsInherit: "build/entitlements.mac.plist",
     extendInfo: [
       "NSDocumentsFolderUsageDescription: Application requests access to the user's Documents folder.",
       "NSDownloadsFolderUsageDescription: Application requests access to the user's Downloads folder.",
     ],
-    notarize: process.env["SIGN"] === "true",
-    identity: process.env["SIGN"] === "true" ? undefined : null,
+    notarize: process.env["MAC_SIGN"] === "true",
+    identity: process.env["MAC_SIGN"] === "true" ? undefined : null,
   },
   dmg: {
     artifactName: "${name}-${version}.${ext}",
