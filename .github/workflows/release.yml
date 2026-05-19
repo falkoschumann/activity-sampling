@@ -16,6 +16,8 @@ jobs:
     strategy:
       matrix:
         os: [macos-latest, ubuntu-latest, windows-latest]
+    env:
+      GH_TOKEN: ${{ github.token }}
     steps:
       - name: Checkout source code
         uses: actions/checkout@v6
