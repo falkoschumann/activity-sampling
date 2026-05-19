@@ -1,8 +1,9 @@
 // Copyright (c) 2026 Falko Schumann. All rights reserved. MIT license.
 
 import { Temporal } from "@js-temporal/polyfill";
-import { useEffect, useReducer, useRef, useState } from "react";
+import { useCallback, useEffect, useReducer, useRef, useState } from "react";
 
+import type { LoggedActivity } from "../../../../shared/domain/logged_activity";
 import { RecentActivitiesQuery, RecentActivitiesQueryResult } from "../../../../shared/domain/recent_activities_query";
 import { IntervalElapsedEvent } from "../../../../shared/domain/interval_elapsed_event";
 import { LogActivityCommand } from "../../../../shared/domain/log_activity_command";
@@ -32,28 +33,10 @@ export default function LogPage() {
   const [result, setResult] = useState(RecentActivitiesQueryResult.create());
   const messageHandler = useMessageHandler();
   const timeoutId = useRef<ReturnType<typeof globalThis.setInterval>>(undefined);
-  const { show, hide } = useNotification({
-    lastActivity: result.workingDays?.[0]?.activities?.[0],
-    onClicked: (activity) => {
-      if (activity == null) {
-        return;
-      }
 
-      dispatch(
-        activitySelected({
-          client: activity.client,
-          project: activity.project,
-          task: activity.task,
-          notes: activity.notes,
-          category: activity.category,
-        }),
-      );
-    },
-  });
-
-  useEffect(() => {
-    (async function () {
-      const result = await messageHandler.queryRecentActivities(RecentActivitiesQuery.create());
+  const handleQueryRecentActivities = useCallback(
+    async (query = RecentActivitiesQuery.create()) => {
+      const result = await messageHandler.queryRecentActivities(query);
       setResult(result);
 
       const activity = result.workingDays?.[0]?.activities?.[0];
@@ -68,8 +51,65 @@ export default function LogPage() {
           }),
         );
       }
+    },
+    [messageHandler],
+  );
+
+  const handleSubmitActivity = useCallback(async () => {
+    await messageHandler.logActivity(
+      LogActivityCommand.create({
+        timestamp: Temporal.Now.instant(),
+        duration: Temporal.Duration.from(state.countdown.interval),
+        client: state.form.client,
+        project: state.form.project,
+        task: state.form.task,
+        notes: state.form.notes,
+        category: state.form.category,
+      }),
+    );
+    dispatch(activityLogged());
+    await handleQueryRecentActivities();
+  }, [
+    handleQueryRecentActivities,
+    messageHandler,
+    state.countdown.interval,
+    state.form.category,
+    state.form.client,
+    state.form.notes,
+    state.form.project,
+    state.form.task,
+  ]);
+
+  const handleNotificationClicked = useCallback(
+    async (activity?: LoggedActivity) => {
+      if (activity == null) {
+        return;
+      }
+
+      dispatch(
+        activitySelected({
+          client: activity.client,
+          project: activity.project,
+          task: activity.task,
+          notes: activity.notes,
+          category: activity.category,
+        }),
+      );
+      await handleSubmitActivity();
+    },
+    [handleSubmitActivity],
+  );
+
+  const { show, hide } = useNotification({
+    lastActivity: result.workingDays?.[0]?.activities?.[0],
+    onClicked: handleNotificationClicked,
+  });
+
+  useEffect(() => {
+    (async function () {
+      await handleQueryRecentActivities();
     })();
-  }, [messageHandler]);
+  }, [handleQueryRecentActivities]);
 
   useEffect(() => {
     function handleTimerStartedEvent(event: TimerStartedEvent) {
@@ -107,40 +147,6 @@ export default function LogPage() {
       messageHandler.removeEventListener("intervalElapsed", handleIntervalElapsedEvent);
     };
   }, [hide, messageHandler, show, timeoutId]);
-
-  async function handleQueryRecentActivities(query = RecentActivitiesQuery.create()) {
-    const result = await messageHandler.queryRecentActivities(query);
-    setResult(result);
-
-    const activity = result.workingDays?.[0]?.activities?.[0];
-    if (activity != null) {
-      dispatch(
-        activitySelected({
-          client: activity.client,
-          project: activity.project,
-          task: activity.task,
-          notes: activity.notes,
-          category: activity.category,
-        }),
-      );
-    }
-  }
-
-  async function handleSubmitActivity() {
-    await messageHandler.logActivity(
-      LogActivityCommand.create({
-        timestamp: Temporal.Now.instant(),
-        duration: Temporal.Duration.from(state.countdown.interval),
-        client: state.form.client,
-        project: state.form.project,
-        task: state.form.task,
-        notes: state.form.notes,
-        category: state.form.category,
-      }),
-    );
-    dispatch(activityLogged());
-    await handleQueryRecentActivities();
-  }
 
   return (
     <>
