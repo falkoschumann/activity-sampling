@@ -31,8 +31,13 @@ jobs:
           node-version: "lts/*"
       - name: Build package
         run: make dist
+      - name: Set OS‑specific distribution file
+        run: |
+          case $RUNNER_OS in
+            Linux) echo "DIST_FILE=./dist/*.deb" >> $GITHUB_ENV ;;
+            macOS) echo "DIST_FILE=./dist/*.dmg" >> $GITHUB_ENV ;;
+            Windows) echo "DIST_FILE=./dist/*.exe" >> $GITHUB_ENV ;;
+          esac
       - name: Create release
-        run:
-          gh release create v1.2.3 --generate-notes --prerelease ./dist/*.deb ./dist/*.dmg
-          ./dist/*.exe
+        run: gh release create v1.2.3 --generate-notes --prerelease ${{ env.DIST_FILE }}
         #run: gh release create v1.2.3 --notes-from-tag ./dist/*.deb ./dist/*.dmg ./dist/*.exe
