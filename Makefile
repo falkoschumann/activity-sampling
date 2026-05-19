@@ -25,6 +25,7 @@ dist: build
 	$(PM) run $(RUN_OPTIONS) build:electron
 #	$(PM) run $(RUN_OPTIONS) build:mac
 #	$(PM) run $(RUN_OPTIONS) build:win
+#	$(PM) run $(RUN_OPTIONS) build:linux
 
 start: prepare
 	$(PM) run $(RUN_OPTIONS) start
