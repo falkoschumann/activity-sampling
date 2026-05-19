@@ -55,6 +55,19 @@ export default function LogPage() {
     (async function () {
       const result = await messageHandler.queryRecentActivities(RecentActivitiesQuery.create());
       setResult(result);
+
+      const activity = result.workingDays?.[0]?.activities?.[0];
+      if (activity != null) {
+        dispatch(
+          activitySelected({
+            client: activity.client,
+            project: activity.project,
+            task: activity.task,
+            notes: activity.notes,
+            category: activity.category,
+          }),
+        );
+      }
     })();
   }, [messageHandler]);
 
@@ -98,6 +111,19 @@ export default function LogPage() {
   async function handleQueryRecentActivities(query = RecentActivitiesQuery.create()) {
     const result = await messageHandler.queryRecentActivities(query);
     setResult(result);
+
+    const activity = result.workingDays?.[0]?.activities?.[0];
+    if (activity != null) {
+      dispatch(
+        activitySelected({
+          client: activity.client,
+          project: activity.project,
+          task: activity.task,
+          notes: activity.notes,
+          category: activity.category,
+        }),
+      );
+    }
   }
 
   async function handleSubmitActivity() {
