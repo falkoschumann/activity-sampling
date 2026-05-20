@@ -9,7 +9,18 @@ permissions:
   contents: write
 
 jobs:
-  release:
+  create-release:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - name: Create release
+        run: |
+          gh release create ${{ github.ref_name }} \
+            --verify-tag \
+            --generate-notes \
+            --draft
+  upload-assets:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -27,9 +38,10 @@ jobs:
         uses: actions/setup-node@v6
         with:
           node-version: "lts/*"
-      - name: Build package
+      - name: Build distribution file
+        shell: bash
         run: make dist
-      - name: Set OS‑specific distribution file
+      - name: Determine OS‑specific distribution file
         shell: bash
         run: |
           case $RUNNER_OS in
@@ -37,10 +49,7 @@ jobs:
             macOS) echo "DIST_FILE=./dist/*.dmg" >> $GITHUB_ENV ;;
             Windows) echo "DIST_FILE=./dist/*.exe" >> $GITHUB_ENV ;;
           esac
-      - name: Create release
+      - name: Upload distribution file
+        shell: bash
         run: |
-          gh release create ${{ github.ref_name }} \
-            --verify-tag \
-            --generate-notes \
-            --draft \
-            ${{ env.DIST_FILE }}
+          gh release upload ${{ github.ref_name }} ${{ env.DIST_FILE }}
