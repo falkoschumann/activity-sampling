@@ -57,7 +57,7 @@ const options: Configuration = {
     artifactName: "${name}-${version}.${ext}",
   },
   linux: {
-    target: ["AppImage", "snap", "deb"],
+    target: ["AppImage", "deb"],
     maintainer: "Falko Schumann",
     category: "Utility",
   },
