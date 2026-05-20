@@ -30,6 +30,7 @@ jobs:
       - name: Build package
         run: make dist
       - name: Set OS‑specific distribution file
+        shell: bash
         run: |
           case $RUNNER_OS in
             Linux) echo "DIST_FILE=./dist/*.deb" >> $GITHUB_ENV ;;
