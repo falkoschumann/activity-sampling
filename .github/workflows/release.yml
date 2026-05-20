@@ -41,5 +41,5 @@ jobs:
           gh release create ${{ github.ref_name }} \
             --verify-tag \
             --notes-from-tag \
-            --prerelease \
+            --draft \
             ${{ env.DIST_FILE }}
