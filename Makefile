@@ -61,6 +61,9 @@ integration-tests: prepare
 e2e-tests: prepare
 	$(RUN) $(RUN_OPTIONS) vitest run e2e
 
+docker-build:
+	docker compose run --rm build
+
 build: prepare
 	$(PM) run $(RUN_OPTIONS) build
 
@@ -90,4 +93,5 @@ $(DIAGRAM_FILES): %.png: %.puml
 	start doc \
 	check format \
 	dev test watch unit-tests integration-tests e2e-tests \
+	docker-build \
 	build prepare version

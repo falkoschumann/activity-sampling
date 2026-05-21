@@ -1,0 +1,7 @@
+services:
+  build:
+    build: .
+    working_dir: /workspace
+    volumes:
+      - .:/workspace
+    command: make
