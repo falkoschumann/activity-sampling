@@ -55,30 +55,29 @@ export default function LogPage() {
     [messageHandler],
   );
 
-  const handleSubmitActivity = useCallback(async () => {
-    await messageHandler.logActivity(
-      LogActivityCommand.create({
-        timestamp: Temporal.Now.instant(),
-        duration: Temporal.Duration.from(state.countdown.interval),
-        client: state.form.client,
-        project: state.form.project,
-        task: state.form.task,
-        notes: state.form.notes,
-        category: state.form.category,
-      }),
-    );
-    dispatch(activityLogged());
-    await handleQueryRecentActivities();
-  }, [
-    handleQueryRecentActivities,
-    messageHandler,
-    state.countdown.interval,
-    state.form.category,
-    state.form.client,
-    state.form.notes,
-    state.form.project,
-    state.form.task,
-  ]);
+  const logActivity = useCallback(
+    async (activity: ActivityTemplate) => {
+      await messageHandler.logActivity(
+        LogActivityCommand.create({
+          timestamp: Temporal.Now.instant(),
+          duration: Temporal.Duration.from(state.countdown.interval),
+          client: activity.client,
+          project: activity.project,
+          task: activity.task,
+          notes: activity.notes,
+          category: activity.category,
+        }),
+      );
+      dispatch(activityLogged());
+      await handleQueryRecentActivities();
+    },
+    [handleQueryRecentActivities, messageHandler, state.countdown.interval],
+  );
+
+  async function handleSubmitActivity() {
+    hideNotification();
+    await logActivity(state.form);
+  }
 
   const handleNotificationClicked = useCallback(
     async (activity?: LoggedActivity) => {
@@ -95,12 +94,12 @@ export default function LogPage() {
           category: activity.category,
         }),
       );
-      await handleSubmitActivity();
+      await logActivity(activity);
     },
-    [handleSubmitActivity],
+    [logActivity],
   );
 
-  const { show, hide } = useNotification({
+  const [showNotification, hideNotification] = useNotification({
     lastActivity: result.workingDays?.[0]?.activities?.[0],
     onClicked: handleNotificationClicked,
   });
@@ -132,8 +131,7 @@ export default function LogPage() {
     }
 
     function handleIntervalElapsedEvent(event: IntervalElapsedEvent) {
-      hide();
-      show();
+      showNotification();
       dispatch(intervalElapsed(event));
     }
 
@@ -146,7 +144,7 @@ export default function LogPage() {
       messageHandler.removeEventListener("timerStopped", handleTimerStoppedEvent);
       messageHandler.removeEventListener("intervalElapsed", handleIntervalElapsedEvent);
     };
-  }, [hide, messageHandler, show, timeoutId]);
+  }, [hideNotification, messageHandler, showNotification, timeoutId]);
 
   return (
     <>

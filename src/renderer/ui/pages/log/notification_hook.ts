@@ -10,10 +10,16 @@ export function useNotification({
 }: {
   lastActivity?: LoggedActivity;
   onClicked: (activity?: LoggedActivity) => void;
-}): { show: () => void; hide: () => void } {
+}): [() => void, () => void] {
   const notificationRef = useRef<Notification>(undefined);
 
+  const hide = useCallback(() => {
+    notificationRef.current?.close();
+    notificationRef.current = undefined;
+  }, []);
+
   const show = useCallback(() => {
+    hide();
     notificationRef.current = new Notification("What are you working on?", {
       body:
         lastActivity != null
@@ -23,12 +29,7 @@ export function useNotification({
       silent: false,
     });
     notificationRef.current.onclick = () => onClicked(lastActivity);
-  }, [lastActivity, onClicked]);
+  }, [hide, lastActivity, onClicked]);
 
-  const hide = useCallback(() => {
-    notificationRef.current?.close();
-    notificationRef.current = undefined;
-  }, []);
-
-  return { show, hide };
+  return [show, hide];
 }
