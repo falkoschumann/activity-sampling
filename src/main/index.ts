@@ -69,10 +69,10 @@ const settingsProvider = SettingsProvider.create({ fileName });
 const eventStore = EventStore.create();
 const holidayRepository = HolidayRepository.create();
 const vacationRepository = VacationRepository.create();
+const timer = Timer.create();
 const timesheetExporter = TimesheetExporter.create();
 
 const timerState = TimerState.create();
-const timer = Timer.create();
 const startTimerCommandHandler = StartTimerCommandHandler.create({
   timerState,
   timer,
@@ -130,9 +130,12 @@ app.on("web-contents-created", (_event, contents) => {
 // explicitly with Cmd + Q.
 app.on("window-all-closed", () => {
   if (process.platform !== "darwin") {
+    shutdownApplication();
     app.quit();
   }
 });
+
+app.on("will-quit", () => shutdownApplication());
 
 // On macOS, it's common to re-create a window in the app when the
 // dock icon is clicked and there are no other windows open.
@@ -305,4 +308,8 @@ function createMainToLogWindowChannels(window: BrowserWindow) {
     (event) =>
       window.webContents.send(INTERVAL_ELAPSED_CHANNEL, JSON.stringify(event)),
   );
+}
+
+function shutdownApplication() {
+  timer.stop();
 }
