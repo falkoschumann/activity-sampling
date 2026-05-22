@@ -1,0 +1,208 @@
+apiVersion: schema.esdm.io/core/v1
+kind: read-model
+name: current-interval
+scope:
+  domain: activity-sampling
+  boundedContext: activity-sampling
+projections:
+  - boundedContext: activity-sampling
+    aggregate: timer
+    event: started
+    rule: Set interval to the value from the event.
+  - boundedContext: activity-sampling
+    aggregate: timer
+    event: stopped
+    rule: Clear the interval because the timer is no longer running.
+paradigm: document
+schema:
+  type: object
+  properties:
+    interval:
+      type: integer
+    running:
+      type: boolean
+---
+apiVersion: schema.esdm.io/core/v1
+kind: query
+name: current-interval
+scope:
+  domain: activity-sampling
+  boundedContext: activity-sampling
+readModel: current-interval
+result:
+  type: object
+  properties:
+    interval:
+      type: integer
+    running:
+      type: boolean
+actors:
+  - user
+---
+apiVersion: schema.esdm.io/core/v1
+kind: read-model
+name: recent-activities
+scope:
+  domain: activity-sampling
+  boundedContext: activity-sampling
+projections:
+  - boundedContext: activity-sampling
+    aggregate: activity
+    event: logged
+    rule: Append the activity entry and retain only entries from the last 30 days.
+paradigm: document
+schema:
+  type: array
+  items:
+    type: object
+    properties:
+      timestamp:
+        type: string
+        format: date-time
+      duration:
+        type: integer
+      client:
+        type: string
+      project:
+        type: string
+      task:
+        type: string
+      notes:
+        type: string
+      category:
+        type: string
+---
+apiVersion: schema.esdm.io/core/v1
+kind: query
+name: recent-activities
+scope:
+  domain: activity-sampling
+  boundedContext: activity-sampling
+readModel: recent-activities
+result:
+  type: array
+  items:
+    type: object
+    properties:
+      date:
+        type: string
+        format: date
+      activities:
+        type: array
+        items:
+          type: object
+constraints:
+  - name: group-by-working-day
+    rule: Group activities by working day, newest day first.
+  - name: summarize-hours
+    rule: Include summary totals for today, yesterday, this week and this month.
+actors:
+  - user
+---
+apiVersion: schema.esdm.io/core/v1
+kind: read-model
+name: report
+scope:
+  domain: activity-sampling
+  boundedContext: activity-sampling
+projections:
+  - boundedContext: activity-sampling
+    aggregate: activity
+    event: logged
+    rule: Accumulate worked hours grouped by client, project, task and category.
+paradigm: document
+schema:
+  type: object
+  properties:
+    byClient:
+      type: array
+    byProject:
+      type: array
+    byTask:
+      type: array
+    byCategory:
+      type: array
+    total:
+      type: number
+---
+apiVersion: schema.esdm.io/core/v1
+kind: query
+name: report
+scope:
+  domain: activity-sampling
+  boundedContext: activity-sampling
+readModel: report
+parameters:
+  type: object
+  properties:
+    from:
+      type: string
+      format: date
+    to:
+      type: string
+      format: date
+result:
+  type: object
+constraints:
+  - name: filter-by-period
+    rule: Only include activities whose timestamp falls within the period.
+actors:
+  - user
+---
+apiVersion: schema.esdm.io/core/v1
+kind: read-model
+name: timesheet
+scope:
+  domain: activity-sampling
+  boundedContext: activity-sampling
+projections:
+  - boundedContext: activity-sampling
+    aggregate: activity
+    event: logged
+    rule: Accumulate worked hours per task per day.
+  - boundedContext: activity-sampling
+    aggregate: calendar
+    event: holidays-changed
+    rule: Update the holidays list used for capacity calculation.
+  - boundedContext: activity-sampling
+    aggregate: calendar
+    event: vacation-changed
+    rule: Update the vacation list used for capacity calculation.
+paradigm: document
+schema:
+  type: object
+  properties:
+    entries:
+      type: array
+    totalHours:
+      type: number
+    capacity:
+      type: number
+---
+apiVersion: schema.esdm.io/core/v1
+kind: query
+name: timesheet
+scope:
+  domain: activity-sampling
+  boundedContext: activity-sampling
+readModel: timesheet
+parameters:
+  type: object
+  properties:
+    from:
+      type: string
+      format: date
+    to:
+      type: string
+      format: date
+result:
+  type: object
+constraints:
+  - name: filter-by-period
+    rule: Only include activities whose timestamp falls within the period.
+  - name: capacity-accounts-for-holidays-and-vacation
+    rule: Subtract holidays and vacation from capacity for the given period.
+actors:
+  - user
+
+

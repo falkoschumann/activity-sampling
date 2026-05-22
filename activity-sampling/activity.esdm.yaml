@@ -1,0 +1,89 @@
+apiVersion: schema.esdm.io/core/v1
+kind: aggregate
+name: activity
+scope:
+  domain: activity-sampling
+  boundedContext: activity-sampling
+identifiedBy:
+  source: state
+  field: timestamp
+state:
+  type: object
+  properties:
+    timestamp:
+      type: string
+      format: date-time
+    duration:
+      type: integer
+      description: Duration in minutes.
+    client:
+      type: string
+    project:
+      type: string
+    task:
+      type: string
+    notes:
+      type: string
+    category:
+      type: string
+  required: [timestamp, duration, client, project, task]
+---
+apiVersion: schema.esdm.io/core/v1
+kind: command
+name: log-activity
+scope:
+  domain: activity-sampling
+  boundedContext: activity-sampling
+  aggregate: activity
+data:
+  type: object
+  properties:
+    timestamp:
+      type: string
+      format: date-time
+    duration:
+      type: integer
+    client:
+      type: string
+    project:
+      type: string
+    task:
+      type: string
+    notes:
+      type: string
+    category:
+      type: string
+  required: [timestamp, duration, client, project, task]
+publishes:
+  - logged
+actors:
+  - user
+---
+apiVersion: schema.esdm.io/core/v1
+kind: event
+name: logged
+scope:
+  domain: activity-sampling
+  boundedContext: activity-sampling
+  aggregate: activity
+data:
+  type: object
+  properties:
+    timestamp:
+      type: string
+      format: date-time
+    duration:
+      type: integer
+    client:
+      type: string
+    project:
+      type: string
+    task:
+      type: string
+    notes:
+      type: string
+    category:
+      type: string
+  required: [timestamp, duration, client, project, task]
+
+

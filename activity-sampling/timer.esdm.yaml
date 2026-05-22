@@ -1,0 +1,126 @@
+apiVersion: schema.esdm.io/core/v1
+kind: aggregate
+name: timer
+scope:
+  domain: activity-sampling
+  boundedContext: activity-sampling
+identifiedBy:
+  source: static
+  value: default
+state:
+  type: object
+  properties:
+    interval:
+      type: integer
+      description: Interval in minutes.
+    running:
+      type: boolean
+invariants:
+  - name: interval-positive
+    rule: The interval must be greater than zero.
+---
+apiVersion: schema.esdm.io/core/v1
+kind: command
+name: start-timer
+scope:
+  domain: activity-sampling
+  boundedContext: activity-sampling
+  aggregate: timer
+data:
+  type: object
+  properties:
+    interval:
+      type: integer
+      description: Interval in minutes.
+  required: [interval]
+publishes:
+  - started
+actors:
+  - user
+---
+apiVersion: schema.esdm.io/core/v1
+kind: command
+name: stop-timer
+scope:
+  domain: activity-sampling
+  boundedContext: activity-sampling
+  aggregate: timer
+data: {}
+publishes:
+  - stopped
+actors:
+  - user
+---
+apiVersion: schema.esdm.io/core/v1
+kind: command
+name: elapse-interval
+scope:
+  domain: activity-sampling
+  boundedContext: activity-sampling
+  aggregate: timer
+data:
+  type: object
+  properties:
+    timestamp:
+      type: string
+      format: date-time
+  required: [timestamp]
+publishes:
+  - interval-elapsed
+actors:
+  - timer
+---
+apiVersion: schema.esdm.io/core/v1
+kind: event
+name: started
+scope:
+  domain: activity-sampling
+  boundedContext: activity-sampling
+  aggregate: timer
+data:
+  type: object
+  properties:
+    interval:
+      type: integer
+      description: Interval in minutes.
+  required: [interval]
+---
+apiVersion: schema.esdm.io/core/v1
+kind: event
+name: stopped
+scope:
+  domain: activity-sampling
+  boundedContext: activity-sampling
+  aggregate: timer
+data: {}
+---
+apiVersion: schema.esdm.io/core/v1
+kind: event
+name: interval-elapsed
+scope:
+  domain: activity-sampling
+  boundedContext: activity-sampling
+  aggregate: timer
+data:
+  type: object
+  properties:
+    timestamp:
+      type: string
+      format: date-time
+  required: [timestamp]
+---
+apiVersion: schema.esdm.io/core/v1
+kind: event-handler
+name: notify-interval-elapsed
+scope:
+  domain: activity-sampling
+deliveryGuarantee: at-most-once
+handles:
+  - boundedContext: activity-sampling
+    aggregate: timer
+    event: interval-elapsed
+sideEffects:
+  - type: other
+    rule: Notify the user that the current interval has elapsed.
+
+

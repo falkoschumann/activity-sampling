@@ -1,0 +1,99 @@
+apiVersion: schema.esdm.io/core/v1
+kind: aggregate
+name: calendar
+scope:
+  domain: activity-sampling
+  boundedContext: activity-sampling
+identifiedBy:
+  source: static
+  value: default
+state:
+  type: object
+  properties:
+    holidays:
+      type: array
+      items:
+        type: string
+        format: date
+    vacation:
+      type: array
+      items:
+        type: string
+        format: date
+---
+apiVersion: schema.esdm.io/core/v1
+kind: command
+name: change-holidays
+scope:
+  domain: activity-sampling
+  boundedContext: activity-sampling
+  aggregate: calendar
+data:
+  type: object
+  properties:
+    holidays:
+      type: array
+      items:
+        type: string
+        format: date
+  required: [holidays]
+publishes:
+  - holidays-changed
+actors:
+  - user
+---
+apiVersion: schema.esdm.io/core/v1
+kind: command
+name: change-vacation
+scope:
+  domain: activity-sampling
+  boundedContext: activity-sampling
+  aggregate: calendar
+data:
+  type: object
+  properties:
+    vacation:
+      type: array
+      items:
+        type: string
+        format: date
+  required: [vacation]
+publishes:
+  - vacation-changed
+actors:
+  - user
+---
+apiVersion: schema.esdm.io/core/v1
+kind: event
+name: holidays-changed
+scope:
+  domain: activity-sampling
+  boundedContext: activity-sampling
+  aggregate: calendar
+data:
+  type: object
+  properties:
+    holidays:
+      type: array
+      items:
+        type: string
+        format: date
+  required: [holidays]
+---
+apiVersion: schema.esdm.io/core/v1
+kind: event
+name: vacation-changed
+scope:
+  domain: activity-sampling
+  boundedContext: activity-sampling
+  aggregate: calendar
+data:
+  type: object
+  properties:
+    vacation:
+      type: array
+      items:
+        type: string
+        format: date
+  required: [vacation]
+

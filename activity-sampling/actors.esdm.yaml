@@ -1,0 +1,27 @@
+apiVersion: schema.esdm.io/core/v1
+kind: bounded-context
+name: activity-sampling
+scope:
+  domain: activity-sampling
+---
+apiVersion: schema.esdm.io/core/v1
+kind: actor
+name: user
+scope:
+  domain: activity-sampling
+  boundedContext: activity-sampling
+type: human
+responsibilities:
+  - Logs activities with client, project, task and optional notes or category.
+  - Analyzes working hours and creates reports, statistics and timesheets.
+---
+apiVersion: schema.esdm.io/core/v1
+kind: actor
+name: timer
+scope:
+  domain: activity-sampling
+  boundedContext: activity-sampling
+type: system
+responsibilities:
+  - Periodically triggers the prompt asking the user about the current activity.
+
