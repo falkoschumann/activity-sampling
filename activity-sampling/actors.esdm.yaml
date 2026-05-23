@@ -26,16 +26,6 @@ responsibilities:
 ---
 apiVersion: schema.esdm.io/core/v1
 kind: actor
-name: timer
-scope:
-  domain: activity-sampling
-  boundedContext: activity-sampling
-type: system
-responsibilities:
-  - Periodically triggers the prompt asking the user about the current activity.
----
-apiVersion: schema.esdm.io/core/v1
-kind: actor
 name: calendar
 scope:
   domain: activity-sampling

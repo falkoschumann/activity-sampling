@@ -10,11 +10,9 @@ identifiedBy:
 state:
   type: object
   properties:
-    interval:
-      type: integer
-      description: Interval in minutes.
-    running:
-      type: boolean
+    currentInterval:
+      type: string
+      format: duration
 invariants:
   - name: interval-positive
     rule: The interval must be greater than zero.
@@ -61,8 +59,6 @@ scope:
 data: {}
 publishes:
   - interval-elapsed
-actors:
-  - timer
 ---
 apiVersion: schema.esdm.io/core/v1
 kind: event
@@ -74,13 +70,15 @@ scope:
 data:
   type: object
   properties:
+    timer:
+      type: string
     timestamp:
       type: string
       format: date-time
     interval:
       type: string
       format: duration
-  required: [timestamp, interval]
+  required: [timer, timestamp, interval]
 ---
 apiVersion: schema.esdm.io/core/v1
 kind: event
@@ -89,7 +87,12 @@ scope:
   domain: activity-sampling
   boundedContext: activity-sampling
   aggregate: timer
-data: {}
+data:
+  type: object
+  properties:
+    timer:
+      type: string
+  required: [timer]
 ---
 apiVersion: schema.esdm.io/core/v1
 kind: event
@@ -101,13 +104,15 @@ scope:
 data:
   type: object
   properties:
+    timer:
+      type: string
     timestamp:
       type: string
       format: date-time
     interval:
       type: string
       format: duration
-  required: [timestamp, interval]
+  required: [timer, timestamp, interval]
 ---
 apiVersion: schema.esdm.io/core/v1
 kind: event-handler
