@@ -6,14 +6,23 @@ scope:
 ---
 apiVersion: schema.esdm.io/core/v1
 kind: actor
-name: user
+name: software-developer
 scope:
   domain: activity-sampling
   boundedContext: activity-sampling
 type: human
 responsibilities:
-  - Logs activities with client, project, task and optional notes or category.
-  - Analyzes working hours and creates reports, statistics and timesheets.
+  - Want to track his/her activities.
+---
+apiVersion: schema.esdm.io/core/v1
+kind: actor
+name: product-owner
+scope:
+  domain: activity-sampling
+  boundedContext: activity-sampling
+type: human
+responsibilities:
+  - Wants to analyze the effort.
 ---
 apiVersion: schema.esdm.io/core/v1
 kind: actor
@@ -24,4 +33,15 @@ scope:
 type: system
 responsibilities:
   - Periodically triggers the prompt asking the user about the current activity.
-
+---
+apiVersion: schema.esdm.io/core/v1
+kind: actor
+name: calendar
+scope:
+  domain: activity-sampling
+  boundedContext: activity-sampling
+type: system
+backedBy:
+  - calendar
+responsibilities:
+  - Receives calendar updates from the external system and triggers synchronization commands.

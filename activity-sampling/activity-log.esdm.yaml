@@ -1,6 +1,6 @@
 apiVersion: schema.esdm.io/core/v1
 kind: aggregate
-name: activity
+name: activity-log
 scope:
   domain: activity-sampling
   boundedContext: activity-sampling
@@ -14,8 +14,8 @@ state:
       type: string
       format: date-time
     duration:
-      type: integer
-      description: Duration in minutes.
+      type: string
+      format: duration
     client:
       type: string
     project:
@@ -34,7 +34,7 @@ name: log-activity
 scope:
   domain: activity-sampling
   boundedContext: activity-sampling
-  aggregate: activity
+  aggregate: activity-log
 data:
   type: object
   properties:
@@ -42,7 +42,8 @@ data:
       type: string
       format: date-time
     duration:
-      type: integer
+      type: string
+      format: duration
     client:
       type: string
     project:
@@ -55,17 +56,17 @@ data:
       type: string
   required: [timestamp, duration, client, project, task]
 publishes:
-  - logged
+  - activity-logged
 actors:
-  - user
+  - software-developer
 ---
 apiVersion: schema.esdm.io/core/v1
 kind: event
-name: logged
+name: activity-logged
 scope:
   domain: activity-sampling
   boundedContext: activity-sampling
-  aggregate: activity
+  aggregate: activity-log
 data:
   type: object
   properties:
@@ -73,7 +74,8 @@ data:
       type: string
       format: date-time
     duration:
-      type: integer
+      type: string
+      format: duration
     client:
       type: string
     project:
@@ -85,5 +87,3 @@ data:
     category:
       type: string
   required: [timestamp, duration, client, project, task]
-
-

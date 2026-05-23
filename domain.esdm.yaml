@@ -2,4 +2,3 @@ apiVersion: schema.esdm.io/core/v1
 kind: domain
 name: activity-sampling
 description: Periodically asks the user about their current activity and logs it for analysis.
-

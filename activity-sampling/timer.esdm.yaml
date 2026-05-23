@@ -21,7 +21,7 @@ invariants:
 ---
 apiVersion: schema.esdm.io/core/v1
 kind: command
-name: start-timer
+name: start
 scope:
   domain: activity-sampling
   boundedContext: activity-sampling
@@ -30,17 +30,17 @@ data:
   type: object
   properties:
     interval:
-      type: integer
-      description: Interval in minutes.
+      type: string
+      format: duration
   required: [interval]
 publishes:
   - started
 actors:
-  - user
+  - software-developer
 ---
 apiVersion: schema.esdm.io/core/v1
 kind: command
-name: stop-timer
+name: stop
 scope:
   domain: activity-sampling
   boundedContext: activity-sampling
@@ -49,7 +49,7 @@ data: {}
 publishes:
   - stopped
 actors:
-  - user
+  - software-developer
 ---
 apiVersion: schema.esdm.io/core/v1
 kind: command
@@ -58,13 +58,7 @@ scope:
   domain: activity-sampling
   boundedContext: activity-sampling
   aggregate: timer
-data:
-  type: object
-  properties:
-    timestamp:
-      type: string
-      format: date-time
-  required: [timestamp]
+data: {}
 publishes:
   - interval-elapsed
 actors:
@@ -80,10 +74,13 @@ scope:
 data:
   type: object
   properties:
+    timestamp:
+      type: string
+      format: date-time
     interval:
-      type: integer
-      description: Interval in minutes.
-  required: [interval]
+      type: string
+      format: duration
+  required: [timestamp, interval]
 ---
 apiVersion: schema.esdm.io/core/v1
 kind: event
@@ -107,7 +104,10 @@ data:
     timestamp:
       type: string
       format: date-time
-  required: [timestamp]
+    interval:
+      type: string
+      format: duration
+  required: [timestamp, interval]
 ---
 apiVersion: schema.esdm.io/core/v1
 kind: event-handler
@@ -122,5 +122,3 @@ handles:
 sideEffects:
   - type: other
     rule: Notify the user that the current interval has elapsed.
-
-

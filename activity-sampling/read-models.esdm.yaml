@@ -32,12 +32,14 @@ readModel: current-interval
 result:
   type: object
   properties:
-    interval:
-      type: integer
-    running:
-      type: boolean
+    timestamp:
+      type: string
+      format: date-time
+    duration:
+      type: string
+      format: duration
 actors:
-  - user
+  - software-developer
 ---
 apiVersion: schema.esdm.io/core/v1
 kind: read-model
@@ -47,8 +49,8 @@ scope:
   boundedContext: activity-sampling
 projections:
   - boundedContext: activity-sampling
-    aggregate: activity
-    event: logged
+    aggregate: activity-log
+    event: activity-logged
     rule: Append the activity entry and retain only entries from the last 30 days.
 paradigm: document
 schema:
@@ -79,25 +81,79 @@ scope:
   domain: activity-sampling
   boundedContext: activity-sampling
 readModel: recent-activities
+parameters:
+  type: object
+  properties:
+    today:
+      type: string
+      format: date
+    timezone:
+      type: string
 result:
   type: array
   items:
     type: object
     properties:
-      date:
-        type: string
-        format: date
-      activities:
+      categories:
+        type: array
+        items:
+          type: string
+      workingDays:
         type: array
         items:
           type: object
+          properties:
+            date:
+              type: string
+              format: date
+            activities:
+              type: array
+              items:
+                type: object
+                properties:
+                  dateTime:
+                    type: string
+                    format: date-time
+                  duration:
+                    type: string
+                    format: duration
+                  client:
+                    type: string
+                  project:
+                    type: string
+                  task:
+                    type: string
+                  notes:
+                    type: string
+                  category:
+                    type: string
+                required: [dateTime, duration, client, project, task]
+          required: [date, activities]
+      timeSummary:
+        type: object
+        # TODO remove prefix "hours" from property names
+        properties:
+          hoursToday:
+            type: string
+            format: duration
+          hoursYesterday:
+            type: string
+            format: duration
+          hoursThisWeek:
+            type: string
+            format: duration
+          hoursThisMonth:
+            type: string
+            format: duration
+        required: [hoursToday, hoursYesterday, hoursThisWeek, hoursThisMonth]
+    required: [categories, workingDays, timeSummary]
 constraints:
   - name: group-by-working-day
     rule: Group activities by working day, newest day first.
   - name: summarize-hours
     rule: Include summary totals for today, yesterday, this week and this month.
 actors:
-  - user
+  - software-developer
 ---
 apiVersion: schema.esdm.io/core/v1
 kind: read-model
@@ -107,8 +163,8 @@ scope:
   boundedContext: activity-sampling
 projections:
   - boundedContext: activity-sampling
-    aggregate: activity
-    event: logged
+    aggregate: activity-log
+    event: activity-logged
     rule: Accumulate worked hours grouped by client, project, task and category.
 paradigm: document
 schema:
@@ -135,19 +191,55 @@ readModel: report
 parameters:
   type: object
   properties:
+    scope:
+      type: string
+      enum: [clients, projects, tasks, categories]
     from:
       type: string
       format: date
     to:
       type: string
       format: date
+    timezone:
+      type: string
+  required: [scope]
 result:
   type: object
+  properties:
+    entries:
+      type: array
+      items:
+        type: object
+        properties:
+          start:
+            type: string
+            format: date
+          finish:
+            type: string
+            format: date
+          client:
+            type: string
+          project:
+            type: string
+          task:
+            type: string
+          category:
+            type: string
+          hours:
+            type: string
+            format: duration
+          cycleTime:
+            type: integer
+        required: [start, finish, client, project, task, category, hours, cycleTime]
+    totalHours:
+      type: string
+      format: duration
+  required: [entries, totalHours]
 constraints:
   - name: filter-by-period
     rule: Only include activities whose timestamp falls within the period.
 actors:
-  - user
+  - product-owner
 ---
 apiVersion: schema.esdm.io/core/v1
 kind: read-model
@@ -157,8 +249,8 @@ scope:
   boundedContext: activity-sampling
 projections:
   - boundedContext: activity-sampling
-    aggregate: activity
-    event: logged
+    aggregate: activity-log
+    event: activity-logged
     rule: Accumulate worked hours per task per day.
   - boundedContext: activity-sampling
     aggregate: calendar
@@ -189,20 +281,57 @@ readModel: timesheet
 parameters:
   type: object
   properties:
-    from:
+    entries:
       type: string
       format: date
     to:
       type: string
       format: date
+    today:
+      type: string
+      format: date
+    timezone:
+      type: string
+  required: [from, to]
 result:
   type: object
+  properties:
+    entries:
+      type: array
+      items:
+        type: object
+        properties:
+          date:
+            type: string
+            format: date
+          client:
+            type: string
+          project:
+            type: string
+          task:
+            type: string
+          hours:
+            type: string
+            format: duration
+        required: [date, client, project, task, hours]
+    totalHours:
+      type: string
+      format: duration
+    capacity:
+      type: object
+      properties:
+        hours:
+          type: string
+          format: duration
+        offset:
+          type: string
+          format: duration
+      required: [hours, offset]
+  required: [entries, totalHours, capacity]
 constraints:
   - name: filter-by-period
     rule: Only include activities whose timestamp falls within the period.
   - name: capacity-accounts-for-holidays-and-vacation
     rule: Subtract holidays and vacation from capacity for the given period.
 actors:
-  - user
-
-
+  - software-developer
