@@ -1,7 +1,7 @@
 export ASAR?=true
 export MAC_SIGN?=false
 
-PLANTUML_FILES=$(wildcard doc/*.puml)
+PLANTUML_FILES=$(wildcard doc/images/*.puml)
 DIAGRAM_FILES=$(subst .puml,.png,$(PLANTUML_FILES))
 JS?=bun
 PM?=bun
@@ -11,7 +11,7 @@ RUN?=bunx
 SHELL:=/bin/bash
 DEPENDENCY_UPDATER=dependabot[bot]
 
-all: dist check
+all: dist check doc
 
 clean:
 	rm -rf coverage out testdata
@@ -86,7 +86,10 @@ version:
 	@echo "Using package runner $(RUN) version $(shell $(RUN) --version)"
 
 $(DIAGRAM_FILES): %.png: %.puml
+# Skip on CI because changes will not be committed
+ifndef CI
 	plantuml $^
+endif
 
 .PHONY: \
 	all clean distclean dist \
