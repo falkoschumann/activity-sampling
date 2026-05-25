@@ -77,8 +77,6 @@ schema:
         type: string
       notes:
         type: string
-      category:
-        type: string
 ---
 apiVersion: schema.esdm.io/core/v1
 kind: query
@@ -100,10 +98,6 @@ result:
   items:
     type: object
     properties:
-      categories:
-        type: array
-        items:
-          type: string
       workingDays:
         type: array
         items:
@@ -156,7 +150,7 @@ result:
             type: string
             format: duration
         required: [hoursToday, hoursYesterday, hoursThisWeek, hoursThisMonth]
-    required: [categories, workingDays, timeSummary]
+    required: [workingDays, timeSummary]
 constraints:
   - name: group-by-working-day
     rule: Group activities by working day, newest day first.
@@ -166,6 +160,45 @@ constraints:
     rule: Include summary totals for today, yesterday, this week and this month.
 actors:
   - software-developer
+---
+apiVersion: schema.esdm.io/core/v1
+kind: read-model
+name: settings
+scope:
+  domain: activity-sampling
+  boundedContext: activity-sampling
+projections:
+  - boundedContext: activity-sampling
+    aggregate: settings
+    event: capacity-changed
+    rule: Update the capacity value used for capacity calculation.
+  - boundedContext: activity-sampling
+    aggregate: settings
+    event: categories-changed
+    rule: Update the categories list used for categorizing activities.
+schema:
+  type: object
+  properties:
+    capacity:
+      type: string
+      format: duration
+    categories:
+      type: array
+      items:
+        type: string
+  required: [capacity, categories]
+---
+apiVersion: schema.esdm.io/core/v1
+kind: query
+name: categories
+scope:
+  domain: activity-sampling
+  boundedContext: activity-sampling
+readModel: settings
+result:
+  type: array
+  items:
+    type: string
 ---
 apiVersion: schema.esdm.io/core/v1
 kind: read-model
@@ -464,6 +497,10 @@ projections:
     aggregate: activity-log
     event: activity-logged
     rule: Accumulate worked hours per task per day.
+  - boundedContext: activity-sampling
+    aggregate: settings
+    event: capacity-changed
+    rule: Update the capacity value used for capacity calculation.
   - boundedContext: activity-sampling
     aggregate: calendar
     event: holidays-changed

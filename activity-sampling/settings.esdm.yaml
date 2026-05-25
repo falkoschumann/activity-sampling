@@ -1,0 +1,75 @@
+apiVersion: schema.esdm.io/core/v1
+kind: aggregate
+name: settings
+scope:
+  domain: activity-sampling
+  boundedContext: activity-sampling
+identifiedBy:
+  source: static
+  value: settings
+state:
+  type: object
+  properties:
+    capacity:
+      type: string
+      format: duration
+    categories:
+      type: array
+      items:
+        type: string
+  required: [capacity, categories]
+---
+apiVersion: schema.esdm.io/core/v1
+kind: command
+name: change-settings
+scope:
+  domain: activity-sampling
+  boundedContext: activity-sampling
+  aggregate: settings
+data:
+  type: object
+  properties:
+    capacity:
+      type: string
+      format: duration
+  categories:
+    type: array
+    items:
+      type: string
+    required: [capacity, categories]
+publishes:
+  - capacity-changed
+  - categories-changed
+actors:
+  - software-developer
+---
+apiVersion: schema.esdm.io/core/v1
+kind: event
+name: capacity-changed
+scope:
+  domain: activity-sampling
+  boundedContext: activity-sampling
+  aggregate: settings
+data:
+  type: object
+  properties:
+    capacity:
+      type: string
+      format: duration
+  required: [capacity]
+---
+apiVersion: schema.esdm.io/core/v1
+kind: event
+name: categories-changed
+scope:
+  domain: activity-sampling
+  boundedContext: activity-sampling
+  aggregate: settings
+data:
+  type: object
+  properties:
+    categories:
+      type: array
+      items:
+        type: string
+  required: [categories]
