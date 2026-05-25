@@ -49,7 +49,7 @@ actors:
 ---
 apiVersion: schema.esdm.io/core/v1
 kind: read-model
-name: recent-activities
+name: timesheet
 scope:
   domain: activity-sampling
   boundedContext: activity-sampling
@@ -57,26 +57,72 @@ projections:
   - boundedContext: activity-sampling
     aggregate: activity-log
     event: activity-logged
-    rule: Append the activity entry and retain only entries from the last 30 days.
+    rule: Append the activity entry to the timesheet.
+  - boundedContext: activity-sampling
+    aggregate: settings
+    event: capacity-changed
+    rule: Update the capacity value used for capacity calculation.
+  - boundedContext: activity-sampling
+    aggregate: calendar
+    event: holidays-changed
+    rule: Update the holidays list used for capacity calculation.
+  - boundedContext: activity-sampling
+    aggregate: calendar
+    event: vacation-changed
+    rule: Update the vacation list used for capacity calculation.
 schema:
-  type: array
-  items:
-    type: object
-    properties:
-      timestamp:
-        type: string
-        format: date-time
-        description: The timestamp when the activity was logged in UTC.
-      duration:
-        type: integer
-      client:
-        type: string
-      project:
-        type: string
-      task:
-        type: string
-      notes:
-        type: string
+  type: object
+  properties:
+    entries:
+      type: array
+      items:
+        type: object
+        properties:
+          timestamp:
+            type: string
+            format: date-time
+            description: The timestamp when the activity was logged in UTC.
+          client:
+            type: string
+          project:
+            type: string
+          task:
+            type: string
+          notes:
+            type: string
+          duration:
+            type: string
+            format: duration
+        required: [date, client, project, task, hours]
+    holidays:
+      type: array
+      items:
+        type: object
+        properties:
+          date:
+            type: string
+            format: date
+          title:
+            type: string
+          duration:
+            type: string
+            format: duration
+        required: [date, title]
+    vacations:
+      type: array
+      items:
+        type: object
+        properties:
+          date:
+            type: string
+            format: date
+          duration:
+            type: string
+            format: duration
+        required: [date]
+    capacity:
+      type: string
+      format: duration
 ---
 apiVersion: schema.esdm.io/core/v1
 kind: query
@@ -84,7 +130,7 @@ name: recent-activities
 scope:
   domain: activity-sampling
   boundedContext: activity-sampling
-readModel: recent-activities
+readModel: timesheet
 parameters:
   type: object
   properties:
@@ -227,10 +273,12 @@ schema:
         properties:
           start:
             type: string
-            format: date
+            format: date-time
+            description: The timestamp when the first activity in the entry was logged in UTC.
           finish:
             type: string
-            format: date
+            format: date-time
+            description: The timestamp when the last activity in the entry was logged in UTC.
           client:
             type: string
           project:
@@ -283,9 +331,11 @@ result:
           start:
             type: string
             format: date
+            description: The date when the first activity in the entry was logged in local time.
           finish:
             type: string
             format: date
+            description: The date when the last activity in the entry was logged in local time.
           client:
             type: string
           project:
@@ -487,80 +537,6 @@ actors:
   - product-owner
 ---
 apiVersion: schema.esdm.io/core/v1
-kind: read-model
-name: timesheet
-scope:
-  domain: activity-sampling
-  boundedContext: activity-sampling
-projections:
-  - boundedContext: activity-sampling
-    aggregate: activity-log
-    event: activity-logged
-    rule: Accumulate worked hours per task per day.
-  - boundedContext: activity-sampling
-    aggregate: settings
-    event: capacity-changed
-    rule: Update the capacity value used for capacity calculation.
-  - boundedContext: activity-sampling
-    aggregate: calendar
-    event: holidays-changed
-    rule: Update the holidays list used for capacity calculation.
-  - boundedContext: activity-sampling
-    aggregate: calendar
-    event: vacation-changed
-    rule: Update the vacation list used for capacity calculation.
-schema:
-  type: object
-  properties:
-    entries:
-      type: array
-      items:
-        type: object
-        properties:
-          date:
-            type: string
-            format: date
-          client:
-            type: string
-          project:
-            type: string
-          task:
-            type: string
-          hours:
-            type: string
-            format: duration
-        required: [date, client, project, task, hours]
-    holidays:
-      type: array
-      items:
-        type: object
-        properties:
-          date:
-            type: string
-            format: date
-          title:
-            type: string
-          duration:
-            type: string
-            format: duration
-        required: [date, title]
-    vacation:
-      type: array
-      items:
-        type: object
-        properties:
-          date:
-            type: string
-            format: date
-          duration:
-            type: string
-            format: duration
-        required: [date]
-    capacity:
-      type: string
-      format: duration
----
-apiVersion: schema.esdm.io/core/v1
 kind: query
 name: timesheet
 scope:
@@ -573,9 +549,11 @@ parameters:
     from:
       type: string
       format: date
+      description: The start date of the timesheet period in local time.
     to:
       type: string
       format: date
+      description: The end date of the timesheet period in local time.
     today:
       type: string
       format: date
@@ -593,6 +571,7 @@ result:
           date:
             type: string
             format: date
+            description: The date when the activity was logged in local time.
           client:
             type: string
           project:
