@@ -60,27 +60,22 @@ export class TimesheetQueryHandler {
   }
 
   async handle(query: TimesheetQuery): Promise<TimesheetQueryResult> {
-    console.log("handle query", query);
     const readModel = new TimesheetReadModel();
 
-    console.log("project capacity", this.capacity);
     readModel.project(CapacityChangedEvent.create({ capacity: this.capacity }));
 
-    console.log("project holidays");
     const holidays = await this.#holidayRepository.findAllByDate(
       query.from,
       query.to,
     );
     readModel.project(HolidaysChangedEvent.create({ holidays }));
 
-    console.log("project vacations");
     const vacations = await this.#vacationRepository.findAllByDate(
       query.from,
       query.to,
     );
     readModel.project(VacationChangedEvent.create({ vacations }));
 
-    console.log("project activity logged");
     const replay = this.#eventStore.replay();
     const timeZone = query.timeZone ?? this.#clock.zone;
     const today =
@@ -97,12 +92,6 @@ export class TimesheetQueryHandler {
       }
     }
 
-    console.log("query timesheet", {
-      from: query.from,
-      to: query.to,
-      today,
-      timeZone,
-    });
     return readModel.queryTimesheet({
       from: query.from,
       to: query.to,
