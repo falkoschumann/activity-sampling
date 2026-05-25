@@ -13,14 +13,20 @@ projections:
     aggregate: timer
     event: stopped
     rule: Clear the interval because the timer is no longer running.
-paradigm: document
 schema:
   type: object
   properties:
     interval:
-      type: integer
+      type: string
+      format: duration
     running:
       type: boolean
+    timestamp:
+      type: string
+      format: date-time
+    currentInterval:
+      type: string
+      format: duration
 ---
 apiVersion: schema.esdm.io/core/v1
 kind: query
@@ -52,7 +58,6 @@ projections:
     aggregate: activity-log
     event: activity-logged
     rule: Append the activity entry and retain only entries from the last 30 days.
-paradigm: document
 schema:
   type: array
   items:
@@ -61,6 +66,7 @@ schema:
       timestamp:
         type: string
         format: date-time
+        description: The timestamp when the activity was logged in UTC.
       duration:
         type: integer
       client:
@@ -106,14 +112,18 @@ result:
             date:
               type: string
               format: date
+              description: The date of the working day in local time.
             activities:
               type: array
               items:
                 type: object
                 properties:
+                  # TODO replace dateTime with time, the date is already included in the parent object
                   dateTime:
                     type: string
                     format: date-time
+                    description: The timestamp when the activity was logged in local time.
+                  # TODO remove duration
                   duration:
                     type: string
                     format: duration
@@ -150,6 +160,8 @@ result:
 constraints:
   - name: group-by-working-day
     rule: Group activities by working day, newest day first.
+  - name: order-activities-by-time
+    rule: Order activities within a working day by time, newest first.
   - name: summarize-hours
     rule: Include summary totals for today, yesterday, this week and this month.
 actors:
@@ -165,21 +177,34 @@ projections:
   - boundedContext: activity-sampling
     aggregate: activity-log
     event: activity-logged
-    rule: Accumulate worked hours grouped by client, project, task and category.
-paradigm: document
+    rule:
+      Join activity entries with same client, project, task and category into a single entry, update
+      start and finish, and accumulate hours and cycle time.
 schema:
-  type: object
-  properties:
-    byClient:
-      type: array
-    byProject:
-      type: array
-    byTask:
-      type: array
-    byCategory:
-      type: array
-    total:
-      type: number
+  type: array
+  items:
+    type: object
+    properties:
+      start:
+        type: string
+        format: date
+      finish:
+        type: string
+        format: date
+      client:
+        type: string
+      project:
+        type: string
+      task:
+        type: string
+      category:
+        type: string
+      hours:
+        type: string
+        format: duration
+      cycleTime:
+        type: integer
+    required: [start, finish, client, project, task, category, hours, cycleTime]
 ---
 apiVersion: schema.esdm.io/core/v1
 kind: query
@@ -194,6 +219,7 @@ parameters:
     scope:
       type: string
       enum: [clients, projects, tasks, categories]
+    # TODO remove from and to parameters because start and finish can be before or after and hours or cycle time are only relevant for done activities
     from:
       type: string
       format: date
@@ -230,12 +256,18 @@ result:
             format: duration
           cycleTime:
             type: integer
+        # TODO client, project, task  and category should be optional depending on the scope
         required: [start, finish, client, project, task, category, hours, cycleTime]
     totalHours:
       type: string
       format: duration
   required: [entries, totalHours]
 constraints:
+  - name: group-by-scope
+    rule: Group entries by the specified scope (clients, projects, tasks or categories).
+  - name: total-hours
+    rule: Include total hours for all entries in the result.
+  # TODO remove filter-by-period constraint
   - name: filter-by-period
     rule: Only include activities whose timestamp falls within the period.
 actors:
@@ -260,16 +292,56 @@ projections:
     aggregate: calendar
     event: vacation-changed
     rule: Update the vacation list used for capacity calculation.
-paradigm: document
 schema:
   type: object
   properties:
     entries:
       type: array
-    totalHours:
-      type: number
+      items:
+        type: object
+        properties:
+          date:
+            type: string
+            format: date
+          client:
+            type: string
+          project:
+            type: string
+          task:
+            type: string
+          hours:
+            type: string
+            format: duration
+        required: [date, client, project, task, hours]
+    holidays:
+      type: array
+      items:
+        type: object
+        properties:
+          date:
+            type: string
+            format: date
+          title:
+            type: string
+          duration:
+            type: string
+            format: duration
+        required: [date, title]
+    vacation:
+      type: array
+      items:
+        type: object
+        properties:
+          date:
+            type: string
+            format: date
+          duration:
+            type: string
+            format: duration
+        required: [date]
     capacity:
-      type: number
+      type: string
+      format: duration
 ---
 apiVersion: schema.esdm.io/core/v1
 kind: query
@@ -281,7 +353,7 @@ readModel: timesheet
 parameters:
   type: object
   properties:
-    entries:
+    from:
       type: string
       format: date
     to:
