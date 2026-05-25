@@ -179,32 +179,42 @@ projections:
     event: activity-logged
     rule:
       Join activity entries with same client, project, task and category into a single entry, update
-      start and finish, and accumulate hours and cycle time.
+      start and finish, and accumulate hours.
+  - boundedContext: activity-sampling
+    aggregate: activity-log
+    event: activity-logged
+    rule: Collect a list of all categories for filtering in the statistics query.
 schema:
-  type: array
-  items:
-    type: object
-    properties:
-      start:
+  type: object
+  properties:
+    activities:
+      type: array
+      items:
+        type: object
+        properties:
+          start:
+            type: string
+            format: date
+          finish:
+            type: string
+            format: date
+          client:
+            type: string
+          project:
+            type: string
+          task:
+            type: string
+          category:
+            type: string
+          hours:
+            type: string
+            format: duration
+        required: [start, finish, client, project, task, category, hours]
+    categories:
+      type: array
+      items:
         type: string
-        format: date
-      finish:
-        type: string
-        format: date
-      client:
-        type: string
-      project:
-        type: string
-      task:
-        type: string
-      category:
-        type: string
-      hours:
-        type: string
-        format: duration
-      cycleTime:
-        type: integer
-    required: [start, finish, client, project, task, category, hours, cycleTime]
+  required: [activities, categories]
 ---
 apiVersion: schema.esdm.io/core/v1
 kind: query
@@ -265,11 +275,181 @@ result:
 constraints:
   - name: group-by-scope
     rule: Group entries by the specified scope (clients, projects, tasks or categories).
+  - name: calculate-cycle-time
+    rule: Calculate cycle time as the difference between start and finish dates.
   - name: total-hours
     rule: Include total hours for all entries in the result.
   # TODO remove filter-by-period constraint
   - name: filter-by-period
     rule: Only include activities whose timestamp falls within the period.
+actors:
+  - product-owner
+---
+apiVersion: schema.esdm.io/core/v1
+kind: query
+name: statistics
+scope:
+  domain: activity-sampling
+  boundedContext: activity-sampling
+readModel: report
+parameters:
+  type: object
+  properties:
+    scope:
+      type: string
+      enum: [workingHours, cycleTime]
+    categories:
+      type: array
+      items:
+        type: string
+    timezone:
+      type: string
+  required: [scope]
+result:
+  type: object
+  properties:
+    histogram:
+      type: array
+      items:
+        type: object
+        properties:
+          binEdges:
+            type: array
+            items:
+              type: string
+          frequencies:
+            type: array
+            items:
+              type: integer
+          xAxisLabel:
+            type: string
+          yAxisLabel:
+            type: string
+        required: [binEdges, frequencies, xAxisLabel, yAxisLabel]
+    median:
+      type: object
+      properties:
+        edge0:
+          type: number
+        edge25:
+          type: number
+        edge50:
+          type: number
+        edge75:
+          type: number
+        edge100:
+          type: number
+      required: [edge0, edge25, edge50, edge75, edge100]
+    categories:
+      type: array
+      items:
+        type: string
+    totalCount:
+      type: integer
+  required: [histogram, median, categories, totalCount]
+constraints:
+  - name: group-by-scope
+    rule: Group entries by the specified scope (clients, projects, tasks or categories).
+  - name: total-count
+    rule: Include total count for all entries in the result.
+actors:
+  - product-owner
+---
+apiVersion: schema.esdm.io/core/v1
+kind: query
+name: estimate
+scope:
+  domain: activity-sampling
+  boundedContext: activity-sampling
+readModel: report
+parameters:
+  type: object
+  properties:
+    categories:
+      type: array
+      items:
+        type: string
+    timezone:
+      type: string
+result:
+  type: object
+  properties:
+    cycleTimes:
+      type: array
+      items:
+        type: object
+        properties:
+          cycleTime:
+            type: integer
+          frequency:
+            type: integer
+          probability:
+            type: number
+          cumulativeProbability:
+            type: number
+        required: [cycleTime, frequency, probability, cumulativeProbability]
+    categories:
+      type: array
+      items:
+        type: string
+    totalCount:
+      type: integer
+  required: [cycleTimes, categories, totalCount]
+constraints:
+  - name: total-count
+    rule: Include total count for all entries in the result.
+actors:
+  - product-owner
+---
+apiVersion: schema.esdm.io/core/v1
+kind: query
+name: burn-up
+scope:
+  domain: activity-sampling
+  boundedContext: activity-sampling
+readModel: report
+parameters:
+  type: object
+  properties:
+    from:
+      type: string
+      format: date
+    to:
+      type: string
+      format: date
+    categories:
+      type: array
+      items:
+        type: string
+    timezone:
+      type: string
+  required: [from, to]
+result:
+  type: object
+  properties:
+    data:
+      type: array
+      items:
+        type: object
+        properties:
+          date:
+            type: string
+            format: date
+          throughput:
+            type: integer
+          cumulativeThroughput:
+            type: number
+        required: [date, throughput, cumulativeThroughput]
+    categories:
+      type: array
+      items:
+        type: string
+    totalThroughput:
+      type: integer
+  required: [data, categories, totalThroughput]
+constraints:
+  - name: total-count
+    rule: Include total count for all entries in the result.
 actors:
   - product-owner
 ---
