@@ -246,7 +246,7 @@ function createRendererToMainChannels() {
     const dto = JSON.parse(json);
     const query = BurnUpQuery.create(dto);
     const result = await burnUpQueryHandler.handle(query);
-    return BurnUpQueryResult.create(result);
+    return JSON.stringify(BurnUpQueryResult.create(result));
   });
   ipcMain.handle(QUERY_SETTINGS_CHANNEL, async (_event) => {
     const settings = await settingsProvider.load();
