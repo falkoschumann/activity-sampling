@@ -46,6 +46,7 @@ state:
             type: string
             format: duration
         required: [date]
+  required: [holidays, vacation]
 ---
 apiVersion: schema.esdm.io/core/v1
 kind: command
