@@ -2,12 +2,15 @@
 
 import { Temporal } from "@js-temporal/polyfill";
 
-import { Clock } from "../../shared/domain/temporal";
+import { Clock, isTimestampInPeriod } from "../../shared/domain/temporal";
 import type {
   TimesheetQuery,
   TimesheetQueryResult,
 } from "../../shared/domain/timesheet_query";
-import { TimesheetProjection } from "../domain/timesheet_projection";
+import { CapacityChangedEvent } from "../domain/capacity_changed_event";
+import { HolidaysChangedEvent } from "../domain/holidays_changed_event";
+import { TimesheetReadModel } from "../domain/timesheet_read_model";
+import { VacationChangedEvent } from "../domain/vacation_changed_event";
 import type { EventStore } from "../infrastructure/event_store";
 import { HolidayRepository } from "../infrastructure/holiday_repository";
 import { VacationRepository } from "../infrastructure/vacation_repository";
@@ -57,31 +60,43 @@ export class TimesheetQueryHandler {
   }
 
   async handle(query: TimesheetQuery): Promise<TimesheetQueryResult> {
-    const replay = this.#eventStore.replay();
-    const timeZone = query.timeZone || this.#clock.zone;
-    const today = this.#clock
-      .instant()
-      .toZonedDateTimeISO(timeZone ?? this.#clock.zone)
-      .toPlainDate();
+    const readModel = new TimesheetReadModel();
+
+    readModel.project(CapacityChangedEvent.create({ capacity: this.capacity }));
+
     const holidays = await this.#holidayRepository.findAllByDate(
       query.from,
       query.to,
     );
+    readModel.project(HolidaysChangedEvent.create({ holidays }));
+
     const vacations = await this.#vacationRepository.findAllByDate(
       query.from,
       query.to,
     );
-    const projection = TimesheetProjection.create({
-      query,
+    readModel.project(VacationChangedEvent.create({ vacations }));
+
+    const replay = this.#eventStore.replay();
+    const timeZone = query.timeZone ?? this.#clock.zone;
+    const today =
+      query.today ??
+      this.#clock
+        .instant()
+        .toZonedDateTimeISO(timeZone ?? this.#clock.zone)
+        .toPlainDate();
+    for await (const event of replay) {
+      if (
+        isTimestampInPeriod(event.timestamp, timeZone, query.from, query.to)
+      ) {
+        readModel.project(event);
+      }
+    }
+
+    return readModel.queryTimesheet({
+      from: query.from,
+      to: query.to,
       today,
       timeZone,
-      capacity: this.capacity,
-      holidays,
-      vacations,
     });
-    for await (const event of replay) {
-      projection.update(event);
-    }
-    return projection.get();
   }
 }
