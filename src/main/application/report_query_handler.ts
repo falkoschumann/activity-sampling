@@ -4,9 +4,9 @@ import type {
   ReportQuery,
   ReportQueryResult,
 } from "../../shared/domain/report_query";
-import { Clock } from "../../shared/domain/temporal";
-import { ReportProjection } from "../domain/report_projection";
+import { Clock, isTimestampInPeriod } from "../../shared/domain/temporal";
 import type { EventStore } from "../infrastructure/event_store";
+import { ReportReadModel } from "../domain/report_read_model";
 
 export class ReportQueryHandler {
   static create({
@@ -28,12 +28,20 @@ export class ReportQueryHandler {
   }
 
   async handle(query: ReportQuery): Promise<ReportQueryResult> {
-    const replay = this.#eventStore.replay();
+    const readModel = new ReportReadModel();
     const timeZone = query.timeZone || this.#clock.zone;
-    const projection = ReportProjection.create({ query, timeZone });
-    for await (const event of replay) {
-      projection.update(event);
+    for await (const event of this.#eventStore.replay()) {
+      if (
+        isTimestampInPeriod(event.timestamp, timeZone, query.from, query.to)
+      ) {
+        readModel.project(event);
+      }
     }
-    return projection.get();
+    return readModel.queryReport({
+      scope: query.scope,
+      from: query.from,
+      to: query.to,
+      timeZone,
+    });
   }
 }

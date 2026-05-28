@@ -35,12 +35,12 @@ export class TimesheetReadModel {
       this.#entries.sort((a, b) =>
         Temporal.Instant.compare(a.timestamp, b.timestamp),
       );
-    } else if (event instanceof CapacityChangedEvent) {
-      this.#capacity = event.capacity;
     } else if (event instanceof HolidaysChangedEvent) {
       this.#holidays = event.holidays;
     } else if (event instanceof VacationChangedEvent) {
       this.#vacations = event.vacations;
+    } else if (event instanceof CapacityChangedEvent) {
+      this.#capacity = event.capacity;
     }
   }
 
@@ -49,18 +49,16 @@ export class TimesheetReadModel {
     let totalHours = Temporal.Duration.from("PT0S");
     for (const entry of this.#entries) {
       if (
-        !isTimestampInPeriod(
+        isTimestampInPeriod(
           entry.timestamp,
           query.timeZone,
           query.from,
           query.to,
         )
       ) {
-        continue;
+        this.#updateEntries(entries, entry, query.timeZone);
+        totalHours = totalHours.add(entry.duration);
       }
-
-      this.#updateEntries(entries, entry, query.timeZone);
-      totalHours = totalHours.add(entry.duration);
     }
     this.#sortEntries(entries);
     totalHours = normalizeDuration(totalHours);
