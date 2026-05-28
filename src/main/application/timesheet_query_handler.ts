@@ -76,7 +76,6 @@ export class TimesheetQueryHandler {
     );
     readModel.project(VacationChangedEvent.create({ vacations }));
 
-    const replay = this.#eventStore.replay();
     const timeZone = query.timeZone ?? this.#clock.zone;
     const today =
       query.today ??
@@ -84,7 +83,7 @@ export class TimesheetQueryHandler {
         .instant()
         .toZonedDateTimeISO(timeZone ?? this.#clock.zone)
         .toPlainDate();
-    for await (const event of replay) {
+    for await (const event of this.#eventStore.replay()) {
       if (
         isTimestampInPeriod(event.timestamp, timeZone, query.from, query.to)
       ) {
