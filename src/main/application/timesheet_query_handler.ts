@@ -1,7 +1,5 @@
 // Copyright (c) 2026 Falko Schumann. All rights reserved. MIT license.
 
-import { Temporal } from "@js-temporal/polyfill";
-
 import { Clock, isTimestampInPeriod } from "../../shared/domain/temporal";
 import type {
   TimesheetQuery,
@@ -14,55 +12,58 @@ import { VacationChangedEvent } from "../domain/vacation_changed_event";
 import type { EventStore } from "../infrastructure/event_store";
 import { HolidayRepository } from "../infrastructure/holiday_repository";
 import { VacationRepository } from "../infrastructure/vacation_repository";
+import type { SettingsProvider } from "../infrastructure/settings_provider";
 
 export class TimesheetQueryHandler {
   static create({
-    capacity = "PT30M",
     eventStore,
     holidayRepository,
     vacationRepository,
+    settingsProvider,
     clock = Clock.systemDefaultZone(),
   }: {
-    capacity?: Temporal.DurationLike | string;
     eventStore: EventStore;
     holidayRepository: HolidayRepository;
     vacationRepository: VacationRepository;
+    settingsProvider: SettingsProvider;
     clock?: Clock;
   }) {
     return new TimesheetQueryHandler(
-      capacity,
       eventStore,
       holidayRepository,
       vacationRepository,
+      settingsProvider,
       clock,
     );
   }
 
-  capacity: Temporal.Duration;
-
-  readonly #eventStore: EventStore;
-  readonly #holidayRepository: HolidayRepository;
-  readonly #vacationRepository: VacationRepository;
-  readonly #clock: Clock;
+  readonly #eventStore;
+  readonly #holidayRepository;
+  readonly #vacationRepository;
+  readonly #settingsProvider;
+  readonly #clock;
 
   private constructor(
-    capacity: Temporal.DurationLike | string,
     eventStore: EventStore,
     holidayRepository: HolidayRepository,
     vacationRepository: VacationRepository,
+    settingsProvider: SettingsProvider,
     clock: Clock,
   ) {
-    this.capacity = Temporal.Duration.from(capacity);
     this.#eventStore = eventStore;
     this.#holidayRepository = holidayRepository;
     this.#vacationRepository = vacationRepository;
+    this.#settingsProvider = settingsProvider;
     this.#clock = clock;
   }
 
   async handle(query: TimesheetQuery): Promise<TimesheetQueryResult> {
     const readModel = new TimesheetReadModel();
 
-    readModel.project(CapacityChangedEvent.create({ capacity: this.capacity }));
+    const settings = await this.#settingsProvider.load();
+    readModel.project(
+      CapacityChangedEvent.create({ capacity: settings.capacity }),
+    );
 
     const holidays = await this.#holidayRepository.findAllByDate(
       query.from,
