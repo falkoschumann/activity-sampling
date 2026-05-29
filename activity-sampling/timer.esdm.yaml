@@ -13,9 +13,6 @@ state:
     currentInterval:
       type: string
       format: duration
-invariants:
-  - name: interval-positive
-    rule: The interval must be greater than zero.
 ---
 apiVersion: schema.esdm.io/core/v1
 kind: command

@@ -5,8 +5,6 @@ scope:
   domain: activity-sampling
 direction: outbound
 category: csv-export
-capabilities:
-  - Write timesheet data as a CSV file in Harvest format.
 ---
 apiVersion: schema.esdm.io/core/v1
 kind: command

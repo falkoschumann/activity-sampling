@@ -31,7 +31,7 @@ scope:
   domain: activity-sampling
   boundedContext: activity-sampling
 type: system
-backedBy:
-  - calendar
 responsibilities:
   - Receives calendar updates from the external system and triggers synchronization commands.
+backedBy:
+  - calendar
