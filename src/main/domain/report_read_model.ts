@@ -116,238 +116,266 @@ function createEntries(activities: Activity[], query: ReportQuery) {
 function createClientsReport(activities: Activity[], query: ReportQuery) {
   const entries: ReportEntry[] = [];
   for (const activity of activities) {
-    if (
-      !isTimestampInPeriod(activity.start, query.timeZone, query.from, query.to)
-    ) {
-      continue;
-    }
+    updateClientsReport(entries, activity, query);
+  }
+  entries.sort(compareClientsReport);
+  return entries;
+}
 
-    let start = activity.start.toZonedDateTimeISO(query.timeZone).toPlainDate();
-    let finish = activity.finish
-      .toZonedDateTimeISO(query.timeZone)
-      .toPlainDate();
-    const index = entries.findIndex(
-      (entry) => entry.client === activity.client,
-    );
-    if (index == -1) {
-      entries.push(
-        ReportEntry.create({
-          start,
-          finish,
-          client: activity.client,
-          hours: activity.hours,
-          cycleTime: finish.since(start).total("days") + 1,
-        }),
-      );
-    } else {
-      const entry = entries[index]!;
-      start =
-        Temporal.PlainDate.compare(start, entry.start) < 0
-          ? start
-          : entry.start;
-      finish =
-        Temporal.PlainDate.compare(finish, entry.finish) > 0
-          ? finish
-          : entry.finish;
-      entries[index] = ReportEntry.create({
+function updateClientsReport(
+  entries: ReportEntry[],
+  activity: Activity,
+  query: ReportQuery,
+) {
+  if (
+    !isTimestampInPeriod(activity.start, query.timeZone, query.from, query.to)
+  ) {
+    return;
+  }
+
+  let start = activity.start.toZonedDateTimeISO(query.timeZone).toPlainDate();
+  let finish = activity.finish.toZonedDateTimeISO(query.timeZone).toPlainDate();
+  const index = entries.findIndex((entry) => entry.client === activity.client);
+  if (index == -1) {
+    entries.push(
+      ReportEntry.create({
         start,
         finish,
         client: activity.client,
-        hours: normalizeDuration(activity.hours.add(entry.hours)),
+        hours: activity.hours,
         cycleTime: finish.since(start).total("days") + 1,
-      });
-    }
+      }),
+    );
+  } else {
+    const entry = entries[index]!;
+    start =
+      Temporal.PlainDate.compare(start, entry.start) < 0 ? start : entry.start;
+    finish =
+      Temporal.PlainDate.compare(finish, entry.finish) > 0
+        ? finish
+        : entry.finish;
+    entries[index] = ReportEntry.create({
+      start,
+      finish,
+      client: activity.client,
+      hours: normalizeDuration(activity.hours.add(entry.hours)),
+      cycleTime: finish.since(start).total("days") + 1,
+    });
   }
-  entries.sort((a, b) => a.client.localeCompare(b.client));
-  return entries;
+}
+
+function compareClientsReport(a: ReportEntry, b: ReportEntry) {
+  return a.client.localeCompare(b.client);
 }
 
 function createProjectsReport(activities: Activity[], query: ReportQuery) {
   const entries: ReportEntry[] = [];
   for (const activity of activities) {
-    if (
-      !isTimestampInPeriod(activity.start, query.timeZone, query.from, query.to)
-    ) {
-      continue;
-    }
+    updateProjectsReport(entries, activity, query);
+  }
+  entries.sort(compareProjectsReport);
+  return entries;
+}
 
-    let start = activity.start.toZonedDateTimeISO(query.timeZone).toPlainDate();
-    let finish = activity.finish
-      .toZonedDateTimeISO(query.timeZone)
-      .toPlainDate();
-    const index = entries.findIndex(
-      (entry) => entry.project === activity.project,
-    );
-    if (index == -1) {
-      entries.push(
-        ReportEntry.create({
-          start,
-          finish,
-          client: activity.client,
-          project: activity.project,
-          hours: activity.hours,
-          cycleTime: finish.since(start).total("days") + 1,
-        }),
-      );
-    } else {
-      const entry = entries[index]!;
-      start =
-        Temporal.PlainDate.compare(start, entry.start) < 0
-          ? start
-          : entry.start;
-      finish =
-        Temporal.PlainDate.compare(finish, entry.finish) > 0
-          ? finish
-          : entry.finish;
-      let client = entry.client;
-      if (!entry.client.includes(activity.client)) {
-        const clients = client.split(", ");
-        clients.push(activity.client);
-        clients.sort();
-        client = clients.join(", ");
-      }
-      entries[index] = ReportEntry.create({
+function updateProjectsReport(
+  entries: ReportEntry[],
+  activity: Activity,
+  query: ReportQuery,
+) {
+  if (
+    !isTimestampInPeriod(activity.start, query.timeZone, query.from, query.to)
+  ) {
+    return;
+  }
+
+  let start = activity.start.toZonedDateTimeISO(query.timeZone).toPlainDate();
+  let finish = activity.finish.toZonedDateTimeISO(query.timeZone).toPlainDate();
+  const index = entries.findIndex(
+    (entry) => entry.project === activity.project,
+  );
+  if (index == -1) {
+    entries.push(
+      ReportEntry.create({
         start,
         finish,
-        client,
+        client: activity.client,
         project: activity.project,
-        hours: normalizeDuration(activity.hours.add(entry.hours)),
+        hours: activity.hours,
         cycleTime: finish.since(start).total("days") + 1,
-      });
+      }),
+    );
+  } else {
+    const entry = entries[index]!;
+    start =
+      Temporal.PlainDate.compare(start, entry.start) < 0 ? start : entry.start;
+    finish =
+      Temporal.PlainDate.compare(finish, entry.finish) > 0
+        ? finish
+        : entry.finish;
+    let client = entry.client;
+    if (!entry.client.includes(activity.client)) {
+      const clients = client.split(", ");
+      clients.push(activity.client);
+      clients.sort();
+      client = clients.join(", ");
     }
+    entries[index] = ReportEntry.create({
+      start,
+      finish,
+      client,
+      project: activity.project,
+      hours: normalizeDuration(activity.hours.add(entry.hours)),
+      cycleTime: finish.since(start).total("days") + 1,
+    });
   }
-  entries.sort((a, b) => a.project.localeCompare(b.project));
-  return entries;
+}
+
+function compareProjectsReport(a: ReportEntry, b: ReportEntry) {
+  return a.project.localeCompare(b.project);
 }
 
 function createTasksReport(activities: Activity[], query: ReportQuery) {
   const entries: ReportEntry[] = [];
   for (const activity of activities) {
-    if (
-      !isTimestampInPeriod(activity.start, query.timeZone, query.from, query.to)
-    ) {
-      continue;
-    }
+    updateTasksReport(entries, activity, query);
+  }
+  entries.sort(compareTasksReport);
+  return entries;
+}
 
-    let start = activity.start.toZonedDateTimeISO(query.timeZone).toPlainDate();
-    let finish = activity.finish
-      .toZonedDateTimeISO(query.timeZone)
-      .toPlainDate();
-    const index = entries.findIndex(
-      (entry) =>
-        entry.task === activity.task &&
-        entry.project === activity.project &&
-        entry.client === activity.client,
-    );
-    if (index == -1) {
-      entries.push(
-        ReportEntry.create({
-          start,
-          finish,
-          client: activity.client,
-          project: activity.project,
-          task: activity.task,
-          category: activity.category,
-          hours: activity.hours,
-          cycleTime: finish.since(start).total("days") + 1,
-        }),
-      );
-    } else {
-      const entry = entries[index]!;
-      start =
-        Temporal.PlainDate.compare(start, entry.start) < 0
-          ? start
-          : entry.start;
-      finish =
-        Temporal.PlainDate.compare(finish, entry.finish) > 0
-          ? finish
-          : entry.finish;
-      let category = entry.category;
-      if (
-        entry.category != null &&
-        activity.category != null &&
-        !entry.category.includes(activity.category)
-      ) {
-        const categories = category.split(", ");
-        categories.push(activity.category);
-        categories.sort();
-        category = categories.join(", ");
-      }
-      entries[index] = ReportEntry.create({
+function updateTasksReport(
+  entries: ReportEntry[],
+  activity: Activity,
+  query: ReportQuery,
+) {
+  if (
+    !isTimestampInPeriod(activity.start, query.timeZone, query.from, query.to)
+  ) {
+    return;
+  }
+
+  let start = activity.start.toZonedDateTimeISO(query.timeZone).toPlainDate();
+  let finish = activity.finish.toZonedDateTimeISO(query.timeZone).toPlainDate();
+  const index = entries.findIndex(
+    (entry) =>
+      entry.task === activity.task &&
+      entry.project === activity.project &&
+      entry.client === activity.client,
+  );
+  if (index == -1) {
+    entries.push(
+      ReportEntry.create({
         start,
         finish,
         client: activity.client,
         project: activity.project,
         task: activity.task,
-        category,
-        hours: normalizeDuration(activity.hours.add(entry.hours)),
+        category: activity.category,
+        hours: activity.hours,
         cycleTime: finish.since(start).total("days") + 1,
-      });
+      }),
+    );
+  } else {
+    const entry = entries[index]!;
+    start =
+      Temporal.PlainDate.compare(start, entry.start) < 0 ? start : entry.start;
+    finish =
+      Temporal.PlainDate.compare(finish, entry.finish) > 0
+        ? finish
+        : entry.finish;
+    let category = entry.category;
+    if (
+      entry.category != null &&
+      activity.category != null &&
+      !entry.category.includes(activity.category)
+    ) {
+      const categories = category.split(", ");
+      categories.push(activity.category);
+      categories.sort();
+      category = categories.join(", ");
     }
+    entries[index] = ReportEntry.create({
+      start,
+      finish,
+      client: activity.client,
+      project: activity.project,
+      task: activity.task,
+      category,
+      hours: normalizeDuration(activity.hours.add(entry.hours)),
+      cycleTime: finish.since(start).total("days") + 1,
+    });
   }
-  entries.sort((a, b) => {
-    const taskComparison = a.task.localeCompare(b.task);
-    if (taskComparison !== 0) {
-      return taskComparison;
-    }
+}
 
-    const projectComparison = a.project.localeCompare(b.project);
-    if (projectComparison !== 0) {
-      return projectComparison;
-    }
+function compareTasksReport(a: ReportEntry, b: ReportEntry) {
+  const taskComparison = a.task.localeCompare(b.task);
+  if (taskComparison !== 0) {
+    return taskComparison;
+  }
 
-    return a.client.localeCompare(b.client);
-  });
-  return entries;
+  const projectComparison = a.project.localeCompare(b.project);
+  if (projectComparison !== 0) {
+    return projectComparison;
+  }
+
+  return a.client.localeCompare(b.client);
 }
 
 function createCategoriesReport(activities: Activity[], query: ReportQuery) {
   const entries: ReportEntry[] = [];
   for (const activity of activities) {
-    if (
-      !isTimestampInPeriod(activity.start, query.timeZone, query.from, query.to)
-    ) {
-      continue;
-    }
+    updateCategoriesReport(entries, activity, query);
+  }
+  entries.sort(compareCategoriesReport);
+  return entries;
+}
 
-    let start = activity.start.toZonedDateTimeISO(query.timeZone).toPlainDate();
-    let finish = activity.finish
-      .toZonedDateTimeISO(query.timeZone)
-      .toPlainDate();
-    const index = entries.findIndex(
-      (entry) => entry.category === (activity.category ?? "N/A"),
-    );
-    if (index == -1) {
-      entries.push(
-        ReportEntry.create({
-          start,
-          finish,
-          category: activity.category,
-          hours: activity.hours,
-          cycleTime: finish.since(start).total("days") + 1,
-        }),
-      );
-    } else {
-      const entry = entries[index]!;
-      start =
-        Temporal.PlainDate.compare(start, entry.start) < 0
-          ? start
-          : entry.start;
-      finish =
-        Temporal.PlainDate.compare(finish, entry.finish) > 0
-          ? finish
-          : entry.finish;
-      entries[index] = ReportEntry.create({
+function updateCategoriesReport(
+  entries: ReportEntry[],
+  activity: Activity,
+  query: ReportQuery,
+) {
+  if (
+    !isTimestampInPeriod(activity.start, query.timeZone, query.from, query.to)
+  ) {
+    return;
+  }
+
+  let start = activity.start.toZonedDateTimeISO(query.timeZone).toPlainDate();
+  let finish = activity.finish.toZonedDateTimeISO(query.timeZone).toPlainDate();
+  const index = entries.findIndex(
+    (entry) => entry.category === (activity.category ?? "N/A"),
+  );
+  if (index == -1) {
+    entries.push(
+      ReportEntry.create({
         start,
         finish,
         category: activity.category,
-        hours: normalizeDuration(activity.hours.add(entry.hours)),
+        hours: activity.hours,
         cycleTime: finish.since(start).total("days") + 1,
-      });
-    }
+      }),
+    );
+  } else {
+    const entry = entries[index]!;
+    start =
+      Temporal.PlainDate.compare(start, entry.start) < 0 ? start : entry.start;
+    finish =
+      Temporal.PlainDate.compare(finish, entry.finish) > 0
+        ? finish
+        : entry.finish;
+    entries[index] = ReportEntry.create({
+      start,
+      finish,
+      category: activity.category,
+      hours: normalizeDuration(activity.hours.add(entry.hours)),
+      cycleTime: finish.since(start).total("days") + 1,
+    });
   }
-  entries.sort((a, b) => a.category.localeCompare(b.category));
-  return entries;
+}
+
+function compareCategoriesReport(a: ReportEntry, b: ReportEntry) {
+  return a.category.localeCompare(b.category);
 }
 
 function sumTotalHours(entrie: ReportEntry[]) {
