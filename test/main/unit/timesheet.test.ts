@@ -13,9 +13,11 @@ import {
 } from "../../../src/shared/domain/timesheet_query";
 import { ActivityLoggedEvent } from "../../../src/main/domain/activity_logged_event";
 import { Holiday, Vacation } from "../../../src/main/domain/calendar";
+import { Settings } from "../../../src/main/domain/settings";
 import { EventStore } from "../../../src/main/infrastructure/event_store";
 import { HolidayRepository } from "../../../src/main/infrastructure/holiday_repository";
 import { VacationRepository } from "../../../src/main/infrastructure/vacation_repository";
+import { SettingsProvider } from "../../../src/main/infrastructure/settings_provider";
 
 describe("Timesheet", () => {
   describe("Summarize hours worked on tasks", () => {
@@ -456,11 +458,13 @@ function configure({
   events,
   holidays,
   vacations,
+  settings = Settings.create(),
   fixedInstant,
 }: {
   events?: ActivityLoggedEvent[];
   holidays?: Holiday[];
   vacations?: Vacation[];
+  settings?: Settings;
   fixedInstant?: string;
 } = {}) {
   const eventStore = EventStore.createNull({ events });
@@ -470,15 +474,18 @@ function configure({
   const vacationRepository = VacationRepository.createNull({
     readFileResponses: vacations ? [vacations] : undefined,
   });
+  const settingsProvider = SettingsProvider.createNull({
+    readFileResponses: settings ? [settings] : undefined,
+  });
   const clock = Clock.fixed(
     fixedInstant ?? "1970-01-01T00:00:00Z",
     "Europe/Berlin",
   );
   const handler = TimesheetQueryHandler.create({
-    capacity: Temporal.Duration.from("PT40H"),
     eventStore,
     holidayRepository,
     vacationRepository,
+    settingsProvider,
     clock,
   });
   return { handler };

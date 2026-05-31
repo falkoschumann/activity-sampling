@@ -1,7 +1,5 @@
 // Copyright (c) 2026 Falko Schumann. All rights reserved. MIT license.
 
-import { Temporal } from "@js-temporal/polyfill";
-
 import { Clock, isTimestampInPeriod } from "../../shared/domain/temporal";
 import type {
   TimesheetQuery,
@@ -9,72 +7,86 @@ import type {
 } from "../../shared/domain/timesheet_query";
 import { CapacityChangedEvent } from "../domain/capacity_changed_event";
 import { HolidaysChangedEvent } from "../domain/holidays_changed_event";
-import { TimesheetReadModel } from "../domain/timesheet_read_model";
+import {
+  initialReadModel,
+  projectTimesheet,
+  queryTimesheet,
+} from "../domain/timesheet_read_model";
 import { VacationChangedEvent } from "../domain/vacation_changed_event";
 import type { EventStore } from "../infrastructure/event_store";
 import { HolidayRepository } from "../infrastructure/holiday_repository";
 import { VacationRepository } from "../infrastructure/vacation_repository";
+import type { SettingsProvider } from "../infrastructure/settings_provider";
 
 export class TimesheetQueryHandler {
   static create({
-    capacity = "PT30M",
     eventStore,
     holidayRepository,
     vacationRepository,
+    settingsProvider,
     clock = Clock.systemDefaultZone(),
   }: {
-    capacity?: Temporal.DurationLike | string;
     eventStore: EventStore;
     holidayRepository: HolidayRepository;
     vacationRepository: VacationRepository;
+    settingsProvider: SettingsProvider;
     clock?: Clock;
   }) {
     return new TimesheetQueryHandler(
-      capacity,
       eventStore,
       holidayRepository,
       vacationRepository,
+      settingsProvider,
       clock,
     );
   }
 
-  capacity: Temporal.Duration;
-
-  readonly #eventStore: EventStore;
-  readonly #holidayRepository: HolidayRepository;
-  readonly #vacationRepository: VacationRepository;
-  readonly #clock: Clock;
+  readonly #eventStore;
+  readonly #holidayRepository;
+  readonly #vacationRepository;
+  readonly #settingsProvider;
+  readonly #clock;
 
   private constructor(
-    capacity: Temporal.DurationLike | string,
     eventStore: EventStore,
     holidayRepository: HolidayRepository,
     vacationRepository: VacationRepository,
+    settingsProvider: SettingsProvider,
     clock: Clock,
   ) {
-    this.capacity = Temporal.Duration.from(capacity);
     this.#eventStore = eventStore;
     this.#holidayRepository = holidayRepository;
     this.#vacationRepository = vacationRepository;
+    this.#settingsProvider = settingsProvider;
     this.#clock = clock;
   }
 
   async handle(query: TimesheetQuery): Promise<TimesheetQueryResult> {
-    const readModel = new TimesheetReadModel();
+    let readModel = initialReadModel;
 
-    readModel.project(CapacityChangedEvent.create({ capacity: this.capacity }));
+    const settings = await this.#settingsProvider.load();
+    readModel = projectTimesheet(
+      readModel,
+      CapacityChangedEvent.create(settings),
+    );
 
     const holidays = await this.#holidayRepository.findAllByDate(
       query.from,
       query.to,
     );
-    readModel.project(HolidaysChangedEvent.create({ holidays }));
+    readModel = projectTimesheet(
+      readModel,
+      HolidaysChangedEvent.create({ holidays }),
+    );
 
     const vacations = await this.#vacationRepository.findAllByDate(
       query.from,
       query.to,
     );
-    readModel.project(VacationChangedEvent.create({ vacations }));
+    readModel = projectTimesheet(
+      readModel,
+      VacationChangedEvent.create({ vacations }),
+    );
 
     const timeZone = query.timeZone ?? this.#clock.zone;
     const today =
@@ -87,11 +99,11 @@ export class TimesheetQueryHandler {
       if (
         isTimestampInPeriod(event.timestamp, timeZone, query.from, query.to)
       ) {
-        readModel.project(event);
+        readModel = projectTimesheet(readModel, event);
       }
     }
 
-    return readModel.queryTimesheet({
+    return queryTimesheet(readModel, {
       from: query.from,
       to: query.to,
       today,

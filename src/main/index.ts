@@ -97,6 +97,7 @@ const timesheetQueryHandler = TimesheetQueryHandler.create({
   eventStore,
   holidayRepository,
   vacationRepository,
+  settingsProvider,
 });
 const exportTimesheetCommandHandler = ExportTimesheetCommandHandler.create({
   timesheetExporter,
@@ -165,7 +166,6 @@ function applySettings(settings: Settings) {
   eventStore.fileName = `${settings.dataDir}/activity-log.csv`;
   holidayRepository.fileName = `${settings.dataDir}/holidays.csv`;
   vacationRepository.fileName = `${settings.dataDir}/vacation.csv`;
-  timesheetQueryHandler.capacity = settings.capacity;
 }
 
 async function installDevTools() {
