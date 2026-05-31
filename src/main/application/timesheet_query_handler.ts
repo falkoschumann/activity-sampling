@@ -1,6 +1,6 @@
 // Copyright (c) 2026 Falko Schumann. All rights reserved. MIT license.
 
-import { Clock, isTimestampInPeriod } from "../../shared/domain/temporal";
+import { isTimestampInPeriod } from "../../shared/domain/temporal";
 import type {
   TimesheetQuery,
   TimesheetQueryResult,
@@ -24,20 +24,17 @@ export class TimesheetQueryHandler {
     holidayRepository,
     vacationRepository,
     settingsProvider,
-    clock = Clock.systemDefaultZone(),
   }: {
     eventStore: EventStore;
     holidayRepository: HolidayRepository;
     vacationRepository: VacationRepository;
     settingsProvider: SettingsProvider;
-    clock?: Clock;
   }) {
     return new TimesheetQueryHandler(
       eventStore,
       holidayRepository,
       vacationRepository,
       settingsProvider,
-      clock,
     );
   }
 
@@ -45,20 +42,17 @@ export class TimesheetQueryHandler {
   readonly #holidayRepository;
   readonly #vacationRepository;
   readonly #settingsProvider;
-  readonly #clock;
 
   private constructor(
     eventStore: EventStore,
     holidayRepository: HolidayRepository,
     vacationRepository: VacationRepository,
     settingsProvider: SettingsProvider,
-    clock: Clock,
   ) {
     this.#eventStore = eventStore;
     this.#holidayRepository = holidayRepository;
     this.#vacationRepository = vacationRepository;
     this.#settingsProvider = settingsProvider;
-    this.#clock = clock;
   }
 
   async handle(query: TimesheetQuery): Promise<TimesheetQueryResult> {
@@ -88,26 +82,19 @@ export class TimesheetQueryHandler {
       VacationChangedEvent.create({ vacations }),
     );
 
-    const timeZone = query.timeZone ?? this.#clock.zone;
-    const today =
-      query.today ??
-      this.#clock
-        .instant()
-        .toZonedDateTimeISO(timeZone ?? this.#clock.zone)
-        .toPlainDate();
     for await (const event of this.#eventStore.replay()) {
       if (
-        isTimestampInPeriod(event.timestamp, timeZone, query.from, query.to)
+        isTimestampInPeriod(
+          event.timestamp,
+          query.timeZone,
+          query.from,
+          query.to,
+        )
       ) {
         readModel = projectTimesheet(readModel, event);
       }
     }
 
-    return queryTimesheet(readModel, {
-      from: query.from,
-      to: query.to,
-      today,
-      timeZone,
-    });
+    return queryTimesheet(readModel, query);
   }
 }

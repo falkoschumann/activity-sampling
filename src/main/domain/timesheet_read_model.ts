@@ -66,7 +66,7 @@ export function projectTimesheet(
 
 export function queryTimesheet(
   readModel: TimesheetReadModel,
-  query: Required<TimesheetQuery>,
+  query: TimesheetQuery,
 ): TimesheetQueryResult {
   const entries = createEntries(readModel, query);
   const totalHours = sumTotalHours(entries);
@@ -75,10 +75,7 @@ export function queryTimesheet(
   return TimesheetQueryResult.create({ entries, capacity, totalHours });
 }
 
-function createEntries(
-  readModel: TimesheetReadModel,
-  query: Required<TimesheetQuery>,
-) {
+function createEntries(readModel: TimesheetReadModel, query: TimesheetQuery) {
   const entries: TimesheetEntry[] = [];
   for (const entry of readModel.entries) {
     updateEntries(entries, entry, query);
@@ -90,7 +87,7 @@ function createEntries(
 function updateEntries(
   entries: TimesheetEntry[],
   entry: TimesheetReadModelEntry,
-  { from, to, timeZone }: Required<TimesheetQuery>,
+  { from, to, timeZone }: TimesheetQuery,
 ) {
   if (!isTimestampInPeriod(entry.timestamp, timeZone, from, to)) {
     return;
@@ -133,7 +130,7 @@ function sumTotalHours(entries: TimesheetEntry[]) {
 function determineCapacity(
   calendar: Calendar,
   totalHours: Temporal.Duration,
-  { from, to, today }: Required<TimesheetQuery>,
+  { from, to, today }: TimesheetQuery,
 ) {
   const hours = calendar.countWorkingHours(from, to);
 
