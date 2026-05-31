@@ -6,8 +6,8 @@ export class TimesheetQuery {
   static create({
     from,
     to,
-    today,
-    timeZone,
+    today = Temporal.Now.plainDateISO(),
+    timeZone = Temporal.Now.timeZoneId(),
   }: {
     from: Temporal.PlainDateLike | string;
     to: Temporal.PlainDateLike | string;
@@ -33,18 +33,18 @@ export class TimesheetQuery {
 
   readonly from: Temporal.PlainDate;
   readonly to: Temporal.PlainDate;
-  readonly today?: Temporal.PlainDate;
-  readonly timeZone?: Temporal.TimeZoneLike;
+  readonly today: Temporal.PlainDate;
+  readonly timeZone: Temporal.TimeZoneLike;
 
   private constructor(
     from: Temporal.PlainDateLike | string,
     to: Temporal.PlainDateLike | string,
-    today?: Temporal.PlainDateLike | string,
-    timeZone?: Temporal.TimeZoneLike,
+    today: Temporal.PlainDateLike | string,
+    timeZone: Temporal.TimeZoneLike,
   ) {
     this.from = Temporal.PlainDate.from(from);
     this.to = Temporal.PlainDate.from(to);
-    this.today = today ? Temporal.PlainDate.from(today) : undefined;
+    this.today = Temporal.PlainDate.from(today);
     this.timeZone = timeZone;
   }
 }
