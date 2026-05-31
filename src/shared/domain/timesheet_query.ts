@@ -122,6 +122,17 @@ export class TimesheetEntry {
     return TimesheetEntry.create({ date, client, project, task, hours });
   }
 
+  static compare(a: TimesheetEntry, b: TimesheetEntry) {
+    const dateComparison = Temporal.PlainDate.compare(a.date, b.date);
+    if (dateComparison !== 0) {
+      return dateComparison;
+    } else if (a.client !== b.client) {
+      return a.client.localeCompare(b.client);
+    } else if (a.project !== b.project) {
+      return a.project.localeCompare(b.project);
+    } else return a.task.localeCompare(b.task);
+  }
+
   readonly date: Temporal.PlainDate;
   readonly client: string;
   readonly project: string;
