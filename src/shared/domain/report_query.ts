@@ -2,8 +2,6 @@
 
 import { Temporal } from "@js-temporal/polyfill";
 
-// TODO replace optional with default values
-
 export class ReportQuery {
   static create({
     scope,

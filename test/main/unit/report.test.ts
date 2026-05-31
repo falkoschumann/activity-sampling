@@ -4,7 +4,12 @@ import { Temporal } from "@js-temporal/polyfill";
 import { describe, expect, it } from "vitest";
 
 import { ReportQueryHandler } from "../../../src/main/application/report_query_handler";
-import { ReportEntry, ReportQuery, ReportQueryResult, ReportScope } from "../../../src/shared/domain/report_query";
+import {
+  ReportEntry,
+  ReportQuery,
+  ReportQueryResult,
+  ReportScope,
+} from "../../../src/shared/domain/report_query";
 import { ActivityLoggedEvent } from "../../../src/main/domain/activity_logged_event";
 import { EventStore } from "../../../src/main/infrastructure/event_store";
 

@@ -12,11 +12,9 @@ import {
   isTimestampInPeriod,
   normalizeDuration,
 } from "../../shared/domain/temporal";
-import { ActivityLoggedEvent } from "./activity_logged_event"; // TODO use type for state and functions to update state with event
+import { ActivityLoggedEvent } from "./activity_logged_event";
 
-// TODO use type for state and functions to update state with event
-
-export type ReportReadModelNew = {
+export type ReportReadModel = {
   activities: Activity[];
   categories: string[];
 };
@@ -31,7 +29,7 @@ export type Activity = {
   readonly hours: Temporal.Duration;
 };
 
-export const initialReportReadModel: ReportReadModelNew = {
+export const initialReportReadModel: ReportReadModel = {
   activities: [],
   categories: [],
 };
@@ -39,7 +37,7 @@ export const initialReportReadModel: ReportReadModelNew = {
 export function projectReport(
   readModel = initialReportReadModel,
   event: ActivityLoggedEvent,
-): ReportReadModelNew {
+): ReportReadModel {
   const activities = projectActivities(readModel.activities, event);
   const categories = projectCategories(readModel.categories, event);
   return { activities, categories };
@@ -49,219 +47,8 @@ export function queryReport(
   readModel = initialReportReadModel,
   query: ReportQuery,
 ): ReportQueryResult {
-  const entries: ReportEntry[] = [];
-  for (const activity of readModel.activities) {
-    if (
-      !isTimestampInPeriod(activity.start, query.timeZone, query.from, query.to)
-    ) {
-      continue;
-    }
-
-    let start = activity.start.toZonedDateTimeISO(query.timeZone).toPlainDate();
-    let finish = activity.finish
-      .toZonedDateTimeISO(query.timeZone)
-      .toPlainDate();
-    switch (query.scope) {
-      case ReportScope.CLIENTS: {
-        const index = entries.findIndex(
-          (entry) => entry.client === activity.client,
-        );
-        if (index == -1) {
-          entries.push(
-            ReportEntry.create({
-              start,
-              finish,
-              client: activity.client,
-              hours: activity.hours,
-              cycleTime: finish.since(start).total("days") + 1,
-            }),
-          );
-        } else {
-          const entry = entries[index]!;
-          start =
-            Temporal.PlainDate.compare(start, entry.start) < 0
-              ? start
-              : entry.start;
-          finish =
-            Temporal.PlainDate.compare(finish, entry.finish) > 0
-              ? finish
-              : entry.finish;
-          entries[index] = ReportEntry.create({
-            start,
-            finish,
-            client: activity.client,
-            hours: normalizeDuration(activity.hours.add(entry.hours)),
-            cycleTime: finish.since(start).total("days") + 1,
-          });
-        }
-        break;
-      }
-      case ReportScope.PROJECTS: {
-        const index = entries.findIndex(
-          (entry) => entry.project === activity.project,
-        );
-        if (index == -1) {
-          entries.push(
-            ReportEntry.create({
-              start,
-              finish,
-              client: activity.client,
-              project: activity.project,
-              hours: activity.hours,
-              cycleTime: finish.since(start).total("days") + 1,
-            }),
-          );
-        } else {
-          const entry = entries[index]!;
-          start =
-            Temporal.PlainDate.compare(start, entry.start) < 0
-              ? start
-              : entry.start;
-          finish =
-            Temporal.PlainDate.compare(finish, entry.finish) > 0
-              ? finish
-              : entry.finish;
-          let client = entry.client;
-          if (!entry.client.includes(activity.client)) {
-            const clients = client.split(", ");
-            clients.push(activity.client);
-            clients.sort();
-            client = clients.join(", ");
-          }
-          entries[index] = ReportEntry.create({
-            start,
-            finish,
-            client,
-            project: activity.project,
-            hours: normalizeDuration(activity.hours.add(entry.hours)),
-            cycleTime: finish.since(start).total("days") + 1,
-          });
-        }
-        break;
-      }
-      case ReportScope.TASKS: {
-        const index = entries.findIndex(
-          (entry) =>
-            entry.task === activity.task &&
-            entry.project === activity.project &&
-            entry.client === activity.client,
-        );
-        if (index == -1) {
-          entries.push(
-            ReportEntry.create({
-              start,
-              finish,
-              client: activity.client,
-              project: activity.project,
-              task: activity.task,
-              category: activity.category,
-              hours: activity.hours,
-              cycleTime: finish.since(start).total("days") + 1,
-            }),
-          );
-        } else {
-          const entry = entries[index]!;
-          start =
-            Temporal.PlainDate.compare(start, entry.start) < 0
-              ? start
-              : entry.start;
-          finish =
-            Temporal.PlainDate.compare(finish, entry.finish) > 0
-              ? finish
-              : entry.finish;
-          let category = entry.category;
-          if (
-            entry.category != null &&
-            activity.category != null &&
-            !entry.category.includes(activity.category)
-          ) {
-            const categories = category.split(", ");
-            categories.push(activity.category);
-            categories.sort();
-            category = categories.join(", ");
-          }
-          entries[index] = ReportEntry.create({
-            start,
-            finish,
-            client: activity.client,
-            project: activity.project,
-            task: activity.task,
-            category,
-            hours: normalizeDuration(activity.hours.add(entry.hours)),
-            cycleTime: finish.since(start).total("days") + 1,
-          });
-        }
-        break;
-      }
-      case ReportScope.CATEGORIES: {
-        const index = entries.findIndex(
-          (entry) => entry.category === (activity.category ?? "N/A"),
-        );
-        if (index == -1) {
-          entries.push(
-            ReportEntry.create({
-              start,
-              finish,
-              category: activity.category,
-              hours: activity.hours,
-              cycleTime: finish.since(start).total("days") + 1,
-            }),
-          );
-        } else {
-          const entry = entries[index]!;
-          start =
-            Temporal.PlainDate.compare(start, entry.start) < 0
-              ? start
-              : entry.start;
-          finish =
-            Temporal.PlainDate.compare(finish, entry.finish) > 0
-              ? finish
-              : entry.finish;
-          entries[index] = ReportEntry.create({
-            start,
-            finish,
-            category: activity.category,
-            hours: normalizeDuration(activity.hours.add(entry.hours)),
-            cycleTime: finish.since(start).total("days") + 1,
-          });
-        }
-        break;
-      }
-    }
-  }
-  switch (query.scope) {
-    case ReportScope.CLIENTS:
-      entries.sort((a, b) => a.client.localeCompare(b.client));
-      break;
-    case ReportScope.PROJECTS:
-      entries.sort((a, b) => a.project.localeCompare(b.project));
-      break;
-    case ReportScope.TASKS:
-      entries.sort((a, b) => {
-        const taskComparison = a.task.localeCompare(b.task);
-        if (taskComparison !== 0) {
-          return taskComparison;
-        }
-
-        const projectComparison = a.project.localeCompare(b.project);
-        if (projectComparison !== 0) {
-          return projectComparison;
-        }
-
-        return a.client.localeCompare(b.client);
-      });
-      break;
-    case ReportScope.CATEGORIES:
-      entries.sort((a, b) => a.category.localeCompare(b.category));
-      break;
-  }
-
-  let totalHours = entries.reduce(
-    (total, entry) => total.add(entry.hours),
-    Temporal.Duration.from("PT0S"),
-  );
-  totalHours = normalizeDuration(totalHours);
-
+  const entries = createEntries(readModel.activities, query);
+  const totalHours = sumTotalHours(entries);
   return ReportQueryResult.create({ entries, totalHours });
 }
 
@@ -302,7 +89,6 @@ function projectActivities(activities: Activity[], event: ActivityLoggedEvent) {
     };
     activities = activities.toSpliced(index, 1, existingActivity);
   }
-  // TODO sort activities?
   return activities;
 }
 
@@ -312,4 +98,262 @@ function projectCategories(categories: string[], event: ActivityLoggedEvent) {
     categories.sort();
   }
   return categories;
+}
+
+function createEntries(activities: Activity[], query: ReportQuery) {
+  switch (query.scope) {
+    case ReportScope.CLIENTS:
+      return createClientsReport(activities, query);
+    case ReportScope.PROJECTS:
+      return createProjectsReport(activities, query);
+    case ReportScope.TASKS:
+      return createTasksReport(activities, query);
+    case ReportScope.CATEGORIES:
+      return createCategoriesReport(activities, query);
+  }
+}
+
+function createClientsReport(activities: Activity[], query: ReportQuery) {
+  const entries: ReportEntry[] = [];
+  for (const activity of activities) {
+    if (
+      !isTimestampInPeriod(activity.start, query.timeZone, query.from, query.to)
+    ) {
+      continue;
+    }
+
+    let start = activity.start.toZonedDateTimeISO(query.timeZone).toPlainDate();
+    let finish = activity.finish
+      .toZonedDateTimeISO(query.timeZone)
+      .toPlainDate();
+    const index = entries.findIndex(
+      (entry) => entry.client === activity.client,
+    );
+    if (index == -1) {
+      entries.push(
+        ReportEntry.create({
+          start,
+          finish,
+          client: activity.client,
+          hours: activity.hours,
+          cycleTime: finish.since(start).total("days") + 1,
+        }),
+      );
+    } else {
+      const entry = entries[index]!;
+      start =
+        Temporal.PlainDate.compare(start, entry.start) < 0
+          ? start
+          : entry.start;
+      finish =
+        Temporal.PlainDate.compare(finish, entry.finish) > 0
+          ? finish
+          : entry.finish;
+      entries[index] = ReportEntry.create({
+        start,
+        finish,
+        client: activity.client,
+        hours: normalizeDuration(activity.hours.add(entry.hours)),
+        cycleTime: finish.since(start).total("days") + 1,
+      });
+    }
+  }
+  entries.sort((a, b) => a.client.localeCompare(b.client));
+  return entries;
+}
+
+function createProjectsReport(activities: Activity[], query: ReportQuery) {
+  const entries: ReportEntry[] = [];
+  for (const activity of activities) {
+    if (
+      !isTimestampInPeriod(activity.start, query.timeZone, query.from, query.to)
+    ) {
+      continue;
+    }
+
+    let start = activity.start.toZonedDateTimeISO(query.timeZone).toPlainDate();
+    let finish = activity.finish
+      .toZonedDateTimeISO(query.timeZone)
+      .toPlainDate();
+    const index = entries.findIndex(
+      (entry) => entry.project === activity.project,
+    );
+    if (index == -1) {
+      entries.push(
+        ReportEntry.create({
+          start,
+          finish,
+          client: activity.client,
+          project: activity.project,
+          hours: activity.hours,
+          cycleTime: finish.since(start).total("days") + 1,
+        }),
+      );
+    } else {
+      const entry = entries[index]!;
+      start =
+        Temporal.PlainDate.compare(start, entry.start) < 0
+          ? start
+          : entry.start;
+      finish =
+        Temporal.PlainDate.compare(finish, entry.finish) > 0
+          ? finish
+          : entry.finish;
+      let client = entry.client;
+      if (!entry.client.includes(activity.client)) {
+        const clients = client.split(", ");
+        clients.push(activity.client);
+        clients.sort();
+        client = clients.join(", ");
+      }
+      entries[index] = ReportEntry.create({
+        start,
+        finish,
+        client,
+        project: activity.project,
+        hours: normalizeDuration(activity.hours.add(entry.hours)),
+        cycleTime: finish.since(start).total("days") + 1,
+      });
+    }
+  }
+  entries.sort((a, b) => a.project.localeCompare(b.project));
+  return entries;
+}
+
+function createTasksReport(activities: Activity[], query: ReportQuery) {
+  const entries: ReportEntry[] = [];
+  for (const activity of activities) {
+    if (
+      !isTimestampInPeriod(activity.start, query.timeZone, query.from, query.to)
+    ) {
+      continue;
+    }
+
+    let start = activity.start.toZonedDateTimeISO(query.timeZone).toPlainDate();
+    let finish = activity.finish
+      .toZonedDateTimeISO(query.timeZone)
+      .toPlainDate();
+    const index = entries.findIndex(
+      (entry) =>
+        entry.task === activity.task &&
+        entry.project === activity.project &&
+        entry.client === activity.client,
+    );
+    if (index == -1) {
+      entries.push(
+        ReportEntry.create({
+          start,
+          finish,
+          client: activity.client,
+          project: activity.project,
+          task: activity.task,
+          category: activity.category,
+          hours: activity.hours,
+          cycleTime: finish.since(start).total("days") + 1,
+        }),
+      );
+    } else {
+      const entry = entries[index]!;
+      start =
+        Temporal.PlainDate.compare(start, entry.start) < 0
+          ? start
+          : entry.start;
+      finish =
+        Temporal.PlainDate.compare(finish, entry.finish) > 0
+          ? finish
+          : entry.finish;
+      let category = entry.category;
+      if (
+        entry.category != null &&
+        activity.category != null &&
+        !entry.category.includes(activity.category)
+      ) {
+        const categories = category.split(", ");
+        categories.push(activity.category);
+        categories.sort();
+        category = categories.join(", ");
+      }
+      entries[index] = ReportEntry.create({
+        start,
+        finish,
+        client: activity.client,
+        project: activity.project,
+        task: activity.task,
+        category,
+        hours: normalizeDuration(activity.hours.add(entry.hours)),
+        cycleTime: finish.since(start).total("days") + 1,
+      });
+    }
+  }
+  entries.sort((a, b) => {
+    const taskComparison = a.task.localeCompare(b.task);
+    if (taskComparison !== 0) {
+      return taskComparison;
+    }
+
+    const projectComparison = a.project.localeCompare(b.project);
+    if (projectComparison !== 0) {
+      return projectComparison;
+    }
+
+    return a.client.localeCompare(b.client);
+  });
+  return entries;
+}
+
+function createCategoriesReport(activities: Activity[], query: ReportQuery) {
+  const entries: ReportEntry[] = [];
+  for (const activity of activities) {
+    if (
+      !isTimestampInPeriod(activity.start, query.timeZone, query.from, query.to)
+    ) {
+      continue;
+    }
+
+    let start = activity.start.toZonedDateTimeISO(query.timeZone).toPlainDate();
+    let finish = activity.finish
+      .toZonedDateTimeISO(query.timeZone)
+      .toPlainDate();
+    const index = entries.findIndex(
+      (entry) => entry.category === (activity.category ?? "N/A"),
+    );
+    if (index == -1) {
+      entries.push(
+        ReportEntry.create({
+          start,
+          finish,
+          category: activity.category,
+          hours: activity.hours,
+          cycleTime: finish.since(start).total("days") + 1,
+        }),
+      );
+    } else {
+      const entry = entries[index]!;
+      start =
+        Temporal.PlainDate.compare(start, entry.start) < 0
+          ? start
+          : entry.start;
+      finish =
+        Temporal.PlainDate.compare(finish, entry.finish) > 0
+          ? finish
+          : entry.finish;
+      entries[index] = ReportEntry.create({
+        start,
+        finish,
+        category: activity.category,
+        hours: normalizeDuration(activity.hours.add(entry.hours)),
+        cycleTime: finish.since(start).total("days") + 1,
+      });
+    }
+  }
+  entries.sort((a, b) => a.category.localeCompare(b.category));
+  return entries;
+}
+
+function sumTotalHours(entrie: ReportEntry[]) {
+  const totalHours = entrie.reduce(
+    (total, entry) => total.add(entry.hours),
+    Temporal.Duration.from("PT0S"),
+  );
+  return normalizeDuration(totalHours);
 }
