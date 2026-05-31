@@ -4,7 +4,6 @@ import { Temporal } from "@js-temporal/polyfill";
 import { describe, expect, it } from "vitest";
 
 import { TimesheetQueryHandler } from "../../../src/main/application/timesheet_query_handler";
-import { Clock } from "../../../src/shared/domain/temporal";
 import {
   Capacity,
   TimesheetEntry,
@@ -26,13 +25,13 @@ describe("Timesheet", () => {
         events: [],
         holidays: [],
         vacations: [],
-        fixedInstant: "2025-09-19T06:00:00Z",
       });
 
       const result = await handler.handle(
         TimesheetQuery.create({
           from: "2025-09-15",
           to: "2025-09-21",
+          today: "2025-09-19",
         }),
       );
 
@@ -195,13 +194,13 @@ describe("Timesheet", () => {
           Holiday.create({ date: "2025-06-10", title: "Pfingstmontag" }),
         ],
         vacations: [],
-        fixedInstant: "2025-06-11T15:00:00Z",
       });
 
       const result = await handler.handle(
         TimesheetQuery.create({
           from: "2025-06-09",
           to: "2025-06-15",
+          today: "2025-06-11",
         }),
       );
 
@@ -459,13 +458,11 @@ function configure({
   holidays,
   vacations,
   settings = Settings.create(),
-  fixedInstant,
 }: {
   events?: ActivityLoggedEvent[];
   holidays?: Holiday[];
   vacations?: Vacation[];
   settings?: Settings;
-  fixedInstant?: string;
 } = {}) {
   const eventStore = EventStore.createNull({ events });
   const holidayRepository = HolidayRepository.createNull({
@@ -477,16 +474,11 @@ function configure({
   const settingsProvider = SettingsProvider.createNull({
     readFileResponses: settings ? [settings] : undefined,
   });
-  const clock = Clock.fixed(
-    fixedInstant ?? "1970-01-01T00:00:00Z",
-    "Europe/Berlin",
-  );
   const handler = TimesheetQueryHandler.create({
     eventStore,
     holidayRepository,
     vacationRepository,
     settingsProvider,
-    clock,
   });
   return { handler };
 }
