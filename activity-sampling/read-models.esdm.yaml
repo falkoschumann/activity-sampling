@@ -62,6 +62,7 @@ parameters:
       format: date
     timezone:
       type: string
+  required: [today, timezone]
 result:
   type: array
   items:
@@ -120,13 +121,6 @@ result:
             format: duration
         required: [hoursToday, hoursYesterday, hoursThisWeek, hoursThisMonth]
     required: [workingDays, timeSummary]
-constraints:
-  - name: group-by-working-day
-    rule: Group activities by working day, newest day first.
-  - name: order-activities-by-time
-    rule: Order activities within a working day by time, newest first.
-  - name: summarize-hours
-    rule: Include summary totals for today, yesterday, this week and this month.
 actors:
   - software-developer
 ---
@@ -242,7 +236,7 @@ parameters:
       format: date
     timezone:
       type: string
-  required: [scope]
+  required: [scope, timezone]
 result:
   type: object
   properties:
@@ -278,16 +272,6 @@ result:
       type: string
       format: duration
   required: [entries, totalHours]
-constraints:
-  - name: group-by-scope
-    rule: Group entries by the specified scope (clients, projects, tasks or categories).
-  - name: calculate-cycle-time
-    rule: Calculate cycle time as the difference between start and finish dates.
-  - name: total-hours
-    rule: Include total hours for all entries in the result.
-  # TODO remove filter-by-period constraint
-  - name: filter-by-period
-    rule: Only include activities whose timestamp falls within the period.
 actors:
   - product-owner
 ---
@@ -353,11 +337,6 @@ result:
     totalCount:
       type: integer
   required: [histogram, median, categories, totalCount]
-constraints:
-  - name: group-by-scope
-    rule: Group entries by the specified scope (clients, projects, tasks or categories).
-  - name: total-count
-    rule: Include total count for all entries in the result.
 actors:
   - product-owner
 ---
@@ -401,9 +380,6 @@ result:
     totalCount:
       type: integer
   required: [cycleTimes, categories, totalCount]
-constraints:
-  - name: total-count
-    rule: Include total count for all entries in the result.
 actors:
   - product-owner
 ---
@@ -453,9 +429,6 @@ result:
     totalThroughput:
       type: integer
   required: [data, categories, totalThroughput]
-constraints:
-  - name: total-count
-    rule: Include total count for all entries in the result.
 actors:
   - product-owner
 ---
@@ -561,7 +534,7 @@ parameters:
       format: date
     timezone:
       type: string
-  required: [from, to]
+  required: [from, to, today, timezone]
 result:
   type: object
   properties:
@@ -598,10 +571,5 @@ result:
           format: duration
       required: [hours, offset]
   required: [entries, totalHours, capacity]
-constraints:
-  - name: filter-by-period
-    rule: Only include activities whose timestamp falls within the period.
-  - name: capacity-accounts-for-holidays-and-vacation
-    rule: Subtract holidays and vacation from capacity for the given period.
 actors:
   - software-developer
