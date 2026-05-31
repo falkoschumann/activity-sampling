@@ -10,11 +10,10 @@ import {
   TimeSummary,
   WorkingDay,
 } from "../../../src/shared/domain/recent_activities_query";
-import { Clock } from "../../../src/shared/domain/temporal";
 import { ActivityLoggedEvent } from "../../../src/main/domain/activity_logged_event";
+import { Settings } from "../../../src/main/domain/settings";
 import { EventStore } from "../../../src/main/infrastructure/event_store";
 import { SettingsProvider } from "../../../src/main/infrastructure/settings_provider";
-import { Settings } from "../../../src/main/domain/settings";
 
 describe("Recent Activities", () => {
   describe("Group activities by working days for the last 30 days", () => {
@@ -293,25 +292,14 @@ describe("Recent Activities", () => {
   });
 });
 
-function configure({
-  events,
-  fixedInstant,
-}: {
-  events?: ActivityLoggedEvent[];
-  fixedInstant?: string;
-}) {
+function configure({ events }: { events?: ActivityLoggedEvent[] }) {
   const eventStore = EventStore.createNull({ events });
   const settingsProvider = SettingsProvider.createNull({
     readFileResponses: [Settings.createTestInstance()],
   });
-  const clock = Clock.fixed(
-    fixedInstant ?? "1970-01-01T00:00:00Z",
-    "Europe/Berlin",
-  );
   const handler = RecentActivitiesQueryHandler.create({
     eventStore,
     settingsProvider,
-    clock,
   });
   return { handler };
 }

@@ -17,16 +17,8 @@ import type { Projection } from "./projection";
 import type { ActivityLoggedEvent } from "./activity_logged_event";
 
 export class RecentActivitiesProjection implements Projection<RecentActivitiesQueryResult> {
-  static create({
-    query,
-    today = Temporal.Now.plainDateISO("Europe/Berlin"),
-    timeZone = "Europe/Berlin",
-  }: {
-    query: RecentActivitiesQuery;
-    today?: Temporal.PlainDate;
-    timeZone?: Temporal.TimeZoneLike;
-  }) {
-    return new RecentActivitiesProjection(query, today, timeZone);
+  static create({ query }: { query: RecentActivitiesQuery }) {
+    return new RecentActivitiesProjection(query);
   }
 
   readonly #timeZone;
@@ -38,19 +30,11 @@ export class RecentActivitiesProjection implements Projection<RecentActivitiesQu
   #date?: Temporal.PlainDate;
   #activities!: LoggedActivity[];
 
-  private constructor(
-    query: RecentActivitiesQuery,
-    today: Temporal.PlainDate,
-    timeZone: Temporal.TimeZoneLike,
-  ) {
-    today = query.today || today;
-    this.#timeZone = timeZone;
-    this.#from = today.subtract({ days: 30 });
-    this.#to = today.with({ day: today.daysInMonth });
-    this.#timeSummaryProjection = TimeSummaryProjection.create({
-      today,
-      timeZone,
-    });
+  private constructor(query: RecentActivitiesQuery) {
+    this.#timeZone = query.timeZone;
+    this.#from = query.today.subtract({ days: 30 });
+    this.#to = query.today.with({ day: query.today.daysInMonth });
+    this.#timeSummaryProjection = TimeSummaryProjection.create(query);
     this.#workingDays = [];
   }
 
