@@ -3,6 +3,10 @@
 import { Temporal } from "@js-temporal/polyfill";
 
 import {
+  isTimestampInPeriod,
+  normalizeDuration,
+} from "../../shared/domain/temporal";
+import {
   TimesheetEntry,
   type TimesheetQuery,
   TimesheetQueryResult,
@@ -12,10 +16,6 @@ import { Calendar, type Holiday, Vacation } from "./calendar";
 import { CapacityChangedEvent } from "./capacity_changed_event";
 import { HolidaysChangedEvent } from "./holidays_changed_event";
 import { VacationChangedEvent } from "./vacation_changed_event";
-import {
-  isTimestampInPeriod,
-  normalizeDuration,
-} from "../../shared/domain/temporal";
 
 export type TimesheetReadModel = {
   entries: TimesheetReadModelEntry[];
@@ -24,6 +24,7 @@ export type TimesheetReadModel = {
   capacity: Temporal.Duration;
 };
 
+// TODO rename to TimesheetEntry
 export type TimesheetReadModelEntry = {
   readonly timestamp: Temporal.Instant;
   readonly duration: Temporal.Duration;
@@ -34,7 +35,7 @@ export type TimesheetReadModelEntry = {
   readonly category?: string;
 };
 
-export const initialReadModel: TimesheetReadModel = {
+export const initialTimesheetReadModel: TimesheetReadModel = {
   entries: [],
   holidays: [],
   vacations: [],
@@ -42,7 +43,7 @@ export const initialReadModel: TimesheetReadModel = {
 };
 
 export function projectTimesheet(
-  readModel: TimesheetReadModel = initialReadModel,
+  readModel: TimesheetReadModel = initialTimesheetReadModel,
   event:
     | ActivityLoggedEvent
     | CapacityChangedEvent

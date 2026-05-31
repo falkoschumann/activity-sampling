@@ -6,8 +6,8 @@ import { LoggedActivity } from "./logged_activity";
 
 export class RecentActivitiesQuery {
   static create({
-    today,
-    timeZone,
+    today = Temporal.Now.plainDateISO(),
+    timeZone = Temporal.Now.timeZoneId(),
   }: {
     today?: Temporal.PlainDateLike | string;
     timeZone?: Temporal.TimeZoneLike;
@@ -25,14 +25,14 @@ export class RecentActivitiesQuery {
     return RecentActivitiesQuery.create({ today, timeZone });
   }
 
-  readonly today?: Temporal.PlainDate;
-  readonly timeZone?: Temporal.TimeZoneLike;
+  readonly today: Temporal.PlainDate;
+  readonly timeZone: Temporal.TimeZoneLike;
 
   private constructor(
-    today?: Temporal.PlainDateLike | string,
-    timeZone?: Temporal.TimeZoneLike,
+    today: Temporal.PlainDateLike | string,
+    timeZone: Temporal.TimeZoneLike,
   ) {
-    this.today = today ? Temporal.PlainDate.from(today) : undefined;
+    this.today = Temporal.PlainDate.from(today);
     this.timeZone = timeZone;
   }
 }

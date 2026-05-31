@@ -8,7 +8,6 @@ import type {
 import { CapacityChangedEvent } from "../domain/capacity_changed_event";
 import { HolidaysChangedEvent } from "../domain/holidays_changed_event";
 import {
-  initialReadModel,
   projectTimesheet,
   queryTimesheet,
 } from "../domain/timesheet_read_model";
@@ -56,11 +55,9 @@ export class TimesheetQueryHandler {
   }
 
   async handle(query: TimesheetQuery): Promise<TimesheetQueryResult> {
-    let readModel = initialReadModel;
-
     const settings = await this.#settingsProvider.load();
-    readModel = projectTimesheet(
-      readModel,
+    let readModel = projectTimesheet(
+      undefined,
       CapacityChangedEvent.create(settings),
     );
 
