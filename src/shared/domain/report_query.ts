@@ -2,19 +2,21 @@
 
 import { Temporal } from "@js-temporal/polyfill";
 
+// TODO replace optional with default values
+
 export class ReportQuery {
   static create({
     scope,
     from,
     to,
-    timeZone,
+    timeZone = Temporal.Now.timeZoneId(),
   }: {
     scope: ReportScope;
     from?: Temporal.PlainDateLike | string;
     to?: Temporal.PlainDateLike | string;
     timeZone?: Temporal.TimeZoneLike;
   }) {
-    return new ReportQuery(scope, from, to, timeZone);
+    return new ReportQuery(scope, timeZone, from, to);
   }
 
   static createTestInstance({
@@ -34,13 +36,13 @@ export class ReportQuery {
   readonly scope: ReportScope;
   readonly from?: Temporal.PlainDate;
   readonly to?: Temporal.PlainDate;
-  readonly timeZone?: Temporal.TimeZoneLike;
+  readonly timeZone: Temporal.TimeZoneLike;
 
   private constructor(
     scope: ReportScope,
+    timeZone: Temporal.TimeZoneLike,
     from?: Temporal.PlainDateLike | string,
     to?: Temporal.PlainDateLike | string,
-    timeZone?: Temporal.TimeZoneLike,
   ) {
     this.scope = scope;
     this.from = from ? Temporal.PlainDate.from(from) : undefined;
@@ -92,6 +94,7 @@ export class ReportQueryResult {
 }
 
 export class ReportEntry {
+  // TODO replace with Activity and model N/A with optional property
   static create({
     start,
     finish,

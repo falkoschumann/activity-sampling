@@ -4,13 +4,7 @@ import { Temporal } from "@js-temporal/polyfill";
 import { describe, expect, it } from "vitest";
 
 import { ReportQueryHandler } from "../../../src/main/application/report_query_handler";
-import {
-  ReportEntry,
-  ReportQuery,
-  ReportQueryResult,
-  ReportScope,
-} from "../../../src/shared/domain/report_query";
-import { Clock } from "../../../src/shared/domain/temporal";
+import { ReportEntry, ReportQuery, ReportQueryResult, ReportScope } from "../../../src/shared/domain/report_query";
 import { ActivityLoggedEvent } from "../../../src/main/domain/activity_logged_event";
 import { EventStore } from "../../../src/main/infrastructure/event_store";
 
@@ -140,13 +134,13 @@ describe("Report", () => {
       const { handler } = configure({
         events: [
           ActivityLoggedEvent.createTestInstance({
-            timestamp: "2025-12-12T11:00:00Z",
+            timestamp: "2025-12-10T11:00:00Z",
           }),
           ActivityLoggedEvent.createTestInstance({
             timestamp: "2025-12-11T11:00:00Z",
           }),
           ActivityLoggedEvent.createTestInstance({
-            timestamp: "2025-12-10T11:00:00Z",
+            timestamp: "2025-12-12T11:00:00Z",
           }),
         ],
       });
@@ -773,7 +767,9 @@ describe("Report", () => {
         ],
       });
 
-      const result = await handler.handle({ scope: ReportScope.CLIENTS });
+      const result = await handler.handle(
+        ReportQuery.create({ scope: ReportScope.CLIENTS }),
+      );
 
       expect(result).toEqual(
         ReportQueryResult.create({
@@ -839,18 +835,8 @@ describe("Report", () => {
   });
 });
 
-function configure({
-  events,
-  fixedInstant,
-}: {
-  events?: ActivityLoggedEvent[];
-  fixedInstant?: string;
-} = {}) {
+function configure({ events }: { events?: ActivityLoggedEvent[] } = {}) {
   const eventStore = EventStore.createNull({ events });
-  const clock = Clock.fixed(
-    fixedInstant ?? "1970-01-01T00:00:00Z",
-    "Europe/Berlin",
-  );
-  const handler = ReportQueryHandler.create({ eventStore, clock });
+  const handler = ReportQueryHandler.create({ eventStore });
   return { handler };
 }
