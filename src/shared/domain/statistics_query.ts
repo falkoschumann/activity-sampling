@@ -5,8 +5,8 @@ import { Temporal } from "@js-temporal/polyfill";
 export class StatisticsQuery {
   static create({
     scope,
-    categories,
-    timeZone,
+    categories = [],
+    timeZone = Temporal.Now.timeZoneId(),
   }: {
     scope: StatisticsScope;
     categories?: string[];
@@ -28,13 +28,13 @@ export class StatisticsQuery {
   }
 
   readonly scope: StatisticsScope;
-  readonly categories?: string[];
-  readonly timeZone?: Temporal.TimeZoneLike;
+  readonly categories: string[];
+  readonly timeZone: Temporal.TimeZoneLike;
 
   private constructor(
     scope: StatisticsScope,
-    categories?: string[],
-    timeZone?: Temporal.TimeZoneLike,
+    categories: string[],
+    timeZone: Temporal.TimeZoneLike,
   ) {
     this.scope = scope;
     this.categories = categories;

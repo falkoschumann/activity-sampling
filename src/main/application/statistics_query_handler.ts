@@ -4,39 +4,26 @@ import type {
   StatisticsQuery,
   StatisticsQueryResult,
 } from "../../shared/domain/statistics_query";
-import { Clock } from "../../shared/domain/temporal";
-import { StatisticsProjection } from "../domain/statistics_projection";
+import { projectReport, queryStatistics } from "../domain/report_read_model";
 import type { EventStore } from "../infrastructure/event_store";
 
 export class StatisticsQueryHandler {
-  static create({
-    eventStore,
-    clock = Clock.systemDefaultZone(),
-  }: {
-    eventStore: EventStore;
-    clock?: Clock;
-  }) {
-    return new StatisticsQueryHandler(eventStore, clock);
+  static create({ eventStore }: { eventStore: EventStore }) {
+    return new StatisticsQueryHandler(eventStore);
   }
 
   readonly #eventStore: EventStore;
-  readonly #clock: Clock;
 
-  private constructor(eventStore: EventStore, clock: Clock) {
+  private constructor(eventStore: EventStore) {
     this.#eventStore = eventStore;
-    this.#clock = clock;
   }
 
   async handle(query: StatisticsQuery): Promise<StatisticsQueryResult> {
-    const replay = this.#eventStore.replay();
-    const timeZone = query.timeZone || this.#clock.zone;
-    const projection = StatisticsProjection.create({
-      query,
-      timeZone,
-    });
-    for await (const event of replay) {
-      projection.update(event);
+    let readModel;
+    for await (const event of this.#eventStore.replay()) {
+      readModel = projectReport(readModel, event);
     }
-    return projection.get();
+
+    return queryStatistics(readModel, query);
   }
 }
