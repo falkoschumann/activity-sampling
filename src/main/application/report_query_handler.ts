@@ -33,6 +33,7 @@ export class ReportQueryHandler {
         readModel = projectReport(readModel, event);
       }
     }
+
     return queryReport(readModel, query);
   }
 }

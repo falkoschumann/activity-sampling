@@ -4,7 +4,12 @@ import {
   type RecentActivitiesQuery,
   RecentActivitiesQueryResult,
 } from "../../shared/domain/recent_activities_query";
-import { RecentActivitiesProjection } from "../domain/recent_activities_projection";
+import { isTimestampInPeriod } from "../../shared/domain/temporal";
+import { CategoriesChangedEvent } from "../domain/categories_changed_event";
+import {
+  projectTimesheet,
+  queryRecentActivities,
+} from "../domain/timesheet_read_model";
 import type { EventStore } from "../infrastructure/event_store";
 import type { SettingsProvider } from "../infrastructure/settings_provider";
 
@@ -34,15 +39,19 @@ export class RecentActivitiesQueryHandler {
     query: RecentActivitiesQuery,
   ): Promise<RecentActivitiesQueryResult> {
     const settings = await this.#settingsProvider.load();
-    const replay = this.#eventStore.replay();
-    const projection = RecentActivitiesProjection.create({ query });
-    for await (const event of replay) {
-      projection.update(event);
+    let readModel = projectTimesheet(
+      undefined,
+      CategoriesChangedEvent.create(settings),
+    );
+
+    const from = query.today.subtract({ days: 30 });
+    const to = query.today.with({ day: query.today.daysInMonth });
+    for await (const event of this.#eventStore.replay()) {
+      if (isTimestampInPeriod(event.timestamp, query.timeZone, from, to)) {
+        readModel = projectTimesheet(readModel, event);
+      }
     }
-    const result = projection.get();
-    return RecentActivitiesQueryResult.create({
-      ...result,
-      categories: settings.categories,
-    });
+
+    return queryRecentActivities(readModel, query);
   }
 }
