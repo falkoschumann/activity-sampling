@@ -3,7 +3,6 @@
 import { describe, expect, it } from "vitest";
 
 import { EstimateQueryHandler } from "../../../src/main/application/estimate_query_handler";
-import { Clock } from "../../../src/shared/domain/temporal";
 import {
   EstimateEntry,
   EstimateQuery,
@@ -303,7 +302,6 @@ describe("Estimate", () => {
 
 function configure({ events }: { events: ActivityLoggedEvent[] }) {
   const eventStore = EventStore.createNull({ events });
-  const clock = Clock.systemDefaultZone();
-  const handler = EstimateQueryHandler.create({ eventStore, clock });
+  const handler = EstimateQueryHandler.create({ eventStore });
   return { handler };
 }

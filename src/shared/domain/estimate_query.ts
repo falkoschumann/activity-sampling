@@ -4,8 +4,8 @@ import { Temporal } from "@js-temporal/polyfill";
 
 export class EstimateQuery {
   static create({
-    categories,
-    timeZone,
+    categories = [],
+    timeZone = Temporal.Now.timeZoneId(),
   }: {
     categories?: string[];
     timeZone?: Temporal.TimeZoneLike;
@@ -23,10 +23,10 @@ export class EstimateQuery {
     return EstimateQuery.create({ categories, timeZone });
   }
 
-  readonly categories?: string[];
-  readonly timeZone?: Temporal.TimeZoneLike;
+  readonly categories: string[];
+  readonly timeZone: Temporal.TimeZoneLike;
 
-  private constructor(categories?: string[], timeZone?: Temporal.TimeZoneLike) {
+  private constructor(categories: string[], timeZone: Temporal.TimeZoneLike) {
     this.categories = categories;
     this.timeZone = timeZone;
   }

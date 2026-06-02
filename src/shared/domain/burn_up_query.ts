@@ -6,8 +6,8 @@ export class BurnUpQuery {
   static create({
     from,
     to,
-    categories,
-    timeZone,
+    categories = [],
+    timeZone = Temporal.Now.timeZoneId(),
   }: {
     from: Temporal.PlainDateLike | string;
     to: Temporal.PlainDateLike | string;
@@ -33,14 +33,14 @@ export class BurnUpQuery {
 
   readonly from: Temporal.PlainDate;
   readonly to: Temporal.PlainDate;
-  readonly categories?: string[];
-  readonly timeZone?: Temporal.TimeZoneLike;
+  readonly categories: string[];
+  readonly timeZone: Temporal.TimeZoneLike;
 
   private constructor(
     from: Temporal.PlainDateLike | string,
     to: Temporal.PlainDateLike | string,
-    categories?: string[],
-    timeZone?: Temporal.TimeZoneLike,
+    categories: string[],
+    timeZone: Temporal.TimeZoneLike,
   ) {
     this.from = Temporal.PlainDate.from(from);
     this.to = Temporal.PlainDate.from(to);

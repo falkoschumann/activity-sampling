@@ -4,39 +4,26 @@ import type {
   EstimateQuery,
   EstimateQueryResult,
 } from "../../shared/domain/estimate_query";
-import { Clock } from "../../shared/domain/temporal";
-import { EstimateProjection } from "../domain/estimate_projection";
+import { projectReport } from "../domain/report_read_model";
+import { queryEstimate } from "../domain/estimate_query";
 import type { EventStore } from "../infrastructure/event_store";
 
 export class EstimateQueryHandler {
-  static create({
-    eventStore,
-    clock = Clock.systemDefaultZone(),
-  }: {
-    eventStore: EventStore;
-    clock?: Clock;
-  }) {
-    return new EstimateQueryHandler(eventStore, clock);
+  static create({ eventStore }: { eventStore: EventStore }) {
+    return new EstimateQueryHandler(eventStore);
   }
 
   readonly #eventStore: EventStore;
-  readonly #clock: Clock;
 
-  private constructor(eventStore: EventStore, clock: Clock) {
+  private constructor(eventStore: EventStore) {
     this.#eventStore = eventStore;
-    this.#clock = clock;
   }
 
   async handle(query: EstimateQuery): Promise<EstimateQueryResult> {
-    const replay = this.#eventStore.replay();
-    const timeZone = query.timeZone || this.#clock.zone;
-    const projection = EstimateProjection.create({
-      query,
-      timeZone,
-    });
-    for await (const event of replay) {
-      projection.update(event);
+    let readModel;
+    for await (const event of this.#eventStore.replay()) {
+      readModel = projectReport(readModel, event);
     }
-    return projection.get();
+    return queryEstimate(readModel, query);
   }
 }

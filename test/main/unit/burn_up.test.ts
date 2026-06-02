@@ -7,7 +7,6 @@ import {
   BurnUpQuery,
   BurnUpQueryResult,
 } from "../../../src/shared/domain/burn_up_query";
-import { Clock } from "../../../src/shared/domain/temporal";
 import { ActivityLoggedEvent } from "../../../src/main/domain/activity_logged_event";
 import { BurnUpQueryHandler } from "../../../src/main/application/burn_up_query_handler";
 import { EventStore } from "../../../src/main/infrastructure/event_store";
@@ -479,7 +478,6 @@ describe("Burn-up", () => {
 
 function configure({ events }: { events: ActivityLoggedEvent[] }) {
   const eventStore = EventStore.createNull({ events });
-  const clock = Clock.systemDefaultZone();
-  const handler = BurnUpQueryHandler.create({ eventStore, clock });
+  const handler = BurnUpQueryHandler.create({ eventStore });
   return { handler };
 }
