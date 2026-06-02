@@ -70,7 +70,6 @@ export class RecentActivitiesQueryResult {
     });
   }
 
-  // TODO provide possible categories and do not query settings in UI
   readonly categories: string[];
   readonly workingDays: WorkingDay[];
   readonly timeSummary: TimeSummary;

@@ -6,11 +6,11 @@ import { normalizeDuration } from "../../shared/domain/temporal";
 import { ActivityLoggedEvent } from "./activity_logged_event";
 
 export type ReportReadModel = {
-  activities: Activity[];
+  activities: RawActivity[];
   categories: string[];
 };
 
-export type Activity = {
+export type RawActivity = {
   readonly start: Temporal.Instant;
   readonly finish: Temporal.Instant;
   readonly client: string;
@@ -34,7 +34,10 @@ export function projectReport(
   return { activities, categories };
 }
 
-function projectActivities(activities: Activity[], event: ActivityLoggedEvent) {
+function projectActivities(
+  activities: RawActivity[],
+  event: ActivityLoggedEvent,
+) {
   const index = activities.findIndex(
     (activity) =>
       activity.client === event.client &&

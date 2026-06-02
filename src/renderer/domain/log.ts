@@ -219,7 +219,7 @@ export function reducer(state: State, action: Action): State {
       if (remaining.sign === -1) {
         remaining = Temporal.Duration.from("PT0S");
       }
-      remaining = normalizeDuration(remaining, "seconds");
+      remaining = normalizeDuration(remaining, { smallestUnit: "seconds" });
 
       const interval = state.countdown.interval;
       const elapsed = interval.subtract(remaining);

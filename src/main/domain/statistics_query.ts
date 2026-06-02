@@ -5,15 +5,14 @@ import {
   StatisticsQueryResult,
   StatisticsScope,
 } from "../../shared/domain/statistics_query";
-import { type Activity, initialReportReadModel } from "./report_read_model";
+import { type Activity, createActivities } from "./activities";
+import { initialReportReadModel } from "./report_read_model";
 
 export function queryStatistics(
   readModel = initialReportReadModel,
   query: StatisticsQuery,
 ): StatisticsQueryResult {
-  const activities = readModel.activities.filter((activity) =>
-    filterCategory(query.categories, activity),
-  );
+  const activities = createActivities(readModel, query);
   const statistics = createDays(activities, query);
   const histogram = createHistogram(
     statistics.xAxisLabel,
@@ -27,12 +26,6 @@ export function queryStatistics(
     categories: readModel.categories,
     totalCount: statistics.totalCount,
   });
-}
-
-function filterCategory(categories: string[], activity: Activity) {
-  return (
-    categories.length === 0 || categories.includes(activity.category ?? "")
-  );
 }
 
 function createDays(activities: Activity[], query: StatisticsQuery) {

@@ -7,15 +7,14 @@ import {
   type BurnUpQuery,
   BurnUpQueryResult,
 } from "../../shared/domain/burn_up_query";
-import { EstimateQuery } from "../../shared/domain/estimate_query";
-import { normalizeDuration } from "../../shared/domain/temporal";
-import { type Activity, initialReportReadModel } from "./report_read_model";
+import { type Activity, createActivities } from "./activities";
+import { initialReportReadModel } from "./report_read_model";
 
 export function queryBurnUp(
   readModel = initialReportReadModel,
   query: BurnUpQuery,
 ): BurnUpQueryResult {
-  const entries = createEntries(readModel, query);
+  const entries = createActivities(readModel, query);
   const throughputs = determineThroughputs(entries);
   const data = fillPeriod(throughputs, query.from, query.to);
   const totalThroughput = determineTotalThroughput(data);
@@ -26,95 +25,7 @@ export function queryBurnUp(
   });
 }
 
-function createEntries(
-  readModel: typeof initialReportReadModel,
-  query: EstimateQuery,
-) {
-  const entries: Entry[] = [];
-  for (const activity of readModel.activities) {
-    updateActivities(entries, activity, query);
-  }
-  entries.sort(compareEntry);
-  return entries;
-}
-
-function updateActivities(
-  entries: Entry[],
-  activity: Activity,
-  query: EstimateQuery,
-) {
-  if (!filterCategory(query.categories)(activity)) {
-    return;
-  }
-
-  let start = activity.start.toZonedDateTimeISO(query.timeZone).toPlainDate();
-  let finish = activity.finish.toZonedDateTimeISO(query.timeZone).toPlainDate();
-  const index = entries.findIndex(
-    (entry) =>
-      entry.task === activity.task &&
-      entry.project === activity.project &&
-      entry.client === activity.client,
-  );
-  if (index == -1) {
-    entries.push({
-      start,
-      finish,
-      client: activity.client,
-      project: activity.project,
-      task: activity.task,
-      hours: activity.hours,
-      cycleTime: finish.since(start).total("days") + 1,
-    });
-  } else {
-    const entry = entries[index]!;
-    start =
-      Temporal.PlainDate.compare(start, entry.start) < 0 ? start : entry.start;
-    finish =
-      Temporal.PlainDate.compare(finish, entry.finish) > 0
-        ? finish
-        : entry.finish;
-    entries[index] = {
-      start,
-      finish,
-      client: activity.client,
-      project: activity.project,
-      task: activity.task,
-      hours: normalizeDuration(activity.hours.add(entry.hours)),
-      cycleTime: finish.since(start).total("days") + 1,
-    };
-  }
-}
-
-function filterCategory(categories: string[]) {
-  return (activity: Activity) =>
-    categories.length === 0 || categories.includes(activity.category ?? "");
-}
-
-function compareEntry(a: Entry, b: Entry) {
-  const taskComparison = a.task.localeCompare(b.task);
-  if (taskComparison !== 0) {
-    return taskComparison;
-  }
-
-  const projectComparison = a.project.localeCompare(b.project);
-  if (projectComparison !== 0) {
-    return projectComparison;
-  }
-
-  return a.client.localeCompare(b.client);
-}
-
-export type Entry = {
-  readonly start: Temporal.PlainDate;
-  readonly finish: Temporal.PlainDate;
-  readonly client: string;
-  readonly project: string;
-  readonly task: string;
-  readonly hours: Temporal.Duration;
-  readonly cycleTime: number;
-};
-
-function determineThroughputs(activities: Entry[]) {
+function determineThroughputs(activities: Activity[]) {
   const throughputs = new Map<string, number>();
   for (const activity of activities) {
     const date = activity.finish.toString();

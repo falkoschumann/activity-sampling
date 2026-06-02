@@ -56,7 +56,9 @@ function updateWorkingDays(
     to: Temporal.PlainDate;
   },
 ) {
-  if (!isTimestampInPeriod(entry.timestamp, timeZone, from, to)) {
+  if (
+    !isTimestampInPeriod({ timestamp: entry.timestamp, timeZone, from, to })
+  ) {
     return;
   }
 

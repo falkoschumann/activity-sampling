@@ -79,12 +79,12 @@ export class TimesheetQueryHandler {
 
     for await (const event of this.#eventStore.replay()) {
       if (
-        isTimestampInPeriod(
-          event.timestamp,
-          query.timeZone,
-          query.from,
-          query.to,
-        )
+        isTimestampInPeriod({
+          timestamp: event.timestamp,
+          timeZone: query.timeZone,
+          from: query.from,
+          to: query.to,
+        })
       ) {
         readModel = projectTimesheet(readModel, event);
       }

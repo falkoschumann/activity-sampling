@@ -45,7 +45,14 @@ export class RecentActivitiesQueryHandler {
     const from = query.today.subtract({ days: 30 });
     const to = query.today.with({ day: query.today.daysInMonth });
     for await (const event of this.#eventStore.replay()) {
-      if (isTimestampInPeriod(event.timestamp, query.timeZone, from, to)) {
+      if (
+        isTimestampInPeriod({
+          timestamp: event.timestamp,
+          timeZone: query.timeZone,
+          from,
+          to,
+        })
+      ) {
         readModel = projectTimesheet(readModel, event);
       }
     }

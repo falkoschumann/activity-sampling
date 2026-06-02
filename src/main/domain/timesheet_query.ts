@@ -42,7 +42,9 @@ function updateEntries(
   entry: TimesheetReadModelEntry,
   { from, to, timeZone }: TimesheetQuery,
 ) {
-  if (!isTimestampInPeriod(entry.timestamp, timeZone, from, to)) {
+  if (
+    !isTimestampInPeriod({ timestamp: entry.timestamp, timeZone, from, to })
+  ) {
     return;
   }
 

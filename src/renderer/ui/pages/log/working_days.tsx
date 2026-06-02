@@ -69,7 +69,7 @@ function ActivityComponent({
   return (
     <li className="list-group-item list-group-item-action py-1 d-flex justify-content-start align-items-start">
       <div className="text-center" style={{ width: "5em" }}>
-        {formatTime(dateTime, FormatStyle.SHORT)}
+        {formatTime(dateTime, { format: FormatStyle.SHORT })}
       </div>
       <div>
         <div className="ms-2 me-auto">

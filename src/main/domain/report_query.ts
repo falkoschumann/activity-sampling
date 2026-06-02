@@ -12,7 +12,7 @@ import {
   isTimestampInPeriod,
   normalizeDuration,
 } from "../../shared/domain/temporal";
-import { type Activity, initialReportReadModel } from "./report_read_model";
+import { initialReportReadModel, type RawActivity } from "./report_read_model";
 
 export function queryReport(
   readModel = initialReportReadModel,
@@ -23,7 +23,7 @@ export function queryReport(
   return ReportQueryResult.create({ entries, totalHours });
 }
 
-function createEntries(activities: Activity[], query: ReportQuery) {
+function createEntries(activities: RawActivity[], query: ReportQuery) {
   switch (query.scope) {
     case ReportScope.CLIENTS:
       return createClientsReport(activities, query);
@@ -36,7 +36,7 @@ function createEntries(activities: Activity[], query: ReportQuery) {
   }
 }
 
-function createClientsReport(activities: Activity[], query: ReportQuery) {
+function createClientsReport(activities: RawActivity[], query: ReportQuery) {
   const entries: ReportEntry[] = [];
   for (const activity of activities) {
     updateClientsReport(entries, activity, query);
@@ -47,11 +47,16 @@ function createClientsReport(activities: Activity[], query: ReportQuery) {
 
 function updateClientsReport(
   entries: ReportEntry[],
-  activity: Activity,
+  activity: RawActivity,
   query: ReportQuery,
 ) {
   if (
-    !isTimestampInPeriod(activity.start, query.timeZone, query.from, query.to)
+    !isTimestampInPeriod({
+      timestamp: activity.start,
+      timeZone: query.timeZone,
+      from: query.from,
+      to: query.to,
+    })
   ) {
     return;
   }
@@ -91,7 +96,7 @@ function compareClientsReport(a: ReportEntry, b: ReportEntry) {
   return a.client.localeCompare(b.client);
 }
 
-function createProjectsReport(activities: Activity[], query: ReportQuery) {
+function createProjectsReport(activities: RawActivity[], query: ReportQuery) {
   const entries: ReportEntry[] = [];
   for (const activity of activities) {
     updateProjectsReport(entries, activity, query);
@@ -102,11 +107,16 @@ function createProjectsReport(activities: Activity[], query: ReportQuery) {
 
 function updateProjectsReport(
   entries: ReportEntry[],
-  activity: Activity,
+  activity: RawActivity,
   query: ReportQuery,
 ) {
   if (
-    !isTimestampInPeriod(activity.start, query.timeZone, query.from, query.to)
+    !isTimestampInPeriod({
+      timestamp: activity.start,
+      timeZone: query.timeZone,
+      from: query.from,
+      to: query.to,
+    })
   ) {
     return;
   }
@@ -157,7 +167,7 @@ function compareProjectsReport(a: ReportEntry, b: ReportEntry) {
   return a.project.localeCompare(b.project);
 }
 
-function createTasksReport(activities: Activity[], query: ReportQuery) {
+function createTasksReport(activities: RawActivity[], query: ReportQuery) {
   const entries: ReportEntry[] = [];
   for (const activity of activities) {
     updateTasksReport(entries, activity, query);
@@ -168,11 +178,16 @@ function createTasksReport(activities: Activity[], query: ReportQuery) {
 
 function updateTasksReport(
   entries: ReportEntry[],
-  activity: Activity,
+  activity: RawActivity,
   query: ReportQuery,
 ) {
   if (
-    !isTimestampInPeriod(activity.start, query.timeZone, query.from, query.to)
+    !isTimestampInPeriod({
+      timestamp: activity.start,
+      timeZone: query.timeZone,
+      from: query.from,
+      to: query.to,
+    })
   ) {
     return;
   }
@@ -244,7 +259,7 @@ function compareTasksReport(a: ReportEntry, b: ReportEntry) {
   return a.client.localeCompare(b.client);
 }
 
-function createCategoriesReport(activities: Activity[], query: ReportQuery) {
+function createCategoriesReport(activities: RawActivity[], query: ReportQuery) {
   const entries: ReportEntry[] = [];
   for (const activity of activities) {
     updateCategoriesReport(entries, activity, query);
@@ -255,11 +270,16 @@ function createCategoriesReport(activities: Activity[], query: ReportQuery) {
 
 function updateCategoriesReport(
   entries: ReportEntry[],
-  activity: Activity,
+  activity: RawActivity,
   query: ReportQuery,
 ) {
   if (
-    !isTimestampInPeriod(activity.start, query.timeZone, query.from, query.to)
+    !isTimestampInPeriod({
+      timestamp: activity.start,
+      timeZone: query.timeZone,
+      from: query.from,
+      to: query.to,
+    })
   ) {
     return;
   }

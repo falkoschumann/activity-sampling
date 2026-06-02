@@ -3,8 +3,6 @@
 import { Temporal } from "@js-temporal/polyfill";
 
 export class LoggedActivity {
-  // TODO remove duration?
-
   static compare(a: LoggedActivity, b: LoggedActivity) {
     return Temporal.PlainDateTime.compare(b.dateTime, a.dateTime);
   }
