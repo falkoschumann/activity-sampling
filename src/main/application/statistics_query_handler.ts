@@ -4,7 +4,8 @@ import type {
   StatisticsQuery,
   StatisticsQueryResult,
 } from "../../shared/domain/statistics_query";
-import { projectReport, queryStatistics } from "../domain/report_read_model";
+import { projectReport } from "../domain/report_read_model";
+import { queryStatistics } from "../domain/statistics_query";
 import type { EventStore } from "../infrastructure/event_store";
 
 export class StatisticsQueryHandler {

@@ -6,10 +6,8 @@ import {
 } from "../../shared/domain/recent_activities_query";
 import { isTimestampInPeriod } from "../../shared/domain/temporal";
 import { CategoriesChangedEvent } from "../domain/categories_changed_event";
-import {
-  projectTimesheet,
-  queryRecentActivities,
-} from "../domain/timesheet_read_model";
+import { queryRecentActivities } from "../domain/recent_activities_query";
+import { projectTimesheet } from "../domain/timesheet_read_model";
 import type { EventStore } from "../infrastructure/event_store";
 import type { SettingsProvider } from "../infrastructure/settings_provider";
 

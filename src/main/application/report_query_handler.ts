@@ -5,7 +5,8 @@ import type {
   ReportQueryResult,
 } from "../../shared/domain/report_query";
 import { isTimestampInPeriod } from "../../shared/domain/temporal";
-import { projectReport, queryReport } from "../domain/report_read_model";
+import { projectReport } from "../domain/report_read_model";
+import { queryReport } from "../domain/report_query";
 import type { EventStore } from "../infrastructure/event_store";
 
 export class ReportQueryHandler {

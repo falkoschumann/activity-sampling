@@ -7,10 +7,8 @@ import type {
 } from "../../shared/domain/timesheet_query";
 import { CapacityChangedEvent } from "../domain/capacity_changed_event";
 import { HolidaysChangedEvent } from "../domain/holidays_changed_event";
-import {
-  projectTimesheet,
-  queryTimesheet,
-} from "../domain/timesheet_read_model";
+import { projectTimesheet } from "../domain/timesheet_read_model";
+import { queryTimesheet } from "../domain/timesheet_query";
 import { VacationChangedEvent } from "../domain/vacation_changed_event";
 import type { EventStore } from "../infrastructure/event_store";
 import { HolidayRepository } from "../infrastructure/holiday_repository";
