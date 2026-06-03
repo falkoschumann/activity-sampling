@@ -10,13 +10,13 @@ export default defineConfig({
     build: {
       rollupOptions: {
         input: {
+          burnUpChart: "src/renderer/burn-up-chart.html",
+          estimate: "src/renderer/estimate.html",
           log: "src/renderer/log.html",
           report: "src/renderer/report.html",
-          statistics: "src/renderer/statistics.html",
-          estimate: "src/renderer/estimate.html",
-          burnUpChart: "src/renderer/burn-up-chart.html",
-          timesheet: "src/renderer/timesheet.html",
           settings: "src/renderer/settings.html",
+          statistics: "src/renderer/statistics.html",
+          timesheet: "src/renderer/timesheet.html",
         },
       },
     },

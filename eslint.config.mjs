@@ -1,6 +1,7 @@
 // Copyright (c) 2025 Falko Schumann. All rights reserved. MIT license.
 
 import js from "@eslint/js";
+import { defineConfig } from "eslint/config";
 import headers from "eslint-plugin-headers";
 import react from "eslint-plugin-react";
 import reactHooks from "eslint-plugin-react-hooks";
@@ -8,10 +9,10 @@ import reactRefresh from "eslint-plugin-react-refresh";
 import globals from "globals";
 import ts from "typescript-eslint";
 
-export default ts.config(
+export default defineConfig(
   { ignores: [".venv", "coverage", "dist", "out", "tmp"] },
   {
-    extends: [js.configs.recommended, ...ts.configs.recommended],
+    extends: [js.configs.recommended, ts.configs.recommended],
     files: ["**/*.{cjs,mjs,js,jsx,ts,tsx}"],
     languageOptions: {
       ecmaVersion: 2024,

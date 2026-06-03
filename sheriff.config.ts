@@ -9,6 +9,8 @@ export const config: SheriffConfig = {
   entryPoints: {
     main: "src/main/index.ts",
     preload: "src/preload/index.ts",
+    burn_up_chart: "src/renderer/burn_up_chart.tsx",
+    estimate: "src/renderer/estimate.tsx",
     log: "src/renderer/log.tsx",
     reports: "src/renderer/report.tsx",
     settings: "src/renderer/settings.tsx",
@@ -44,12 +46,12 @@ export const config: SheriffConfig = {
     ],
   },
   depRules: {
+    "component:*": [sameTag, "component:shared"],
     "layer:entry": ["layer:*"],
     "layer:application": ["layer:infrastructure"],
     "layer:*": [sameTag, "layer:domain"],
     "ui:entry": ["ui:*"],
     "ui:page": ["ui:layout"],
     "ui:*": [sameTag, "ui:component", "layer:domain"],
-    "component:*": [sameTag, "component:shared"],
   },
 };
