@@ -4,12 +4,10 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
-    merge-strategy: "rebase"
   - package-ecosystem: "bun"
     directory: "/"
     schedule:
       interval: "weekly"
-    merge-strategy: "rebase"
     groups:
       minor-and-patch:
         patterns:
@@ -27,12 +25,6 @@ updates:
           - "@vitest/*"
     ignore:
       - dependency-name: "@types/node"
-        update-types:
-          - "version-update:semver-major"
-      - dependency-name: "eslint"
-        update-types:
-          - "version-update:semver-major"
-      - dependency-name: "@eslint/*"
         update-types:
           - "version-update:semver-major"
       - dependency-name: "eslint-plugin-headers"
