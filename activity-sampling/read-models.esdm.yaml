@@ -171,13 +171,13 @@ scope:
   boundedContext: activity-sampling
 projections:
   - boundedContext: activity-sampling
-    aggregate: activity-log
+    aggregate: logged-activity
     event: activity-logged
     rule:
       Join activity entries with same client, project, task and category into a single entry, update
       start and finish, and accumulate hours.
   - boundedContext: activity-sampling
-    aggregate: activity-log
+    aggregate: logged-activity
     event: activity-logged
     rule: Collect a list of all categories for filtering in the statistics query.
 schema:
@@ -440,7 +440,7 @@ scope:
   boundedContext: activity-sampling
 projections:
   - boundedContext: activity-sampling
-    aggregate: activity-log
+    aggregate: logged-activity
     event: activity-logged
     rule: Append the activity entry to the timesheet.
   - boundedContext: activity-sampling

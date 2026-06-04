@@ -12,7 +12,7 @@ name: export-timesheet
 scope:
   domain: activity-sampling
   boundedContext: activity-sampling
-  aggregate: activity-log
+  aggregate: logged-activity
 data:
   type: object
   properties:
@@ -48,7 +48,7 @@ name: timesheet-exported
 scope:
   domain: activity-sampling
   boundedContext: activity-sampling
-  aggregate: activity-log
+  aggregate: logged-activity
 data:
   type: array
   items:
@@ -81,7 +81,7 @@ scope:
 deliveryGuarantee: at-most-once
 handles:
   - boundedContext: activity-sampling
-    aggregate: activity-log
+    aggregate: logged-activity
     event: timesheet-exported
 sideEffects:
   - type: external-call

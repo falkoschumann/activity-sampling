@@ -1,6 +1,6 @@
 apiVersion: schema.esdm.io/core/v1
 kind: aggregate
-name: activity-log
+name: logged-activity
 scope:
   domain: activity-sampling
   boundedContext: activity-sampling
@@ -34,7 +34,7 @@ name: log-activity
 scope:
   domain: activity-sampling
   boundedContext: activity-sampling
-  aggregate: activity-log
+  aggregate: logged-activity
 data:
   type: object
   properties:
@@ -66,7 +66,7 @@ name: activity-logged
 scope:
   domain: activity-sampling
   boundedContext: activity-sampling
-  aggregate: activity-log
+  aggregate: logged-activity
 data:
   type: object
   properties:
