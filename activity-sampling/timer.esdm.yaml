@@ -10,9 +10,13 @@ identifiedBy:
 state:
   type: object
   properties:
-    currentInterval:
+    interval:
       type: string
       format: duration
+    nextElapseAt:
+      type: string
+      format: date-time
+  required: [intervaö]
 ---
 apiVersion: schema.esdm.io/core/v1
 kind: command
@@ -34,30 +38,6 @@ actors:
   - software-developer
 ---
 apiVersion: schema.esdm.io/core/v1
-kind: command
-name: stop
-scope:
-  domain: activity-sampling
-  boundedContext: activity-sampling
-  aggregate: timer
-data: {}
-publishes:
-  - stopped
-actors:
-  - software-developer
----
-apiVersion: schema.esdm.io/core/v1
-kind: command
-name: elapse-interval
-scope:
-  domain: activity-sampling
-  boundedContext: activity-sampling
-  aggregate: timer
-data: {}
-publishes:
-  - interval-elapsed
----
-apiVersion: schema.esdm.io/core/v1
 kind: event
 name: started
 scope:
@@ -69,13 +49,24 @@ data:
   properties:
     timer:
       type: string
-    timestamp:
-      type: string
-      format: date-time
     interval:
       type: string
       format: duration
-  required: [timer, timestamp, interval]
+  required: [timer, interval]
+---
+apiVersion: schema.esdm.io/core/v1
+kind: command
+name: stop
+scope:
+  domain: activity-sampling
+  boundedContext: activity-sampling
+  aggregate: timer
+data:
+  type: null
+publishes:
+  - stopped
+actors:
+  - software-developer
 ---
 apiVersion: schema.esdm.io/core/v1
 kind: event
@@ -92,8 +83,38 @@ data:
   required: [timer]
 ---
 apiVersion: schema.esdm.io/core/v1
+kind: command
+name: tick
+scope:
+  domain: activity-sampling
+  boundedContext: activity-sampling
+  aggregate: timer
+data:
+  type: null
+publishes:
+  - ticked
+  - elapsed
+---
+apiVersion: schema.esdm.io/core/v1
 kind: event
-name: interval-elapsed
+name: ticked
+scope:
+  domain: activity-sampling
+  boundedContext: activity-sampling
+  aggregate: timer
+data:
+  type: object
+  properties:
+    timer:
+      type: string
+    elapsedTime:
+      type: string
+      format: duration
+  required: [timer]
+---
+apiVersion: schema.esdm.io/core/v1
+kind: event
+name: elapsed
 scope:
   domain: activity-sampling
   boundedContext: activity-sampling
@@ -106,21 +127,67 @@ data:
     timestamp:
       type: string
       format: date-time
-    interval:
+    duration:
       type: string
       format: duration
-  required: [timer, timestamp, interval]
+  required: [timer, timestamp, duration]
 ---
 apiVersion: schema.esdm.io/core/v1
 kind: event-handler
-name: notify-interval-elapsed
+name: notify-timer-elapsed
 scope:
   domain: activity-sampling
 deliveryGuarantee: at-most-once
 handles:
   - boundedContext: activity-sampling
     aggregate: timer
-    event: interval-elapsed
+    event: elapsed
 sideEffects:
   - type: other
     rule: Notify the user that the current interval has elapsed.
+---
+apiVersion: schema.esdm.io/core/v1
+kind: process-manager
+name: timer
+scope:
+  domain: activity-sampling
+deliveryGuarantee: at-most-once
+correlatedBy:
+  source: event-field
+  field: timer
+state:
+  type: null
+startsWhen:
+  - boundedContext: activity-sampling
+    aggregate: timer
+    event: started
+endsWhen:
+  - name: timer-stopped
+    condition: Stop command is received.
+timers:
+  - name: progress
+    after:
+      value: 1
+      unit: seconds
+reactions:
+  - when:
+      boundedContext: activity-sampling
+      aggregate: timer
+      event: started
+    rule: Start the timer.
+    setTimers:
+      - progress
+  - when:
+      boundedContext: activity-sampling
+      aggregate: timer
+      event: stopped
+    rule: Stop the timer.
+    cancelTimers:
+      - progress
+  - when:
+      timer: progress
+    rule: Tick the timer.
+    emits:
+      - boundedContext: activity-sampling
+        aggregate: timer
+        command: tick

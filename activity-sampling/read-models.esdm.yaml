@@ -1,6 +1,6 @@
 apiVersion: schema.esdm.io/core/v1
 kind: read-model
-name: current-interval
+name: timer
 scope:
   domain: activity-sampling
   boundedContext: activity-sampling
@@ -8,25 +8,32 @@ projections:
   - boundedContext: activity-sampling
     aggregate: timer
     event: started
-    rule: Set interval to the value from the event.
+    rule: Reset progress and set running.
   - boundedContext: activity-sampling
     aggregate: timer
-    event: stopped
-    rule: Clear the interval because the timer is no longer running.
+    event: ticked
+    rule: Update progress.
+  - boundedContext: activity-sampling
+    aggregate: timer
+    event: elapsed
+    rule: Memorize timestamp and interval of current interval.
 schema:
   type: object
   properties:
-    interval:
+    isRunning:
+      type: boolean
+    elapsedTime:
       type: string
       format: duration
-    running:
-      type: boolean
-    timestamp:
+    progress:
+      type: number
+    currentTimestamp:
       type: string
       format: date-time
-    currentInterval:
+    currentDuration:
       type: string
       format: duration
+  required: [isRunning, elapsedTime, progress]
 ---
 apiVersion: schema.esdm.io/core/v1
 kind: query
@@ -34,7 +41,7 @@ name: current-interval
 scope:
   domain: activity-sampling
   boundedContext: activity-sampling
-readModel: current-interval
+readModel: timer
 result:
   type: object
   properties:
