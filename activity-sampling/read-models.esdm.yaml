@@ -460,7 +460,7 @@ projections:
     rule: Update the holidays list used for capacity calculation.
   - boundedContext: activity-sampling
     aggregate: calendar
-    event: vacation-changed
+    event: vacations-changed
     rule: Update the vacation list used for capacity calculation.
 schema:
   type: object

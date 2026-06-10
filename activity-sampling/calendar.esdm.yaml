@@ -23,29 +23,10 @@ state:
     holidays:
       type: array
       items:
-        type: object
-        properties:
-          date:
-            type: string
-            format: date
-          title:
-            type: string
-          duration:
-            type: string
-            format: duration
-        required: [date, title]
+        type: Holiday
     vacation:
       type: array
-      items:
-        type: object
-        properties:
-          date:
-            type: string
-            format: date
-          duration:
-            type: string
-            format: duration
-        required: [date]
+      items: Vacation
   required: [holidays, vacation]
 ---
 apiVersion: schema.esdm.io/core/v1
@@ -58,43 +39,9 @@ scope:
 data:
   type: array
   items:
-    type: object
-    properties:
-      date:
-        type: string
-        format: date
-      title:
-        type: string
-      duration:
-        type: string
-        format: duration
-    required: [date, title]
+    type: Holiday
 publishes:
   - holidays-changed
-actors:
-  - calendar
----
-apiVersion: schema.esdm.io/core/v1
-kind: command
-name: sync-vacation
-scope:
-  domain: activity-sampling
-  boundedContext: activity-sampling
-  aggregate: calendar
-data:
-  type: array
-  items:
-    type: object
-    properties:
-      date:
-        type: string
-        format: date
-      duration:
-        type: string
-        format: duration
-    required: [date]
-publishes:
-  - vacation-changed
 actors:
   - calendar
 ---
@@ -108,21 +55,30 @@ scope:
 data:
   type: array
   items:
-    type: object
-    properties:
-      date:
-        type: string
-        format: date
-      title:
-        type: string
-      duration:
-        type: string
-        format: duration
-    required: [date, title]
+    type: Holiday
 ---
 apiVersion: schema.esdm.io/core/v1
-kind: event
-name: vacation-changed
+kind: value-object
+name: holiday
+scope:
+  domain: activity-sampling
+  boundedContext: activity-sampling
+schema:
+  type: object
+  properties:
+    date:
+      type: string
+      format: date
+    title:
+      type: string
+    duration:
+      type: string
+      format: duration
+  required: [date, title]
+---
+apiVersion: schema.esdm.io/core/v1
+kind: command
+name: sync-vacations
 scope:
   domain: activity-sampling
   boundedContext: activity-sampling
@@ -139,3 +95,44 @@ data:
         type: string
         format: duration
     required: [date]
+publishes:
+  - vacations-changed
+actors:
+  - calendar
+---
+apiVersion: schema.esdm.io/core/v1
+kind: event
+name: vacations-changed
+scope:
+  domain: activity-sampling
+  boundedContext: activity-sampling
+  aggregate: calendar
+data:
+  type: array
+  items:
+    type: object
+    properties:
+      date:
+        type: string
+        format: date
+      duration:
+        type: string
+        format: duration
+    required: [date]
+---
+apiVersion: schema.esdm.io/core/v1
+kind: value-object
+name: vacation
+scope:
+  domain: activity-sampling
+  boundedContext: activity-sampling
+schema:
+  type: object
+  properties:
+    date:
+      type: string
+      format: date
+    duration:
+      type: string
+      format: duration
+  required: [date]
