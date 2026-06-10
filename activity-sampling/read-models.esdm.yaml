@@ -83,7 +83,6 @@ result:
             date:
               type: string
               format: date
-              description: The date of the working day in local time.
             activities:
               type: array
               items:
@@ -255,11 +254,9 @@ result:
           start:
             type: string
             format: date
-            description: The date when the first activity in the entry was logged in local time.
           finish:
             type: string
             format: date
-            description: The date when the last activity in the entry was logged in local time.
           client:
             type: string
           project:
@@ -531,11 +528,9 @@ parameters:
     from:
       type: string
       format: date
-      description: The start date of the timesheet period in local time.
     to:
       type: string
       format: date
-      description: The end date of the timesheet period in local time.
     today:
       type: string
       format: date
@@ -553,7 +548,6 @@ result:
           date:
             type: string
             format: date
-            description: The date when the activity was logged in local time.
           client:
             type: string
           project:
