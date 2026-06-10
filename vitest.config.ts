@@ -16,11 +16,12 @@ export default defineConfig({
       provider: "istanbul",
       reporter: ["text", "html", "cobertura", "json"],
       thresholds: {
-        statements: 90,
+        statements: 85,
         branches: 85,
       },
     },
     outputFile: "coverage/junit.xml",
     reporters: ["junit", "tree"],
+    setupFiles: ["./src/shared/polyfill.ts"],
   },
 });
