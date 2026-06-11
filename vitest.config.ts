@@ -8,7 +8,6 @@ export default defineConfig({
       enabled: true,
       include: [
         "src/**/application/**/*",
-        "src/**/common/**/*",
         "src/**/domain/**/*",
         "src/**/infrastructure/**/*",
         // exclude layers UI and root
