@@ -38,7 +38,7 @@
   "devDependencies": {
     "@eslint/js": "10.0.1",
     "@js-temporal/polyfill": "0.5.1",
-    "@muspellheim/shared": "0.23.0",
+    "@muspellheim/shared": "0.24.0",
     "@softarc/sheriff-core": "0.19.6",
     "@types/node": "24.13.2",
     "@types/react": "19.2.17",
