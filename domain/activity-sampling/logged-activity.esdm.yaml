@@ -30,6 +30,42 @@ state:
 ---
 apiVersion: schema.esdm.io/core/v1
 kind: command
+name: export-timesheet
+scope:
+  domain: activity-sampling
+  boundedContext: activity-sampling
+  aggregate: logged-activity
+data:
+  type: object
+  properties:
+    timesheets:
+      type: array
+      items:
+        type: object
+        properties:
+          date:
+            type: string
+            format: date
+          client:
+            type: string
+          project:
+            type: string
+          task:
+            type: string
+          hours:
+            type: string
+            format: duration
+        required: [date, client, project, task, hours]
+    filename:
+      type: string
+  required: [timesheets, filename]
+publishes:
+  - timesheet-exported
+actors:
+  - software-developer
+---
+apiVersion: schema.esdm.io/core/v1
+kind: command
 name: log-activity
 scope:
   domain: activity-sampling
@@ -87,3 +123,34 @@ data:
     category:
       type: string
   required: [timestamp, duration, client, project, task]
+---
+apiVersion: schema.esdm.io/core/v1
+kind: event
+name: timesheet-exported
+scope:
+  domain: activity-sampling
+  boundedContext: activity-sampling
+  aggregate: logged-activity
+data:
+  type: array
+  items:
+    type: object
+    properties:
+      date:
+        type: string
+        format: date
+      client:
+        type: string
+      project:
+        type: string
+      task:
+        type: string
+      notes:
+        type: string
+      hours:
+        type: integer
+      firstName:
+        type: string
+      lastName:
+        type: string
+    required: [date, client, project, task, hours, firstName, lastName]

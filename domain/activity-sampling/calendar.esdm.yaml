@@ -90,39 +90,3 @@ data:
         type: string
         format: duration
     required: [date]
----
-apiVersion: schema.esdm.io/core/v1
-kind: value-object
-name: holiday
-scope:
-  domain: activity-sampling
-  boundedContext: activity-sampling
-schema:
-  type: object
-  properties:
-    date:
-      type: string
-      format: date
-    title:
-      type: string
-    duration:
-      type: string
-      format: duration
-  required: [date, title]
----
-apiVersion: schema.esdm.io/core/v1
-kind: value-object
-name: vacation
-scope:
-  domain: activity-sampling
-  boundedContext: activity-sampling
-schema:
-  type: object
-  properties:
-    date:
-      type: string
-      format: date
-    duration:
-      type: string
-      format: duration
-  required: [date]

@@ -75,6 +75,26 @@ publishes:
 ---
 apiVersion: schema.esdm.io/core/v1
 kind: event
+name: elapsed
+scope:
+  domain: activity-sampling
+  boundedContext: activity-sampling
+  aggregate: timer
+data:
+  type: object
+  properties:
+    timer:
+      type: string
+    timestamp:
+      type: string
+      format: date-time
+    duration:
+      type: string
+      format: duration
+  required: [timer, timestamp, duration]
+---
+apiVersion: schema.esdm.io/core/v1
+kind: event
 name: started
 scope:
   domain: activity-sampling
@@ -123,93 +143,3 @@ data:
       type: string
       format: duration
   required: [timer, elapsedTime, duration]
----
-apiVersion: schema.esdm.io/core/v1
-kind: event
-name: elapsed
-scope:
-  domain: activity-sampling
-  boundedContext: activity-sampling
-  aggregate: timer
-data:
-  type: object
-  properties:
-    timer:
-      type: string
-    timestamp:
-      type: string
-      format: date-time
-    duration:
-      type: string
-      format: duration
-  required: [timer, timestamp, duration]
----
-apiVersion: schema.esdm.io/core/v1
-kind: process-manager
-name: timer
-scope:
-  domain: activity-sampling
-deliveryGuarantee: at-most-once
-correlatedBy:
-  source: event-field
-  field: timer
-state:
-  type: object
-  properties:
-    interval:
-      type: string
-      format: duration
-    nextElapseAt:
-      type: string
-      format: date-time
-startsWhen:
-  - boundedContext: activity-sampling
-    aggregate: timer
-    event: started
-endsWhen:
-  - name: program-exit
-    condition: The program exits.
-timers:
-  - name: progress
-    after:
-      value: 1
-      unit: seconds
-reactions:
-  - when:
-      boundedContext: activity-sampling
-      aggregate: timer
-      event: started
-    rule: Start the timer.
-    setTimers:
-      - progress
-  - when:
-      boundedContext: activity-sampling
-      aggregate: timer
-      event: stopped
-    rule: Stop the timer.
-    cancelTimers:
-      - progress
-  - when:
-      timer: progress
-    rule: Tick the timer.
-    emits:
-      - boundedContext: activity-sampling
-        aggregate: timer
-        command: tick
----
-apiVersion: schema.esdm.io/core/v1
-kind: event-handler
-name: notification
-scope:
-  domain: activity-sampling
-deliveryGuarantee: at-most-once
-handles:
-  - boundedContext: activity-sampling
-    aggregate: logged-activity
-    event: activity-logged
-  - boundedContext: activity-sampling
-    aggregate: timer
-    event: elapsed
-sideEffects:
-  - type: other
-    rule: Notify the user that the current interval has elapsed.
