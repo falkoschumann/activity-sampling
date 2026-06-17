@@ -35,3 +35,13 @@ responsibilities:
   - Receives calendar updates from the external system and triggers synchronization commands.
 backedBy:
   - calendar
+---
+apiVersion: schema.esdm.io/core/v1
+kind: external-system
+name: calendar
+scope:
+  domain: activity-sampling
+direction: inbound
+category: calendar
+capabilities:
+  - Provides information about holidays and vacations.

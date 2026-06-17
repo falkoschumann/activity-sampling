@@ -1,14 +1,4 @@
 apiVersion: schema.esdm.io/core/v1
-kind: external-system
-name: calendar
-scope:
-  domain: activity-sampling
-direction: inbound
-category: calendar
-capabilities:
-  - Provides information about holidays and vacations.
----
-apiVersion: schema.esdm.io/core/v1
 kind: aggregate
 name: calendar
 scope:
@@ -46,37 +36,6 @@ actors:
   - calendar
 ---
 apiVersion: schema.esdm.io/core/v1
-kind: event
-name: holidays-changed
-scope:
-  domain: activity-sampling
-  boundedContext: activity-sampling
-  aggregate: calendar
-data:
-  type: array
-  items:
-    type: Holiday
----
-apiVersion: schema.esdm.io/core/v1
-kind: value-object
-name: holiday
-scope:
-  domain: activity-sampling
-  boundedContext: activity-sampling
-schema:
-  type: object
-  properties:
-    date:
-      type: string
-      format: date
-    title:
-      type: string
-    duration:
-      type: string
-      format: duration
-  required: [date, title]
----
-apiVersion: schema.esdm.io/core/v1
 kind: command
 name: sync-vacations
 scope:
@@ -102,6 +61,18 @@ actors:
 ---
 apiVersion: schema.esdm.io/core/v1
 kind: event
+name: holidays-changed
+scope:
+  domain: activity-sampling
+  boundedContext: activity-sampling
+  aggregate: calendar
+data:
+  type: array
+  items:
+    type: Holiday
+---
+apiVersion: schema.esdm.io/core/v1
+kind: event
 name: vacations-changed
 scope:
   domain: activity-sampling
@@ -119,6 +90,25 @@ data:
         type: string
         format: duration
     required: [date]
+---
+apiVersion: schema.esdm.io/core/v1
+kind: value-object
+name: holiday
+scope:
+  domain: activity-sampling
+  boundedContext: activity-sampling
+schema:
+  type: object
+  properties:
+    date:
+      type: string
+      format: date
+    title:
+      type: string
+    duration:
+      type: string
+      format: duration
+  required: [date, title]
 ---
 apiVersion: schema.esdm.io/core/v1
 kind: value-object

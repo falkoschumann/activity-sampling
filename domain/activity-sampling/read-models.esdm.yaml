@@ -8,7 +8,11 @@ projections:
   - boundedContext: activity-sampling
     aggregate: timer
     event: started
-    rule: Reset progress and set running.
+    rule: Set running and reset progress.
+  - boundedContext: activity-sampling
+    aggregate: timer
+    event: stopped
+    rule: Set non-running.
   - boundedContext: activity-sampling
     aggregate: timer
     event: ticked
@@ -16,7 +20,7 @@ projections:
   - boundedContext: activity-sampling
     aggregate: timer
     event: elapsed
-    rule: Memorize timestamp and interval of current interval.
+    rule: Memorize timestamp and duration of current interval.
 schema:
   type: object
   properties:

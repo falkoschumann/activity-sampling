@@ -1,12 +1,4 @@
 apiVersion: schema.esdm.io/core/v1
-kind: external-system
-name: timesheet
-scope:
-  domain: activity-sampling
-direction: outbound
-category: csv-export
----
-apiVersion: schema.esdm.io/core/v1
 kind: command
 name: export-timesheet
 scope:
@@ -87,3 +79,11 @@ sideEffects:
   - type: external-call
     externalSystem: timesheet
     rule: Write the timesheet for the exported period as a CSV file in Harvest format.
+---
+apiVersion: schema.esdm.io/core/v1
+kind: external-system
+name: timesheet
+scope:
+  domain: activity-sampling
+direction: outbound
+category: csv-export
