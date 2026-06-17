@@ -11,7 +11,7 @@ RUN?=bunx
 SHELL:=/bin/bash
 DEPENDENCY_UPDATER=dependabot[bot]
 
-all: dist check doc
+all: dist doc check
 
 clean:
 	rm -rf coverage out testdata
@@ -33,6 +33,7 @@ start: prepare
 doc: $(DIAGRAM_FILES)
 
 check: test
+	esdm lint
 	$(RUN) $(RUN_OPTIONS) eslint .
 	$(RUN) $(RUN_OPTIONS) stylelint "**/*.scss" --ignore-path .gitignore
 	$(RUN) $(RUN_OPTIONS) prettier --check .
