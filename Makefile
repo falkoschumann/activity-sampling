@@ -32,6 +32,12 @@ start: prepare
 
 doc: $(DIAGRAM_FILES)
 
+domain:
+	esdm view
+
+domain-detailed:
+	esdm view --with-details
+
 check: test
 	esdm lint
 	$(RUN) $(RUN_OPTIONS) eslint .
@@ -94,7 +100,7 @@ endif
 
 .PHONY: \
 	all clean distclean dist \
-	start doc \
+	start doc domain domain-detailed \
 	check format \
 	dev test watch unit-tests integration-tests e2e-tests \
 	docker-build \
