@@ -1,0 +1,16 @@
+apiVersion: schema.esdm.io/core/v1
+kind: event-handler
+name: notifier
+scope:
+  domain: activity-sampling
+deliveryGuarantee: at-most-once
+handles:
+  - boundedContext: activity-sampling
+    aggregate: logged-activity
+    event: activity-logged
+  - boundedContext: activity-sampling
+    aggregate: timer
+    event: elapsed
+sideEffects:
+  - type: other
+    rule: Notify the user that the current interval has elapsed.

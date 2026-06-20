@@ -1,0 +1,52 @@
+apiVersion: schema.esdm.io/core/v1
+kind: process-manager
+name: timer
+scope:
+  domain: activity-sampling
+deliveryGuarantee: at-most-once
+correlatedBy:
+  source: event-field
+  field: timer
+state:
+  type: object
+  properties:
+    interval:
+      type: string
+      format: duration
+    nextElapseAt:
+      type: string
+      format: date-time
+startsWhen:
+  - boundedContext: activity-sampling
+    aggregate: timer
+    event: started
+endsWhen:
+  - name: program-exit
+    condition: The program exits.
+timers:
+  - name: progress
+    after:
+      value: 1
+      unit: seconds
+reactions:
+  - when:
+      boundedContext: activity-sampling
+      aggregate: timer
+      event: started
+    rule: Start the timer.
+    setTimers:
+      - progress
+  - when:
+      boundedContext: activity-sampling
+      aggregate: timer
+      event: stopped
+    rule: Stop the timer.
+    cancelTimers:
+      - progress
+  - when:
+      timer: progress
+    rule: Tick the timer.
+    emits:
+      - boundedContext: activity-sampling
+        aggregate: timer
+        command: tick
