@@ -30,6 +30,39 @@ state:
 ---
 apiVersion: schema.esdm.io/core/v1
 kind: command
+name: log-activity
+scope:
+  domain: activity-sampling
+  boundedContext: activity-sampling
+  aggregate: logged-activity
+data:
+  type: object
+  properties:
+    timestamp:
+      type: string
+      format: date-time
+    duration:
+      type: string
+      format: duration
+    client:
+      type: string
+    project:
+      type: string
+    task:
+      type: string
+    notes:
+      type: string
+    category:
+      type: string
+  required: [timestamp, duration, client, project, task]
+publishes:
+  - activity-logged
+actors:
+  - software-developer
+  - notifier
+---
+apiVersion: schema.esdm.io/core/v1
+kind: command
 name: export-timesheet
 scope:
   domain: activity-sampling
@@ -65,38 +98,6 @@ actors:
   - software-developer
 ---
 apiVersion: schema.esdm.io/core/v1
-kind: command
-name: log-activity
-scope:
-  domain: activity-sampling
-  boundedContext: activity-sampling
-  aggregate: logged-activity
-data:
-  type: object
-  properties:
-    timestamp:
-      type: string
-      format: date-time
-    duration:
-      type: string
-      format: duration
-    client:
-      type: string
-    project:
-      type: string
-    task:
-      type: string
-    notes:
-      type: string
-    category:
-      type: string
-  required: [timestamp, duration, client, project, task]
-publishes:
-  - activity-logged
-actors:
-  - software-developer
----
-apiVersion: schema.esdm.io/core/v1
 kind: event
 name: activity-logged
 scope:
@@ -121,6 +122,8 @@ data:
     notes:
       type: string
     category:
+      type: string
+    notification:
       type: string
   required: [timestamp, duration, client, project, task]
 ---

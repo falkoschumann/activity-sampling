@@ -1,16 +1,36 @@
 apiVersion: schema.esdm.io/core/v1
-kind: event-handler
+kind: process-manager
 name: notifier
 scope:
   domain: activity-sampling
 deliveryGuarantee: at-most-once
-handles:
-  - boundedContext: activity-sampling
-    aggregate: logged-activity
-    event: activity-logged
+correlatedBy:
+  source: event-field
+  field: notification
+state:
+  type: object
+  properties:
+    lastActivity:
+      type: LoggedActivity
+startsWhen:
   - boundedContext: activity-sampling
     aggregate: timer
     event: elapsed
-sideEffects:
-  - type: other
-    rule: Notify the user that the current interval has elapsed.
+endsWhen:
+  - name: close-notification
+    condition: The notification is closed.
+reactions:
+  - when:
+      boundedContext: activity-sampling
+      aggregate: logged-activity
+      event: activity-logged
+    rule: Store last activity.
+  - when:
+      boundedContext: activity-sampling
+      aggregate: timer
+      event: elapsed
+    rule: Show notification with last activity.
+    emits:
+      - boundedContext: activity-sampling
+        aggregate: logged-activity
+        command: log-activity

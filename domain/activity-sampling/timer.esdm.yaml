@@ -58,7 +58,7 @@ data:
     duration:
       type: string
       format: duration
-    elapsedTime:
+    progressedTime:
       type: string
       format: duration
     timestamp:
@@ -68,7 +68,8 @@ data:
   required: [isElapsed, duration]
 constraints:
   - name: tick-or-elapse
-    rule: If isElapsed is true, timestamp must be provided, otherwise elapsedTime must be provided.
+    rule:
+      If isElapsed is true, timestamp must be provided, otherwise progressedTime must be provided.
 publishes:
   - ticked
   - elapsed
@@ -116,13 +117,13 @@ data:
   properties:
     timer:
       type: string
-    elapsedTime:
+    progressedTime:
       type: string
       format: duration
     duration:
       type: string
       format: duration
-  required: [timer, elapsedTime, duration]
+  required: [timer, progressedTime, duration]
 ---
 apiVersion: schema.esdm.io/core/v1
 kind: event
@@ -136,10 +137,12 @@ data:
   properties:
     timer:
       type: string
+    notification:
+      type: string
     timestamp:
       type: string
       format: date-time
     duration:
       type: string
       format: duration
-  required: [timer, timestamp, duration]
+  required: [timer, notification, timestamp, duration]

@@ -35,3 +35,15 @@ responsibilities:
   - Receives calendar updates from the external system and triggers synchronization commands.
 backedBy:
   - calendar
+---
+apiVersion: schema.esdm.io/core/v1
+kind: actor
+name: notifier
+scope:
+  domain: activity-sampling
+  boundedContext: activity-sampling
+type: system
+responsibilities:
+  - Show notification to the user when the current interval has elapsed.
+backedBy:
+  - notifications
