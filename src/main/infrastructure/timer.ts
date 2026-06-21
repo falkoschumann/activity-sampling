@@ -1,7 +1,6 @@
 // Copyright (c) 2026 Falko Schumann. All rights reserved. MIT license.
 
 import { Clock } from "../../shared/domain/temporal";
-import { Temporal } from "@js-temporal/polyfill";
 
 export const INTERVAL_ELAPSED_EVENT = "intervalElapsed";
 

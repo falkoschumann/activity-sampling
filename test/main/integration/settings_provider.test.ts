@@ -2,16 +2,13 @@
 
 import path from "node:path";
 
-import { Temporal } from "@js-temporal/polyfill";
 import { describe, expect, it } from "vitest";
 
-import { Settings } from "../../../src/main/domain/settings";
-import { SettingsProvider } from "../../../src/main/infrastructure/settings_provider";
-
-const NON_EXISTING_FILE = path.resolve(
-  import.meta.dirname,
-  "../data/settings/non-existing.json",
-);
+import {
+  createSettings,
+  createTestSettings,
+} from "../../../src/main/domain/settings/settings.aggregate";
+import { SettingsProvider } from "../../../src/main/infrastructure/settings.provider";
 
 const MINIMAL_FILE = path.resolve(
   import.meta.dirname,
@@ -23,9 +20,19 @@ const FULL_FILE = path.resolve(
   "../data/settings/full.json",
 );
 
+const NON_EXISTING_FILE = path.resolve(
+  import.meta.dirname,
+  "../data/settings/non-existing.json",
+);
+
 const CORRUPT_FILE = path.resolve(
   import.meta.dirname,
   "../data/settings/corrupt.json",
+);
+
+const INVALID_FILE = path.resolve(
+  import.meta.dirname,
+  "../data/settings/invalid.json",
 );
 
 const TEST_FILE = path.resolve(
@@ -34,124 +41,91 @@ const TEST_FILE = path.resolve(
 );
 
 describe("Settings provider", () => {
-  describe("Load", () => {
-    it("should return default settings when file does not exist", async () => {
-      const gateway = SettingsProvider.create({ fileName: NON_EXISTING_FILE });
+  it("should load minimal example", async () => {
+    const gateway = SettingsProvider.create({ filename: MINIMAL_FILE });
 
-      const settings = await gateway.load();
+    const settings = await gateway.load();
 
-      expect(settings).toEqual(Settings.create());
-    });
-
-    it("should return full minimal file", async () => {
-      const gateway = SettingsProvider.create({ fileName: MINIMAL_FILE });
-
-      const settings = await gateway.load();
-
-      expect(settings).toEqual(
-        Settings.create({
-          dataDir: "other-data",
-          capacity: Temporal.Duration.from("PT40H"),
-        }),
-      );
-    });
-
-    it("should return full example file", async () => {
-      const gateway = SettingsProvider.create({ fileName: FULL_FILE });
-
-      const settings = await gateway.load();
-
-      expect(settings).toEqual(
-        Settings.create({
-          dataDir: "other-data",
-          capacity: Temporal.Duration.from("PT20H"),
-          categories: ["Category 1", "Category 2"],
-        }),
-      );
-    });
-
-    it("should throw an error when the file is corrupted", async () => {
-      const gateway = SettingsProvider.create({ fileName: CORRUPT_FILE });
-
-      const result = gateway.load();
-
-      await expect(result).rejects.toThrow(SyntaxError);
-    });
+    expect(settings).toEqual(
+      createSettings({
+        capacity: "PT32H",
+        categories: ["", "Feature", "Rework", "Training"],
+      }),
+    );
   });
 
-  describe("Store", () => {
-    it("should store settings", async () => {
-      const gateway = SettingsProvider.create({ fileName: TEST_FILE });
-      const example = Settings.create({
-        dataDir: "test-data-dir",
-        capacity: Temporal.Duration.from("PT35H"),
-      });
+  it("should load full example", async () => {
+    const gateway = SettingsProvider.create({ filename: FULL_FILE });
 
-      await gateway.store(example);
+    const settings = await gateway.load();
 
-      const settings = await gateway.load();
-      expect(settings).toEqual(example);
-    });
+    expect(settings).toEqual(
+      createTestSettings({
+        firstName: "John",
+        lastName: "Doe",
+      }),
+    );
   });
 
-  describe("Nullable", () => {
-    describe("Load", () => {
-      it("should return default settings when configurable response is null", async () => {
-        const gateway = SettingsProvider.createNull({
-          readFileResponses: [null],
-        });
+  it("should return default settings when file does not exist", async () => {
+    const gateway = SettingsProvider.create({ filename: NON_EXISTING_FILE });
 
-        const settings = await gateway.load();
+    const settings = await gateway.load();
 
-        expect(settings).toEqual(Settings.create());
-      });
+    expect(settings).toEqual(createSettings());
+  });
 
-      it("should return configurable responses", async () => {
-        const gateway = SettingsProvider.createNull({
-          readFileResponses: [
-            Settings.create({
-              dataDir: "data-dir",
-              capacity: "PT20H",
-              categories: ["category 1", "category 2"],
-            }),
-          ],
-        });
+  it("should throw an error when the file is corrupted", async () => {
+    const gateway = SettingsProvider.create({ filename: CORRUPT_FILE });
 
-        const settings = await gateway.load();
+    const result = gateway.load();
 
-        expect(settings).toEqual(
-          Settings.create({
-            dataDir: "data-dir",
-            capacity: "PT20H",
-            categories: ["category 1", "category 2"],
-          }),
-        );
-      });
+    await expect(result).rejects.toThrow(SyntaxError);
+  });
 
-      it("should throw an error when configurable response is an error", async () => {
-        const gateway = SettingsProvider.createNull({
-          readFileResponses: [new Error("Test error")],
-        });
+  it("should throw an error when the file is invalid", async () => {
+    const gateway = SettingsProvider.create({ filename: INVALID_FILE });
 
-        const settings = gateway.load();
+    const result = gateway.load();
 
-        await expect(settings).rejects.toThrow("Test error");
-      });
+    await expect(result).rejects.toThrow(TypeError);
+  });
+
+  it("should load stored settings", async () => {
+    const gateway = SettingsProvider.create({ filename: TEST_FILE });
+    const settings = createTestSettings();
+
+    await gateway.store(settings);
+
+    expect(await gateway.load()).toEqual(createTestSettings());
+  });
+
+  it("should load settings when using nullable", async () => {
+    const gateway = SettingsProvider.createNull({
+      readFileResponses: [createTestSettings()],
     });
 
-    describe("Store", () => {
-      it("should store settings", async () => {
-        const gateway = SettingsProvider.createNull();
-        const storedSettings = gateway.trackStored();
+    const settings = await gateway.load();
 
-        await gateway.store(
-          Settings.create({ dataDir: "data-dir", capacity: "PT40H" }),
-        );
+    expect(settings).toEqual(createTestSettings());
+  });
 
-        expect(storedSettings.data).toEqual<Settings[]>([
-          Settings.create({ dataDir: "data-dir", capacity: "PT40H" }),
-        ]);
-      });
+  it("should store settings when using nullable", async () => {
+    const gateway = SettingsProvider.createNull();
+    const trackedStored = gateway.trackStored();
+
+    await gateway.store(createTestSettings());
+
+    expect(trackedStored.data).toEqual([createTestSettings()]);
+  });
+
+  it("should return default settings when using nullable", async () => {
+    const gateway = SettingsProvider.createNull({
+      readFileResponses: [null],
     });
+
+    const settings = await gateway.load();
+
+    expect(settings).toEqual(createSettings());
   });
 });

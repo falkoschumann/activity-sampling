@@ -3,11 +3,10 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 
-import { Temporal } from "@js-temporal/polyfill";
 import { beforeEach, describe, expect, it } from "vitest";
 
-import { Vacation } from "../../../src/main/domain/calendar";
-import { VacationRepository } from "../../../src/main/infrastructure/vacation_repository";
+import { Vacation } from "../../../src/main/domain/vacation";
+import { VacationRepository } from "../../../src/main/infrastructure/vacation.repository";
 
 const NON_EXISTING_FILE = path.resolve(
   import.meta.dirname,

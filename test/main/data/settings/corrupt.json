@@ -1,4 +1,4 @@
 {
-  "dataDir": "other-data"
-  "capacity": "PT20H"
+  "capacity": "PT32H"
+  "categories": ["", "Feature", "Rework", "Training"]
 }

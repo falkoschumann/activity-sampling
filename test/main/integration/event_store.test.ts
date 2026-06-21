@@ -6,7 +6,7 @@ import fsPromise from "node:fs/promises";
 import { describe, expect, it } from "vitest";
 
 import { EventStore } from "../../../src/main/infrastructure/event_store";
-import { ActivityLoggedEvent } from "../../../src/main/domain/activity_logged_event";
+import { ActivityLoggedEvent } from "../../../src/main/domain/logged-activity/activity_logged.event";
 
 const TEST_FILE = path.resolve(
   import.meta.dirname,

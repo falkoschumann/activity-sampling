@@ -5,10 +5,9 @@ import fsPromise from "node:fs/promises";
 
 import { describe, expect, it } from "vitest";
 
-import {
-  Timesheet,
-  TimesheetExporter,
-} from "../../../src/main/infrastructure/timesheet_exporter";
+import { TimesheetExporterGateway } from "../../../src/main/infrastructure/timesheet_exporter.gateway";
+import { TimesheetData } from "../../../src/main/domain/timesheet_data";
+import { TimesheetExportedEvent } from "../../../src/main/domain/logged-activity/timesheet_exported.event";
 
 const TEST_FILE = path.resolve(
   import.meta.dirname,
@@ -18,23 +17,28 @@ const TEST_FILE = path.resolve(
 describe("Timesheet export", () => {
   it("should export timesheet without an error", async () => {
     await fsPromise.rm(TEST_FILE, { force: true });
-    const exporter = TimesheetExporter.create();
+    const exporter = TimesheetExporterGateway.create();
 
-    const timesheets = [Timesheet.createTestInstance()];
-    await exporter.exportTimesheet(timesheets, TEST_FILE);
+    const event = TimesheetExportedEvent.create({
+      filename: TEST_FILE,
+      timesheets: [TimesheetData.createTestInstance()],
+    });
+    await exporter.exportTimesheet(event);
   });
 
   describe("Nullable", () => {
     it("should export timesheet without an error", async () => {
-      const exporter = TimesheetExporter.createNull();
+      const exporter = TimesheetExporterGateway.createNull();
       const exported = exporter.trackExported();
 
-      const timesheets = [Timesheet.createTestInstance()];
-      const fileName = "export/null-timesheets.csv";
-      await exporter.exportTimesheet(timesheets, fileName);
+      const event = TimesheetExportedEvent.create({
+        filename: "export/null-timesheets.csv",
+        timesheets: [TimesheetData.createTestInstance()],
+      });
+      await exporter.exportTimesheet(event);
 
-      expect(exported.data).toEqual<Timesheet[][]>([
-        [Timesheet.createTestInstance()],
+      expect(exported.data).toEqual<TimesheetData[][]>([
+        [TimesheetData.createTestInstance()],
       ]);
     });
   });

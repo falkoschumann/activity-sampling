@@ -12,7 +12,7 @@ import type { Options as ParseOptions } from "csv-parse";
 import type { Options as StringifyOptions } from "csv-stringify";
 import { stringify as syncStringify } from "csv-stringify/sync";
 
-import { ActivityLoggedEvent } from "../domain/activity_logged_event";
+import { ActivityLoggedEvent } from "../domain/logged-activity/activity_logged.event";
 
 export class EventStore extends EventTarget {
   static create({
