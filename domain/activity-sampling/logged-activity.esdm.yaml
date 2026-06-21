@@ -74,21 +74,7 @@ data:
     timesheets:
       type: array
       items:
-        type: object
-        properties:
-          date:
-            type: string
-            format: date
-          client:
-            type: string
-          project:
-            type: string
-          task:
-            type: string
-          hours:
-            type: string
-            format: duration
-        required: [date, client, project, task, hours]
+        type: TimesheetEntry
     filename:
       type: string
   required: [timesheets, filename]
@@ -135,25 +121,12 @@ scope:
   boundedContext: activity-sampling
   aggregate: logged-activity
 data:
-  type: array
-  items:
-    type: object
-    properties:
-      date:
-        type: string
-        format: date
-      client:
-        type: string
-      project:
-        type: string
-      task:
-        type: string
-      notes:
-        type: string
-      hours:
-        type: integer
-      firstName:
-        type: string
-      lastName:
-        type: string
-    required: [date, client, project, task, hours, firstName, lastName]
+  type: object
+  properties:
+    filename:
+      type: string
+    timesheets:
+      type: array
+      items:
+        type: TimesheetData
+    required: [filename, timesheets]

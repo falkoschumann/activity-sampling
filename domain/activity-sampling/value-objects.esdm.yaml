@@ -1,6 +1,6 @@
 apiVersion: schema.esdm.io/core/v1
 kind: value-object
-name: holiday
+name: timesheet-entry
 scope:
   domain: activity-sampling
   boundedContext: activity-sampling
@@ -10,16 +10,20 @@ schema:
     date:
       type: string
       format: date
-    title:
+    client:
       type: string
-    duration:
+    project:
+      type: string
+    task:
+      type: string
+    hours:
       type: string
       format: duration
-  required: [date, title]
+  required: [date, client, project, task, hours]
 ---
 apiVersion: schema.esdm.io/core/v1
 kind: value-object
-name: vacation
+name: timesheet-data
 scope:
   domain: activity-sampling
   boundedContext: activity-sampling
@@ -29,7 +33,18 @@ schema:
     date:
       type: string
       format: date
-    duration:
+    client:
       type: string
-      format: duration
-  required: [date]
+    project:
+      type: string
+    task:
+      type: string
+    notes:
+      type: string
+    hours:
+      type: number
+    firstName:
+      type: string
+    lastName:
+      type: string
+  required: [date, client, project, task, hours, firstName, lastName]

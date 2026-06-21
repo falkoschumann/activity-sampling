@@ -143,12 +143,8 @@ scope:
 projections:
   - boundedContext: activity-sampling
     aggregate: settings
-    event: capacity-changed
-    rule: Update the capacity value used for capacity calculation.
-  - boundedContext: activity-sampling
-    aggregate: settings
-    event: categories-changed
-    rule: Update the categories list used for categorizing activities.
+    event: changed
+    rule: Update the settings.
 schema:
   type: object
   properties:
@@ -159,6 +155,10 @@ schema:
       type: array
       items:
         type: string
+    firstName:
+      type: string
+    lastName:
+      type: string
   required: [capacity, categories]
 ---
 apiVersion: schema.esdm.io/core/v1
@@ -453,14 +453,14 @@ projections:
     rule: Append the activity entry to the timesheet.
   - boundedContext: activity-sampling
     aggregate: settings
-    event: capacity-changed
+    event: changed
     rule: Update the capacity value used for capacity calculation.
   - boundedContext: activity-sampling
-    aggregate: calendar
+    aggregate: holiday
     event: holidays-changed
     rule: Update the holidays list used for capacity calculation.
   - boundedContext: activity-sampling
-    aggregate: calendar
+    aggregate: vacation
     event: vacations-changed
     rule: Update the vacation list used for capacity calculation.
 schema:

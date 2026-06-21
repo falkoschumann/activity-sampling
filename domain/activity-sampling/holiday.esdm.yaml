@@ -1,0 +1,49 @@
+apiVersion: schema.esdm.io/core/v1
+kind: aggregate
+name: holiday
+scope:
+  domain: activity-sampling
+  boundedContext: activity-sampling
+identifiedBy:
+  source: state
+  field: date
+state:
+  type: object
+  properties:
+    date:
+      type: string
+      format: date
+    title:
+      type: string
+    duration:
+      type: string
+      format: duration
+  required: [date, title]
+---
+apiVersion: schema.esdm.io/core/v1
+kind: command
+name: sync-holidays
+scope:
+  domain: activity-sampling
+  boundedContext: activity-sampling
+  aggregate: holiday
+data:
+  type: array
+  items:
+    type: Holiday
+publishes:
+  - holidays-changed
+actors:
+  - calendar
+---
+apiVersion: schema.esdm.io/core/v1
+kind: event
+name: holidays-changed
+scope:
+  domain: activity-sampling
+  boundedContext: activity-sampling
+  aggregate: holiday
+data:
+  type: array
+  items:
+    type: Holiday

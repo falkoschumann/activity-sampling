@@ -1,6 +1,6 @@
 apiVersion: schema.esdm.io/core/v1
 kind: event-handler
-name: write-timesheet-csv
+name: timesheet-exporter
 scope:
   domain: activity-sampling
 deliveryGuarantee: at-most-once

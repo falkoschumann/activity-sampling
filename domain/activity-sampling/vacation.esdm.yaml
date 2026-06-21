@@ -1,0 +1,47 @@
+apiVersion: schema.esdm.io/core/v1
+kind: aggregate
+name: vacation
+scope:
+  domain: activity-sampling
+  boundedContext: activity-sampling
+identifiedBy:
+  source: state
+  field: date
+state:
+  type: object
+  properties:
+    date:
+      type: string
+      format: date
+    duration:
+      type: string
+      format: duration
+  required: [date]
+---
+apiVersion: schema.esdm.io/core/v1
+kind: command
+name: sync-vacations
+scope:
+  domain: activity-sampling
+  boundedContext: activity-sampling
+  aggregate: vacation
+data:
+  type: array
+  items:
+    type: Vacation
+publishes:
+  - vacations-changed
+actors:
+  - calendar
+---
+apiVersion: schema.esdm.io/core/v1
+kind: event
+name: vacations-changed
+scope:
+  domain: activity-sampling
+  boundedContext: activity-sampling
+  aggregate: vacation
+data:
+  type: array
+  items:
+    type: Vacation
