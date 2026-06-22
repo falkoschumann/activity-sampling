@@ -1,6 +1,6 @@
 // Copyright (c) 2026 Falko Schumann. All rights reserved. MIT license.
 
-import { EventBus, type Message, MessageRouter } from "@muspellheim/shared";
+import { EventBus, MessageRouter, MessageTracker } from "@muspellheim/shared";
 import { describe, expect, it } from "vitest";
 
 import { NotifierProcessManager } from "../../../src/main/application/notifier.process_manager";
@@ -60,8 +60,7 @@ describe("Notifier", () => {
 
   it("should do nothing when notification clicked and last activity does not exist", async () => {
     const { eventBus, messageRouter, notifications } = configure();
-    const messages: Message[] = [];
-    messageRouter.register("log-activity", (message) => messages.push(message));
+    const messageTracker = MessageTracker.create(messageRouter, "log-activity");
     const showTracked = notifications.trackShow();
     eventBus.publish(
       TimerElapsedEvent.create({
@@ -73,13 +72,12 @@ describe("Notifier", () => {
 
     notifications.simulateClick();
 
-    expect(messages).toEqual([]);
+    expect(messageTracker.messages).toEqual([]);
   });
 
   it("should emit last activity when notification clicked", async () => {
     const { eventBus, messageRouter, notifications } = configure();
-    const messages: Message[] = [];
-    messageRouter.register("log-activity", (message) => messages.push(message));
+    const messageTracker = MessageTracker.create(messageRouter, "log-activity");
     const showTracked = notifications.trackShow();
     eventBus.publish(
       ActivityLoggedEvent.createTestInstance({
@@ -98,7 +96,7 @@ describe("Notifier", () => {
 
     notifications.simulateClick();
 
-    expect(messages).toEqual([
+    expect(messageTracker.messages).toEqual([
       LogActivityCommand.createTestInstance({
         client: "my-client",
         project: "my-project",

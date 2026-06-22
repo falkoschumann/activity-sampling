@@ -1,6 +1,6 @@
 // Copyright (c) 2026 Falko Schumann. All rights reserved. MIT license.
 
-import { EventBus, type Message, MessageRouter } from "@muspellheim/shared";
+import { EventBus, MessageRouter, MessageTracker } from "@muspellheim/shared";
 import { describe, expect, it } from "vitest";
 
 import { TimerProcessManager } from "../../../src/main/application/timer.process_manager";
@@ -35,12 +35,11 @@ describe("Timer", () => {
   it("should tick the timer", async () => {
     const { manager, eventBus, messageRouter } = configure();
     eventBus.publish(TimerStartedEvent.create({ interval: "PT30M" }));
-    const messages: Message[] = [];
-    messageRouter.register("tick-timer", (message) => messages.push(message));
+    const messageTracker = MessageTracker.create(messageRouter, "tick-timer");
 
     await manager.simulateTick("PT10M");
 
-    expect(messages).toEqual([
+    expect(messageTracker.messages).toEqual([
       TickTimerCommand.create({ progressedTime: "PT10M", duration: "PT30M" }),
     ]);
   });
@@ -48,12 +47,11 @@ describe("Timer", () => {
   it("should elapse the timer", async () => {
     const { manager, eventBus, messageRouter } = configure();
     eventBus.publish(TimerStartedEvent.create({ interval: "PT30M" }));
-    const messages: Message[] = [];
-    messageRouter.register("tick-timer", (message) => messages.push(message));
+    const messageTracker = MessageTracker.create(messageRouter, "tick-timer");
 
     await manager.simulateTick("PT30M");
 
-    expect(messages).toEqual([
+    expect(messageTracker.messages).toEqual([
       TickTimerCommand.create({
         isElapsed: true,
         duration: "PT30M",
