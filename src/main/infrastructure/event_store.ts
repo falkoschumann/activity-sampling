@@ -50,7 +50,7 @@ export class EventStore extends EventTarget {
     const file = await this.#fs.open(this.fileName, "a");
     const stream = file.createWriteStream();
     stringifier.pipe(stream);
-    stringifier.write(event);
+    stringifier.write(event.data);
     stringifier.end();
 
     this.dispatchEvent(new CustomEvent(RECORDED_EVENT, { detail: event }));
@@ -60,13 +60,33 @@ export class EventStore extends EventTarget {
     return OutputTracker.create(this, RECORDED_EVENT);
   }
 
-  async *replay(): AsyncGenerator<ActivityLoggedEvent> {
+  async *replay({
+    from,
+    to,
+  }: {
+    from?: Temporal.InstantLike;
+    to?: Temporal.InstantLike;
+  } = {}): AsyncGenerator<ActivityLoggedEvent> {
     try {
       const file = await this.#fs.open(this.fileName, "r");
       const parser = file.createReadStream().pipe(parse(PARSE_CONFIGURATION));
       for await (const record of parser) {
         validateRecord(record);
-        yield ActivityLoggedEvent.create(record);
+        const event = ActivityLoggedEvent.create(record);
+        if (
+          from != null &&
+          Temporal.Instant.compare(event.data.timestamp, from) < 0
+        ) {
+          continue;
+        }
+        if (
+          to != null &&
+          Temporal.Instant.compare(event.data.timestamp, to) > 0
+        ) {
+          continue;
+        }
+
+        yield event;
       }
       parser.end();
     } catch (error) {
@@ -199,11 +219,10 @@ class FileHandleStub {
   createReadStream() {
     const readable = new stream.PassThrough();
     setTimeout(() => {
-      const events = this.#createReadStreamResponses.next();
-      const record = syncStringify(
-        events as unknown[],
-        STRINGIFY_CONFIGURATION,
-      );
+      const events =
+        this.#createReadStreamResponses.next() as ActivityLoggedEvent[];
+      const data = events.map((event) => event.data);
+      const record = syncStringify(data as unknown[], STRINGIFY_CONFIGURATION);
       readable.emit("data", record);
       readable.emit("end");
     }, 0);

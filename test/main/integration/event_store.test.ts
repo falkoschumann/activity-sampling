@@ -20,6 +20,11 @@ const MINIMAL_FILE = path.resolve(
 
 const FULL_FILE = path.resolve(import.meta.dirname, "../data/events/full.csv");
 
+const FILTER_FILE = path.resolve(
+  import.meta.dirname,
+  "../data/events/filter.csv",
+);
+
 const NON_EXISTING_FILE = path.resolve(
   import.meta.dirname,
   "../data/events/non_existing.csv",
@@ -32,7 +37,6 @@ const CORRUPT_FILE = path.resolve(
 
 describe("Event store", () => {
   it("should replay minimal event", async () => {
-    await fsPromise.rm(TEST_FILE, { force: true });
     const store = EventStore.create({ fileName: MINIMAL_FILE });
 
     const events = await Array.fromAsync(store.replay());
@@ -43,7 +47,6 @@ describe("Event store", () => {
   });
 
   it("should replay full event", async () => {
-    await fsPromise.rm(TEST_FILE, { force: true });
     const store = EventStore.create({ fileName: FULL_FILE });
 
     const events = await Array.fromAsync(store.replay());
@@ -52,6 +55,87 @@ describe("Event store", () => {
       ActivityLoggedEvent.createTestInstance({
         notes: "Test notes",
         category: "Test category",
+      }),
+    ]);
+  });
+
+  it("should replay all events when filter is not set", async () => {
+    const store = EventStore.create({ fileName: FILTER_FILE });
+
+    const events = await Array.fromAsync(store.replay());
+
+    expect(events).toEqual<ActivityLoggedEvent[]>([
+      ActivityLoggedEvent.createTestInstance({
+        timestamp: "2026-06-15T10:00:00Z",
+      }),
+      ActivityLoggedEvent.createTestInstance({
+        timestamp: "2026-06-16T10:00:00Z",
+      }),
+      ActivityLoggedEvent.createTestInstance({
+        timestamp: "2026-06-18T10:00:00Z",
+      }),
+      ActivityLoggedEvent.createTestInstance({
+        timestamp: "2026-06-19T10:00:00Z",
+      }),
+    ]);
+  });
+
+  it("should replay filtered event with start", async () => {
+    const store = EventStore.create({ fileName: FILTER_FILE });
+
+    const events = await Array.fromAsync(
+      store.replay({ from: "2026-06-16T10:00:00Z" }),
+    );
+
+    expect(events).toEqual<ActivityLoggedEvent[]>([
+      ActivityLoggedEvent.createTestInstance({
+        timestamp: "2026-06-16T10:00:00Z",
+      }),
+      ActivityLoggedEvent.createTestInstance({
+        timestamp: "2026-06-18T10:00:00Z",
+      }),
+      ActivityLoggedEvent.createTestInstance({
+        timestamp: "2026-06-19T10:00:00Z",
+      }),
+    ]);
+  });
+
+  it("should replay filtered event with end", async () => {
+    const store = EventStore.create({ fileName: FILTER_FILE });
+
+    const events = await Array.fromAsync(
+      store.replay({ to: "2026-06-18T10:00:00Z" }),
+    );
+
+    expect(events).toEqual<ActivityLoggedEvent[]>([
+      ActivityLoggedEvent.createTestInstance({
+        timestamp: "2026-06-15T10:00:00Z",
+      }),
+      ActivityLoggedEvent.createTestInstance({
+        timestamp: "2026-06-16T10:00:00Z",
+      }),
+      ActivityLoggedEvent.createTestInstance({
+        timestamp: "2026-06-18T10:00:00Z",
+      }),
+    ]);
+  });
+
+  it("should replay filtered event with start and end", async () => {
+    const store = EventStore.create({ fileName: FILTER_FILE });
+
+    const events = await Array.fromAsync(
+      store.replay({
+        from: "2026-06-16T10:00:00Z",
+        to: "2026-06-18T10:00:00Z",
+      }),
+    );
+
+    expect(events).toEqual<ActivityLoggedEvent[]>([
+      ActivityLoggedEvent.createTestInstance({
+        timestamp: "2026-06-16T10:00:00Z",
+      }),
+      ActivityLoggedEvent.createTestInstance({
+        timestamp: "2026-06-18T10:00:00Z",
       }),
     ]);
   });
