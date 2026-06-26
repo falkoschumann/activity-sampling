@@ -1,5 +1,106 @@
 apiVersion: schema.esdm.io/core/v1
 kind: read-model
+name: timesheet
+scope:
+  domain: activity-sampling
+  boundedContext: activity-sampling
+projections:
+  - boundedContext: activity-sampling
+    aggregate: logged-activity
+    event: activity-logged
+    rule: Append the activity entry to the timesheet.
+  - boundedContext: activity-sampling
+    aggregate: settings
+    event: changed
+    rule: Update the capacity value used for capacity calculation.
+  - boundedContext: activity-sampling
+    aggregate: holiday
+    event: holidays-changed
+    rule: Update the holidays list used for capacity calculation.
+  - boundedContext: activity-sampling
+    aggregate: vacation
+    event: vacations-changed
+    rule: Update the vacation list used for capacity calculation.
+schema:
+  type: object
+  properties:
+    entries:
+      type: array
+      items:
+        type: object
+        properties:
+          timestamp:
+            type: string
+            format: date-time
+            description: The timestamp when the activity was logged in UTC.
+          duration:
+            type: string
+            format: duration
+          client:
+            type: string
+          project:
+            type: string
+          task:
+            type: string
+          notes:
+            type: string
+          category:
+            type: string
+        required: [timestamp, duration, client, project, task]
+    holidays:
+      type: array
+      items:
+        type: Holiday
+    vacations:
+      type: array
+      items:
+        type: Vacation
+    capacity:
+      type: string
+      format: duration
+    categories:
+      type: array
+      items:
+        type: string
+  required:
+    - entries
+    - holidays
+    - vacations
+    - capacity
+    - categories
+---
+apiVersion: schema.esdm.io/core/v1
+kind: query
+name: get-recent-activities
+scope:
+  domain: activity-sampling
+  boundedContext: activity-sampling
+readModel: timesheet
+parameters:
+  type: object
+  properties:
+    today:
+      type: string
+      format: date
+    timezone:
+      type: string
+  required: [today, timezone]
+result:
+  type: array
+  items:
+    type: object
+    properties:
+      workingDays:
+        type: array
+        items: WorkingDay
+      timeSummary:
+        type: TimeSummary
+    required: [workingDays, timeSummary]
+actors:
+  - software-developer
+---
+apiVersion: schema.esdm.io/core/v1
+kind: read-model
 name: timer
 scope:
   domain: activity-sampling
@@ -55,82 +156,6 @@ result:
     duration:
       type: string
       format: duration
-actors:
-  - software-developer
----
-apiVersion: schema.esdm.io/core/v1
-kind: query
-name: recent-activities
-scope:
-  domain: activity-sampling
-  boundedContext: activity-sampling
-readModel: timesheet
-parameters:
-  type: object
-  properties:
-    today:
-      type: string
-      format: date
-    timezone:
-      type: string
-  required: [today, timezone]
-result:
-  type: array
-  items:
-    type: object
-    properties:
-      workingDays:
-        type: array
-        items:
-          type: object
-          properties:
-            date:
-              type: string
-              format: date
-            activities:
-              type: array
-              items:
-                type: object
-                properties:
-                  # TODO replace dateTime with time, the date is already included in the parent object
-                  dateTime:
-                    type: string
-                    format: date-time
-                    description: The timestamp when the activity was logged in local time.
-                  # TODO remove duration
-                  duration:
-                    type: string
-                    format: duration
-                  client:
-                    type: string
-                  project:
-                    type: string
-                  task:
-                    type: string
-                  notes:
-                    type: string
-                  category:
-                    type: string
-                required: [dateTime, duration, client, project, task]
-          required: [date, activities]
-      timeSummary:
-        type: object
-        # TODO remove prefix "hours" from property names
-        properties:
-          hoursToday:
-            type: string
-            format: duration
-          hoursYesterday:
-            type: string
-            format: duration
-          hoursThisWeek:
-            type: string
-            format: duration
-          hoursThisMonth:
-            type: string
-            format: duration
-        required: [hoursToday, hoursYesterday, hoursThisWeek, hoursThisMonth]
-    required: [workingDays, timeSummary]
 actors:
   - software-developer
 ---
@@ -439,85 +464,6 @@ result:
   required: [data, categories, totalThroughput]
 actors:
   - product-owner
----
-apiVersion: schema.esdm.io/core/v1
-kind: read-model
-name: timesheet
-scope:
-  domain: activity-sampling
-  boundedContext: activity-sampling
-projections:
-  - boundedContext: activity-sampling
-    aggregate: logged-activity
-    event: activity-logged
-    rule: Append the activity entry to the timesheet.
-  - boundedContext: activity-sampling
-    aggregate: settings
-    event: changed
-    rule: Update the capacity value used for capacity calculation.
-  - boundedContext: activity-sampling
-    aggregate: holiday
-    event: holidays-changed
-    rule: Update the holidays list used for capacity calculation.
-  - boundedContext: activity-sampling
-    aggregate: vacation
-    event: vacations-changed
-    rule: Update the vacation list used for capacity calculation.
-schema:
-  type: object
-  properties:
-    entries:
-      type: array
-      items:
-        type: object
-        properties:
-          timestamp:
-            type: string
-            format: date-time
-            description: The timestamp when the activity was logged in UTC.
-          duration:
-            type: string
-            format: duration
-          client:
-            type: string
-          project:
-            type: string
-          task:
-            type: string
-          notes:
-            type: string
-          category:
-            type: string
-        required: [timestamp, duration, client, project, task]
-    holidays:
-      type: array
-      items:
-        type: object
-        properties:
-          date:
-            type: string
-            format: date
-          title:
-            type: string
-          duration:
-            type: string
-            format: duration
-        required: [date, title]
-    vacations:
-      type: array
-      items:
-        type: object
-        properties:
-          date:
-            type: string
-            format: date
-          duration:
-            type: string
-            format: duration
-        required: [date]
-    capacity:
-      type: string
-      format: duration
 ---
 apiVersion: schema.esdm.io/core/v1
 kind: query
