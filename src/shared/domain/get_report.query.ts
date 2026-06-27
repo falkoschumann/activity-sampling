@@ -1,8 +1,6 @@
 // Copyright (c) 2026 Falko Schumann. All rights reserved. MIT license.
 
-import { Temporal } from "@js-temporal/polyfill";
-
-export class ReportQuery {
+export class GetReportQuery {
   static create({
     scope,
     from,
@@ -10,11 +8,11 @@ export class ReportQuery {
     timeZone = Temporal.Now.timeZoneId(),
   }: {
     scope: ReportScope;
-    from?: Temporal.PlainDateLike | string;
-    to?: Temporal.PlainDateLike | string;
+    from?: Temporal.PlainDateLike;
+    to?: Temporal.PlainDateLike;
     timeZone?: Temporal.TimeZoneLike;
   }) {
-    return new ReportQuery(scope, timeZone, from, to);
+    return new GetReportQuery(scope, timeZone, from, to);
   }
 
   static createTestInstance({
@@ -24,28 +22,28 @@ export class ReportQuery {
     timeZone,
   }: {
     scope?: ReportScope;
-    from?: Temporal.PlainDateLike | string;
-    to?: Temporal.PlainDateLike | string;
+    from?: Temporal.PlainDateLike;
+    to?: Temporal.PlainDateLike;
     timeZone?: Temporal.TimeZoneLike;
   } = {}) {
-    return ReportQuery.create({ scope, from, to, timeZone });
+    return GetReportQuery.create({ scope, from, to, timeZone });
   }
 
-  readonly scope: ReportScope;
-  readonly from?: Temporal.PlainDate;
-  readonly to?: Temporal.PlainDate;
-  readonly timeZone: Temporal.TimeZoneLike;
+  readonly type = "get-report";
+  readonly data;
 
   private constructor(
     scope: ReportScope,
     timeZone: Temporal.TimeZoneLike,
-    from?: Temporal.PlainDateLike | string,
-    to?: Temporal.PlainDateLike | string,
+    from?: Temporal.PlainDateLike,
+    to?: Temporal.PlainDateLike,
   ) {
-    this.scope = scope;
-    this.from = from ? Temporal.PlainDate.from(from) : undefined;
-    this.to = to ? Temporal.PlainDate.from(to) : undefined;
-    this.timeZone = timeZone;
+    this.data = {
+      scope,
+      from: from ? Temporal.PlainDate.from(from) : undefined,
+      to: to ? Temporal.PlainDate.from(to) : undefined,
+      timeZone,
+    };
   }
 }
 
@@ -58,15 +56,15 @@ export const ReportScope = Object.freeze({
 
 export type ReportScope = (typeof ReportScope)[keyof typeof ReportScope];
 
-export class ReportQueryResult {
+export class GetReportQueryResult {
   static create({
     entries = [],
     totalHours = "PT0S",
   }: {
     entries?: ReportEntry[];
-    totalHours?: Temporal.DurationLike | string;
+    totalHours?: Temporal.DurationLike;
   } = {}) {
-    return new ReportQueryResult(entries, totalHours);
+    return new GetReportQueryResult(entries, totalHours);
   }
 
   static createTestInstance({
@@ -74,9 +72,9 @@ export class ReportQueryResult {
     totalHours = "PT8H",
   }: {
     entries?: ReportEntry[];
-    totalHours?: Temporal.DurationLike | string;
+    totalHours?: Temporal.DurationLike;
   } = {}) {
-    return ReportQueryResult.create({ entries, totalHours });
+    return GetReportQueryResult.create({ entries, totalHours });
   }
 
   readonly entries: ReportEntry[];
@@ -84,7 +82,7 @@ export class ReportQueryResult {
 
   private constructor(
     entries: ReportEntry[],
-    totalHours: Temporal.DurationLike | string,
+    totalHours: Temporal.DurationLike,
   ) {
     this.entries = entries.map((entry) => ReportEntry.create(entry));
     this.totalHours = Temporal.Duration.from(totalHours);
@@ -103,13 +101,13 @@ export class ReportEntry {
     hours,
     cycleTime,
   }: {
-    start: Temporal.PlainDateLike | string;
-    finish: Temporal.PlainDateLike | string;
+    start: Temporal.PlainDateLike;
+    finish: Temporal.PlainDateLike;
     client?: string;
     project?: string;
     task?: string;
     category?: string;
-    hours: Temporal.DurationLike | string;
+    hours: Temporal.DurationLike;
     cycleTime: number;
   }) {
     return new ReportEntry(
@@ -134,13 +132,13 @@ export class ReportEntry {
     hours = Temporal.Duration.from("PT8H"),
     cycleTime = 1,
   }: {
-    start?: Temporal.PlainDateLike | string;
-    finish?: Temporal.PlainDateLike | string;
+    start?: Temporal.PlainDateLike;
+    finish?: Temporal.PlainDateLike;
     client?: string;
     project?: string;
     task?: string;
     category?: string;
-    hours?: Temporal.DurationLike | string;
+    hours?: Temporal.DurationLike;
     cycleTime?: number;
   } = {}) {
     return ReportEntry.create({
@@ -165,13 +163,13 @@ export class ReportEntry {
   readonly cycleTime: number;
 
   private constructor(
-    start: Temporal.PlainDateLike | string,
-    finish: Temporal.PlainDateLike | string,
+    start: Temporal.PlainDateLike,
+    finish: Temporal.PlainDateLike,
     client: string,
     project: string,
     task: string,
     category: string,
-    hours: Temporal.DurationLike | string,
+    hours: Temporal.DurationLike,
     cycleTime: number,
   ) {
     this.start = Temporal.PlainDate.from(start);

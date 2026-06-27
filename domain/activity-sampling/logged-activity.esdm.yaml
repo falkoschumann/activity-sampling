@@ -1,6 +1,6 @@
 apiVersion: schema.esdm.io/core/v1
 kind: aggregate
-name: logged-activity
+name: activity
 scope:
   domain: activity-sampling
   boundedContext: activity-sampling
@@ -10,23 +10,24 @@ identifiedBy:
 state:
   type: object
   properties:
-    timestamp:
+    start:
       type: string
-      format: date-time
-    duration:
+      format: date
+    finish:
       type: string
-      format: duration
+      format: date
     client:
       type: string
     project:
       type: string
     task:
       type: string
-    notes:
-      type: string
     category:
       type: string
-  required: [timestamp, duration, client, project, task]
+    hours:
+      type: string
+      format: duration
+  required: [start, finish, client, project, task, hours]
 ---
 apiVersion: schema.esdm.io/core/v1
 kind: command

@@ -14,7 +14,7 @@ import type { WorkingDay } from "../../../src/shared/domain/working_day";
 import { EventStore } from "../../../src/main/infrastructure/event_store";
 import { SettingsProvider } from "../../../src/main/infrastructure/settings.provider";
 
-describe("Recent Activities", () => {
+describe("Get recent Activities", () => {
   it("should return empty result when no activity is logged", async () => {
     const { handler } = configure({
       events: [],

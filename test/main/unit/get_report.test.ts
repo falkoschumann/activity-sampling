@@ -3,27 +3,27 @@
 import { Temporal } from "@js-temporal/polyfill";
 import { describe, expect, it } from "vitest";
 
-import { ReportQueryHandler } from "../../../src/main/application/report_query_handler";
+import { GetReportQueryHandler } from "../../../src/main/application/get_report.query_handler";
+import { ActivityLoggedEvent } from "../../../src/main/domain/logged-activity/activity_logged.event";
 import {
-  ReportEntry,
-  ReportQuery,
-  ReportQueryResult,
+  GetReportQuery,
+  GetReportQueryResult,
   ReportScope,
-} from "../../../src/shared/domain/report_query";
-import { ActivityLoggedEvent } from "../../../src/main/domain/activity_logged_event";
+} from "../../../src/shared/domain/get_report.query";
+import { ReportEntry } from "../../../src/shared/domain/report_entry";
 import { EventStore } from "../../../src/main/infrastructure/event_store";
 
-describe("Report", () => {
+describe("Get report", () => {
   describe("Summarize hours worked for clients", () => {
     it("should return an empty result when no activity is logged", async () => {
       const { handler } = configure({ events: [] });
 
       const result = await handler.handle(
-        ReportQuery.create({ scope: ReportScope.CLIENTS }),
+        GetReportQuery.create({ scope: ReportScope.CLIENTS }),
       );
 
       expect(result).toEqual(
-        ReportQueryResult.create({
+        GetReportQueryResult.create({
           entries: [],
           totalHours: "PT0S",
         }),
@@ -54,11 +54,11 @@ describe("Report", () => {
       });
 
       const result = await handler.handle(
-        ReportQuery.create({ scope: ReportScope.CLIENTS }),
+        GetReportQuery.create({ scope: ReportScope.CLIENTS }),
       );
 
       expect(result).toEqual(
-        ReportQueryResult.create({
+        GetReportQueryResult.create({
           entries: [
             ReportEntry.create({
               start: "2025-06-26",
@@ -102,11 +102,11 @@ describe("Report", () => {
       });
 
       const result = await handler.handle(
-        ReportQuery.create({ scope: ReportScope.CLIENTS }),
+        GetReportQuery.create({ scope: ReportScope.CLIENTS }),
       );
 
       expect(result).toEqual(
-        ReportQueryResult.create({
+        GetReportQueryResult.create({
           entries: [
             ReportEntry.create({
               start: "2025-12-10",
@@ -151,11 +151,11 @@ describe("Report", () => {
       });
 
       const result = await handler.handle(
-        ReportQuery.create({ scope: ReportScope.CLIENTS }),
+        GetReportQuery.create({ scope: ReportScope.CLIENTS }),
       );
 
       expect(result).toEqual(
-        ReportQueryResult.create({
+        GetReportQueryResult.create({
           entries: [
             ReportEntry.create({
               start: "2025-12-10",
@@ -176,11 +176,11 @@ describe("Report", () => {
       const { handler } = configure({ events: [] });
 
       const result = await handler.handle(
-        ReportQuery.create({ scope: ReportScope.PROJECTS }),
+        GetReportQuery.create({ scope: ReportScope.PROJECTS }),
       );
 
       expect(result).toEqual(
-        ReportQueryResult.create({
+        GetReportQueryResult.create({
           entries: [],
           totalHours: "PT0S",
         }),
@@ -209,11 +209,11 @@ describe("Report", () => {
       });
 
       const result = await handler.handle(
-        ReportQuery.create({ scope: ReportScope.PROJECTS }),
+        GetReportQuery.create({ scope: ReportScope.PROJECTS }),
       );
 
       expect(result).toEqual(
-        ReportQueryResult.create({
+        GetReportQueryResult.create({
           entries: [
             ReportEntry.create({
               start: "2025-12-08",
@@ -274,11 +274,11 @@ describe("Report", () => {
       });
 
       const result = await handler.handle(
-        ReportQuery.create({ scope: ReportScope.PROJECTS }),
+        GetReportQuery.create({ scope: ReportScope.PROJECTS }),
       );
 
       expect(result).toEqual(
-        ReportQueryResult.create({
+        GetReportQueryResult.create({
           entries: [
             ReportEntry.create({
               start: "2025-06-03",
@@ -324,11 +324,11 @@ describe("Report", () => {
       });
 
       const result = await handler.handle(
-        ReportQuery.create({ scope: ReportScope.PROJECTS }),
+        GetReportQuery.create({ scope: ReportScope.PROJECTS }),
       );
 
       expect(result).toEqual(
-        ReportQueryResult.create({
+        GetReportQueryResult.create({
           entries: [
             ReportEntry.create({
               start: "2025-12-10",
@@ -366,11 +366,11 @@ describe("Report", () => {
       const { handler } = configure({ events: [] });
 
       const result = await handler.handle(
-        ReportQuery.create({ scope: ReportScope.TASKS }),
+        GetReportQuery.create({ scope: ReportScope.TASKS }),
       );
 
       expect(result).toEqual(
-        ReportQueryResult.create({
+        GetReportQueryResult.create({
           entries: [],
           totalHours: "PT0S",
         }),
@@ -399,11 +399,11 @@ describe("Report", () => {
       });
 
       const result = await handler.handle(
-        ReportQuery.create({ scope: ReportScope.TASKS }),
+        GetReportQuery.create({ scope: ReportScope.TASKS }),
       );
 
       expect(result).toEqual(
-        ReportQueryResult.create({
+        GetReportQueryResult.create({
           entries: [
             ReportEntry.create({
               start: "2025-06-26",
@@ -453,11 +453,11 @@ describe("Report", () => {
       });
 
       const result = await handler.handle(
-        ReportQuery.create({ scope: ReportScope.TASKS }),
+        GetReportQuery.create({ scope: ReportScope.TASKS }),
       );
 
       expect(result).toEqual(
-        ReportQueryResult.create({
+        GetReportQueryResult.create({
           entries: [
             ReportEntry.create({
               start: "2025-06-26",
@@ -526,11 +526,11 @@ describe("Report", () => {
       });
 
       const result = await handler.handle(
-        ReportQuery.create({ scope: ReportScope.TASKS }),
+        GetReportQuery.create({ scope: ReportScope.TASKS }),
       );
 
       expect(result).toEqual(
-        ReportQueryResult.create({
+        GetReportQueryResult.create({
           entries: [
             ReportEntry.create({
               start: "2025-12-05",
@@ -589,11 +589,11 @@ describe("Report", () => {
       const { handler } = configure({ events: [] });
 
       const result = await handler.handle(
-        ReportQuery.create({ scope: ReportScope.CATEGORIES }),
+        GetReportQuery.create({ scope: ReportScope.CATEGORIES }),
       );
 
       expect(result).toEqual(
-        ReportQueryResult.create({
+        GetReportQueryResult.create({
           entries: [],
           totalHours: "PT0S",
         }),
@@ -622,11 +622,11 @@ describe("Report", () => {
       });
 
       const result = await handler.handle(
-        ReportQuery.create({ scope: ReportScope.CATEGORIES }),
+        GetReportQuery.create({ scope: ReportScope.CATEGORIES }),
       );
 
       expect(result).toEqual(
-        ReportQueryResult.create({
+        GetReportQueryResult.create({
           entries: [
             ReportEntry.create({
               start: "2025-06-26",
@@ -668,11 +668,11 @@ describe("Report", () => {
       });
 
       const result = await handler.handle(
-        ReportQuery.create({ scope: ReportScope.CATEGORIES }),
+        GetReportQuery.create({ scope: ReportScope.CATEGORIES }),
       );
 
       expect(result).toEqual(
-        ReportQueryResult.create({
+        GetReportQueryResult.create({
           entries: [
             ReportEntry.create({
               start: "2025-06-26",
@@ -716,11 +716,11 @@ describe("Report", () => {
       });
 
       const result = await handler.handle(
-        ReportQuery.create({ scope: ReportScope.CATEGORIES }),
+        GetReportQuery.create({ scope: ReportScope.CATEGORIES }),
       );
 
       expect(result).toEqual(
-        ReportQueryResult.create({
+        GetReportQueryResult.create({
           entries: [
             ReportEntry.create({
               start: "2025-12-10",
@@ -773,11 +773,11 @@ describe("Report", () => {
       });
 
       const result = await handler.handle(
-        ReportQuery.create({ scope: ReportScope.CLIENTS }),
+        GetReportQuery.create({ scope: ReportScope.CLIENTS }),
       );
 
       expect(result).toEqual(
-        ReportQueryResult.create({
+        GetReportQueryResult.create({
           entries: [
             ReportEntry.create({
               start: "2025-06-26",
@@ -828,7 +828,7 @@ describe("Report", () => {
       });
 
       const result = await handler.handle(
-        ReportQuery.create({
+        GetReportQuery.create({
           scope: ReportScope.TASKS,
           from: "2025-09-15",
           to: "2025-09-21",
@@ -842,6 +842,6 @@ describe("Report", () => {
 
 function configure({ events }: { events?: ActivityLoggedEvent[] } = {}) {
   const eventStore = EventStore.createNull({ events });
-  const handler = ReportQueryHandler.create({ eventStore });
+  const handler = GetReportQueryHandler.create({ eventStore });
   return { handler };
 }

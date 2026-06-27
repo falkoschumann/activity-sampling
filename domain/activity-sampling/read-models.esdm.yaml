@@ -12,7 +12,7 @@ projections:
   - boundedContext: activity-sampling
     aggregate: settings
     event: changed
-    rule: Update the capacity value used for capacity calculation.
+    rule: Memorize the capacity and categories.
   - boundedContext: activity-sampling
     aggregate: holiday
     event: holidays-changed

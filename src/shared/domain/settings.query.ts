@@ -1,8 +1,18 @@
 // Copyright (c) 2026 Falko Schumann. All rights reserved. MIT license.
 
-import { Temporal } from "@js-temporal/polyfill";
+export class SettingsQuery {
+  static create(_options?: never) {
+    return new SettingsQuery();
+  }
 
-export class Settings {
+  static createTestInstance(options?: never) {
+    return SettingsQuery.create(options);
+  }
+
+  private constructor() {}
+}
+
+export class SettingsQueryResult {
   static create({
     dataDir = "data",
     capacity = "PT40H",
@@ -12,7 +22,7 @@ export class Settings {
     capacity?: Temporal.DurationLike | string;
     categories?: string[];
   } = {}) {
-    return new Settings(dataDir, capacity, categories);
+    return new SettingsQueryResult(dataDir, capacity, categories);
   }
 
   static createTestInstance({
@@ -24,7 +34,7 @@ export class Settings {
     capacity?: Temporal.DurationLike | string;
     categories?: string[];
   } = {}) {
-    return Settings.create({ dataDir, capacity, categories });
+    return SettingsQueryResult.create({ dataDir, capacity, categories });
   }
 
   readonly dataDir: string;

@@ -1,68 +1,48 @@
 // Copyright (c) 2026 Falko Schumann. All rights reserved. MIT license.
 
-import { Temporal } from "@js-temporal/polyfill";
-
+import type { ActivityState } from "./logged-activity/activity.aggregate";
 import {
+  type GetReportQuery,
+  GetReportQueryResult,
   ReportEntry,
-  type ReportQuery,
-  ReportQueryResult,
-  ReportScope,
-} from "../../shared/domain/report_query";
-import {
-  isTimestampInPeriod,
-  normalizeDuration,
-} from "../../shared/domain/temporal";
-import { initialReportReadModel, type RawActivity } from "./report_read_model";
+  ReportScope
+} from "../../shared/domain/get_report.query";
+import { normalizeDuration } from "../../shared/domain/temporal";
+import type { ReportView } from "./report.read_model";
 
-export function queryReport(
-  readModel = initialReportReadModel,
-  query: ReportQuery,
-): ReportQueryResult {
+export function getReport(
+  readModel: ReportView,
+  query: GetReportQuery,
+): GetReportQueryResult {
   const entries = createEntries(readModel.activities, query);
   const totalHours = sumTotalHours(entries);
-  return ReportQueryResult.create({ entries, totalHours });
+  return GetReportQueryResult.create({ entries, totalHours });
 }
 
-function createEntries(activities: RawActivity[], query: ReportQuery) {
-  switch (query.scope) {
+function createEntries(activities: ActivityState[], query: GetReportQuery) {
+  switch (query.data.scope) {
     case ReportScope.CLIENTS:
-      return createClientsReport(activities, query);
+      return createClientsReport(activities);
     case ReportScope.PROJECTS:
-      return createProjectsReport(activities, query);
+      return createProjectsReport(activities);
     case ReportScope.TASKS:
-      return createTasksReport(activities, query);
+      return createTasksReport(activities);
     case ReportScope.CATEGORIES:
-      return createCategoriesReport(activities, query);
+      return createCategoriesReport(activities);
   }
 }
 
-function createClientsReport(activities: RawActivity[], query: ReportQuery) {
+function createClientsReport(activities: ActivityState[]) {
   const entries: ReportEntry[] = [];
   for (const activity of activities) {
-    updateClientsReport(entries, activity, query);
+    updateClientsReport(entries, activity);
   }
   entries.sort(compareClientsReport);
   return entries;
 }
 
-function updateClientsReport(
-  entries: ReportEntry[],
-  activity: RawActivity,
-  query: ReportQuery,
-) {
-  if (
-    !isTimestampInPeriod({
-      timestamp: activity.start,
-      timeZone: query.timeZone,
-      from: query.from,
-      to: query.to,
-    })
-  ) {
-    return;
-  }
-
-  let start = activity.start.toZonedDateTimeISO(query.timeZone).toPlainDate();
-  let finish = activity.finish.toZonedDateTimeISO(query.timeZone).toPlainDate();
+function updateClientsReport(entries: ReportEntry[], activity: ActivityState) {
+  let { start, finish } = activity;
   const index = entries.findIndex((entry) => entry.client === activity.client);
   if (index == -1) {
     entries.push(
@@ -96,33 +76,17 @@ function compareClientsReport(a: ReportEntry, b: ReportEntry) {
   return a.client.localeCompare(b.client);
 }
 
-function createProjectsReport(activities: RawActivity[], query: ReportQuery) {
+function createProjectsReport(activities: ActivityState[]) {
   const entries: ReportEntry[] = [];
   for (const activity of activities) {
-    updateProjectsReport(entries, activity, query);
+    updateProjectsReport(entries, activity);
   }
   entries.sort(compareProjectsReport);
   return entries;
 }
 
-function updateProjectsReport(
-  entries: ReportEntry[],
-  activity: RawActivity,
-  query: ReportQuery,
-) {
-  if (
-    !isTimestampInPeriod({
-      timestamp: activity.start,
-      timeZone: query.timeZone,
-      from: query.from,
-      to: query.to,
-    })
-  ) {
-    return;
-  }
-
-  let start = activity.start.toZonedDateTimeISO(query.timeZone).toPlainDate();
-  let finish = activity.finish.toZonedDateTimeISO(query.timeZone).toPlainDate();
+function updateProjectsReport(entries: ReportEntry[], activity: ActivityState) {
+  let { start, finish } = activity;
   const index = entries.findIndex(
     (entry) => entry.project === activity.project,
   );
@@ -167,33 +131,17 @@ function compareProjectsReport(a: ReportEntry, b: ReportEntry) {
   return a.project.localeCompare(b.project);
 }
 
-function createTasksReport(activities: RawActivity[], query: ReportQuery) {
+function createTasksReport(activities: ActivityState[]) {
   const entries: ReportEntry[] = [];
   for (const activity of activities) {
-    updateTasksReport(entries, activity, query);
+    updateTasksReport(entries, activity);
   }
   entries.sort(compareTasksReport);
   return entries;
 }
 
-function updateTasksReport(
-  entries: ReportEntry[],
-  activity: RawActivity,
-  query: ReportQuery,
-) {
-  if (
-    !isTimestampInPeriod({
-      timestamp: activity.start,
-      timeZone: query.timeZone,
-      from: query.from,
-      to: query.to,
-    })
-  ) {
-    return;
-  }
-
-  let start = activity.start.toZonedDateTimeISO(query.timeZone).toPlainDate();
-  let finish = activity.finish.toZonedDateTimeISO(query.timeZone).toPlainDate();
+function updateTasksReport(entries: ReportEntry[], activity: ActivityState) {
+  let { start, finish } = activity;
   const index = entries.findIndex(
     (entry) =>
       entry.task === activity.task &&
@@ -259,10 +207,10 @@ function compareTasksReport(a: ReportEntry, b: ReportEntry) {
   return a.client.localeCompare(b.client);
 }
 
-function createCategoriesReport(activities: RawActivity[], query: ReportQuery) {
+function createCategoriesReport(activities: ActivityState[]) {
   const entries: ReportEntry[] = [];
   for (const activity of activities) {
-    updateCategoriesReport(entries, activity, query);
+    updateCategoriesReport(entries, activity);
   }
   entries.sort(compareCategoriesReport);
   return entries;
@@ -270,22 +218,9 @@ function createCategoriesReport(activities: RawActivity[], query: ReportQuery) {
 
 function updateCategoriesReport(
   entries: ReportEntry[],
-  activity: RawActivity,
-  query: ReportQuery,
+  activity: ActivityState,
 ) {
-  if (
-    !isTimestampInPeriod({
-      timestamp: activity.start,
-      timeZone: query.timeZone,
-      from: query.from,
-      to: query.to,
-    })
-  ) {
-    return;
-  }
-
-  let start = activity.start.toZonedDateTimeISO(query.timeZone).toPlainDate();
-  let finish = activity.finish.toZonedDateTimeISO(query.timeZone).toPlainDate();
+  let { start, finish } = activity;
   const index = entries.findIndex(
     (entry) => entry.category === (activity.category ?? "N/A"),
   );
@@ -294,7 +229,7 @@ function updateCategoriesReport(
       ReportEntry.create({
         start,
         finish,
-        category: activity.category,
+        category: activity.category ?? "N/A",
         hours: activity.hours,
         cycleTime: finish.since(start).total("days") + 1,
       }),

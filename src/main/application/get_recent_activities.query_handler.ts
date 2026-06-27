@@ -2,10 +2,13 @@
 
 import {
   type GetRecentActivitiesQuery,
-  GetRecentActivitiesQueryResult
+  GetRecentActivitiesQueryResult,
 } from "../../shared/domain/get_recent_activities.query";
 import { SettingsChangedEvent } from "../domain/settings/settings_changed.event";
-import { createTimesheet, projectTimesheet } from "../domain/timesheet.read_model";
+import {
+  createTimesheet,
+  projectTimesheet,
+} from "../domain/timesheet.read_model";
 import { getRecentActivities } from "../domain/get_recent_activities.query";
 import type { EventStore } from "../infrastructure/event_store";
 import type { SettingsProvider } from "../infrastructure/settings.provider";
@@ -21,8 +24,8 @@ export class GetRecentActivitiesQueryHandler {
     return new GetRecentActivitiesQueryHandler(eventStore, settingsProvider);
   }
 
-  readonly #eventStore: EventStore;
-  readonly #settingsProvider: SettingsProvider;
+  readonly #eventStore;
+  readonly #settingsProvider;
 
   private constructor(
     eventStore: EventStore,
