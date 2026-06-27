@@ -2,7 +2,6 @@
 
 import { initialReportReadModel, type RawActivity } from "./report_read_model";
 import { EstimateQuery } from "../../shared/domain/estimate_query";
-import { Temporal } from "@js-temporal/polyfill";
 import { normalizeDuration } from "../../shared/domain/temporal";
 
 export type Activity = {

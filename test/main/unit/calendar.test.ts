@@ -3,7 +3,6 @@
 import { describe, expect, it } from "vitest";
 
 import { Calendar, Holiday, Vacation } from "../../../src/main/domain/calendar";
-import { Temporal } from "@js-temporal/polyfill";
 
 describe("Calendar", () => {
   it("should count business hours", () => {

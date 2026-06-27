@@ -1,6 +1,5 @@
 // Copyright (c) 2026 Falko Schumann. All rights reserved. MIT license.
 
-import { Temporal } from "@js-temporal/polyfill";
 import { EventTracker } from "@muspellheim/shared";
 import { describe, expect, it } from "vitest";
 
