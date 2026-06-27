@@ -18,7 +18,7 @@ export function getRecentActivities(
   query: GetRecentActivitiesQuery,
 ): GetRecentActivitiesQueryResult {
   // we assume the view is pre-filtered by last 30 days and end of current month
-  const workingDays = createWorkingDays(view, query);
+  const workingDays = createWorkingDays(view);
   const timeSummary = createTimeSummary(view, query);
   return GetRecentActivitiesQueryResult.create({
     workingDays,
@@ -26,13 +26,10 @@ export function getRecentActivities(
   });
 }
 
-function createWorkingDays(
-  view: TimesheetView,
-  query: GetRecentActivitiesQuery,
-) {
+function createWorkingDays(view: TimesheetView) {
   const workingDays: WorkingDay[] = [];
   for (const entry of view.entries) {
-    updateWorkingDays(workingDays, entry, query);
+    updateWorkingDays(workingDays, entry);
   }
   return workingDays.sort(WorkingDay.compare).reverse();
 }
@@ -40,22 +37,18 @@ function createWorkingDays(
 function updateWorkingDays(
   workingDays: WorkingDay[],
   entry: TimesheetViewEntry,
-  query: GetRecentActivitiesQuery,
 ) {
   let workingDay = workingDays.at(-1);
-  const dateTime = entry.timestamp
-    .toZonedDateTimeISO(query.data.timeZone)
-    .toPlainDateTime();
   if (
     workingDay?.date == null ||
-    !dateTime.toPlainDate().equals(workingDay.date)
+    !entry.timestamp.toPlainDate().equals(workingDay.date)
   ) {
-    workingDay = WorkingDay.create({ date: dateTime });
+    workingDay = WorkingDay.create({ date: entry.timestamp });
     workingDays.push(workingDay);
   }
   workingDay.activities.push(
     RecentActivity.create({
-      time: dateTime,
+      time: entry.timestamp,
       client: entry.client,
       project: entry.project,
       task: entry.task,
@@ -82,10 +75,7 @@ function createTimeSummary(
   let hoursThisWeek = Temporal.Duration.from("PT0S");
   let hoursThisMonth = Temporal.Duration.from("PT0S");
   for (const entry of view.entries) {
-    const date = entry.timestamp
-      .toZonedDateTimeISO(query.data.timeZone)
-      .toPlainDateTime()
-      .toPlainDate();
+    const date = entry.timestamp.toPlainDate();
     const hours = entry.duration;
     if (date.equals(query.data.today)) {
       hoursToday = hoursToday.add(hours);

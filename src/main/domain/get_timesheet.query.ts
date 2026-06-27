@@ -15,29 +15,24 @@ export function getTimesheet(
   query: GetTimesheetQuery,
 ): GetTimesheetQueryResult {
   // we assume the view is pre-filtered by from and to date
-  const entries = createEntries(readModel, query);
+  const entries = createEntries(readModel);
   const totalHours = sumTotalHours(entries);
   const calendar = Calendar.create(readModel);
   const capacity = determineCapacity(calendar, totalHours, query);
   return GetTimesheetQueryResult.create({ entries, capacity, totalHours });
 }
 
-function createEntries(readModel: TimesheetView, query: GetTimesheetQuery) {
+function createEntries(readModel: TimesheetView) {
   const entries: TimesheetEntry[] = [];
   for (const entry of readModel.entries) {
-    updateEntries(entries, entry, query);
+    updateEntries(entries, entry);
   }
   entries.sort(TimesheetEntry.compare);
   return entries;
 }
 
-function updateEntries(
-  entries: TimesheetEntry[],
-  entry: TimesheetViewEntry,
-  query: GetTimesheetQuery,
-) {
-  const { timeZone } = query.data;
-  const date = entry.timestamp.toZonedDateTimeISO(timeZone).toPlainDate();
+function updateEntries(entries: TimesheetEntry[], entry: TimesheetViewEntry) {
+  const date = entry.timestamp.toPlainDate();
   const index = entries.findIndex(
     (e) =>
       Temporal.PlainDate.compare(e.date, date.toString()) === 0 &&

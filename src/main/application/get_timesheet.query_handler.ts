@@ -55,13 +55,15 @@ export class GetTimesheetQueryHandler {
   }
 
   async handle(query: GetTimesheetQuery): Promise<GetTimesheetQueryResult> {
+    const { from: fromDate, to: toDate, timeZone } = query.data;
+
     const settings = await this.#settingsProvider.load();
     let readModel = projectTimesheet(
       createTimesheet(),
       SettingsChangedEvent.create(settings),
+      { timeZone },
     );
 
-    const { from: fromDate, to: toDate, timeZone } = query.data;
     const holidays = await this.#holidayRepository.findAllByDate(
       fromDate,
       toDate,
@@ -69,6 +71,7 @@ export class GetTimesheetQueryHandler {
     readModel = projectTimesheet(
       readModel,
       HolidaysChangedEvent.create({ holidays }),
+      { timeZone },
     );
 
     const vacations = await this.#vacationRepository.findAllByDate(
@@ -78,12 +81,13 @@ export class GetTimesheetQueryHandler {
     readModel = projectTimesheet(
       readModel,
       VacationsChangedEvent.create({ vacations }),
+      { timeZone },
     );
 
     const from = fromDate.toZonedDateTime(timeZone).startOfDay();
     const to = toDate.add("P1D").toZonedDateTime(timeZone).startOfDay();
     for await (const event of this.#eventStore.replay({ from, to })) {
-      readModel = projectTimesheet(readModel, event);
+      readModel = projectTimesheet(readModel, event, { timeZone });
     }
 
     return getTimesheet(readModel, query);

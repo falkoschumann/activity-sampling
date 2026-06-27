@@ -16,7 +16,7 @@ export type TimesheetView = {
 };
 
 export type TimesheetViewEntry = Readonly<{
-  timestamp: Temporal.Instant;
+  timestamp: Temporal.PlainDateTime;
   duration: Temporal.Duration;
   client: string;
   project: string;
@@ -42,10 +42,24 @@ export function projectTimesheet(
     | HolidaysChangedEvent
     | SettingsChangedEvent
     | VacationsChangedEvent,
+  { timeZone }: { timeZone: Temporal.TimeZoneLike },
 ): TimesheetView {
   if (event instanceof ActivityLoggedEvent) {
-    const entries = [...view.entries, event.data];
-    entries.sort((a, b) => Temporal.Instant.compare(a.timestamp, b.timestamp));
+    const newEntry: TimesheetViewEntry = {
+      timestamp: event.data.timestamp
+        .toZonedDateTimeISO(timeZone)
+        .toPlainDateTime(),
+      duration: event.data.duration,
+      client: event.data.client,
+      project: event.data.project,
+      task: event.data.task,
+      notes: event.data.notes,
+      category: event.data.category,
+    };
+    const entries = [...view.entries, newEntry];
+    entries.sort((a, b) =>
+      Temporal.PlainDateTime.compare(a.timestamp, b.timestamp),
+    );
     return { ...view, entries };
   } else if (event instanceof HolidaysChangedEvent) {
     return { ...view, holidays: event.holidays };
