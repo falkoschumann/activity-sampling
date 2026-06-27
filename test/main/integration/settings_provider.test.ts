@@ -100,7 +100,7 @@ describe("Settings provider", () => {
     expect(await gateway.load()).toEqual(createTestSettings());
   });
 
-  it("should load settings when using nullable", async () => {
+  it("should load configurable responses when using nullable", async () => {
     const gateway = SettingsProvider.createNull({
       readFileResponses: [createTestSettings()],
     });
@@ -110,7 +110,7 @@ describe("Settings provider", () => {
     expect(settings).toEqual(createTestSettings());
   });
 
-  it("should store settings when using nullable", async () => {
+  it("should track stored settings when using nullable", async () => {
     const gateway = SettingsProvider.createNull();
     const trackedStored = gateway.trackStored();
 

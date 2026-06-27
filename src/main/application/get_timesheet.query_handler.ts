@@ -1,21 +1,23 @@
 // Copyright (c) 2026 Falko Schumann. All rights reserved. MIT license.
 
-import { isTimestampInPeriod } from "../../shared/domain/temporal";
 import type {
-  TimesheetQuery,
-  TimesheetQueryResult,
-} from "../../shared/domain/timesheet_query";
-import { CapacityChangedEvent } from "../domain/capacity_changed_event";
-import { HolidaysChangedEvent } from "../domain/holidays_changed_event";
-import { projectTimesheet } from "../domain/timesheet_read_model";
-import { queryTimesheet } from "../domain/timesheet_query";
-import { VacationChangedEvent } from "../domain/vacation_changed_event";
+  GetTimesheetQuery,
+  GetTimesheetQueryResult,
+} from "../../shared/domain/get_timesheet.query";
+import { getTimesheet } from "../domain/get_timesheet.query";
+import {
+  createTimesheet,
+  projectTimesheet,
+} from "../domain/timesheet.read_model";
+import { SettingsChangedEvent } from "../domain/settings/settings_changed.event";
+import { HolidaysChangedEvent } from "../domain/holiday/holidays_changed.event";
+import { VacationsChangedEvent } from "../domain/vacation/vacations_changed.event";
 import type { EventStore } from "../infrastructure/event_store";
-import { HolidayRepository } from "../infrastructure/holiday_repository";
-import { VacationRepository } from "../infrastructure/vacation_repository";
-import type { SettingsProvider } from "../infrastructure/settings_provider";
+import { HolidayRepository } from "../infrastructure/holiday.repository";
+import type { SettingsProvider } from "../infrastructure/settings.provider";
+import { VacationRepository } from "../infrastructure/vacation.repository";
 
-export class TimesheetQueryHandler {
+export class GetTimesheetQueryHandler {
   static create({
     eventStore,
     holidayRepository,
@@ -27,7 +29,7 @@ export class TimesheetQueryHandler {
     vacationRepository: VacationRepository;
     settingsProvider: SettingsProvider;
   }) {
-    return new TimesheetQueryHandler(
+    return new GetTimesheetQueryHandler(
       eventStore,
       holidayRepository,
       vacationRepository,
@@ -52,16 +54,17 @@ export class TimesheetQueryHandler {
     this.#settingsProvider = settingsProvider;
   }
 
-  async handle(query: TimesheetQuery): Promise<TimesheetQueryResult> {
+  async handle(query: GetTimesheetQuery): Promise<GetTimesheetQueryResult> {
     const settings = await this.#settingsProvider.load();
     let readModel = projectTimesheet(
-      undefined,
-      CapacityChangedEvent.create(settings),
+      createTimesheet(),
+      SettingsChangedEvent.create(settings),
     );
 
+    const { from: fromDate, to: toDate, timeZone } = query.data;
     const holidays = await this.#holidayRepository.findAllByDate(
-      query.from,
-      query.to,
+      fromDate,
+      toDate,
     );
     readModel = projectTimesheet(
       readModel,
@@ -69,27 +72,20 @@ export class TimesheetQueryHandler {
     );
 
     const vacations = await this.#vacationRepository.findAllByDate(
-      query.from,
-      query.to,
+      fromDate,
+      toDate,
     );
     readModel = projectTimesheet(
       readModel,
-      VacationChangedEvent.create({ vacations }),
+      VacationsChangedEvent.create({ vacations }),
     );
 
-    for await (const event of this.#eventStore.replay()) {
-      if (
-        isTimestampInPeriod({
-          timestamp: event.timestamp,
-          timeZone: query.timeZone,
-          from: query.from,
-          to: query.to,
-        })
-      ) {
-        readModel = projectTimesheet(readModel, event);
-      }
+    const from = fromDate.toZonedDateTime(timeZone).startOfDay();
+    const to = toDate.add("P1D").toZonedDateTime(timeZone).startOfDay();
+    for await (const event of this.#eventStore.replay({ from, to })) {
+      readModel = projectTimesheet(readModel, event);
     }
 
-    return queryTimesheet(readModel, query);
+    return getTimesheet(readModel, query);
   }
 }

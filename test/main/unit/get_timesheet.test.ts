@@ -3,22 +3,20 @@
 import { Temporal } from "@js-temporal/polyfill";
 import { describe, expect, it } from "vitest";
 
-import { TimesheetQueryHandler } from "../../../src/main/application/timesheet_query_handler";
-import {
-  Capacity,
-  TimesheetEntry,
-  TimesheetQuery,
-  TimesheetQueryResult,
-} from "../../../src/shared/domain/timesheet_query";
-import { ActivityLoggedEvent } from "../../../src/main/domain/activity_logged_event";
-import { Holiday, Vacation } from "../../../src/main/domain/calendar";
-import { Settings } from "../../../src/main/domain/settings";
+import { GetTimesheetQueryHandler } from "../../../src/main/application/get_timesheet.query_handler";
+import { createHoliday, type HolidayState } from "../../../src/main/domain/holiday/holiday.aggregate";
+import { ActivityLoggedEvent } from "../../../src/main/domain/logged-activity/activity_logged.event";
+import { createVacation, type VacationState } from "../../../src/main/domain/vacation/vacation.aggregate";
+import { createSettings, type SettingsState } from "../../../src/main/domain/settings/settings.aggregate";
+import { GetTimesheetQuery, GetTimesheetQueryResult } from "../../../src/shared/domain/get_timesheet.query";
+import { Capacity } from "../../../src/shared/domain/capacity";
+import { TimesheetEntry } from "../../../src/shared/domain/timesheet_entry";
 import { EventStore } from "../../../src/main/infrastructure/event_store";
-import { HolidayRepository } from "../../../src/main/infrastructure/holiday_repository";
-import { VacationRepository } from "../../../src/main/infrastructure/vacation_repository";
-import { SettingsProvider } from "../../../src/main/infrastructure/settings_provider";
+import { HolidayRepository } from "../../../src/main/infrastructure/holiday.repository";
+import { VacationRepository } from "../../../src/main/infrastructure/vacation.repository";
+import { SettingsProvider } from "../../../src/main/infrastructure/settings.provider";
 
-describe("Timesheet", () => {
+describe("Get timesheet", () => {
   describe("Summarize hours worked on tasks", () => {
     it("should return an empty result when no activities are logged", async () => {
       const { handler } = configure({
@@ -28,7 +26,7 @@ describe("Timesheet", () => {
       });
 
       const result = await handler.handle(
-        TimesheetQuery.create({
+        GetTimesheetQuery.create({
           from: "2025-09-15",
           to: "2025-09-21",
           today: "2025-09-19",
@@ -36,7 +34,7 @@ describe("Timesheet", () => {
       );
 
       expect(result).toEqual(
-        TimesheetQueryResult.create({
+        GetTimesheetQueryResult.create({
           entries: [],
           totalHours: "PT0S",
           capacity: Capacity.create({
@@ -96,7 +94,7 @@ describe("Timesheet", () => {
       });
 
       const result = await handler.handle(
-        TimesheetQuery.create({
+        GetTimesheetQuery.create({
           from: "2025-06-02",
           to: "2025-06-08",
           today: "2025-11-19",
@@ -158,7 +156,7 @@ describe("Timesheet", () => {
       });
 
       const result = await handler.handle(
-        TimesheetQuery.create({
+        GetTimesheetQuery.create({
           from: "2025-06-02",
           to: "2025-06-08",
           today: "2025-11-19",
@@ -191,13 +189,13 @@ describe("Timesheet", () => {
           }),
         ],
         holidays: [
-          Holiday.create({ date: "2025-06-10", title: "Pfingstmontag" }),
+          createHoliday({ date: "2025-06-10", title: "Pfingstmontag" }),
         ],
         vacations: [],
       });
 
       const result = await handler.handle(
-        TimesheetQuery.create({
+        GetTimesheetQuery.create({
           from: "2025-06-09",
           to: "2025-06-15",
           today: "2025-06-11",
@@ -205,7 +203,7 @@ describe("Timesheet", () => {
       );
 
       expect(result).toEqual(
-        TimesheetQueryResult.create({
+        GetTimesheetQueryResult.create({
           entries: [
             TimesheetEntry.createTestInstance({
               date: "2025-06-09",
@@ -253,7 +251,7 @@ describe("Timesheet", () => {
       });
 
       const result = await handler.handle(
-        TimesheetQuery.create({
+        GetTimesheetQuery.create({
           from: "2025-06-09",
           to: "2025-06-15",
           today: "2025-06-12",
@@ -291,7 +289,7 @@ describe("Timesheet", () => {
       });
 
       const result = await handler.handle(
-        TimesheetQuery.create({
+        GetTimesheetQuery.create({
           from: "2025-06-09",
           to: "2025-06-15",
           today: "2025-06-12",
@@ -328,7 +326,7 @@ describe("Timesheet", () => {
       });
 
       const result = await handler.handle(
-        TimesheetQuery.create({
+        GetTimesheetQuery.create({
           from: "2025-06-09",
           to: "2025-06-15",
           today: "2025-06-12",
@@ -366,7 +364,7 @@ describe("Timesheet", () => {
       });
 
       const result = await handler.handle(
-        TimesheetQuery.create({
+        GetTimesheetQuery.create({
           from: "2025-06-09",
           to: "2025-06-15",
           today: "2025-06-03",
@@ -398,13 +396,13 @@ describe("Timesheet", () => {
           }),
         ],
         holidays: [
-          Holiday.create({ date: "2025-06-09", title: "Pfingstmontag" }),
+          createHoliday({ date: "2025-06-09", title: "Pfingstmontag" }),
         ],
         vacations: [],
       });
 
       const result = await handler.handle(
-        TimesheetQuery.create({
+        GetTimesheetQuery.create({
           from: "2025-06-09",
           to: "2025-06-15",
           today: "2025-06-12",
@@ -435,11 +433,11 @@ describe("Timesheet", () => {
           }),
         ],
         holidays: [],
-        vacations: [Vacation.create({ date: "2025-09-10" })],
+        vacations: [createVacation({ date: "2025-09-10" })],
       });
 
       const result = await handler.handle(
-        TimesheetQuery.create({
+        GetTimesheetQuery.create({
           from: "2025-09-08",
           to: "2025-09-14",
           today: "2025-09-11",
@@ -457,12 +455,12 @@ function configure({
   events,
   holidays,
   vacations,
-  settings = Settings.create(),
+  settings = createSettings(),
 }: {
   events?: ActivityLoggedEvent[];
-  holidays?: Holiday[];
-  vacations?: Vacation[];
-  settings?: Settings;
+  holidays?: HolidayState[];
+  vacations?: VacationState[];
+  settings?: SettingsState;
 } = {}) {
   const eventStore = EventStore.createNull({ events });
   const holidayRepository = HolidayRepository.createNull({
@@ -474,7 +472,7 @@ function configure({
   const settingsProvider = SettingsProvider.createNull({
     readFileResponses: settings ? [settings] : undefined,
   });
-  const handler = TimesheetQueryHandler.create({
+  const handler = GetTimesheetQueryHandler.create({
     eventStore,
     holidayRepository,
     vacationRepository,

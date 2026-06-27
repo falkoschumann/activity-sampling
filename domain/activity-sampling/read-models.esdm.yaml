@@ -493,34 +493,12 @@ result:
     entries:
       type: array
       items:
-        type: object
-        properties:
-          date:
-            type: string
-            format: date
-          client:
-            type: string
-          project:
-            type: string
-          task:
-            type: string
-          hours:
-            type: string
-            format: duration
-        required: [date, client, project, task, hours]
+        type: TimesheetEntry
     totalHours:
       type: string
       format: duration
     capacity:
-      type: object
-      properties:
-        hours:
-          type: string
-          format: duration
-        offset:
-          type: string
-          format: duration
-      required: [hours, offset]
+      type: Capacity
   required: [entries, totalHours, capacity]
 actors:
   - software-developer

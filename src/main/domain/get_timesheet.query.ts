@@ -1,34 +1,28 @@
 // Copyright (c) 2026 Falko Schumann. All rights reserved. MIT license.
 
-import { Temporal } from "@js-temporal/polyfill";
+import { normalizeDuration } from "../../shared/domain/temporal";
 
+import type { TimesheetView, TimesheetViewEntry } from "./timesheet.read_model";
 import {
-  isTimestampInPeriod,
-  normalizeDuration,
-} from "../../shared/domain/temporal";
-import {
-  TimesheetEntry,
-  type TimesheetQuery,
-  TimesheetQueryResult,
-} from "../../shared/domain/timesheet_query";
+  type GetTimesheetQuery,
+  GetTimesheetQueryResult,
+} from "../../shared/domain/get_timesheet.query";
+import { TimesheetEntry } from "../../shared/domain/timesheet_entry";
 import { Calendar } from "./calendar";
-import type {
-  TimesheetReadModel,
-  TimesheetReadModelEntry,
-} from "./timesheet_read_model";
 
-export function queryTimesheet(
-  readModel: TimesheetReadModel,
-  query: TimesheetQuery,
-): TimesheetQueryResult {
+export function getTimesheet(
+  readModel: TimesheetView,
+  query: GetTimesheetQuery,
+): GetTimesheetQueryResult {
+  // we assume the view is pre-filtered by from and to date
   const entries = createEntries(readModel, query);
   const totalHours = sumTotalHours(entries);
   const calendar = Calendar.create(readModel);
   const capacity = determineCapacity(calendar, totalHours, query);
-  return TimesheetQueryResult.create({ entries, capacity, totalHours });
+  return GetTimesheetQueryResult.create({ entries, capacity, totalHours });
 }
 
-function createEntries(readModel: TimesheetReadModel, query: TimesheetQuery) {
+function createEntries(readModel: TimesheetView, query: GetTimesheetQuery) {
   const entries: TimesheetEntry[] = [];
   for (const entry of readModel.entries) {
     updateEntries(entries, entry, query);
@@ -39,15 +33,10 @@ function createEntries(readModel: TimesheetReadModel, query: TimesheetQuery) {
 
 function updateEntries(
   entries: TimesheetEntry[],
-  entry: TimesheetReadModelEntry,
-  { from, to, timeZone }: TimesheetQuery,
+  entry: TimesheetViewEntry,
+  query: GetTimesheetQuery,
 ) {
-  if (
-    !isTimestampInPeriod({ timestamp: entry.timestamp, timeZone, from, to })
-  ) {
-    return;
-  }
-
+  const { timeZone } = query.data;
   const date = entry.timestamp.toZonedDateTimeISO(timeZone).toPlainDate();
   const index = entries.findIndex(
     (e) =>
@@ -85,8 +74,9 @@ function sumTotalHours(entries: TimesheetEntry[]) {
 function determineCapacity(
   calendar: Calendar,
   totalHours: Temporal.Duration,
-  { from, to, today }: TimesheetQuery,
+  query: GetTimesheetQuery,
 ) {
+  const { from, to, today } = query.data;
   const hours = calendar.countWorkingHours(from, to);
 
   let end: Temporal.PlainDate;

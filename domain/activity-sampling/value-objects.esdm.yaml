@@ -61,7 +61,6 @@ schema:
       type: string
       format: duration
   required: [today, yesterday, thisWeek, thisMonth]
-
 ---
 apiVersion: schema.esdm.io/core/v1
 kind: value-object
@@ -85,6 +84,23 @@ schema:
       type: string
       format: duration
   required: [date, client, project, task, hours]
+---
+apiVersion: schema.esdm.io/core/v1
+kind: value-object
+name: capacity
+scope:
+  domain: activity-sampling
+  boundedContext: activity-sampling
+schema:
+  type: object
+  properties:
+    hours:
+      type: string
+      format: duration
+    offset:
+      type: string
+      format: duration
+  required: [hours, offset]
 ---
 apiVersion: schema.esdm.io/core/v1
 kind: value-object

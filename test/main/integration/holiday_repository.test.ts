@@ -5,7 +5,10 @@ import path from "node:path";
 
 import { beforeEach, describe, expect, it } from "vitest";
 
-import { Holiday } from "../../../src/main/domain/holiday";
+import {
+  createHoliday,
+  type HolidayState,
+} from "../../../src/main/domain/holiday/holiday.aggregate";
 import { HolidayRepository } from "../../../src/main/infrastructure/holiday.repository";
 
 const NON_EXISTING_FILE = path.resolve(
@@ -23,167 +26,123 @@ const TEST_FILE = path.resolve(
   "../../../testdata/test-holidays.csv",
 );
 
-const KARFREITAG: Holiday = {
+const KARFREITAG: HolidayState = {
   date: Temporal.PlainDate.from("2025-04-18"),
   title: "Karfreitag",
 };
 
-const OSTERSONNTAG: Holiday = {
+const OSTERSONNTAG: HolidayState = {
   date: Temporal.PlainDate.from("2025-04-20"),
   title: "Ostersonntag",
 };
 
-const OSTERMONTAG: Holiday = {
+const OSTERMONTAG: HolidayState = {
   date: Temporal.PlainDate.from("2025-04-21"),
   title: "Ostermontag",
   duration: Temporal.Duration.from("PT8H"),
 };
 
 describe("Holiday repository", () => {
-  describe("Find all by date", () => {
-    it("should find nothing when file does not exist", async () => {
-      const repository = HolidayRepository.create({
-        fileName: NON_EXISTING_FILE,
-      });
-
-      const holidays = await repository.findAllByDate(
-        "2025-01-01",
-        "2025-12-31",
-      );
-
-      expect(holidays).toEqual<Holiday[]>([]);
-    });
-
-    it("should find all saved holidays", async () => {
-      const repository = HolidayRepository.create({ fileName: EXAMPLE_FILE });
-
-      const holidays = await repository.findAllByDate(
-        "2025-01-01",
-        "2025-12-31",
-      );
-
-      expect(holidays).toEqual<Holiday[]>([
-        KARFREITAG,
-        OSTERSONNTAG,
-        OSTERMONTAG,
-      ]);
-    });
-
-    it("should find all by date with lower limit", async () => {
-      const repository = HolidayRepository.create({ fileName: EXAMPLE_FILE });
-
-      const holidays = await repository.findAllByDate(
-        "2025-04-21",
-        "2025-04-27",
-      );
-
-      expect(holidays).toEqual<Holiday[]>([OSTERMONTAG]);
-    });
-
-    it("should find all by date with upper limit", async () => {
-      const repository = HolidayRepository.create({ fileName: EXAMPLE_FILE });
-
-      const holidays = await repository.findAllByDate(
-        "2025-04-14",
-        "2025-04-20",
-      );
-
-      expect(holidays).toEqual<Holiday[]>([KARFREITAG, OSTERSONNTAG]);
-    });
+  beforeEach(async () => {
+    await fs.rm(TEST_FILE, { force: true });
   });
 
-  describe("Save all", () => {
-    beforeEach(async () => {
-      await fs.rm(TEST_FILE, { force: true });
-    });
+  it("should find all holidays", async () => {
+    const repository = HolidayRepository.create({ fileName: EXAMPLE_FILE });
 
-    it("should load saved holidays", async () => {
-      const repository = HolidayRepository.create({ fileName: TEST_FILE });
+    const holidays = await repository.findAll();
 
-      await repository.saveAll([KARFREITAG, OSTERSONNTAG]);
-      const holidays = await repository.findAllByDate(
-        "2025-04-14",
-        "2025-04-20",
-      );
-
-      expect(holidays).toEqual<Holiday[]>([KARFREITAG, OSTERSONNTAG]);
-    });
-
-    it("should update existing holidays", async () => {
-      const repository = HolidayRepository.create({ fileName: TEST_FILE });
-
-      await repository.saveAll([
-        Holiday.create({ date: "2025-10-08", title: "Foo" }),
-        Holiday.create({ date: "2025-10-10", title: "Bar" }),
-      ]);
-      await repository.saveAll([
-        Holiday.create({ date: "2025-10-08", title: "Changed" }),
-      ]);
-
-      const holidays = await repository.findAllByDate(
-        "2025-10-06",
-        "2025-10-12",
-      );
-      expect(holidays).toEqual<Holiday[]>([
-        Holiday.create({ date: "2025-10-08", title: "Changed" }),
-        Holiday.create({ date: "2025-10-10", title: "Bar" }),
-      ]);
-    });
+    expect(holidays).toEqual<HolidayState[]>([
+      KARFREITAG,
+      OSTERSONNTAG,
+      OSTERMONTAG,
+    ]);
   });
 
-  describe("Nullable", () => {
-    describe("Find all by date", () => {
-      it("should return nothing when configurable response is null", async () => {
-        const repository = HolidayRepository.createNull({
-          readFileResponses: [null],
-        });
-
-        const holidays = await repository.findAllByDate(
-          "2025-01-01",
-          "2025-12-31",
-        );
-
-        expect(holidays).toEqual<Holiday[]>([]);
-      });
-
-      it("should return configurable responses", async () => {
-        const repository = HolidayRepository.createNull({
-          readFileResponses: [
-            [Holiday.create({ date: "2025-06-09", title: "Pfingstmontag" })],
-          ],
-        });
-
-        const holidays = await repository.findAllByDate(
-          "2025-01-01",
-          "2025-12-31",
-        );
-
-        expect(holidays).toEqual<Holiday[]>([
-          Holiday.create({ date: "2025-06-09", title: "Pfingstmontag" }),
-        ]);
-      });
-
-      it("should throw an error when configurable response is an error", async () => {
-        const repository = HolidayRepository.createNull({
-          readFileResponses: [new Error("Test error")],
-        });
-
-        const holidays = repository.findAllByDate("2025-01-01", "2025-12-31");
-
-        await expect(holidays).rejects.toThrow("Test error");
-      });
+  it("should find nothing when file does not exist", async () => {
+    const repository = HolidayRepository.create({
+      fileName: NON_EXISTING_FILE,
     });
+
+    const holidays = await repository.findAll();
+
+    expect(holidays).toEqual<HolidayState[]>([]);
   });
-});
 
-describe("Holiday", () => {
-  it("should map model", () => {
-    const command = Holiday.createTestInstance();
+  it("should find all by date with lower limit", async () => {
+    const repository = HolidayRepository.create({ fileName: EXAMPLE_FILE });
 
-    const json = JSON.stringify(command);
-    const dto = JSON.parse(json);
-    const model = Holiday.create(dto);
+    const holidays = await repository.findAllByDate("2025-04-21", "2025-04-27");
 
-    expect(model).toEqual(Holiday.createTestInstance());
+    expect(holidays).toEqual<HolidayState[]>([OSTERMONTAG]);
+  });
+
+  it("should find all by date with upper limit", async () => {
+    const repository = HolidayRepository.create({ fileName: EXAMPLE_FILE });
+
+    const holidays = await repository.findAllByDate("2025-04-14", "2025-04-20");
+
+    expect(holidays).toEqual<HolidayState[]>([KARFREITAG, OSTERSONNTAG]);
+  });
+
+  it("should load saved holidays", async () => {
+    const repository = HolidayRepository.create({ fileName: TEST_FILE });
+
+    await repository.saveAll([KARFREITAG, OSTERSONNTAG]);
+    const holidays = await repository.findAllByDate("2025-04-14", "2025-04-20");
+
+    expect(holidays).toEqual<HolidayState[]>([KARFREITAG, OSTERSONNTAG]);
+  });
+
+  it("should update existing holidays", async () => {
+    const repository = HolidayRepository.create({ fileName: TEST_FILE });
+
+    await repository.saveAll([
+      createHoliday({ date: "2025-10-08", title: "Foo" }),
+      createHoliday({ date: "2025-10-10", title: "Bar" }),
+    ]);
+    await repository.saveAll([
+      createHoliday({ date: "2025-10-08", title: "Changed" }),
+    ]);
+
+    const holidays = await repository.findAllByDate("2025-10-06", "2025-10-12");
+    expect(holidays).toEqual<HolidayState[]>([
+      createHoliday({ date: "2025-10-08", title: "Changed" }),
+      createHoliday({ date: "2025-10-10", title: "Bar" }),
+    ]);
+  });
+
+  it("should return configurable responses", async () => {
+    const repository = HolidayRepository.createNull({
+      readFileResponses: [
+        [createHoliday({ date: "2025-06-09", title: "Pfingstmontag" })],
+      ],
+    });
+
+    const holidays = await repository.findAllByDate("2025-01-01", "2025-12-31");
+
+    expect(holidays).toEqual<HolidayState[]>([
+      createHoliday({ date: "2025-06-09", title: "Pfingstmontag" }),
+    ]);
+  });
+
+  it("should return nothing when configurable response is null", async () => {
+    const repository = HolidayRepository.createNull({
+      readFileResponses: [null],
+    });
+
+    const holidays = await repository.findAllByDate("2025-01-01", "2025-12-31");
+
+    expect(holidays).toEqual<HolidayState[]>([]);
+  });
+
+  it("should throw an error when configurable response is an error", async () => {
+    const repository = HolidayRepository.createNull({
+      readFileResponses: [new Error("Test error")],
+    });
+
+    const holidays = repository.findAllByDate("2025-01-01", "2025-12-31");
+
+    await expect(holidays).rejects.toThrow("Test error");
   });
 });

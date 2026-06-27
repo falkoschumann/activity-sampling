@@ -11,7 +11,10 @@ import { stringify } from "csv/sync";
 import type { Options as ParseOptions } from "csv-parse";
 import type { Options as StringifyOptions } from "csv-stringify";
 
-import { Vacation } from "../domain/vacation";
+import {
+  createVacation,
+  type VacationState,
+} from "../domain/vacation/vacation.aggregate";
 
 export class VacationRepository {
   static create({
@@ -25,7 +28,7 @@ export class VacationRepository {
   static createNull({
     readFileResponses = [],
   }: {
-    readFileResponses?: (Vacation[] | null | Error)[];
+    readFileResponses?: (VacationState[] | null | Error)[];
   } = {}) {
     return new VacationRepository(
       "null-holidays.csv",
@@ -42,14 +45,14 @@ export class VacationRepository {
     this.#fs = fs;
   }
 
-  async findAll(): Promise<Vacation[]> {
+  async findAll(): Promise<VacationState[]> {
     try {
       const fileContent = await this.#fs.readFile(this.fileName);
       const records = parse(fileContent, PARSE_CONFIGURATION);
-      const vacations: Vacation[] = [];
+      const vacations: VacationState[] = [];
       for await (const record of records) {
         validateRecord(record);
-        const vacation = Vacation.create(record);
+        const vacation = createVacation(record);
         vacations.push(vacation);
       }
       return vacations;
@@ -64,9 +67,9 @@ export class VacationRepository {
   }
 
   async findAllByDate(
-    from: Temporal.PlainDateLike | string,
-    to: Temporal.PlainDateLike | string,
-  ): Promise<Vacation[]> {
+    from: Temporal.PlainDateLike,
+    to: Temporal.PlainDateLike,
+  ): Promise<VacationState[]> {
     const vacations = await this.findAll();
     return vacations.filter(
       (vacation) =>
@@ -75,7 +78,7 @@ export class VacationRepository {
     );
   }
 
-  async saveAll(vacations: Vacation[]): Promise<void> {
+  async saveAll(vacations: VacationState[]): Promise<void> {
     const merged = await this.findAll();
     for (const vacation of vacations) {
       const index = merged.findIndex(
@@ -154,9 +157,11 @@ function validateRecord(record: unknown) {
 }
 
 class FsPromiseStub {
-  readonly #readFileResponses: ConfigurableResponses<Vacation[] | null | Error>;
+  readonly #readFileResponses: ConfigurableResponses<
+    VacationState[] | null | Error
+  >;
 
-  constructor(readFileResponses: (Vacation[] | null | Error)[]) {
+  constructor(readFileResponses: (VacationState[] | null | Error)[]) {
     this.#readFileResponses = ConfigurableResponses.create(
       readFileResponses,
       "read file",

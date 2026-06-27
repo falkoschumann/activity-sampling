@@ -11,7 +11,10 @@ import { stringify } from "csv/sync";
 import type { Options as ParseOptions } from "csv-parse";
 import type { Options as StringifyOptions } from "csv-stringify";
 
-import { Holiday } from "../domain/holiday";
+import {
+  createHoliday,
+  type HolidayState,
+} from "../domain/holiday/holiday.aggregate";
 
 export class HolidayRepository {
   static create({
@@ -23,7 +26,7 @@ export class HolidayRepository {
   static createNull({
     readFileResponses = [],
   }: {
-    readFileResponses?: (Holiday[] | null | Error)[];
+    readFileResponses?: (HolidayState[] | null | Error)[];
   } = {}) {
     return new HolidayRepository(
       "null-holidays.csv",
@@ -40,14 +43,14 @@ export class HolidayRepository {
     this.#fs = fs;
   }
 
-  async findAll(): Promise<Holiday[]> {
+  async findAll(): Promise<HolidayState[]> {
     try {
       const fileContent = await this.#fs.readFile(this.fileName);
       const records = parse(fileContent, PARSE_CONFIGURATION);
-      const holidays: Holiday[] = [];
+      const holidays: HolidayState[] = [];
       for await (const record of records) {
         validateRecord(record);
-        const holiday = Holiday.create(record);
+        const holiday = createHoliday(record);
         holidays.push(holiday);
       }
       return holidays;
@@ -62,9 +65,9 @@ export class HolidayRepository {
   }
 
   async findAllByDate(
-    from: Temporal.PlainDateLike | string,
-    to: Temporal.PlainDateLike | string,
-  ): Promise<Holiday[]> {
+    from: Temporal.PlainDateLike,
+    to: Temporal.PlainDateLike,
+  ): Promise<HolidayState[]> {
     const holidays = await this.findAll();
     return holidays.filter(
       (holiday) =>
@@ -73,7 +76,7 @@ export class HolidayRepository {
     );
   }
 
-  async saveAll(holidays: Holiday[]): Promise<void> {
+  async saveAll(holidays: HolidayState[]): Promise<void> {
     const merged = await this.findAll();
     for (const holiday of holidays) {
       const index = merged.findIndex(
@@ -156,9 +159,11 @@ function validateRecord(record: unknown) {
 }
 
 class FsPromiseStub {
-  readonly #readFileResponses: ConfigurableResponses<Holiday[] | null | Error>;
+  readonly #readFileResponses: ConfigurableResponses<
+    HolidayState[] | null | Error
+  >;
 
-  constructor(readFileResponses: (Holiday[] | null | Error)[]) {
+  constructor(readFileResponses: (HolidayState[] | null | Error)[]) {
     this.#readFileResponses = ConfigurableResponses.create(
       readFileResponses,
       "read file",

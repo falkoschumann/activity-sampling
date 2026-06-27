@@ -1,0 +1,5 @@
+Timestamp,Duration,Client,Project,Task,Notes,Category
+2026-06-15T10:00:00Z,PT30M,Test client,Test project,Test task,,
+2026-06-16T10:00:00Z,PT30M,Test client,Test project,Test task,,
+2026-06-18T10:00:00Z,PT30M,Test client,Test project,Test task,,
+2026-06-19T10:00:00Z,PT30M,Test client,Test project,Test task,,
