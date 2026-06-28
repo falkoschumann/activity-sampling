@@ -129,3 +129,51 @@ schema:
     lastName:
       type: string
   required: [date, client, project, task, hours, firstName, lastName]
+---
+apiVersion: schema.esdm.io/core/v1
+kind: value-object
+name: report-entry
+scope:
+  domain: activity-sampling
+  boundedContext: activity-sampling
+schema:
+  type: object
+  properties:
+    start:
+      type: string
+      format: date
+    finish:
+      type: string
+      format: date
+    client:
+      type: string
+    project:
+      type: string
+    task:
+      type: string
+    category:
+      type: string
+    hours:
+      type: string
+      format: duration
+    cycleTime:
+      type: integer
+  required: [start, finish, hours, cycleTime]
+---
+apiVersion: schema.esdm.io/core/v1
+kind: value-object
+name: burn-up-data
+scope:
+  domain: activity-sampling
+  boundedContext: activity-sampling
+schema:
+  type: object
+  properties:
+    date:
+      type: string
+      format: date
+    throughput:
+      type: integer
+    cumulativeThroughput:
+      type: number
+  required: [date, throughput, cumulativeThroughput]

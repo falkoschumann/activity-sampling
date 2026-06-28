@@ -6,8 +6,8 @@ scope:
   boundedContext: activity-sampling
 projections:
   - boundedContext: activity-sampling
-    aggregate: logged-activity
-    event: activity-logged
+    aggregate: activity
+    event: logged
     rule: Append the activity entry to the timesheet.
   - boundedContext: activity-sampling
     aggregate: settings
@@ -205,14 +205,14 @@ scope:
   boundedContext: activity-sampling
 projections:
   - boundedContext: activity-sampling
-    aggregate: logged-activity
-    event: activity-logged
+    aggregate: activity
+    event: logged
     rule:
       Join activity entries with same client, project, task and category into a single entry, update
       start and finish, and accumulate hours.
   - boundedContext: activity-sampling
-    aggregate: logged-activity
-    event: activity-logged
+    aggregate: activity
+    event: logged
     rule: Collect a list of all categories for filtering in the statistics query.
 schema:
   type: object
@@ -277,29 +277,7 @@ result:
     entries:
       type: array
       items:
-        type: object
-        properties:
-          start:
-            type: string
-            format: date
-          finish:
-            type: string
-            format: date
-          client:
-            type: string
-          project:
-            type: string
-          task:
-            type: string
-          category:
-            type: string
-          hours:
-            type: string
-            format: duration
-          cycleTime:
-            type: integer
-        # TODO client, project, task  and category should be optional depending on the scope
-        required: [start, finish, client, project, task, category, hours, cycleTime]
+        type: ReportEntry
     totalHours:
       type: string
       format: duration
@@ -435,32 +413,23 @@ parameters:
       type: array
       items:
         type: string
-    timezone:
+    timeZone:
       type: string
-  required: [from, to]
+  required: [from, to, categories, timeZone]
 result:
   type: object
   properties:
     data:
       type: array
       items:
-        type: object
-        properties:
-          date:
-            type: string
-            format: date
-          throughput:
-            type: integer
-          cumulativeThroughput:
-            type: number
-        required: [date, throughput, cumulativeThroughput]
+        type: BurnUpData
+    totalThroughput:
+      type: integer
     categories:
       type: array
       items:
         type: string
-    totalThroughput:
-      type: integer
-  required: [data, categories, totalThroughput]
+  required: [data, totalThroughput, categories]
 actors:
   - product-owner
 ---

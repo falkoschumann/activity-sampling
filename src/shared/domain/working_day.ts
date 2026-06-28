@@ -38,8 +38,6 @@ export class WorkingDay {
     activities: RecentActivity[],
   ) {
     this.date = Temporal.PlainDate.from(date);
-    this.activities = activities.map((activity) =>
-      RecentActivity.create(activity),
-    );
+    this.activities = activities.map(RecentActivity.create);
   }
 }

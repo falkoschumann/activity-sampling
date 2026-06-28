@@ -32,7 +32,7 @@ export class ExportTimesheetCommand {
   private constructor(filename: string, timesheets: TimesheetEntry[]) {
     this.data = {
       filename,
-      timesheets: timesheets.map((entry) => TimesheetEntry.create(entry)),
+      timesheets: timesheets.map(TimesheetEntry.create),
     };
   }
 }

@@ -63,7 +63,7 @@ export class GetRecentActivitiesQueryResult {
   readonly timeSummary;
 
   private constructor(workingDays: WorkingDay[], timeSummary: TimeSummary) {
-    this.workingDays = workingDays.map((day) => WorkingDay.create(day));
+    this.workingDays = workingDays.map(WorkingDay.create);
     this.timeSummary = TimeSummary.create(timeSummary);
   }
 }

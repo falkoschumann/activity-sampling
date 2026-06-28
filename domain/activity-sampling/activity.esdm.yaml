@@ -6,10 +6,12 @@ scope:
   boundedContext: activity-sampling
 identifiedBy:
   source: state
-  field: timestamp
+  field: id
 state:
   type: object
   properties:
+    id:
+      type: number
     start:
       type: string
       format: date
@@ -35,7 +37,7 @@ name: log-activity
 scope:
   domain: activity-sampling
   boundedContext: activity-sampling
-  aggregate: logged-activity
+  aggregate: activity
 data:
   type: object
   properties:
@@ -57,7 +59,7 @@ data:
       type: string
   required: [timestamp, duration, client, project, task]
 publishes:
-  - activity-logged
+  - logged
 actors:
   - software-developer
   - notifier
@@ -68,7 +70,7 @@ name: export-timesheet
 scope:
   domain: activity-sampling
   boundedContext: activity-sampling
-  aggregate: logged-activity
+  aggregate: activity
 data:
   type: object
   properties:
@@ -86,11 +88,11 @@ actors:
 ---
 apiVersion: schema.esdm.io/core/v1
 kind: event
-name: activity-logged
+name: logged
 scope:
   domain: activity-sampling
   boundedContext: activity-sampling
-  aggregate: logged-activity
+  aggregate: activity
 data:
   type: object
   properties:
@@ -120,7 +122,7 @@ name: timesheet-exported
 scope:
   domain: activity-sampling
   boundedContext: activity-sampling
-  aggregate: logged-activity
+  aggregate: activity
 data:
   type: object
   properties:

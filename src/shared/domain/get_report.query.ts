@@ -1,5 +1,7 @@
 // Copyright (c) 2026 Falko Schumann. All rights reserved. MIT license.
 
+import { ReportEntry } from "./report_entry";
+
 export class GetReportQuery {
   static create({
     scope,
@@ -84,101 +86,7 @@ export class GetReportQueryResult {
     entries: ReportEntry[],
     totalHours: Temporal.DurationLike,
   ) {
-    this.entries = entries.map((entry) => ReportEntry.create(entry));
+    this.entries = entries.map(ReportEntry.create);
     this.totalHours = Temporal.Duration.from(totalHours);
-  }
-}
-
-export class ReportEntry {
-  // TODO replace with Activity and model N/A with optional property
-  static create({
-    start,
-    finish,
-    client = "N/A",
-    project = "N/A",
-    task = "N/A",
-    category = "N/A",
-    hours,
-    cycleTime,
-  }: {
-    start: Temporal.PlainDateLike;
-    finish: Temporal.PlainDateLike;
-    client?: string;
-    project?: string;
-    task?: string;
-    category?: string;
-    hours: Temporal.DurationLike;
-    cycleTime: number;
-  }) {
-    return new ReportEntry(
-      start,
-      finish,
-      client,
-      project,
-      task,
-      category,
-      hours,
-      cycleTime,
-    );
-  }
-
-  static createTestInstance({
-    start = Temporal.PlainDate.from("2025-11-19"),
-    finish = Temporal.PlainDate.from("2025-11-19"),
-    client = "Test client",
-    project,
-    task,
-    category,
-    hours = Temporal.Duration.from("PT8H"),
-    cycleTime = 1,
-  }: {
-    start?: Temporal.PlainDateLike;
-    finish?: Temporal.PlainDateLike;
-    client?: string;
-    project?: string;
-    task?: string;
-    category?: string;
-    hours?: Temporal.DurationLike;
-    cycleTime?: number;
-  } = {}) {
-    return ReportEntry.create({
-      start,
-      finish,
-      client,
-      project,
-      task,
-      category,
-      hours,
-      cycleTime,
-    });
-  }
-
-  readonly start: Temporal.PlainDate;
-  readonly finish: Temporal.PlainDate;
-  readonly client: string;
-  readonly project: string;
-  readonly task: string;
-  readonly category: string;
-  readonly hours: Temporal.Duration;
-  readonly cycleTime: number;
-
-  private constructor(
-    start: Temporal.PlainDateLike,
-    finish: Temporal.PlainDateLike,
-    client: string,
-    project: string,
-    task: string,
-    category: string,
-    hours: Temporal.DurationLike,
-    cycleTime: number,
-  ) {
-    this.start = Temporal.PlainDate.from(start);
-    this.finish = Temporal.PlainDate.from(finish);
-    this.client = client;
-    this.project = project;
-    this.task = task;
-    this.category = category;
-    this.hours = Temporal.Duration.from(hours);
-    this.cycleTime = cycleTime;
   }
 }

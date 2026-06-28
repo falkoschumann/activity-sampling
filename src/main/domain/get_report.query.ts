@@ -1,20 +1,20 @@
 // Copyright (c) 2026 Falko Schumann. All rights reserved. MIT license.
 
 import type { ActivityState } from "./logged-activity/activity.aggregate";
+import type { ReportView } from "./report.read_model";
 import {
   type GetReportQuery,
   GetReportQueryResult,
-  ReportEntry,
-  ReportScope
+  ReportScope,
 } from "../../shared/domain/get_report.query";
+import { ReportEntry } from "../../shared/domain/report_entry";
 import { normalizeDuration } from "../../shared/domain/temporal";
-import type { ReportView } from "./report.read_model";
 
 export function getReport(
-  readModel: ReportView,
+  view: ReportView,
   query: GetReportQuery,
 ): GetReportQueryResult {
-  const entries = createEntries(readModel.activities, query);
+  const entries = createEntries(view.activities, query);
   const totalHours = sumTotalHours(entries);
   return GetReportQueryResult.create({ entries, totalHours });
 }
@@ -73,7 +73,7 @@ function updateClientsReport(entries: ReportEntry[], activity: ActivityState) {
 }
 
 function compareClientsReport(a: ReportEntry, b: ReportEntry) {
-  return a.client.localeCompare(b.client);
+  return a.client!.localeCompare(b.client!);
 }
 
 function createProjectsReport(activities: ActivityState[]) {
@@ -109,8 +109,8 @@ function updateProjectsReport(entries: ReportEntry[], activity: ActivityState) {
       Temporal.PlainDate.compare(finish, entry.finish) > 0
         ? finish
         : entry.finish;
-    let client = entry.client;
-    if (!entry.client.includes(activity.client)) {
+    let client = entry.client!;
+    if (!client.includes(activity.client)) {
       const clients = client.split(", ");
       clients.push(activity.client);
       clients.sort();
@@ -128,7 +128,7 @@ function updateProjectsReport(entries: ReportEntry[], activity: ActivityState) {
 }
 
 function compareProjectsReport(a: ReportEntry, b: ReportEntry) {
-  return a.project.localeCompare(b.project);
+  return a.project!.localeCompare(b.project!);
 }
 
 function createTasksReport(activities: ActivityState[]) {
@@ -169,11 +169,11 @@ function updateTasksReport(entries: ReportEntry[], activity: ActivityState) {
       Temporal.PlainDate.compare(finish, entry.finish) > 0
         ? finish
         : entry.finish;
-    let category = entry.category;
+    let category = entry.category!;
     if (
-      entry.category != null &&
+      category != null &&
       activity.category != null &&
-      !entry.category.includes(activity.category)
+      !category.includes(activity.category)
     ) {
       const categories = category.split(", ");
       categories.push(activity.category);
@@ -194,17 +194,17 @@ function updateTasksReport(entries: ReportEntry[], activity: ActivityState) {
 }
 
 function compareTasksReport(a: ReportEntry, b: ReportEntry) {
-  const taskComparison = a.task.localeCompare(b.task);
+  const taskComparison = a.task!.localeCompare(b.task!);
   if (taskComparison !== 0) {
     return taskComparison;
   }
 
-  const projectComparison = a.project.localeCompare(b.project);
+  const projectComparison = a.project!.localeCompare(b.project!);
   if (projectComparison !== 0) {
     return projectComparison;
   }
 
-  return a.client.localeCompare(b.client);
+  return a.client!.localeCompare(b.client!);
 }
 
 function createCategoriesReport(activities: ActivityState[]) {
@@ -253,7 +253,7 @@ function updateCategoriesReport(
 }
 
 function compareCategoriesReport(a: ReportEntry, b: ReportEntry) {
-  return a.category.localeCompare(b.category);
+  return a.category!.localeCompare(b.category!);
 }
 
 function sumTotalHours(entries: ReportEntry[]) {

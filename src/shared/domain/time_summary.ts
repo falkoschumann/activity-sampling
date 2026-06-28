@@ -29,10 +29,10 @@ export class TimeSummary {
     return new TimeSummary(today, yesterday, thisWeek, thisMonth);
   }
 
-  readonly today: Temporal.Duration;
-  readonly yesterday: Temporal.Duration;
-  readonly thisWeek: Temporal.Duration;
-  readonly thisMonth: Temporal.Duration;
+  readonly today;
+  readonly yesterday;
+  readonly thisWeek;
+  readonly thisMonth;
 
   private constructor(
     today: Temporal.DurationLike,

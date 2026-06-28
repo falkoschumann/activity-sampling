@@ -37,9 +37,9 @@ export class SettingsQueryResult {
     return SettingsQueryResult.create({ dataDir, capacity, categories });
   }
 
-  readonly dataDir: string;
-  readonly capacity: Temporal.Duration;
-  readonly categories: string[];
+  readonly dataDir;
+  readonly capacity;
+  readonly categories;
 
   private constructor(
     dataDir: string,

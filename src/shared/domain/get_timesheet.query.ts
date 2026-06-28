@@ -84,7 +84,7 @@ export class GetTimesheetQueryResult {
     totalHours: Temporal.DurationLike,
     capacity: Capacity,
   ) {
-    this.entries = entries.map((entry) => TimesheetEntry.create(entry));
+    this.entries = entries.map(TimesheetEntry.create);
     this.totalHours = Temporal.Duration.from(totalHours);
     this.capacity = Capacity.create(capacity);
   }
