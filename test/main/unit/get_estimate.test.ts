@@ -2,21 +2,21 @@
 
 import { describe, expect, it } from "vitest";
 
-import { EstimateQueryHandler } from "../../../src/main/application/estimate_query_handler";
+import { GetEstimateQueryHandler } from "../../../src/main/application/get_estimate.query_handler";
+import { ActivityLoggedEvent } from "../../../src/main/domain/logged-activity/activity_logged.event";
 import {
-  EstimateEntry,
-  EstimateQuery,
-  EstimateQueryResult,
-} from "../../../src/shared/domain/estimate_query";
-import { ActivityLoggedEvent } from "../../../src/main/domain/activity_logged_event";
+  GetEstimateQuery,
+  GetEstimateQueryResult,
+} from "../../../src/shared/domain/get_estimate.query";
+import type { EstimateEntry } from "../../../src/shared/domain/estimate_entry";
 import { EventStore } from "../../../src/main/infrastructure/event_store";
 
-describe("Estimate", () => {
+describe("get estimate", () => {
   describe("Estimate tasks with cycle times", () => {
     it("should return an empty list when no activity is logged", async () => {
       const { handler } = configure({ events: [] });
 
-      const result = await handler.handle(EstimateQuery.create({}));
+      const result = await handler.handle(GetEstimateQuery.create({}));
 
       expect(result.cycleTimes).toEqual<EstimateEntry[]>([]);
     });
@@ -56,10 +56,10 @@ describe("Estimate", () => {
       ];
       const { handler } = configure({ events });
 
-      const result = await handler.handle(EstimateQuery.create({}));
+      const result = await handler.handle(GetEstimateQuery.create({}));
 
       expect(result).toEqual(
-        EstimateQueryResult.create({
+        GetEstimateQueryResult.create({
           cycleTimes: [
             {
               cycleTime: 1,
@@ -106,10 +106,10 @@ describe("Estimate", () => {
       ];
       const { handler } = configure({ events });
 
-      const result = await handler.handle(EstimateQuery.create({}));
+      const result = await handler.handle(GetEstimateQuery.create({}));
 
       expect(result).toEqual(
-        EstimateQueryResult.create({
+        GetEstimateQueryResult.create({
           cycleTimes: [
             {
               cycleTime: 1,
@@ -158,11 +158,11 @@ describe("Estimate", () => {
       const { handler } = configure({ events });
 
       const result = await handler.handle(
-        EstimateQuery.create({ categories: ["Category A"] }),
+        GetEstimateQuery.create({ categories: ["Category A"] }),
       );
 
       expect(result).toEqual(
-        EstimateQueryResult.create({
+        GetEstimateQueryResult.create({
           cycleTimes: [
             {
               cycleTime: 1,
@@ -201,11 +201,11 @@ describe("Estimate", () => {
       const { handler } = configure({ events });
 
       const result = await handler.handle(
-        EstimateQuery.create({ categories: [""] }),
+        GetEstimateQuery.create({ categories: [""] }),
       );
 
       expect(result).toEqual(
-        EstimateQueryResult.create({
+        GetEstimateQueryResult.create({
           cycleTimes: [
             {
               cycleTime: 1,
@@ -240,11 +240,11 @@ describe("Estimate", () => {
       const { handler } = configure({ events });
 
       const result = await handler.handle(
-        EstimateQuery.create({ categories: ["", "Category A"] }),
+        GetEstimateQuery.create({ categories: ["", "Category A"] }),
       );
 
       expect(result).toEqual(
-        EstimateQueryResult.create({
+        GetEstimateQueryResult.create({
           cycleTimes: [
             {
               cycleTime: 1,
@@ -279,11 +279,11 @@ describe("Estimate", () => {
       const { handler } = configure({ events });
 
       const result = await handler.handle(
-        EstimateQuery.create({ categories: [] }),
+        GetEstimateQuery.create({ categories: [] }),
       );
 
       expect(result).toEqual(
-        EstimateQueryResult.create({
+        GetEstimateQueryResult.create({
           cycleTimes: [
             {
               cycleTime: 1,
@@ -302,6 +302,6 @@ describe("Estimate", () => {
 
 function configure({ events }: { events: ActivityLoggedEvent[] }) {
   const eventStore = EventStore.createNull({ events });
-  const handler = EstimateQueryHandler.create({ eventStore });
+  const handler = GetEstimateQueryHandler.create({ eventStore });
   return { handler };
 }

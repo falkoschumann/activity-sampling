@@ -372,17 +372,7 @@ result:
     cycleTimes:
       type: array
       items:
-        type: object
-        properties:
-          cycleTime:
-            type: integer
-          frequency:
-            type: integer
-          probability:
-            type: number
-          cumulativeProbability:
-            type: number
-        required: [cycleTime, frequency, probability, cumulativeProbability]
+        type: EstimateEntry
     categories:
       type: array
       items:

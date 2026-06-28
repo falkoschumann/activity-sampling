@@ -177,3 +177,22 @@ schema:
     cumulativeThroughput:
       type: number
   required: [date, throughput, cumulativeThroughput]
+---
+apiVersion: schema.esdm.io/core/v1
+kind: value-object
+name: estimate-entry
+scope:
+  domain: activity-sampling
+  boundedContext: activity-sampling
+schema:
+  type: object
+  properties:
+    cycleTime:
+      type: integer
+    frequency:
+      type: integer
+    probability:
+      type: number
+    cumulativeProbability:
+      type: number
+  required: [cycleTime, frequency, probability, cumulativeProbability]
