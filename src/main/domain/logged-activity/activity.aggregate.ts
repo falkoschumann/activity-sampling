@@ -9,3 +9,11 @@ export type ActivityState = {
   readonly category?: string;
   readonly hours: Temporal.Duration;
 };
+
+const NO_CATEGORY = "";
+
+export function filterCategory(categories: string[]) {
+  return (activity: ActivityState) =>
+    categories.length === 0 ||
+    categories.includes(activity.category ?? NO_CATEGORY);
+}

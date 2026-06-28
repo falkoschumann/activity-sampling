@@ -1,31 +1,32 @@
 // Copyright (c) 2026 Falko Schumann. All rights reserved. MIT license.
 
-import { Temporal } from "@js-temporal/polyfill";
-
 import {
-  BurnUpData,
-  type BurnUpQuery,
-  BurnUpQueryResult,
-} from "../../shared/domain/burn_up_query";
-import { type Activity, createActivities } from "./activities";
-import { initialReportReadModel } from "./report_read_model";
+  type ActivityState,
+  mergeCategories,
+} from "./logged-activity/activity.aggregate";
+import type { ReportView } from "./report.read_model";
+import {
+  type GetBurnUpQuery,
+  GetBurnUpQueryResult,
+} from "../../shared/domain/get_burn_up.query";
+import { BurnUpData } from "../../shared/domain/burn_up_data";
 
-export function queryBurnUp(
-  readModel = initialReportReadModel,
-  query: BurnUpQuery,
-): BurnUpQueryResult {
-  const entries = createActivities(readModel, query);
-  const throughputs = determineThroughputs(entries);
-  const data = fillPeriod(throughputs, query.from, query.to);
+export function getBurnUp(
+  view: ReportView,
+  query: GetBurnUpQuery,
+): GetBurnUpQueryResult {
+  const activities = mergeCategories(view.activities, query.data.categories);
+  const throughputs = determineThroughputs(activities);
+  const data = fillPeriod(throughputs, query.data.from, query.data.to);
   const totalThroughput = determineTotalThroughput(data);
-  return BurnUpQueryResult.create({
+  return GetBurnUpQueryResult.create({
     data,
     totalThroughput,
-    categories: readModel.categories,
+    categories: view.categories,
   });
 }
 
-function determineThroughputs(activities: Activity[]) {
+function determineThroughputs(activities: ActivityState[]) {
   const throughputs = new Map<string, number>();
   for (const activity of activities) {
     const date = activity.finish.toString();

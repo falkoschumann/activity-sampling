@@ -22,8 +22,8 @@ endsWhen:
 reactions:
   - when:
       boundedContext: activity-sampling
-      aggregate: logged-activity
-      event: activity-logged
+      aggregate: activity
+      event: logged
     rule: Store last activity.
   - when:
       boundedContext: activity-sampling
@@ -32,5 +32,5 @@ reactions:
     rule: Show notification with last activity.
     emits:
       - boundedContext: activity-sampling
-        aggregate: logged-activity
+        aggregate: activity
         command: log-activity

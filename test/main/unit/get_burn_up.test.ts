@@ -2,22 +2,22 @@
 
 import { describe, expect, it } from "vitest";
 
+import { GetBurnUpQueryHandler } from "../../../src/main/application/get_burn_up.query_handler";
+import { ActivityLoggedEvent } from "../../../src/main/domain/logged-activity/activity_logged.event";
 import {
-  BurnUpData,
-  BurnUpQuery,
-  BurnUpQueryResult,
-} from "../../../src/shared/domain/burn_up_query";
-import { ActivityLoggedEvent } from "../../../src/main/domain/activity_logged_event";
-import { BurnUpQueryHandler } from "../../../src/main/application/burn_up_query_handler";
+  GetBurnUpQuery,
+  GetBurnUpQueryResult,
+} from "../../../src/shared/domain/get_burn_up.query";
+import { BurnUpData } from "../../../src/shared/domain/burn_up_data";
 import { EventStore } from "../../../src/main/infrastructure/event_store";
 
-describe("Burn-up", () => {
+describe("Get burn-up", () => {
   describe("Determine tasks done over time", () => {
     it("should return an empty list when no activity is logged", async () => {
       const { handler } = configure({ events: [] });
 
       const result = await handler.handle(
-        BurnUpQuery.create({
+        GetBurnUpQuery.create({
           from: "2021-10-11",
           to: "2021-10-22",
         }),
@@ -91,7 +91,7 @@ describe("Burn-up", () => {
       const { handler } = configure({ events });
 
       const result = await handler.handle(
-        BurnUpQuery.create({
+        GetBurnUpQuery.create({
           from: "2021-10-11",
           to: "2021-10-22",
         }),
@@ -160,6 +160,10 @@ describe("Burn-up", () => {
         }),
       ]);
     });
+
+    it.todo(
+      "should join the cycle time of an activity with multiple categories",
+    );
   });
 
   describe("Determine total throughput", () => {
@@ -167,7 +171,7 @@ describe("Burn-up", () => {
       const { handler } = configure({ events: [] });
 
       const result = await handler.handle(
-        BurnUpQuery.create({
+        GetBurnUpQuery.create({
           from: "2021-10-11",
           to: "2021-10-22",
         }),
@@ -241,7 +245,7 @@ describe("Burn-up", () => {
       const { handler } = configure({ events });
 
       const result = await handler.handle(
-        BurnUpQuery.create({
+        GetBurnUpQuery.create({
           from: "2021-10-11",
           to: "2021-10-22",
         }),
@@ -256,13 +260,13 @@ describe("Burn-up", () => {
       const { handler } = configure({ events: [] });
 
       const result = await handler.handle(
-        BurnUpQuery.create({
+        GetBurnUpQuery.create({
           from: "2021-10-11",
           to: "2021-10-22",
         }),
       );
 
-      expect(result).toEqual(BurnUpQueryResult.create());
+      expect(result).toEqual(GetBurnUpQueryResult.create());
     });
 
     it("should return data for a given period", async () => {
@@ -330,14 +334,14 @@ describe("Burn-up", () => {
       const { handler } = configure({ events });
 
       const result = await handler.handle(
-        BurnUpQuery.create({
+        GetBurnUpQuery.create({
           from: "2021-10-11",
           to: "2021-10-22",
         }),
       );
 
       expect(result).toEqual(
-        BurnUpQueryResult.create({
+        GetBurnUpQueryResult.create({
           data: [
             BurnUpData.create({
               date: "2021-10-11",
@@ -412,7 +416,7 @@ describe("Burn-up", () => {
       const { handler } = configure({ events: [] });
 
       const result = await handler.handle(
-        BurnUpQuery.create({
+        GetBurnUpQuery.create({
           from: "2021-10-11",
           to: "2021-10-22",
         }),
@@ -442,7 +446,7 @@ describe("Burn-up", () => {
       const { handler } = configure({ events });
 
       const result = await handler.handle(
-        BurnUpQuery.create({
+        GetBurnUpQuery.create({
           from: "2021-10-12",
           to: "2021-10-14",
           categories: ["category-1"],
@@ -450,7 +454,7 @@ describe("Burn-up", () => {
       );
 
       expect(result).toEqual(
-        BurnUpQueryResult.create({
+        GetBurnUpQueryResult.create({
           data: [
             BurnUpData.create({
               date: "2021-10-12",
@@ -478,6 +482,6 @@ describe("Burn-up", () => {
 
 function configure({ events }: { events: ActivityLoggedEvent[] }) {
   const eventStore = EventStore.createNull({ events });
-  const handler = BurnUpQueryHandler.create({ eventStore });
+  const handler = GetBurnUpQueryHandler.create({ eventStore });
   return { handler };
 }

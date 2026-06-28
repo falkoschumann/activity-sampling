@@ -6,7 +6,7 @@ scope:
 deliveryGuarantee: at-most-once
 handles:
   - boundedContext: activity-sampling
-    aggregate: logged-activity
+    aggregate: activity
     event: timesheet-exported
 sideEffects:
   - type: external-call
