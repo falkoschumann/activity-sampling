@@ -2,24 +2,24 @@
 
 import { describe, expect, it } from "vitest";
 
-import { StatisticsQueryHandler } from "../../../src/main/application/statistics_query_handler";
+import { GetStatisticsQueryHandler } from "../../../src/main/application/get_statistics.query_handler";
+import { ActivityLoggedEvent } from "../../../src/main/domain/logged-activity/activity_logged.event";
 import {
-  Histogram,
-  Median,
-  StatisticsQuery,
-  StatisticsQueryResult,
+  GetStatisticsQuery,
+  GetStatisticsQueryResult,
   StatisticsScope,
-} from "../../../src/shared/domain/statistics_query";
-import { ActivityLoggedEvent } from "../../../src/main/domain/activity_logged_event";
+} from "../../../src/shared/domain/get_statistics.query";
+import { Histogram } from "../../../src/shared/domain/histogram";
+import { Median } from "../../../src/shared/domain/median";
 import { EventStore } from "../../../src/main/infrastructure/event_store";
 
-describe("Statistics", () => {
+describe("Get statistics", () => {
   describe("Create histogram for hours worked on tasks", () => {
     it("should return empty histogram when no activities are logged", async () => {
       const { handler } = configure({ events: [] });
 
       const result = await handler.handle(
-        StatisticsQuery.create({
+        GetStatisticsQuery.create({
           scope: StatisticsScope.WORKING_HOURS,
         }),
       );
@@ -58,7 +58,7 @@ describe("Statistics", () => {
       const { handler } = configure({ events });
 
       const result = await handler.handle(
-        StatisticsQuery.create({
+        GetStatisticsQuery.create({
           scope: StatisticsScope.WORKING_HOURS,
         }),
       );
@@ -94,13 +94,13 @@ describe("Statistics", () => {
       const { handler } = configure({ events });
 
       const result = await handler.handle(
-        StatisticsQuery.create({
+        GetStatisticsQuery.create({
           scope: StatisticsScope.WORKING_HOURS,
         }),
       );
 
       expect(result).toEqual(
-        StatisticsQueryResult.create({
+        GetStatisticsQueryResult.create({
           histogram: {
             binEdges: ["0", "0.5", "1", "2", "3", "5"],
             frequencies: [0, 0, 1, 1, 1],
@@ -146,13 +146,13 @@ describe("Statistics", () => {
       const { handler } = configure({ events });
 
       const result = await handler.handle(
-        StatisticsQuery.create({
+        GetStatisticsQuery.create({
           scope: StatisticsScope.WORKING_HOURS,
         }),
       );
 
       expect(result).toEqual(
-        StatisticsQueryResult.create({
+        GetStatisticsQueryResult.create({
           histogram: {
             binEdges: ["0", "0.5", "1", "2", "3", "5"],
             frequencies: [1, 0, 0, 1, 2],
@@ -203,13 +203,13 @@ describe("Statistics", () => {
       const { handler } = configure({ events });
 
       const result = await handler.handle(
-        StatisticsQuery.create({
+        GetStatisticsQuery.create({
           scope: StatisticsScope.WORKING_HOURS,
         }),
       );
 
       expect(result).toEqual(
-        StatisticsQueryResult.create({
+        GetStatisticsQueryResult.create({
           histogram: {
             binEdges: ["0", "0.5", "1", "2", "3", "5"],
             frequencies: [0, 1, 1, 1, 2],
@@ -235,7 +235,7 @@ describe("Statistics", () => {
       const { handler } = configure({ events: [] });
 
       const result = await handler.handle(
-        StatisticsQuery.create({
+        GetStatisticsQuery.create({
           scope: StatisticsScope.CYCLE_TIMES,
         }),
       );
@@ -281,7 +281,7 @@ describe("Statistics", () => {
       const { handler } = configure({ events });
 
       const result = await handler.handle(
-        StatisticsQuery.create({
+        GetStatisticsQuery.create({
           scope: StatisticsScope.CYCLE_TIMES,
         }),
       );
@@ -337,14 +337,14 @@ describe("Statistics", () => {
       const { handler } = configure({ events });
 
       const result = await handler.handle(
-        StatisticsQuery.create({
+        GetStatisticsQuery.create({
           scope: StatisticsScope.CYCLE_TIMES,
           categories: ["Category A"],
         }),
       );
 
       expect(result).toEqual(
-        StatisticsQueryResult.create({
+        GetStatisticsQueryResult.create({
           histogram: {
             binEdges: ["0", "1", "2", "3", "5", "8"],
             frequencies: [1, 0, 0, 1, 1],
@@ -370,7 +370,7 @@ describe("Statistics", () => {
       const { handler } = configure({ events: [] });
 
       const result = await handler.handle(
-        StatisticsQuery.create({
+        GetStatisticsQuery.create({
           scope: StatisticsScope.WORKING_HOURS,
         }),
       );
@@ -410,7 +410,7 @@ describe("Statistics", () => {
       const { handler } = configure({ events });
 
       const result = await handler.handle(
-        StatisticsQuery.create({
+        GetStatisticsQuery.create({
           scope: StatisticsScope.WORKING_HOURS,
         }),
       );
@@ -432,7 +432,7 @@ describe("Statistics", () => {
       const { handler } = configure({ events: [] });
 
       const result = await handler.handle(
-        StatisticsQuery.create({
+        GetStatisticsQuery.create({
           scope: StatisticsScope.CYCLE_TIMES,
         }),
       );
@@ -479,7 +479,7 @@ describe("Statistics", () => {
       const { handler } = configure({ events });
 
       const result = await handler.handle(
-        StatisticsQuery.create({
+        GetStatisticsQuery.create({
           scope: StatisticsScope.CYCLE_TIMES,
         }),
       );
@@ -523,14 +523,14 @@ describe("Statistics", () => {
       const { handler } = configure({ events });
 
       const result = await handler.handle(
-        StatisticsQuery.create({
+        GetStatisticsQuery.create({
           scope: StatisticsScope.WORKING_HOURS,
           categories: ["Category A"],
         }),
       );
 
       expect(result).toEqual(
-        StatisticsQueryResult.create({
+        GetStatisticsQueryResult.create({
           histogram: {
             binEdges: ["0", "0.5", "1", "2", "3", "5"],
             frequencies: [0, 0, 1, 1, 1],
@@ -574,14 +574,14 @@ describe("Statistics", () => {
       const { handler } = configure({ events });
 
       const result = await handler.handle(
-        StatisticsQuery.create({
+        GetStatisticsQuery.create({
           scope: StatisticsScope.CYCLE_TIMES,
           categories: [""],
         }),
       );
 
       expect(result).toEqual(
-        StatisticsQueryResult.create({
+        GetStatisticsQueryResult.create({
           histogram: {
             binEdges: ["0", "1", "2"],
             frequencies: [2, 0],
@@ -621,14 +621,14 @@ describe("Statistics", () => {
       const { handler } = configure({ events });
 
       const result = await handler.handle(
-        StatisticsQuery.create({
+        GetStatisticsQuery.create({
           scope: StatisticsScope.CYCLE_TIMES,
           categories: ["", "Category A"],
         }),
       );
 
       expect(result).toEqual(
-        StatisticsQueryResult.create({
+        GetStatisticsQueryResult.create({
           histogram: {
             binEdges: ["0", "1", "2"],
             frequencies: [2, 0],
@@ -668,14 +668,14 @@ describe("Statistics", () => {
       const { handler } = configure({ events });
 
       const result = await handler.handle(
-        StatisticsQuery.create({
+        GetStatisticsQuery.create({
           scope: StatisticsScope.CYCLE_TIMES,
           categories: [],
         }),
       );
 
       expect(result).toEqual(
-        StatisticsQueryResult.create({
+        GetStatisticsQueryResult.create({
           histogram: {
             binEdges: ["0", "1", "2"],
             frequencies: [3, 0],
@@ -699,6 +699,6 @@ describe("Statistics", () => {
 
 function configure({ events }: { events?: ActivityLoggedEvent[] }) {
   const eventStore = EventStore.createNull({ events });
-  const handler = StatisticsQueryHandler.create({ eventStore });
+  const handler = GetStatisticsQueryHandler.create({ eventStore });
   return { handler };
 }

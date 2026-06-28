@@ -8,17 +8,16 @@ import {
   GetTimesheetQueryResult,
 } from "../../shared/domain/get_timesheet.query";
 import { TimesheetEntry } from "../../shared/domain/timesheet_entry";
-import { Calendar } from "./calendar";
+import { countWorkingHours } from "./calendar.service";
 
 export function getTimesheet(
-  readModel: TimesheetView,
+  view: TimesheetView,
   query: GetTimesheetQuery,
 ): GetTimesheetQueryResult {
   // we assume the view is pre-filtered by from and to date
-  const entries = createEntries(readModel);
+  const entries = createEntries(view);
   const totalHours = sumTotalHours(entries);
-  const calendar = Calendar.create(readModel);
-  const capacity = determineCapacity(calendar, totalHours, query);
+  const capacity = determineCapacity(view, query, totalHours);
   return GetTimesheetQueryResult.create({ entries, capacity, totalHours });
 }
 
@@ -67,12 +66,12 @@ function sumTotalHours(entries: TimesheetEntry[]) {
 }
 
 function determineCapacity(
-  calendar: Calendar,
-  totalHours: Temporal.Duration,
+  view: TimesheetView,
   query: GetTimesheetQuery,
+  totalHours: Temporal.Duration,
 ) {
   const { from, to, today } = query.data;
-  const hours = calendar.countWorkingHours(from, to);
+  const hours = countWorkingHours(from, to, view);
 
   let end: Temporal.PlainDate;
   if (Temporal.PlainDate.compare(today, from) < 0) {
@@ -82,7 +81,7 @@ function determineCapacity(
   } else {
     end = today;
   }
-  const businessDays = calendar.countWorkingHours(from, end);
+  const businessDays = countWorkingHours(from, end, view);
   const offset = normalizeDuration(totalHours.subtract(businessDays));
 
   return { hours, offset };

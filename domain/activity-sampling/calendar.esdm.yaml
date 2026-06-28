@@ -1,0 +1,38 @@
+apiVersion: schema.esdm.io/core/v1
+kind: domain-service
+name: calendar
+scope:
+  domain: activity-sampling
+  boundedContext: activity-sampling
+functions:
+  - name: count-working-hours
+    arguments:
+      type: object
+      properties:
+        from:
+          type: string
+          format: date
+        to:
+          type: string
+          format: date
+        options:
+          type: object
+          properties:
+            holidays:
+              type: array
+              items:
+                type: Holiday
+            vacations:
+              type: array
+              items:
+                type: Vacation
+            capacity:
+              type: string
+              format: duration
+            businessDays:
+              type: array
+              items:
+                type: integer
+    returns:
+      type: string
+      format: duration

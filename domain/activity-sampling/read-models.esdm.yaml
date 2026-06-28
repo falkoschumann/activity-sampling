@@ -250,7 +250,7 @@ schema:
 ---
 apiVersion: schema.esdm.io/core/v1
 kind: query
-name: report
+name: get-report
 scope:
   domain: activity-sampling
   boundedContext: activity-sampling
@@ -287,7 +287,7 @@ actors:
 ---
 apiVersion: schema.esdm.io/core/v1
 kind: query
-name: statistics
+name: get-statistics
 scope:
   domain: activity-sampling
   boundedContext: activity-sampling
@@ -311,35 +311,9 @@ result:
     histogram:
       type: array
       items:
-        type: object
-        properties:
-          binEdges:
-            type: array
-            items:
-              type: string
-          frequencies:
-            type: array
-            items:
-              type: integer
-          xAxisLabel:
-            type: string
-          yAxisLabel:
-            type: string
-        required: [binEdges, frequencies, xAxisLabel, yAxisLabel]
+        type: Histogram
     median:
-      type: object
-      properties:
-        edge0:
-          type: number
-        edge25:
-          type: number
-        edge50:
-          type: number
-        edge75:
-          type: number
-        edge100:
-          type: number
-      required: [edge0, edge25, edge50, edge75, edge100]
+      type: Median
     categories:
       type: array
       items:
@@ -352,7 +326,7 @@ actors:
 ---
 apiVersion: schema.esdm.io/core/v1
 kind: query
-name: estimate
+name: get-estimate
 scope:
   domain: activity-sampling
   boundedContext: activity-sampling
@@ -385,7 +359,7 @@ actors:
 ---
 apiVersion: schema.esdm.io/core/v1
 kind: query
-name: burn-up
+name: get-burn-up
 scope:
   domain: activity-sampling
   boundedContext: activity-sampling
@@ -425,7 +399,7 @@ actors:
 ---
 apiVersion: schema.esdm.io/core/v1
 kind: query
-name: timesheet
+name: get-timesheet
 scope:
   domain: activity-sampling
   boundedContext: activity-sampling

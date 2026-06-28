@@ -196,3 +196,47 @@ schema:
     cumulativeProbability:
       type: number
   required: [cycleTime, frequency, probability, cumulativeProbability]
+---
+apiVersion: schema.esdm.io/core/v1
+kind: value-object
+name: histogram
+scope:
+  domain: activity-sampling
+  boundedContext: activity-sampling
+schema:
+  type: object
+  properties:
+    binEdges:
+      type: array
+      items:
+        type: string
+    frequencies:
+      type: array
+      items:
+        type: integer
+    xAxisLabel:
+      type: string
+    yAxisLabel:
+      type: string
+  required: [binEdges, frequencies, xAxisLabel, yAxisLabel]
+---
+apiVersion: schema.esdm.io/core/v1
+kind: value-object
+name: median
+scope:
+  domain: activity-sampling
+  boundedContext: activity-sampling
+schema:
+  type: object
+  properties:
+    edge0:
+      type: number
+    edge25:
+      type: number
+    edge50:
+      type: number
+    edge75:
+      type: number
+    edge100:
+      type: number
+  required: [edge0, edge25, edge50, edge75, edge100]

@@ -1,35 +1,38 @@
 // Copyright (c) 2026 Falko Schumann. All rights reserved. MIT license.
 
 import {
-  type StatisticsQuery,
-  StatisticsQueryResult,
+  type ActivityState,
+  mergeCategories,
+} from "./logged-activity/activity.aggregate";
+import type { ReportView } from "./report.read_model";
+import {
+  type GetStatisticsQuery,
+  GetStatisticsQueryResult,
   StatisticsScope,
-} from "../../shared/domain/statistics_query";
-import { type Activity, createActivities } from "./activities";
-import { initialReportReadModel } from "./report_read_model";
+} from "../../shared/domain/get_statistics.query";
 
-export function queryStatistics(
-  readModel = initialReportReadModel,
-  query: StatisticsQuery,
-): StatisticsQueryResult {
-  const activities = createActivities(readModel, query);
+export function getStatistics(
+  view: ReportView,
+  query: GetStatisticsQuery,
+): GetStatisticsQueryResult {
+  const activities = mergeCategories(view.activities, query.data.categories);
   const statistics = createDays(activities, query);
   const histogram = createHistogram(
     statistics.xAxisLabel,
     statistics.days,
-    query.scope,
+    query.data.scope,
   );
   const median = createMedian(statistics.days);
-  return StatisticsQueryResult.create({
+  return GetStatisticsQueryResult.create({
     histogram,
     median,
-    categories: readModel.categories,
+    categories: view.categories,
     totalCount: statistics.totalCount,
   });
 }
 
-function createDays(activities: Activity[], query: StatisticsQuery) {
-  switch (query.scope) {
+function createDays(activities: ActivityState[], query: GetStatisticsQuery) {
+  switch (query.data.scope) {
     case StatisticsScope.WORKING_HOURS:
       return createWorkingHoursStatistics(activities);
     case StatisticsScope.CYCLE_TIMES:
@@ -37,7 +40,7 @@ function createDays(activities: Activity[], query: StatisticsQuery) {
   }
 }
 
-function createWorkingHoursStatistics(activities: Activity[]) {
+function createWorkingHoursStatistics(activities: ActivityState[]) {
   let totalCount = 0;
   let days: number[] = [];
   for (const activity of activities) {
@@ -49,7 +52,7 @@ function createWorkingHoursStatistics(activities: Activity[]) {
   return { xAxisLabel: "Duration (days)", days, totalCount };
 }
 
-function createCycleTimesStatistics(activities: Activity[]) {
+function createCycleTimesStatistics(activities: ActivityState[]) {
   let totalCount = 0;
   let days: number[] = [];
   for (const activity of activities) {
