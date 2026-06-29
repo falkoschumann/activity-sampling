@@ -131,17 +131,11 @@ schema:
       format: duration
     progress:
       type: number
-    currentTimestamp:
-      type: string
-      format: date-time
-    currentDuration:
-      type: string
-      format: duration
   required: [isRunning, elapsedTime, progress]
 ---
 apiVersion: schema.esdm.io/core/v1
 kind: query
-name: current-interval
+name: get-current-interval
 scope:
   domain: activity-sampling
   boundedContext: activity-sampling
@@ -149,12 +143,14 @@ readModel: timer
 result:
   type: object
   properties:
-    timestamp:
-      type: string
-      format: date-time
-    duration:
+    isRunning:
+      type: boolean
+    elapsedTime:
       type: string
       format: duration
+    progress:
+      type: number
+  required: [isRunning, elapsedTime, progress]
 actors:
   - software-developer
 ---
@@ -187,7 +183,7 @@ schema:
 ---
 apiVersion: schema.esdm.io/core/v1
 kind: query
-name: categories
+name: get-categories
 scope:
   domain: activity-sampling
   boundedContext: activity-sampling

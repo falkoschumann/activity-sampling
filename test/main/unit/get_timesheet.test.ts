@@ -4,11 +4,23 @@ import { Temporal } from "@js-temporal/polyfill";
 import { describe, expect, it } from "vitest";
 
 import { GetTimesheetQueryHandler } from "../../../src/main/application/get_timesheet.query_handler";
-import { createHoliday, type HolidayState } from "../../../src/main/domain/holiday/holiday.aggregate";
+import {
+  createHoliday,
+  type HolidayState,
+} from "../../../src/main/domain/holiday/holiday.aggregate";
 import { ActivityLoggedEvent } from "../../../src/main/domain/logged-activity/activity_logged.event";
-import { createVacation, type VacationState } from "../../../src/main/domain/vacation/vacation.aggregate";
-import { createSettings, type SettingsState } from "../../../src/main/domain/settings/settings.aggregate";
-import { GetTimesheetQuery, GetTimesheetQueryResult } from "../../../src/shared/domain/get_timesheet.query";
+import {
+  createVacation,
+  type VacationState,
+} from "../../../src/main/domain/vacation/vacation.aggregate";
+import {
+  createSettings,
+  type SettingsState,
+} from "../../../src/main/domain/settings/settings.aggregate";
+import {
+  GetTimesheetQuery,
+  GetTimesheetQueryResult,
+} from "../../../src/shared/domain/get_timesheet.query";
 import { Capacity } from "../../../src/shared/domain/capacity";
 import { TimesheetEntry } from "../../../src/shared/domain/timesheet_entry";
 import { EventStore } from "../../../src/main/infrastructure/event_store";
