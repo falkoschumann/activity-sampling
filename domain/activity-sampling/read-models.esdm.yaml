@@ -189,9 +189,14 @@ scope:
   boundedContext: activity-sampling
 readModel: settings
 result:
-  type: array
-  items:
-    type: string
+  type: object
+  properties:
+    categories:
+    type: array
+    items:
+      type: string
+  required:
+    - categories
 ---
 apiVersion: schema.esdm.io/core/v1
 kind: read-model
