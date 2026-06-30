@@ -6,32 +6,44 @@ import { LogActivityCommand } from "../../shared/domain/logged-activity/log_acti
 import { ActivityLoggedEvent } from "../domain/logged-activity/activity_logged.event";
 import { TimerElapsedEvent } from "../domain/timer/timer_elapsed.event";
 import { NotificationsAdapter } from "../infrastructure/notifications_adapter";
+import { Clock } from "../../shared/domain/temporal";
 
 export class NotifierProcessManager {
   static create({
     eventBus,
     messageRouter,
     notifications,
+    clock = Clock.systemUtc(),
   }: {
     eventBus: EventBus;
     messageRouter: MessageRouter;
     notifications: NotificationsAdapter;
+    clock?: Clock;
   }) {
-    return new NotifierProcessManager(eventBus, messageRouter, notifications);
+    return new NotifierProcessManager(
+      eventBus,
+      messageRouter,
+      notifications,
+      clock,
+    );
   }
 
   readonly #messageRouter;
   readonly #notification;
+  readonly #clock;
 
   #lastActivity?: ActivityLoggedEvent;
+  #duration?: Temporal.Duration;
 
   private constructor(
     eventBus: EventBus,
     messageRouter: MessageRouter,
     notification: NotificationsAdapter,
+    clock: Clock,
   ) {
     this.#messageRouter = messageRouter;
     this.#notification = notification;
+    this.#clock = clock;
 
     eventBus.subscribe((event: ActivityLoggedEvent | TimerElapsedEvent) =>
       this.#react(event),
@@ -44,6 +56,7 @@ export class NotifierProcessManager {
     } else if (event instanceof TimerElapsedEvent) {
       await this.#notification.hide();
 
+      this.#duration = event.data.duration;
       const title = "What are you working on?";
       let body;
       if (this.#lastActivity != null) {
@@ -64,7 +77,11 @@ export class NotifierProcessManager {
     }
 
     this.#messageRouter.route(
-      LogActivityCommand.create(this.#lastActivity.data),
+      LogActivityCommand.create({
+        ...this.#lastActivity.data,
+        timestamp: this.#clock.instant(),
+        duration: this.#duration ?? this.#lastActivity.data.duration,
+      }),
     );
   }
 }

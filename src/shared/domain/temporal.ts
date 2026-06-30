@@ -14,7 +14,7 @@ export class Clock {
   }
 
   static fixed(
-    fixedInstant: Temporal.Instant | string,
+    fixedInstant: Temporal.InstantLike,
     zone: Temporal.TimeZoneLike,
   ) {
     return new Clock(() => Temporal.Instant.from(fixedInstant), zone);
@@ -22,13 +22,13 @@ export class Clock {
 
   static offset(
     baseClock: Clock,
-    offsetDuration: Temporal.Duration | Temporal.DurationLike | string,
+    offsetDuration: Temporal.DurationLike,
   ): Clock {
     return new OffsetClock(baseClock, Temporal.Duration.from(offsetDuration));
   }
 
-  #instantFactory: () => Temporal.Instant;
-  #zone: Temporal.TimeZoneLike;
+  readonly #instantFactory: () => Temporal.Instant;
+  readonly #zone: Temporal.TimeZoneLike;
 
   protected constructor(
     instantFactory: () => Temporal.Instant,
@@ -63,10 +63,10 @@ export function isTimestampInPeriod({
   from,
   to,
 }: {
-  timestamp: Temporal.Instant | string;
+  timestamp: Temporal.InstantLike;
   timeZone: Temporal.TimeZoneLike;
-  from?: Temporal.PlainDate | Temporal.PlainDateLike | string;
-  to?: Temporal.PlainDate | Temporal.PlainDateLike | string;
+  from?: Temporal.PlainDateLike;
+  to?: Temporal.PlainDateLike;
 }) {
   timestamp = Temporal.Instant.from(timestamp);
   const date = timestamp.toZonedDateTimeISO(timeZone).toPlainDate();
@@ -78,9 +78,9 @@ export function isDateInPeriod({
   from,
   to,
 }: {
-  date: Temporal.PlainDate | Temporal.PlainDateLike | string;
-  from?: Temporal.PlainDate | Temporal.PlainDateLike | string;
-  to?: Temporal.PlainDate | Temporal.PlainDateLike | string;
+  date: Temporal.PlainDateLike;
+  from?: Temporal.PlainDateLike;
+  to?: Temporal.PlainDateLike;
 }) {
   return (
     (from == null || Temporal.PlainDate.compare(date, from) >= 0) &&
@@ -89,7 +89,7 @@ export function isDateInPeriod({
 }
 
 export function normalizeDuration(
-  duration: Temporal.Duration | Temporal.DurationLike | string,
+  duration: Temporal.DurationLike,
   {
     smallestUnit = "milliseconds",
     largestUnit = "hours",
@@ -125,7 +125,7 @@ export const FormatStyle = Object.freeze({
 export type FormatStyle = (typeof FormatStyle)[keyof typeof FormatStyle];
 
 export function formatDateTime(
-  dateTime: Temporal.PlainDateTime | Temporal.PlainDateTimeLike | string,
+  dateTime: Temporal.PlainDateTimeLike,
   {
     dateFormat = FormatStyle.MEDIUM,
     timeFormat = FormatStyle.MEDIUM,
@@ -139,7 +139,7 @@ export function formatDateTime(
 }
 
 export function formatDate(
-  date: Temporal.PlainDate | Temporal.PlainDateLike | string,
+  date: Temporal.PlainDateLike,
   { format = FormatStyle.MEDIUM }: { format?: FormatStyle } = {},
 ): string {
   return Temporal.PlainDate.from(date).toLocaleString(undefined, {
@@ -148,7 +148,7 @@ export function formatDate(
 }
 
 export function formatTime(
-  time: Temporal.PlainTime | Temporal.PlainTimeLike | string,
+  time: Temporal.PlainTimeLike,
   { format = FormatStyle.MEDIUM }: { format?: FormatStyle } = {},
 ): string {
   return Temporal.PlainTime.from(time).toLocaleString(undefined, {
@@ -158,7 +158,7 @@ export function formatTime(
 }
 
 export function formatDuration(
-  duration: Temporal.Duration | Temporal.DurationLike | string,
+  duration: Temporal.DurationLike,
   { format = FormatStyle.MEDIUM }: { format?: FormatStyle } = {},
 ): string {
   const s = Temporal.Duration.from(duration).toLocaleString(undefined, {
