@@ -7,7 +7,7 @@
       "devDependencies": {
         "@eslint/js": "10.0.1",
         "@js-temporal/polyfill": "0.5.1",
-        "@muspellheim/shared": "0.28.1",
+        "@muspellheim/shared": "0.28.2",
         "@softarc/sheriff-core": "0.19.6",
         "@types/node": "24.13.2",
         "@types/react": "19.2.17",
@@ -227,7 +227,7 @@
 
     "@malept/flatpak-bundler": ["@malept/flatpak-bundler@0.4.0", "", { "dependencies": { "debug": "^4.1.1", "fs-extra": "^9.0.0", "lodash": "^4.17.15", "tmp-promise": "^3.0.2" } }, "sha512-9QOtNffcOF/c1seMCDnjckb3R9WHcG34tky+FHpNKKCW0wc/scYLwMtO+ptyGUfMW0/b/n4qRiALlaFHc9Oj7Q=="],
 
-    "@muspellheim/shared": ["@muspellheim/shared@0.28.1", "", {}, "sha512-HJt/tdK294Osj9H+DEyn3iWbiYQJH9ZLFSWHDjpaJ2psdMght4apT402XB5dOxpClvT9sQYc3ybKjVJOXLvi+A=="],
+    "@muspellheim/shared": ["@muspellheim/shared@0.28.2", "", {}, "sha512-SPkus3r9w0Q+FaxSaF0vWjwyhffSR6/5nJWgkWIrGSRKzNnWrq8NPtZg9pDbOVp9/xHJIaUBjOkrpIUf5RI3Wg=="],
 
     "@napi-rs/wasm-runtime": ["@napi-rs/wasm-runtime@1.1.6", "", { "dependencies": { "@tybys/wasm-util": "^0.10.3" }, "peerDependencies": { "@emnapi/core": "^1.7.1", "@emnapi/runtime": "^1.7.1" } }, "sha512-ZLv/JdUfkvOy9eCnnBaGfiO+XimbjebAeO+MRQqD/B+FR1tnRN0tpKSJHRbE8sFfS6aqsXZ67TQjfwfsxULVbg=="],
 
