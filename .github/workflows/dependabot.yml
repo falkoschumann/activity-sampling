@@ -18,9 +18,8 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
       - name: Auto-merge minor and patch updates
         if:
-          github.event.workflow_run.conclusion == 'success' && ( steps.metadata.outputs.update-type
-          == 'version-update:semver-minor' || steps.metadata.outputs.update-type ==
-          'version-update:semver-patch' )
+          steps.metadata.outputs.update-type == 'version-update:semver-minor' ||
+          steps.metadata.outputs.update-type == 'version-update:semver-patch'
         run: gh pr merge --auto --merge "$PR_URL"
         env:
           PR_URL: ${{ github.event.pull_request.html_url }}
