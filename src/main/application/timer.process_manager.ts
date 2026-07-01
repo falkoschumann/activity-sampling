@@ -1,6 +1,10 @@
 // Copyright (c) 2026 Falko Schumann. All rights reserved. MIT license.
 
-import { type EventBus, MessageRouter, OutputTracker } from "@muspellheim/shared";
+import {
+  type EventBus,
+  MessageRouter,
+  OutputTracker,
+} from "@muspellheim/shared";
 
 import { TickTimerCommand } from "../../shared/domain/timer/tick_timer.command";
 import { TimerStartedEvent } from "../domain/timer/timer_started.event";

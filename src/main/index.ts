@@ -1,7 +1,14 @@
 // Copyright (c) 2026 Falko Schumann. All rights reserved. MIT license.
 
 import path from "node:path";
+import fs from "node:fs/promises";
 
+import {
+  EventBus,
+  type Message,
+  MessageRouter,
+  State,
+} from "@muspellheim/shared";
 import { shell } from "electron/common";
 import { app, BrowserWindow, dialog, ipcMain, Menu } from "electron/main";
 import {
@@ -9,104 +16,150 @@ import {
   REACT_DEVELOPER_TOOLS,
 } from "electron-devtools-installer";
 
-import { CurrentIntervalQueryHandler } from "./application/current_interval_query_handler";
-import { BurnUpQueryHandler } from "./application/burn_up_query_handler";
-import { EstimateQueryHandler } from "./application/estimate_query_handler";
-import { LogActivityCommandHandler } from "./application/log_activity_command_handler";
-import { ExportTimesheetCommandHandler } from "./application/export_timesheet_command_handler";
-import { RecentActivitiesQueryHandler } from "./application/recent_activities_query_handler";
-import { ReportQueryHandler } from "./application/report_query_handler";
-import { StartTimerCommandHandler } from "./application/start_timer_command_handler";
-import { StatisticsQueryHandler } from "./application/statistics_query_handler";
-import { StopTimerCommandHandler } from "./application/stop_timer_command_handler";
-import { TimesheetQueryHandler } from "./application/timesheet_query_handler";
-import type { StartTimerCommand } from "../shared/domain/start_timer_command";
-import type { StopTimerCommand } from "../shared/domain/stop_timer_command";
-import { LogActivityCommand } from "../shared/domain/log_activity_command";
-import { ExportTimesheetCommand } from "../shared/domain/export_timesheet_command";
-import { RecentActivitiesQuery } from "../shared/domain/recent_activities_query";
-import { ReportQuery } from "../shared/domain/report_query";
-import { StatisticsQuery } from "../shared/domain/statistics_query";
-import { TimesheetQuery } from "../shared/domain/timesheet_query";
-import { EstimateQuery } from "../shared/domain/estimate_query";
-import { BurnUpQuery, BurnUpQueryResult } from "../shared/domain/burn_up_query";
-import { INTERVAL_ELAPSED_EVENT } from "../shared/domain/interval_elapsed_event";
-import { TIMER_STARTED_EVENT } from "../shared/domain/timer_started_event";
-import { TIMER_STOPPED_EVENT } from "../shared/domain/timer_stopped_event";
-import { Settings } from "./domain/settings";
-import { TimerState } from "./domain/timer_state";
+import { ChangeSettingsCommandHandler } from "./application/change_settings.command_handler";
+import { ExportTimesheetCommandHandler } from "./application/export_timesheet.command_handler";
+import { GetBurnUpQueryHandler } from "./application/get_burn_up.query_handler";
+import { GetCategoriesQueryHandler } from "./application/get_categories.query_handler";
+import { GetCurrentIntervalQueryHandler } from "./application/get_current_interval.query_handler";
+import { GetEstimateQueryHandler } from "./application/get_estimate.query_handler";
+import { GetRecentActivitiesQueryHandler } from "./application/get_recent_activities.query_handler";
+import { GetReportQueryHandler } from "./application/get_report.query_handler";
+import { GetStatisticsQueryHandler } from "./application/get_statistics.query_handler";
+import { GetTimesheetQueryHandler } from "./application/get_timesheet.query_handler";
+import { LogActivityCommandHandler } from "./application/log_activity.command_handler";
+import { NotifierProcessManager } from "./application/notifier.process_manager";
+import { StartTimerCommandHandler } from "./application/start_timer.command_handler";
+import { StopTimerCommandHandler } from "./application/stop_timer.command_handler";
+import { TickTimerCommandHandler } from "./application/tick_timer.command_handler";
+import { TimerProcessManager } from "./application/timer.process_manager";
+import { TimesheetExportEventHandler } from "./application/timesheet_exporter.event_handler";
+import type { TimerStartedEvent } from "./domain/timer/timer_started.event";
+import type { TimerStoppedEvent } from "./domain/timer/timer_stopped.event";
+import type { TimerTickedEvent } from "./domain/timer/timer_ticked.event";
+import type { TimerElapsedEvent } from "./domain/timer/timer_elapsed.event";
+import { createTimer, projectTimer } from "./domain/timer.read_model";
 import { EventStore } from "./infrastructure/event_store";
-import { HolidayRepository } from "./infrastructure/holiday_repository";
-import { SettingsProvider } from "./infrastructure/settings_provider";
-import { Timer } from "./infrastructure/timer";
-import { TimesheetExporter } from "./infrastructure/timesheet_exporter";
-import {
-  EXPORT_TIMESHEET_CHANNEL,
-  INTERVAL_ELAPSED_CHANNEL,
-  LOG_ACTIVITY_CHANNEL,
-  QUERY_BURN_UP_CHANNEL,
-  QUERY_ESTIMATE_CHANNEL,
-  QUERY_RECENT_ACTIVITIES_CHANNEL,
-  QUERY_REPORT_CHANNEL,
-  QUERY_SETTINGS_CHANNEL,
-  QUERY_STATISTICS_CHANNEL,
-  QUERY_TIMESHEET_CHANNEL,
-  SHOW_OPEN_DIALOG_CHANNEL,
-  TIMER_STARTED_CHANNEL,
-  TIMER_STOPPED_CHANNEL,
-  UPDATE_SETTINGS_CHANNEL,
-} from "../shared/infrastructure/channels";
-import { VacationRepository } from "./infrastructure/vacation_repository";
+import { HolidayRepository } from "./infrastructure/holiday.repository";
+import { SettingsProvider } from "./infrastructure/settings.provider";
+import { NotificationsGateway } from "./infrastructure/notifications.gateway";
+import { TimesheetExporterGateway } from "./infrastructure/timesheet_exporter.gateway";
+import { VacationRepository } from "./infrastructure/vacation.repository";
 import { chooseDataDirectory, openWindow } from "./ui/actions";
 import { createMenu } from "./ui/menu";
+import {
+  EVENT_CHANNEL,
+  MESSAGE_CHANNEL,
+} from "../shared/infrastructure/channels";
+import { StopTimerCommand } from "../shared/domain/timer/stop_timer.command";
 
 const isProduction = app.isPackaged;
 
-const fileName = isProduction
-  ? path.join(app.getPath("userData"), "settings.json")
-  : undefined;
-const settingsProvider = SettingsProvider.create({ fileName });
+const messageRouter = new MessageRouter();
+const eventBus = new EventBus();
+
 const eventStore = EventStore.create();
+const settingsProvider = SettingsProvider.create();
 const holidayRepository = HolidayRepository.create();
 const vacationRepository = VacationRepository.create();
-const timer = Timer.create();
-const timesheetExporter = TimesheetExporter.create();
 
-const timerState = TimerState.create();
-const startTimerCommandHandler = StartTimerCommandHandler.create({
-  timerState,
-  timer,
+const notificationsGateway = NotificationsGateway.create();
+const timesheetExporterGateway = TimesheetExporterGateway.create();
+
+// Activity
+messageRouter.register(
+  "export-timesheet",
+  ExportTimesheetCommandHandler.create({ eventBus, settingsProvider }),
+);
+messageRouter.register(
+  "log-activity",
+  LogActivityCommandHandler.create({ eventBus, eventStore }),
+);
+
+// Settings
+messageRouter.register(
+  "change-settings",
+  ChangeSettingsCommandHandler.create({ eventBus, settingsProvider }),
+);
+
+// Timer
+messageRouter.register(
+  "start-timer",
+  StartTimerCommandHandler.create({ eventBus }),
+);
+messageRouter.register(
+  "stop-timer",
+  StopTimerCommandHandler.create({ eventBus }),
+);
+messageRouter.register(
+  "tick-timer",
+  TickTimerCommandHandler.create({ eventBus }),
+);
+
+// Queries
+messageRouter.register(
+  "get-burn-up",
+  GetBurnUpQueryHandler.create({ eventStore }),
+);
+messageRouter.register(
+  "get-categories",
+  GetCategoriesQueryHandler.create({ settingsProvider }),
+);
+const timerView = new State(createTimer());
+eventBus.subscribe<
+  TimerStartedEvent | TimerStoppedEvent | TimerTickedEvent | TimerElapsedEvent
+>((event) => {
+  let view = timerView.get();
+  view = projectTimer(view, event);
+  timerView.put(view);
 });
-const stopTimerCommandHandler = StopTimerCommandHandler.create({ timer });
-const currentIntervalQueryHandler = CurrentIntervalQueryHandler.create({
-  timerState,
-  timer,
+messageRouter.register(
+  "get-current-interval",
+  GetCurrentIntervalQueryHandler.create({ view: timerView }),
+);
+messageRouter.register(
+  "get-estimate",
+  GetEstimateQueryHandler.create({ eventStore }),
+);
+messageRouter.register(
+  "get-recent-activities",
+  GetRecentActivitiesQueryHandler.create({ eventStore, settingsProvider }),
+);
+messageRouter.register(
+  "get-report",
+  GetReportQueryHandler.create({ eventStore }),
+);
+messageRouter.register(
+  "get-statistics",
+  GetStatisticsQueryHandler.create({ eventStore }),
+);
+messageRouter.register(
+  "get-timesheet",
+  GetTimesheetQueryHandler.create({
+    eventStore,
+    holidayRepository,
+    vacationRepository,
+    settingsProvider,
+  }),
+);
+
+// Integration
+NotifierProcessManager.create({
+  eventBus,
+  messageRouter,
+  notificationsGateway,
 });
-const logActivityCommandHandler = LogActivityCommandHandler.create({
-  eventStore,
+TimerProcessManager.create({
+  eventBus,
+  messageRouter,
 });
-const recentActivitiesQueryHandler = RecentActivitiesQueryHandler.create({
-  eventStore,
-  settingsProvider,
-});
-const reportQueryHandler = ReportQueryHandler.create({ eventStore });
-const statisticsQueryHandler = StatisticsQueryHandler.create({ eventStore });
-const estimateQueryHandler = EstimateQueryHandler.create({ eventStore });
-const burnUpQueryHandler = BurnUpQueryHandler.create({ eventStore });
-const timesheetQueryHandler = TimesheetQueryHandler.create({
-  eventStore,
-  holidayRepository,
-  vacationRepository,
-  settingsProvider,
-});
-const exportTimesheetCommandHandler = ExportTimesheetCommandHandler.create({
-  timesheetExporter,
+TimesheetExportEventHandler.create({
+  eventBus,
+  timesheetExporterGateway,
 });
 
 app.whenReady().then(async () => {
   await initializeApplication();
   await installDevTools();
-  createRendererToMainChannels();
   createWindow();
 });
 
@@ -147,25 +200,55 @@ app.on("activate", function () {
 });
 
 async function initializeApplication() {
-  let settings = await settingsProvider.load();
-  if (settings.dataDir !== Settings.create().dataDir) {
-    applySettings(settings);
+  if (!isProduction) {
     return;
   }
 
-  let dataDir;
+  let preferences = await loadPreferences();
+  if (preferences.dataDirectory != null) {
+    applyDataDirectory(preferences.dataDirectory);
+    return;
+  }
+
+  let dataDirectory;
   do {
-    dataDir = await chooseDataDirectory();
-  } while (dataDir == null);
-  settings = { ...settings, dataDir };
-  await settingsProvider.store(settings);
-  applySettings(settings);
+    dataDirectory = await chooseDataDirectory();
+  } while (dataDirectory == null);
+  preferences = { ...preferences, dataDirectory };
+  await storePreferences(preferences);
+  applyDataDirectory(dataDirectory);
 }
 
-function applySettings(settings: Settings) {
-  eventStore.fileName = `${settings.dataDir}/activity-log.csv`;
-  holidayRepository.fileName = `${settings.dataDir}/holidays.csv`;
-  vacationRepository.fileName = `${settings.dataDir}/vacation.csv`;
+type Preferences = Readonly<{ dataDirectory?: string }>;
+
+const preferencesDirectory = app.getPath("userData");
+const preferencesFile = path.join(preferencesDirectory, "preferences.json");
+
+async function loadPreferences(): Promise<Preferences> {
+  try {
+    const json = await fs.readFile(preferencesFile, "utf-8");
+    return JSON.parse(json);
+  } catch (error) {
+    dialog.showErrorBox("Could not load preferences:", String(error));
+    return {};
+  }
+}
+
+async function storePreferences(preferences: Preferences) {
+  try {
+    const json = JSON.stringify(preferences);
+    await fs.mkdir(preferencesDirectory, { recursive: true });
+    await fs.writeFile(preferencesFile, json, "utf-8");
+  } catch (error) {
+    dialog.showErrorBox("Could not store preferences:", String(error));
+  }
+}
+
+function applyDataDirectory(dataDirectory: string) {
+  eventStore.filename = `${dataDirectory}/activity-log.csv`;
+  settingsProvider.filename = `${dataDirectory}/settings.json`;
+  holidayRepository.filename = `${dataDirectory}/holidays.csv`;
+  vacationRepository.filename = `${dataDirectory}/vacation.csv`;
 }
 
 async function installDevTools() {
@@ -184,87 +267,6 @@ async function installDevTools() {
   }
 }
 
-function createRendererToMainChannels() {
-  ipcMain.handle(LOG_ACTIVITY_CHANNEL, async (_event, json: string) => {
-    const dto = JSON.parse(json);
-    const command = LogActivityCommand.create(dto);
-    const status = await logActivityCommandHandler.handle(command);
-    return JSON.stringify(status);
-  });
-  ipcMain.handle(EXPORT_TIMESHEET_CHANNEL, async (_event, json: string) => {
-    const dto = JSON.parse(json);
-    const result = await dialog.showSaveDialog({
-      title: "Export timesheet file",
-      properties: ["showOverwriteConfirmation", "createDirectory"],
-      defaultPath: "timesheets.csv",
-    });
-    const fileName = result.filePath;
-    if (fileName == null) {
-      return;
-    }
-    const command = ExportTimesheetCommand.create({
-      ...dto,
-      fileName,
-    });
-    const status = await exportTimesheetCommandHandler.handle(command);
-    return JSON.stringify(status);
-  });
-  ipcMain.handle(
-    QUERY_RECENT_ACTIVITIES_CHANNEL,
-    async (_event, json: string) => {
-      const dto = JSON.parse(json);
-      const query = RecentActivitiesQuery.create(dto);
-      const result = await recentActivitiesQueryHandler.handle(query);
-      return JSON.stringify(result);
-    },
-  );
-  ipcMain.handle(QUERY_REPORT_CHANNEL, async (_event, json: string) => {
-    const dto = JSON.parse(json);
-    const query = ReportQuery.create(dto);
-    const result = await reportQueryHandler.handle(query);
-    return JSON.stringify(result);
-  });
-  ipcMain.handle(QUERY_STATISTICS_CHANNEL, async (_event, json: string) => {
-    const dto = JSON.parse(json);
-    const query = StatisticsQuery.create(dto);
-    const result = await statisticsQueryHandler.handle(query);
-    return JSON.stringify(result);
-  });
-  ipcMain.handle(QUERY_TIMESHEET_CHANNEL, async (_event, json: string) => {
-    const dto = JSON.parse(json);
-    const query = TimesheetQuery.create(dto);
-    const result = await timesheetQueryHandler.handle(query);
-    return JSON.stringify(result);
-  });
-  ipcMain.handle(QUERY_ESTIMATE_CHANNEL, async (_event, json: string) => {
-    const dto = JSON.parse(json);
-    const query = EstimateQuery.create(dto);
-    const result = await estimateQueryHandler.handle(query);
-    return JSON.stringify(result);
-  });
-  ipcMain.handle(QUERY_BURN_UP_CHANNEL, async (_event, json: string) => {
-    const dto = JSON.parse(json);
-    const query = BurnUpQuery.create(dto);
-    const result = await burnUpQueryHandler.handle(query);
-    return JSON.stringify(BurnUpQueryResult.create(result));
-  });
-  ipcMain.handle(QUERY_SETTINGS_CHANNEL, async (_event) => {
-    const settings = await settingsProvider.load();
-    return JSON.stringify(settings);
-  });
-  ipcMain.handle(UPDATE_SETTINGS_CHANNEL, async (_event, json: string) => {
-    const dto = JSON.parse(json);
-    const model = Settings.create(dto);
-    await settingsProvider.store(model);
-    applySettings(model);
-  });
-  ipcMain.handle(
-    SHOW_OPEN_DIALOG_CHANNEL,
-    async (_event, options: Electron.OpenDialogOptions) =>
-      dialog.showOpenDialog(options),
-  );
-}
-
 function createWindow() {
   const mainWindow = openWindow({
     rendererFile: "log.html",
@@ -272,44 +274,28 @@ function createWindow() {
     height: 900,
   });
 
-  const onStartTimer = (command: StartTimerCommand) =>
-    startTimerCommandHandler.handle(command);
-
-  const onStopTimer = (command: StopTimerCommand) =>
-    stopTimerCommandHandler.handle(command);
-
-  const onDataDirectoryChanged = async (dataDir: string) => {
-    let settings = await settingsProvider.load();
-    settings = { ...settings, dataDir };
-    await settingsProvider.store(settings);
-    applySettings(settings);
+  const onDataDirectoryChanged = async (dataDirectory: string) => {
+    let preferences = await loadPreferences();
+    preferences = { ...preferences, dataDirectory };
+    await storePreferences(preferences);
+    applyDataDirectory(dataDirectory);
     mainWindow.webContents.reload();
   };
 
   const menu = createMenu({
-    onStartTimer,
-    onStopTimer,
+    messageRouter,
     onDataDirectoryChanged,
   });
   Menu.setApplicationMenu(menu);
 
-  createMainToLogWindowChannels(mainWindow);
-}
-
-function createMainToLogWindowChannels(window: BrowserWindow) {
-  startTimerCommandHandler.addEventListener(TIMER_STARTED_EVENT, (event) =>
-    window.webContents.send(TIMER_STARTED_CHANNEL, JSON.stringify(event)),
+  ipcMain.handle(MESSAGE_CHANNEL, async (_event, message: Message) =>
+    messageRouter.route(message),
   );
-  stopTimerCommandHandler.addEventListener(TIMER_STOPPED_EVENT, (event) =>
-    window.webContents.send(TIMER_STOPPED_CHANNEL, JSON.stringify(event)),
-  );
-  currentIntervalQueryHandler.addEventListener(
-    INTERVAL_ELAPSED_EVENT,
-    (event) =>
-      window.webContents.send(INTERVAL_ELAPSED_CHANNEL, JSON.stringify(event)),
+  eventBus.subscribe((event) =>
+    mainWindow.webContents.send(EVENT_CHANNEL, event),
   );
 }
 
 function shutdownApplication() {
-  timer.stop();
+  void messageRouter.route(StopTimerCommand.create());
 }

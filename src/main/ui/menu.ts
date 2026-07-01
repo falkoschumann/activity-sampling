@@ -2,19 +2,18 @@
 
 import { app, Menu, type MenuItemConstructorOptions } from "electron/main";
 
-import { StartTimerCommand } from "../../shared/domain/start_timer_command";
-import { StopTimerCommand } from "../../shared/domain/stop_timer_command";
+import { StartTimerCommand } from "../../shared/domain/timer/start_timer.command";
+import { StopTimerCommand } from "../../shared/domain/timer/stop_timer.command";
 import { chooseDataDirectory, openWindow } from "./actions";
+import type { MessageRouter } from "@muspellheim/shared";
 
 const isMac = process.platform === "darwin";
 
 export function createMenu({
-  onStartTimer,
-  onStopTimer,
+  messageRouter,
   onDataDirectoryChanged,
 }: {
-  onStartTimer: (command: StartTimerCommand) => void;
-  onStopTimer: (command: StopTimerCommand) => void;
+  messageRouter: MessageRouter;
   onDataDirectoryChanged: (directory: string) => void;
 }): Menu {
   const template: MenuItemConstructorOptions[] = [
@@ -56,9 +55,9 @@ export function createMenu({
           label: "Open...",
           accelerator: "CmdOrCtrl+O",
           click: async () => {
-            const directory = await chooseDataDirectory();
-            if (directory != null) {
-              onDataDirectoryChanged(directory);
+            const dataDirectory = await chooseDataDirectory();
+            if (dataDirectory != null) {
+              onDataDirectoryChanged(dataDirectory);
             }
           },
         },
@@ -119,43 +118,57 @@ export function createMenu({
             {
               label: "5 min",
               click: () =>
-                onStartTimer(StartTimerCommand.create({ interval: "PT5M" })),
+                messageRouter.route(
+                  StartTimerCommand.create({ interval: "PT5M" }),
+                ),
             },
             {
               label: "10 min",
               click: () =>
-                onStartTimer(StartTimerCommand.create({ interval: "PT10M" })),
+                messageRouter.route(
+                  StartTimerCommand.create({ interval: "PT10M" }),
+                ),
             },
             {
               label: "15 min",
               click: () =>
-                onStartTimer(StartTimerCommand.create({ interval: "PT15M" })),
+                messageRouter.route(
+                  StartTimerCommand.create({ interval: "PT15M" }),
+                ),
             },
             {
               label: "20 min",
               click: () =>
-                onStartTimer(StartTimerCommand.create({ interval: "PT20M" })),
+                messageRouter.route(
+                  StartTimerCommand.create({ interval: "PT20M" }),
+                ),
             },
             {
               label: "30 min",
               click: () =>
-                onStartTimer(StartTimerCommand.create({ interval: "PT30M" })),
+                messageRouter.route(
+                  StartTimerCommand.create({ interval: "PT30M" }),
+                ),
             },
             {
               label: "60 min",
               click: () =>
-                onStartTimer(StartTimerCommand.create({ interval: "PT1H" })),
+                messageRouter.route(
+                  StartTimerCommand.create({ interval: "PT1H" }),
+                ),
             },
             {
               label: "1 min",
               click: () =>
-                onStartTimer(StartTimerCommand.create({ interval: "PT1M" })),
+                messageRouter.route(
+                  StartTimerCommand.create({ interval: "PT1M" }),
+                ),
             },
           ],
         },
         {
           label: "Stop",
-          click: () => onStopTimer(StopTimerCommand.create()),
+          click: () => messageRouter.route(StopTimerCommand.create()),
         },
       ],
     },

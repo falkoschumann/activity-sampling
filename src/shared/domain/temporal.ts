@@ -105,11 +105,7 @@ export function normalizeDuration(
 }
 
 export type DurationType =
-  | "days"
-  | "hours"
-  | "minutes"
-  | "seconds"
-  | "milliseconds";
+  "days" | "hours" | "minutes" | "seconds" | "milliseconds";
 
 export const FormatStyle = Object.freeze({
   // Example: Samstag, 28. Juni 2025
