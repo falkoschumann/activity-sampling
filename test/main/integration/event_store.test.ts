@@ -37,7 +37,7 @@ const CORRUPT_FILE = path.resolve(
 
 describe("Event store", () => {
   it("should replay minimal event", async () => {
-    const store = EventStore.create({ fileName: MINIMAL_FILE });
+    const store = EventStore.create({ filename: MINIMAL_FILE });
 
     const events = await Array.fromAsync(store.replay());
 
@@ -47,7 +47,7 @@ describe("Event store", () => {
   });
 
   it("should replay full event", async () => {
-    const store = EventStore.create({ fileName: FULL_FILE });
+    const store = EventStore.create({ filename: FULL_FILE });
 
     const events = await Array.fromAsync(store.replay());
 
@@ -60,7 +60,7 @@ describe("Event store", () => {
   });
 
   it("should replay all events when filter is not set", async () => {
-    const store = EventStore.create({ fileName: FILTER_FILE });
+    const store = EventStore.create({ filename: FILTER_FILE });
 
     const events = await Array.fromAsync(store.replay());
 
@@ -81,7 +81,7 @@ describe("Event store", () => {
   });
 
   it("should replay filtered event with start", async () => {
-    const store = EventStore.create({ fileName: FILTER_FILE });
+    const store = EventStore.create({ filename: FILTER_FILE });
 
     const events = await Array.fromAsync(
       store.replay({ from: "2026-06-16T10:00:00Z" }),
@@ -101,7 +101,7 @@ describe("Event store", () => {
   });
 
   it("should replay filtered event with end", async () => {
-    const store = EventStore.create({ fileName: FILTER_FILE });
+    const store = EventStore.create({ filename: FILTER_FILE });
 
     const events = await Array.fromAsync(
       store.replay({ to: "2026-06-18T10:00:00Z" }),
@@ -121,7 +121,7 @@ describe("Event store", () => {
   });
 
   it("should replay filtered event with start and end", async () => {
-    const store = EventStore.create({ fileName: FILTER_FILE });
+    const store = EventStore.create({ filename: FILTER_FILE });
 
     const events = await Array.fromAsync(
       store.replay({
@@ -141,7 +141,7 @@ describe("Event store", () => {
   });
 
   it("should replay nothing when file does not exist", async () => {
-    const store = EventStore.create({ fileName: NON_EXISTING_FILE });
+    const store = EventStore.create({ filename: NON_EXISTING_FILE });
 
     const events = await Array.fromAsync(store.replay());
 
@@ -149,7 +149,7 @@ describe("Event store", () => {
   });
 
   it("should throw an error when file is corrupt", async () => {
-    const store = EventStore.create({ fileName: CORRUPT_FILE });
+    const store = EventStore.create({ filename: CORRUPT_FILE });
 
     const events = Array.fromAsync(store.replay());
 
@@ -158,7 +158,7 @@ describe("Event store", () => {
 
   it("should record and replay events", async () => {
     await fsPromise.rm(TEST_FILE, { force: true });
-    const store = EventStore.create({ fileName: TEST_FILE });
+    const store = EventStore.create({ filename: TEST_FILE });
 
     await store.record(ActivityLoggedEvent.createTestInstance());
     const events = await Array.fromAsync(store.replay());

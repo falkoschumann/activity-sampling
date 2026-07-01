@@ -41,7 +41,7 @@ describe("Vacation repository", () => {
   });
 
   it("should find all vacations", async () => {
-    const repository = VacationRepository.create({ fileName: EXAMPLE_FILE });
+    const repository = VacationRepository.create({ filename: EXAMPLE_FILE });
 
     const vacations = await repository.findAll();
 
@@ -53,7 +53,7 @@ describe("Vacation repository", () => {
 
   it("should find nothing when file does not exist", async () => {
     const repository = VacationRepository.create({
-      fileName: NON_EXISTING_FILE,
+      filename: NON_EXISTING_FILE,
     });
 
     const vacations = await repository.findAll();
@@ -62,7 +62,7 @@ describe("Vacation repository", () => {
   });
 
   it("should find all by date with lower limit", async () => {
-    const repository = VacationRepository.create({ fileName: EXAMPLE_FILE });
+    const repository = VacationRepository.create({ filename: EXAMPLE_FILE });
 
     const vacations = await repository.findAllByDate(
       "2025-09-12",
@@ -73,7 +73,7 @@ describe("Vacation repository", () => {
   });
 
   it("should find all by date with upper limit", async () => {
-    const repository = VacationRepository.create({ fileName: EXAMPLE_FILE });
+    const repository = VacationRepository.create({ filename: EXAMPLE_FILE });
 
     const vacations = await repository.findAllByDate(
       "2025-09-08",
@@ -84,7 +84,7 @@ describe("Vacation repository", () => {
   });
 
   it("should load saved vacations", async () => {
-    const repository = VacationRepository.create({ fileName: TEST_FILE });
+    const repository = VacationRepository.create({ filename: TEST_FILE });
 
     await repository.saveAll([VACATION_DAY_1, VACATION_DAY_2]);
     const vacations = await repository.findAllByDate(
@@ -99,7 +99,7 @@ describe("Vacation repository", () => {
   });
 
   it("should update existing vacations", async () => {
-    const repository = VacationRepository.create({ fileName: TEST_FILE });
+    const repository = VacationRepository.create({ filename: TEST_FILE });
 
     await repository.saveAll([VACATION_DAY_1]);
     await repository.saveAll([VACATION_DAY_2]);

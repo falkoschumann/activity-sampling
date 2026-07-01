@@ -16,9 +16,9 @@ import { ActivityLoggedEvent } from "../domain/logged-activity/activity_logged.e
 
 export class EventStore extends EventTarget {
   static create({
-    fileName = "data/activity-log.csv",
-  }: { fileName?: string } = {}) {
-    return new EventStore(fileName, fsPromise);
+    filename = "data/activity-log.csv",
+  }: { filename?: string } = {}) {
+    return new EventStore(filename, fsPromise);
   }
 
   static createNull({ events }: { events?: ActivityLoggedEvent[] } = {}) {
@@ -28,26 +28,26 @@ export class EventStore extends EventTarget {
     );
   }
 
-  fileName: string;
+  filename;
 
-  readonly #fs: typeof fsPromise;
+  readonly #fs;
 
-  private constructor(fileName: string, fs: typeof fsPromise) {
+  private constructor(filename: string, fs: typeof fsPromise) {
     super();
-    this.fileName = fileName;
+    this.filename = filename;
     this.#fs = fs;
   }
 
   async record(event: ActivityLoggedEvent) {
-    const dirName = path.resolve(path.dirname(this.fileName));
+    const dirName = path.resolve(path.dirname(this.filename));
     await this.#fs.mkdir(dirName, { recursive: true });
 
-    const existsFile = await this.#existsFile(this.fileName);
+    const existsFile = await this.#existsFile(this.filename);
     const stringifier = stringify({
       ...STRINGIFY_CONFIGURATION,
       header: !existsFile,
     });
-    const file = await this.#fs.open(this.fileName, "a");
+    const file = await this.#fs.open(this.filename, "a");
     const stream = file.createWriteStream();
     stringifier.pipe(stream);
     stringifier.write(event.data);
@@ -68,7 +68,7 @@ export class EventStore extends EventTarget {
     to?: Temporal.InstantLike;
   } = {}): AsyncGenerator<ActivityLoggedEvent> {
     try {
-      const file = await this.#fs.open(this.fileName, "r");
+      const file = await this.#fs.open(this.filename, "r");
       const parser = file.createReadStream().pipe(parse(PARSE_CONFIGURATION));
       for await (const record of parser) {
         validateRecord(record);

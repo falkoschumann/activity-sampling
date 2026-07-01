@@ -30,18 +30,19 @@ export class SettingsProvider extends EventTarget {
     );
   }
 
-  readonly #filename: string;
-  readonly #fs: typeof fsPromise;
+  filename;
+
+  readonly #fs;
 
   private constructor(filename: string, fs: typeof fsPromise) {
     super();
-    this.#filename = filename;
+    this.filename = filename;
     this.#fs = fs;
   }
 
   async load(): Promise<SettingsState> {
     try {
-      const fileContent = await this.#fs.readFile(this.#filename, "utf-8");
+      const fileContent = await this.#fs.readFile(this.filename, "utf-8");
       const json = JSON.parse(fileContent);
       validateJson(json);
       return createSettings(json);
@@ -56,11 +57,11 @@ export class SettingsProvider extends EventTarget {
   }
 
   async store(settings: SettingsState) {
-    const dir = path.dirname(this.#filename);
+    const dir = path.dirname(this.filename);
     await this.#fs.mkdir(dir, { recursive: true });
 
     const json = JSON.stringify(settings, null, 2);
-    await this.#fs.writeFile(this.#filename, json, "utf-8");
+    await this.#fs.writeFile(this.filename, json, "utf-8");
     this.dispatchEvent(new CustomEvent("stored", { detail: settings }));
   }
 

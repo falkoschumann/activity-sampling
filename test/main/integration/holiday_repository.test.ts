@@ -48,7 +48,7 @@ describe("Holiday repository", () => {
   });
 
   it("should find all holidays", async () => {
-    const repository = HolidayRepository.create({ fileName: EXAMPLE_FILE });
+    const repository = HolidayRepository.create({ filename: EXAMPLE_FILE });
 
     const holidays = await repository.findAll();
 
@@ -61,7 +61,7 @@ describe("Holiday repository", () => {
 
   it("should find nothing when file does not exist", async () => {
     const repository = HolidayRepository.create({
-      fileName: NON_EXISTING_FILE,
+      filename: NON_EXISTING_FILE,
     });
 
     const holidays = await repository.findAll();
@@ -70,7 +70,7 @@ describe("Holiday repository", () => {
   });
 
   it("should find all by date with lower limit", async () => {
-    const repository = HolidayRepository.create({ fileName: EXAMPLE_FILE });
+    const repository = HolidayRepository.create({ filename: EXAMPLE_FILE });
 
     const holidays = await repository.findAllByDate("2025-04-21", "2025-04-27");
 
@@ -78,7 +78,7 @@ describe("Holiday repository", () => {
   });
 
   it("should find all by date with upper limit", async () => {
-    const repository = HolidayRepository.create({ fileName: EXAMPLE_FILE });
+    const repository = HolidayRepository.create({ filename: EXAMPLE_FILE });
 
     const holidays = await repository.findAllByDate("2025-04-14", "2025-04-20");
 
@@ -86,7 +86,7 @@ describe("Holiday repository", () => {
   });
 
   it("should load saved holidays", async () => {
-    const repository = HolidayRepository.create({ fileName: TEST_FILE });
+    const repository = HolidayRepository.create({ filename: TEST_FILE });
 
     await repository.saveAll([KARFREITAG, OSTERSONNTAG]);
     const holidays = await repository.findAllByDate("2025-04-14", "2025-04-20");
@@ -95,7 +95,7 @@ describe("Holiday repository", () => {
   });
 
   it("should update existing holidays", async () => {
-    const repository = HolidayRepository.create({ fileName: TEST_FILE });
+    const repository = HolidayRepository.create({ filename: TEST_FILE });
 
     await repository.saveAll([
       createHoliday({ date: "2025-10-08", title: "Foo" }),

@@ -18,11 +18,11 @@ import {
 
 export class VacationRepository {
   static create({
-    fileName = "data/vacation.csv",
+    filename = "data/vacation.csv",
   }: {
-    fileName?: string;
+    filename?: string;
   } = {}) {
-    return new VacationRepository(fileName, fsPromise);
+    return new VacationRepository(filename, fsPromise);
   }
 
   static createNull({
@@ -36,18 +36,18 @@ export class VacationRepository {
     );
   }
 
-  fileName: string;
+  filename;
 
-  readonly #fs: typeof fsPromise;
+  readonly #fs;
 
-  private constructor(fileName: string, fs: typeof fsPromise) {
-    this.fileName = fileName;
+  private constructor(filename: string, fs: typeof fsPromise) {
+    this.filename = filename;
     this.#fs = fs;
   }
 
   async findAll(): Promise<VacationState[]> {
     try {
-      const fileContent = await this.#fs.readFile(this.fileName);
+      const fileContent = await this.#fs.readFile(this.filename);
       const records = parse(fileContent, PARSE_CONFIGURATION);
       const vacations: VacationState[] = [];
       for await (const record of records) {
@@ -92,10 +92,10 @@ export class VacationRepository {
       }
     }
 
-    const dirName = path.resolve(path.dirname(this.fileName));
+    const dirName = path.resolve(path.dirname(this.filename));
     await this.#fs.mkdir(dirName, { recursive: true });
     const stringifier = stringify(merged, STRINGIFY_CONFIGURATION);
-    await this.#fs.writeFile(this.fileName, stringifier);
+    await this.#fs.writeFile(this.filename, stringifier);
   }
 }
 
