@@ -14,7 +14,7 @@ const TEST_FILE = path.resolve(
   "../../../testdata/test-timesheets.csv",
 );
 
-describe("Timesheet export", () => {
+describe("Timesheet exporter", () => {
   it("should export timesheet without an error", async () => {
     await fsPromise.rm(TEST_FILE, { force: true });
     const exporter = TimesheetExporterGateway.create();

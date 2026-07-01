@@ -5,13 +5,13 @@ import { EventEmitter } from "node:events";
 import { OutputTracker } from "@muspellheim/shared";
 import { Notification } from "electron";
 
-export class NotificationsAdapter extends EventTarget {
+export class NotificationsGateway extends EventTarget {
   static create() {
-    return new NotificationsAdapter(Notification);
+    return new NotificationsGateway(Notification);
   }
 
   static createNull() {
-    return new NotificationsAdapter(
+    return new NotificationsGateway(
       NotificationStub as unknown as typeof Notification,
     );
   }

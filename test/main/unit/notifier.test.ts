@@ -7,13 +7,13 @@ import { NotifierProcessManager } from "../../../src/main/application/notifier.p
 import { LogActivityCommand } from "../../../src/shared/domain/logged-activity/log_activity.command";
 import { TimerElapsedEvent } from "../../../src/main/domain/timer/timer_elapsed.event";
 import { ActivityLoggedEvent } from "../../../src/main/domain/logged-activity/activity_logged.event";
-import { NotificationsAdapter } from "../../../src/main/infrastructure/notifications_adapter";
+import { NotificationsGateway } from "../../../src/main/infrastructure/notifications.gateway";
 import { Clock } from "../../../src/shared/domain/temporal";
 
 describe("Notifier", () => {
   it("should notify without last activity", async () => {
-    const { eventBus, notifications } = configure();
-    const showTracked = notifications.trackShow();
+    const { eventBus, notificationsGateway } = configure();
+    const showTracked = notificationsGateway.trackShow();
 
     eventBus.publish(
       TimerElapsedEvent.create({
@@ -32,8 +32,8 @@ describe("Notifier", () => {
   });
 
   it("should notify with last activity", async () => {
-    const { eventBus, notifications } = configure();
-    const showTracked = notifications.trackShow();
+    const { eventBus, notificationsGateway } = configure();
+    const showTracked = notificationsGateway.trackShow();
 
     eventBus.publish(
       ActivityLoggedEvent.createTestInstance({
@@ -60,9 +60,9 @@ describe("Notifier", () => {
   });
 
   it("should do nothing when notification clicked and last activity does not exist", async () => {
-    const { eventBus, messageRouter, notifications } = configure();
+    const { eventBus, messageRouter, notificationsGateway } = configure();
     const messageTracker = MessageTracker.create(messageRouter, "log-activity");
-    const showTracked = notifications.trackShow();
+    const showTracked = notificationsGateway.trackShow();
     eventBus.publish(
       TimerElapsedEvent.create({
         timestamp: "2026-06-13T11:00:00Z",
@@ -71,15 +71,16 @@ describe("Notifier", () => {
     );
     await expect.poll(() => showTracked.data).toEqual([expect.anything()]);
 
-    notifications.simulateClick();
+    notificationsGateway.simulateClick();
 
     expect(messageTracker.messages).toEqual([]);
   });
 
   it("should emit last activity when notification clicked", async () => {
-    const { eventBus, messageRouter, notifications, clock } = configure();
+    const { eventBus, messageRouter, notificationsGateway, clock } =
+      configure();
     const messageTracker = MessageTracker.create(messageRouter, "log-activity");
-    const showTracked = notifications.trackShow();
+    const showTracked = notificationsGateway.trackShow();
     eventBus.publish(
       ActivityLoggedEvent.createTestInstance({
         client: "my-client",
@@ -96,7 +97,7 @@ describe("Notifier", () => {
     );
     await expect.poll(() => showTracked.data).toEqual([expect.anything()]);
 
-    notifications.simulateClick();
+    notificationsGateway.simulateClick();
 
     expect(messageTracker.messages).toEqual([
       LogActivityCommand.createTestInstance({
@@ -113,13 +114,13 @@ describe("Notifier", () => {
 function configure() {
   const eventBus = new EventBus();
   const messageRouter = new MessageRouter();
-  const notifications = NotificationsAdapter.createNull();
+  const notificationsGateway = NotificationsGateway.createNull();
   const clock = Clock.fixed("2026-06-13T11:00:00Z", "UTC");
   NotifierProcessManager.create({
     eventBus,
     messageRouter,
-    notifications,
+    notificationsGateway,
     clock,
   });
-  return { eventBus, messageRouter, notifications, clock };
+  return { eventBus, messageRouter, notificationsGateway, clock };
 }

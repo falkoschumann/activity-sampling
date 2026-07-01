@@ -8,28 +8,28 @@ import type { TimesheetExporterGateway } from "../infrastructure/timesheet_expor
 export class TimesheetExportEventHandler {
   static create({
     eventBus,
-    timesheetExporter,
+    timesheetExporterGateway,
   }: {
     eventBus: EventBus;
-    timesheetExporter: TimesheetExporterGateway;
+    timesheetExporterGateway: TimesheetExporterGateway;
   }) {
-    return new TimesheetExportEventHandler(eventBus, timesheetExporter);
+    return new TimesheetExportEventHandler(eventBus, timesheetExporterGateway);
   }
 
-  readonly #timesheetExporter;
+  readonly #timesheetExporterGateway;
 
   private constructor(
     eventBus: EventBus,
-    timesheetExporter: TimesheetExporterGateway,
+    timesheetExporterGateway: TimesheetExporterGateway,
   ) {
-    this.#timesheetExporter = timesheetExporter;
+    this.#timesheetExporterGateway = timesheetExporterGateway;
 
     eventBus.subscribe((event: TimesheetExportedEvent) => this.#handle(event));
   }
 
   async #handle(event: TimesheetExportedEvent) {
     if (event.type === "timesheet-exported") {
-      await this.#timesheetExporter.exportTimesheet(event);
+      await this.#timesheetExporterGateway.exportTimesheet(event);
     }
   }
 }

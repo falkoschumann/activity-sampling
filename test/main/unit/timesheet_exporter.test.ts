@@ -11,8 +11,8 @@ import { TimesheetExporterGateway } from "../../../src/main/infrastructure/times
 describe("Export timesheet", () => {
   describe("Export timesheet in Harvest format", () => {
     it("should export timesheet", async () => {
-      const { eventBus, timesheetExporter } = configure();
-      const exported = timesheetExporter.trackExported();
+      const { eventBus, timesheetExporterGateway } = configure();
+      const exported = timesheetExporterGateway.trackExported();
 
       eventBus.publish(
         TimesheetExportedEvent.create({
@@ -38,10 +38,10 @@ describe("Export timesheet", () => {
 
 function configure() {
   const eventBus = new EventBus();
-  const timesheetExporter = TimesheetExporterGateway.createNull();
+  const timesheetExporterGateway = TimesheetExporterGateway.createNull();
   const handler = TimesheetExportEventHandler.create({
     eventBus,
-    timesheetExporter,
+    timesheetExporterGateway,
   });
-  return { handler, eventBus, timesheetExporter };
+  return { handler, eventBus, timesheetExporterGateway };
 }

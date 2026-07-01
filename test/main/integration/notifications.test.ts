@@ -2,11 +2,11 @@
 
 import { describe, expect, it } from "vitest";
 
-import { NotificationsAdapter } from "../../../src/main/infrastructure/notifications_adapter";
+import { NotificationsGateway } from "../../../src/main/infrastructure/notifications.gateway";
 
-describe("Notification adapter", () => {
+describe("Notifications", () => {
   it("should show notification", async () => {
-    const adapter = NotificationsAdapter.createNull();
+    const adapter = NotificationsGateway.createNull();
     const showTracked = adapter.trackShow();
 
     await adapter.show({ title: "my-title" });
@@ -15,7 +15,7 @@ describe("Notification adapter", () => {
   });
 
   it("should hide notification when showing another one", async () => {
-    const adapter = NotificationsAdapter.createNull();
+    const adapter = NotificationsGateway.createNull();
     await adapter.show({ title: "my-title" });
     const hideTracked = adapter.trackHide();
 
@@ -25,7 +25,7 @@ describe("Notification adapter", () => {
   });
 
   it("should not hide notification when not showing another one", async () => {
-    const adapter = NotificationsAdapter.createNull();
+    const adapter = NotificationsGateway.createNull();
     const hideTracked = adapter.trackHide();
 
     await adapter.hide();
@@ -34,7 +34,7 @@ describe("Notification adapter", () => {
   });
 
   it("should emit click event", async () => {
-    const adapter = NotificationsAdapter.createNull();
+    const adapter = NotificationsGateway.createNull();
     let clicked = false;
     await adapter.show({
       title: "my-title",
