@@ -1,7 +1,7 @@
 // Copyright (c) 2026 Falko Schumann. All rights reserved. MIT license.
 
 import {
-  type GetBurnUpQuery,
+  GetBurnUpQuery,
   GetBurnUpQueryResult,
 } from "../../shared/domain/get_burn_up.query";
 import { getBurnUp } from "../domain/get_burn_up.query";
@@ -20,6 +20,7 @@ export class GetBurnUpQueryHandler {
   }
 
   async handle(query: GetBurnUpQuery): Promise<GetBurnUpQueryResult> {
+    query = GetBurnUpQuery.create(query.data);
     const { from: fromDate, to: toDate, timeZone } = query.data;
     const from = fromDate.toZonedDateTime(timeZone).startOfDay();
     const to = toDate.add("P1D").toZonedDateTime(timeZone).startOfDay();

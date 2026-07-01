@@ -1,8 +1,8 @@
 // Copyright (c) 2026 Falko Schumann. All rights reserved. MIT license.
 
-import type {
+import {
   GetStatisticsQuery,
-  GetStatisticsQueryResult,
+  type GetStatisticsQueryResult,
 } from "../../shared/domain/get_statistics.query";
 import { createReport, projectReport } from "../domain/report.read_model";
 import { getStatistics } from "../domain/get_statistics.query";
@@ -20,6 +20,7 @@ export class GetStatisticsQueryHandler {
   }
 
   async handle(query: GetStatisticsQuery): Promise<GetStatisticsQueryResult> {
+    query = GetStatisticsQuery.create(query.data);
     const { timeZone } = query.data;
     let view = createReport();
     for await (const event of this.#eventStore.replay()) {

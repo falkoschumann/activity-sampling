@@ -5,7 +5,7 @@ import {
   type SettingsState,
 } from "../domain/settings/settings.aggregate";
 import {
-  type GetCategoriesQuery,
+  GetCategoriesQuery,
   GetCategoriesQueryResult,
 } from "../../shared/domain/get_categories.query";
 import { getCategories } from "../domain/get_categories.query";
@@ -31,6 +31,7 @@ export class GetCategoriesQueryHandler {
   }
 
   async handle(query: GetCategoriesQuery): Promise<GetCategoriesQueryResult> {
+    query = GetCategoriesQuery.create(query.data);
     const view = await this.#settingsProvider.load();
     return getCategories(view, query);
   }

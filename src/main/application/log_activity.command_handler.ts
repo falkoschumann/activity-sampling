@@ -30,6 +30,7 @@ export class LogActivityCommandHandler {
   }
 
   async handle(command: LogActivityCommand): Promise<CommandStatus> {
+    command = LogActivityCommand.create(command.data);
     const events = logActivity(command);
     for (const event of events) {
       this.#eventBus.publish(event);

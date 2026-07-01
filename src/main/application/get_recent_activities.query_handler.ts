@@ -1,7 +1,7 @@
 // Copyright (c) 2026 Falko Schumann. All rights reserved. MIT license.
 
 import {
-  type GetRecentActivitiesQuery,
+  GetRecentActivitiesQuery,
   GetRecentActivitiesQueryResult,
 } from "../../shared/domain/get_recent_activities.query";
 import { SettingsChangedEvent } from "../domain/settings/settings_changed.event";
@@ -38,6 +38,7 @@ export class GetRecentActivitiesQueryHandler {
   async handle(
     query: GetRecentActivitiesQuery,
   ): Promise<GetRecentActivitiesQueryResult> {
+    query = GetRecentActivitiesQuery.create(query.data);
     const { today, timeZone } = query.data;
 
     const settings = await this.#settingsProvider.load();

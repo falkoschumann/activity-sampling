@@ -1,8 +1,8 @@
 // Copyright (c) 2026 Falko Schumann. All rights reserved. MIT license.
 
-import type {
+import {
   GetEstimateQuery,
-  GetEstimateQueryResult,
+  type GetEstimateQueryResult,
 } from "../../shared/domain/get_estimate.query";
 import { createReport, projectReport } from "../domain/report.read_model";
 import { getEstimate } from "../domain/get_estimate.query";
@@ -20,6 +20,7 @@ export class GetEstimateQueryHandler {
   }
 
   async handle(query: GetEstimateQuery): Promise<GetEstimateQueryResult> {
+    query = GetEstimateQuery.create(query.data);
     const { timeZone } = query.data;
     let view = createReport();
     for await (const event of this.#eventStore.replay()) {

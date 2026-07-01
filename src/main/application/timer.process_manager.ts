@@ -1,10 +1,6 @@
 // Copyright (c) 2026 Falko Schumann. All rights reserved. MIT license.
 
-import {
-  type EventBus,
-  MessageRouter,
-  OutputTracker,
-} from "@muspellheim/shared";
+import { type EventBus, MessageRouter, OutputTracker } from "@muspellheim/shared";
 
 import { TickTimerCommand } from "../../shared/domain/timer/tick_timer.command";
 import { TimerStartedEvent } from "../domain/timer/timer_started.event";
@@ -72,20 +68,13 @@ export class TimerProcessManager extends EventTarget {
   }
 
   async #react(event: TimerStartedEvent | TimerStoppedEvent) {
-    if (event instanceof TimerStartedEvent) {
-      this.#timer.clearInterval(this.#progressTimerId);
-
-      this.#interval = event.data.interval;
-      this.#nextElapsedAt = this.#clock.instant().add(this.#interval);
-      this.#progressTimerId = this.#timer.setInterval(() => this.#tick(), 1000);
-      this.dispatchEvent(
-        new CustomEvent("setTimers", { detail: { name: "progress" } }),
-      );
-    } else if (event instanceof TimerStoppedEvent) {
-      this.#timer.clearInterval(this.#progressTimerId);
-      this.dispatchEvent(
-        new CustomEvent("cancelTimers", { detail: { name: "progress" } }),
-      );
+    switch (event.type) {
+      case "timer-started":
+        this.#handleTimerStarted(event);
+        break;
+      case "timer-stopped":
+        this.#handleTimerStopped();
+        break;
     }
   }
 
@@ -103,6 +92,24 @@ export class TimerProcessManager extends EventTarget {
       this.#clock.zone,
     );
     this.#tick();
+  }
+
+  #handleTimerStarted(event: TimerStartedEvent) {
+    this.#timer.clearInterval(this.#progressTimerId);
+
+    this.#interval = event.data.interval;
+    this.#nextElapsedAt = this.#clock.instant().add(this.#interval);
+    this.#progressTimerId = this.#timer.setInterval(() => this.#tick(), 1000);
+    this.dispatchEvent(
+      new CustomEvent("setTimers", { detail: { name: "progress" } }),
+    );
+  }
+
+  #handleTimerStopped() {
+    this.#timer.clearInterval(this.#progressTimerId);
+    this.dispatchEvent(
+      new CustomEvent("cancelTimers", { detail: { name: "progress" } }),
+    );
   }
 
   #tick() {

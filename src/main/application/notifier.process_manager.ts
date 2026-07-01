@@ -5,31 +5,31 @@ import type { EventBus, MessageRouter } from "@muspellheim/shared";
 import { LogActivityCommand } from "../../shared/domain/logged-activity/log_activity.command";
 import { ActivityLoggedEvent } from "../domain/logged-activity/activity_logged.event";
 import { TimerElapsedEvent } from "../domain/timer/timer_elapsed.event";
-import { NotificationsAdapter } from "../infrastructure/notifications_adapter";
+import { NotificationsGateway } from "../infrastructure/notifications.gateway";
 import { Clock } from "../../shared/domain/temporal";
 
 export class NotifierProcessManager {
   static create({
     eventBus,
     messageRouter,
-    notifications,
+    notificationsGateway,
     clock = Clock.systemUtc(),
   }: {
     eventBus: EventBus;
     messageRouter: MessageRouter;
-    notifications: NotificationsAdapter;
+    notificationsGateway: NotificationsGateway;
     clock?: Clock;
   }) {
     return new NotifierProcessManager(
       eventBus,
       messageRouter,
-      notifications,
+      notificationsGateway,
       clock,
     );
   }
 
   readonly #messageRouter;
-  readonly #notification;
+  readonly #notificationsGateway;
   readonly #clock;
 
   #lastActivity?: ActivityLoggedEvent;
@@ -38,11 +38,11 @@ export class NotifierProcessManager {
   private constructor(
     eventBus: EventBus,
     messageRouter: MessageRouter,
-    notification: NotificationsAdapter,
+    notificationsGateway: NotificationsGateway,
     clock: Clock,
   ) {
     this.#messageRouter = messageRouter;
-    this.#notification = notification;
+    this.#notificationsGateway = notificationsGateway;
     this.#clock = clock;
 
     eventBus.subscribe((event: ActivityLoggedEvent | TimerElapsedEvent) =>
@@ -51,24 +51,35 @@ export class NotifierProcessManager {
   }
 
   async #react(event: ActivityLoggedEvent | TimerElapsedEvent) {
-    if (event instanceof ActivityLoggedEvent) {
-      this.#lastActivity = event;
-    } else if (event instanceof TimerElapsedEvent) {
-      await this.#notification.hide();
-
-      this.#duration = event.data.duration;
-      const title = "What are you working on?";
-      let body;
-      if (this.#lastActivity != null) {
-        const { client, project, task } = this.#lastActivity.data;
-        body = `${project} (${client}) ${task}`;
-      }
-      await this.#notification.show({
-        title,
-        body,
-        onClick: () => this.#emitLogActivity(),
-      });
+    switch (event.type) {
+      case "activity-logged":
+        this.#handleActivityLog(event);
+        break;
+      case "timer-elapsed":
+        await this.#handleTimerElapsed(event);
+        break;
     }
+  }
+
+  #handleActivityLog(event: ActivityLoggedEvent) {
+    this.#lastActivity = event;
+  }
+
+  async #handleTimerElapsed(event: TimerElapsedEvent) {
+    await this.#notificationsGateway.hide();
+
+    this.#duration = event.data.duration;
+    const title = "What are you working on?";
+    let body;
+    if (this.#lastActivity != null) {
+      const { client, project, task } = this.#lastActivity.data;
+      body = `${project} (${client}) ${task}`;
+    }
+    await this.#notificationsGateway.show({
+      title,
+      body,
+      onClick: () => this.#emitLogActivity(),
+    });
   }
 
   #emitLogActivity() {

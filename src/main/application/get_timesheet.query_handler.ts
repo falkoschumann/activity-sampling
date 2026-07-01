@@ -1,8 +1,8 @@
 // Copyright (c) 2026 Falko Schumann. All rights reserved. MIT license.
 
-import type {
+import {
   GetTimesheetQuery,
-  GetTimesheetQueryResult,
+  type GetTimesheetQueryResult,
 } from "../../shared/domain/get_timesheet.query";
 import { getTimesheet } from "../domain/get_timesheet.query";
 import {
@@ -55,6 +55,7 @@ export class GetTimesheetQueryHandler {
   }
 
   async handle(query: GetTimesheetQuery): Promise<GetTimesheetQueryResult> {
+    query = GetTimesheetQuery.create(query.data);
     const { from: fromDate, to: toDate, timeZone } = query.data;
 
     const settings = await this.#settingsProvider.load();
