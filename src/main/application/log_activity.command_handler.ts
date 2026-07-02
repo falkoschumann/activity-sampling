@@ -8,7 +8,7 @@ import {
 
 import {
   logActivity,
-  LogActivityCommand,
+  type LogActivityCommand,
 } from "../../shared/domain/activity/log_activity.command";
 import type { EventStore } from "../infrastructure/event_store.ts";
 
@@ -32,7 +32,6 @@ export class LogActivityCommandHandler {
   }
 
   async handle(command: LogActivityCommand): Promise<CommandStatus> {
-    command = LogActivityCommand.create(command.data);
     const events = logActivity(command);
     for (const event of events) {
       this.#eventBus.publish(event);

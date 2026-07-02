@@ -1,5 +1,33 @@
 apiVersion: schema.esdm.io/core/v1
 kind: value-object
+name: activity
+scope:
+  domain: activity-sampling
+  boundedContext: activity-sampling
+schema:
+  type: object
+  properties:
+    start:
+      type: string
+      format: date
+    finish:
+      type: string
+      format: date
+    client:
+      type: string
+    project:
+      type: string
+    task:
+      type: string
+    category:
+      type: string
+    hours:
+      type: string
+      format: duration
+  required: [start, finish, client, project, task, hours]
+---
+apiVersion: schema.esdm.io/core/v1
+kind: value-object
 name: working-day
 scope:
   domain: activity-sampling

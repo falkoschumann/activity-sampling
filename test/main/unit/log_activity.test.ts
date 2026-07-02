@@ -4,54 +4,89 @@ import { type CommandStatus, EventBus, Success } from "@muspellheim/shared";
 import { describe, expect, it } from "vitest";
 
 import { LogActivityCommandHandler } from "../../../src/main/application/log_activity.command_handler";
-import { LogActivityCommand } from "../../../src/shared/domain/activity/log_activity.command";
-import { ActivityLoggedEvent } from "../../../src/shared/domain/activity/activity_logged.event";
+import { createLogActivityCommand } from "../../../src/shared/domain/activity/log_activity.command";
+import {
+  type ActivityLoggedEvent,
+  type ActivityLoggedEventData,
+  createActivityLoggedEvent,
+} from "../../../src/shared/domain/activity/activity_logged.event";
 import { EventStore } from "../../../src/main/infrastructure/event_store";
 
+const minimalActivity: ActivityLoggedEventData = {
+  timestamp: "2026-01-01T12:00:00Z",
+  duration: "PT1H",
+  client: "my client",
+  project: "my project",
+  task: "my task",
+  notification: "notifier",
+};
+
+const fullActivity: ActivityLoggedEventData = {
+  ...minimalActivity,
+  notes: "my notes",
+  category: "my category",
+};
+
 describe("Log activity", () => {
-  describe("Log the activity with a client, a project, a task and with optional notes or category", () => {
-    it("should log only with required fields", async () => {
-      const { handler, eventBus, eventStore } = configure();
-      const recordEvents = eventStore.trackRecorded();
+  it("should log only with required fields", async () => {
+    const { handler, eventBus, eventStore } = configure();
+    const recordEvents = eventStore.trackRecorded();
 
-      const status = await handler.handle(
-        LogActivityCommand.createTestInstance(),
-      );
+    const status = await handler.handle(
+      createLogActivityCommand(minimalActivity),
+    );
 
-      expect(status).toEqual<CommandStatus>(new Success());
-      expect(eventBus.getEvents()).toEqual([
-        ActivityLoggedEvent.createTestInstance(),
-      ]);
-      expect(recordEvents.data).toEqual([
-        ActivityLoggedEvent.createTestInstance(),
-      ]);
-    });
+    expect(status).toEqual<CommandStatus>(new Success());
+    expect(eventBus.getEvents()).toEqual([
+      createActivityLoggedEvent(minimalActivity),
+    ]);
+    expect(recordEvents.data).toEqual([
+      createActivityLoggedEvent(minimalActivity),
+    ]);
+  });
 
-    it("should log with all optional fields", async () => {
-      const { handler, eventBus, eventStore } = configure();
-      const recordEvents = eventStore.trackRecorded();
+  it("should log with all optional fields", async () => {
+    const { handler, eventBus, eventStore } = configure();
+    const recordEvents = eventStore.trackRecorded();
 
-      const status = await handler.handle(
-        LogActivityCommand.createTestInstance({
-          notes: "my notes",
-          category: "my category",
-        }),
-      );
+    const status = await handler.handle(createLogActivityCommand(fullActivity));
 
-      expect(status).toEqual<CommandStatus>(new Success());
-      expect(eventBus.getEvents()).toEqual([
-        ActivityLoggedEvent.createTestInstance({
-          notes: "my notes",
-          category: "my category",
-        }),
-      ]);
-      expect(recordEvents.data).toEqual([
-        ActivityLoggedEvent.createTestInstance({
-          notes: "my notes",
-          category: "my category",
-        }),
-      ]);
-    });
+    expect(status).toEqual<CommandStatus>(new Success());
+    expect(eventBus.getEvents()).toEqual([
+      createActivityLoggedEvent(fullActivity),
+    ]);
+    expect(recordEvents.data).toEqual([
+      createActivityLoggedEvent(fullActivity),
+    ]);
+  });
+
+  it("should normalize timestamp and duration", async () => {
+    const { handler, eventBus, eventStore } = configure();
+    const recordEvents = eventStore.trackRecorded();
+
+    const status = await handler.handle(
+      createLogActivityCommand({
+        ...minimalActivity,
+        timestamp: "2026-01-01T12:13:14.123456789Z",
+        duration: "PT1H30M15.123456789S",
+      }),
+    );
+
+    expect(status).toEqual<CommandStatus>(new Success());
+    expect(eventBus.getEvents()).toEqual([
+      createActivityLoggedEvent({
+        ...minimalActivity,
+        timestamp: "2026-01-01T12:13:14Z",
+        duration: "PT1H30M",
+      }),
+    ]);
+    expect(recordEvents.data).toEqual([
+      createActivityLoggedEvent({
+        ...minimalActivity,
+        timestamp: "2026-01-01T12:13:14Z",
+        duration: "PT1H30M",
+      }),
+    ]);
   });
 });
 

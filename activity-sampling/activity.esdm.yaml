@@ -5,31 +5,10 @@ scope:
   domain: activity-sampling
   boundedContext: activity-sampling
 identifiedBy:
-  source: state
-  field: id
+  source: static
+  value: nothing
 state:
-  type: object
-  properties:
-    id:
-      type: number
-    start:
-      type: string
-      format: date
-    finish:
-      type: string
-      format: date
-    client:
-      type: string
-    project:
-      type: string
-    task:
-      type: string
-    category:
-      type: string
-    hours:
-      type: string
-      format: duration
-  required: [start, finish, client, project, task, hours]
+  type: null
 ---
 apiVersion: schema.esdm.io/core/v1
 kind: command

@@ -1,96 +1,53 @@
 // Copyright (c) 2026 Falko Schumann. All rights reserved. MIT license.
 
-import { ActivityLoggedEvent } from "./activity_logged.event";
+import {
+  type ActivityLoggedEvent,
+  createActivityLoggedEvent,
+} from "./activity_logged.event";
 
-export class LogActivityCommand {
-  static create({
-    timestamp,
-    duration,
-    client,
-    project,
-    task,
-    notes,
-    category,
-  }: {
-    timestamp: Temporal.Instant | string;
-    duration: Temporal.DurationLike | string;
-    client: string;
-    project: string;
-    task: string;
-    notes?: string;
-    category?: string;
-  }) {
-    return new LogActivityCommand(
-      timestamp,
-      duration,
-      client,
-      project,
-      task,
-      notes,
-      category,
-    );
-  }
+export interface LogActivityCommand {
+  readonly type: "log-activity";
+  readonly data: LogActivityData;
+}
 
-  static createTestInstance({
-    timestamp = "2025-08-14T11:00:00Z",
-    duration = "PT30M",
-    client = "Test client",
-    project = "Test project",
-    task = "Test task",
-    notes,
-    category,
-  }: {
-    timestamp?: Temporal.Instant | string;
-    duration?: Temporal.DurationLike | string;
-    client?: string;
-    project?: string;
-    task?: string;
-    notes?: string;
-    category?: string;
-  } = {}) {
-    return LogActivityCommand.create({
-      timestamp,
-      duration,
-      client,
-      project,
-      task,
-      notes,
-      category,
-    });
-  }
+export interface LogActivityData {
+  readonly timestamp: Temporal.InstantLike;
+  readonly duration: Temporal.DurationLike;
+  readonly client: string;
+  readonly project: string;
+  readonly task: string;
+  readonly notes?: string;
+  readonly category?: string;
+}
 
-  readonly type = "log-activity";
-  readonly data;
-
-  private constructor(
-    timestamp: Temporal.Instant | string,
-    duration: Temporal.DurationLike | string,
-    client: string,
-    project: string,
-    task: string,
-    notes?: string,
-    category?: string,
-  ) {
-    this.data = {
-      timestamp: Temporal.Instant.from(timestamp),
-      duration: Temporal.Duration.from(duration),
-      client: client,
-      project: project,
-      task: task,
-      notes: notes,
-      category: category,
-    };
-  }
+export function createLogActivityCommand({
+  timestamp,
+  duration,
+  client,
+  project,
+  task,
+  notes,
+  category,
+}: {
+  timestamp: Temporal.InstantLike;
+  duration: Temporal.DurationLike;
+  client: string;
+  project: string;
+  task: string;
+  notes?: string;
+  category?: string;
+}): LogActivityCommand {
+  return {
+    type: "log-activity",
+    data: { timestamp, duration, client, project, task, notes, category },
+  };
 }
 
 export function logActivity(
   command: LogActivityCommand,
 ): ActivityLoggedEvent[] {
-  return [
-    ActivityLoggedEvent.create({
-      ...command.data,
-      timestamp: command.data.timestamp.round("seconds"),
-      duration: command.data.duration.round("minutes"),
-    }),
-  ];
+  let { timestamp, duration } = command.data;
+  timestamp = Temporal.Instant.from(timestamp).round("seconds").toString();
+  duration = Temporal.Duration.from(duration).round("minutes").toString();
+  return [createActivityLoggedEvent({ ...command.data, timestamp, duration })];
 }
