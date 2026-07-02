@@ -1,11 +1,14 @@
 // Copyright (c) 2026 Falko Schumann. All rights reserved. MIT license.
 
 import {
+  getBurnUp,
   GetBurnUpQuery,
   GetBurnUpQueryResult,
 } from "../../shared/domain/get_burn_up.query";
-import { getBurnUp } from "../domain/get_burn_up.query";
-import { createReport, projectReport } from "../domain/report.read_model";
+import {
+  createReport,
+  projectReport,
+} from "../../shared/domain/report.read_model";
 import type { EventStore } from "../infrastructure/event_store";
 
 export class GetBurnUpQueryHandler {

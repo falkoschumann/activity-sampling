@@ -1,6 +1,6 @@
 // Copyright (c) 2026 Falko Schumann. All rights reserved. MIT license.
 
-import { normalizeDuration } from "../../../shared/domain/temporal";
+import { normalizeDuration } from "../temporal";
 
 export type ActivityState = {
   readonly start: Temporal.PlainDate;
@@ -12,6 +12,35 @@ export type ActivityState = {
   readonly hours: Temporal.Duration;
   // TODO add cycle time
 };
+
+// TODO use create activity
+export function createActivity({
+  start,
+  finish,
+  client,
+  project,
+  task,
+  category,
+  hours,
+}: {
+  start: Temporal.PlainDateLike;
+  finish: Temporal.PlainDateLike;
+  client: string;
+  project: string;
+  task: string;
+  category?: string;
+  hours: Temporal.Duration;
+}): ActivityState {
+  return {
+    start: Temporal.PlainDate.from(start),
+    finish: Temporal.PlainDate.from(finish),
+    client,
+    project,
+    task,
+    category,
+    hours: Temporal.Duration.from(hours),
+  };
+}
 
 export function mergeCategories(
   activities: ActivityState[],

@@ -10,7 +10,7 @@ import addFormats from "ajv-formats";
 import {
   createSettings,
   type SettingsState,
-} from "../domain/settings/settings.aggregate";
+} from "../../shared/domain/settings/settings.aggregate";
 
 export class SettingsProvider extends EventTarget {
   static create({

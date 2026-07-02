@@ -2,8 +2,10 @@
 
 import { EventBus, Success } from "@muspellheim/shared";
 
-import { StopTimerCommand } from "../../shared/domain/timer/stop_timer.command";
-import { stopTimer } from "../domain/timer/stop_timer.command";
+import {
+  stopTimer,
+  StopTimerCommand,
+} from "../../shared/domain/timer/stop_timer.command";
 
 export class StopTimerCommandHandler {
   static create({ eventBus }: { eventBus: EventBus }) {

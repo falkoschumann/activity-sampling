@@ -14,7 +14,7 @@ import type { Options as StringifyOptions } from "csv-stringify";
 import {
   createHoliday,
   type HolidayState,
-} from "../domain/holiday/holiday.aggregate";
+} from "../../shared/domain/holiday/holiday.aggregate";
 
 export class HolidayRepository {
   static create({

@@ -19,7 +19,7 @@ import {
 import { ChangeSettingsCommandHandler } from "./application/change_settings.command_handler";
 import { ExportTimesheetCommandHandler } from "./application/export_timesheet.command_handler";
 import { GetBurnUpQueryHandler } from "./application/get_burn_up.query_handler";
-import { GetCategoriesQueryHandler } from "./application/get_categories.query_handler";
+import { GetSettingsQueryHandler } from "./application/get_settings.query_handler";
 import { GetCurrentIntervalQueryHandler } from "./application/get_current_interval.query_handler";
 import { GetEstimateQueryHandler } from "./application/get_estimate.query_handler";
 import { GetRecentActivitiesQueryHandler } from "./application/get_recent_activities.query_handler";
@@ -33,11 +33,11 @@ import { StopTimerCommandHandler } from "./application/stop_timer.command_handle
 import { TickTimerCommandHandler } from "./application/tick_timer.command_handler";
 import { TimerProcessManager } from "./application/timer.process_manager";
 import { TimesheetExportEventHandler } from "./application/timesheet_exporter.event_handler";
-import type { TimerStartedEvent } from "./domain/timer/timer_started.event";
-import type { TimerStoppedEvent } from "./domain/timer/timer_stopped.event";
-import type { TimerTickedEvent } from "./domain/timer/timer_ticked.event";
-import type { TimerElapsedEvent } from "./domain/timer/timer_elapsed.event";
-import { createTimer, projectTimer } from "./domain/timer.read_model";
+import type { TimerStartedEvent } from "../shared/domain/timer/timer_started.event";
+import type { TimerStoppedEvent } from "../shared/domain/timer/timer_stopped.event";
+import type { TimerTickedEvent } from "../shared/domain/timer/timer_ticked.event";
+import type { TimerElapsedEvent } from "../shared/domain/timer/timer_elapsed.event";
+import { createTimer, projectTimer } from "../shared/domain/timer.read_model";
 import { EventStore } from "./infrastructure/event_store";
 import { HolidayRepository } from "./infrastructure/holiday.repository";
 import { SettingsProvider } from "./infrastructure/settings.provider";
@@ -101,8 +101,8 @@ messageRouter.register(
   GetBurnUpQueryHandler.create({ eventStore }),
 );
 messageRouter.register(
-  "get-categories",
-  GetCategoriesQueryHandler.create({ settingsProvider }),
+  "get-settings",
+  GetSettingsQueryHandler.create({ settingsProvider }),
 );
 const timerView = new State(createTimer());
 eventBus.subscribe<

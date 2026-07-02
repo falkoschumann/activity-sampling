@@ -3,7 +3,7 @@
 import { describe, expect, it } from "vitest";
 
 import { GetBurnUpQueryHandler } from "../../../src/main/application/get_burn_up.query_handler";
-import { ActivityLoggedEvent } from "../../../src/main/domain/logged-activity/activity_logged.event";
+import { ActivityLoggedEvent } from "../../../src/shared/domain/activity/activity_logged.event";
 import {
   GetBurnUpQuery,
   GetBurnUpQueryResult,

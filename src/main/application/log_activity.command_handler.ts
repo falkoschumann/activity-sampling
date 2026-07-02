@@ -6,8 +6,10 @@ import {
   Success,
 } from "@muspellheim/shared";
 
-import { LogActivityCommand } from "../../shared/domain/logged-activity/log_activity.command";
-import { logActivity } from "../domain/logged-activity/log_activity.command";
+import {
+  logActivity,
+  LogActivityCommand,
+} from "../../shared/domain/activity/log_activity.command";
 import type { EventStore } from "../infrastructure/event_store.ts";
 
 export class LogActivityCommandHandler {

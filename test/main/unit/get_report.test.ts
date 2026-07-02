@@ -4,7 +4,7 @@ import { Temporal } from "@js-temporal/polyfill";
 import { describe, expect, it } from "vitest";
 
 import { GetReportQueryHandler } from "../../../src/main/application/get_report.query_handler";
-import { ActivityLoggedEvent } from "../../../src/main/domain/logged-activity/activity_logged.event";
+import { ActivityLoggedEvent } from "../../../src/shared/domain/activity/activity_logged.event";
 import {
   GetReportQuery,
   GetReportQueryResult,

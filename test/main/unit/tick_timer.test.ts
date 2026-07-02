@@ -5,8 +5,8 @@ import { describe, expect, it } from "vitest";
 
 import { TickTimerCommandHandler } from "../../../src/main/application/tick_timer.command_handler";
 import { TickTimerCommand } from "../../../src/shared/domain/timer/tick_timer.command";
-import { TimerTickedEvent } from "../../../src/main/domain/timer/timer_ticked.event";
-import { TimerElapsedEvent } from "../../../src/main/domain/timer/timer_elapsed.event";
+import { TimerTickedEvent } from "../../../src/shared/domain/timer/timer_ticked.event";
+import { TimerElapsedEvent } from "../../../src/shared/domain/timer/timer_elapsed.event";
 
 describe("Tick timer", () => {
   it("should tick the timer", async () => {

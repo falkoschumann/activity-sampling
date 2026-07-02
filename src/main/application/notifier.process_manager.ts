@@ -2,11 +2,11 @@
 
 import type { EventBus, MessageRouter } from "@muspellheim/shared";
 
-import { LogActivityCommand } from "../../shared/domain/logged-activity/log_activity.command";
-import { ActivityLoggedEvent } from "../domain/logged-activity/activity_logged.event";
-import { TimerElapsedEvent } from "../domain/timer/timer_elapsed.event";
+import { LogActivityCommand } from "../../shared/domain/activity/log_activity.command";
+import { ActivityLoggedEvent } from "../../shared/domain/activity/activity_logged.event";
+import { TimerElapsedEvent } from "../../shared/domain/timer/timer_elapsed.event";
+import { Clock } from "../infrastructure/clock";
 import { NotificationsGateway } from "../infrastructure/notifications.gateway";
-import { Clock } from "../../shared/domain/temporal";
 
 export class NotifierProcessManager {
   static create({

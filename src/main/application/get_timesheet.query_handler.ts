@@ -1,17 +1,17 @@
 // Copyright (c) 2026 Falko Schumann. All rights reserved. MIT license.
 
 import {
+  createTimesheet,
+  projectTimesheet,
+} from "../../shared/domain/timesheet.read_model";
+import {
+  getTimesheet,
   GetTimesheetQuery,
   type GetTimesheetQueryResult,
 } from "../../shared/domain/get_timesheet.query";
-import { getTimesheet } from "../domain/get_timesheet.query";
-import {
-  createTimesheet,
-  projectTimesheet,
-} from "../domain/timesheet.read_model";
-import { SettingsChangedEvent } from "../domain/settings/settings_changed.event";
-import { HolidaysChangedEvent } from "../domain/holiday/holidays_changed.event";
-import { VacationsChangedEvent } from "../domain/vacation/vacations_changed.event";
+import { SettingsChangedEvent } from "../../shared/domain/settings/settings_changed.event";
+import { HolidaysChangedEvent } from "../../shared/domain/holiday/holidays_changed.event";
+import { VacationsChangedEvent } from "../../shared/domain/vacation/vacations_changed.event";
 import type { EventStore } from "../infrastructure/event_store";
 import { HolidayRepository } from "../infrastructure/holiday.repository";
 import type { SettingsProvider } from "../infrastructure/settings.provider";

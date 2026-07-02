@@ -1,15 +1,15 @@
 // Copyright (c) 2026 Falko Schumann. All rights reserved. MIT license.
 
 import {
+  getRecentActivities,
   GetRecentActivitiesQuery,
   GetRecentActivitiesQueryResult,
 } from "../../shared/domain/get_recent_activities.query";
-import { SettingsChangedEvent } from "../domain/settings/settings_changed.event";
+import { SettingsChangedEvent } from "../../shared/domain/settings/settings_changed.event";
 import {
   createTimesheet,
   projectTimesheet,
-} from "../domain/timesheet.read_model";
-import { getRecentActivities } from "../domain/get_recent_activities.query";
+} from "../../shared/domain/timesheet.read_model";
 import type { EventStore } from "../infrastructure/event_store";
 import type { SettingsProvider } from "../infrastructure/settings.provider";
 

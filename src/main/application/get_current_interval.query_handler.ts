@@ -1,12 +1,15 @@
 // Copyright (c) 2026 Falko Schumann. All rights reserved. MIT license.
 
 import {
+  getCurrentInterval,
   GetCurrentIntervalQuery,
   GetCurrentIntervalQueryResult,
 } from "../../shared/domain/get_current_interval.query";
-import { getCurrentInterval } from "../domain/get_current_interval.query";
 import { State } from "@muspellheim/shared";
-import { createTimer, type TimerView } from "../domain/timer.read_model";
+import {
+  createTimer,
+  type TimerView,
+} from "../../shared/domain/timer.read_model";
 
 export class GetCurrentIntervalQueryHandler {
   static create({ view }: { view: State<TimerView> }) {

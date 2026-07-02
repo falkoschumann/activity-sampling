@@ -10,11 +10,11 @@ import {
 import {
   createTimer,
   projectTimer,
-} from "../../../src/main/domain/timer.read_model";
-import { TimerStartedEvent } from "../../../src/main/domain/timer/timer_started.event";
-import { TimerTickedEvent } from "../../../src/main/domain/timer/timer_ticked.event";
-import { TimerElapsedEvent } from "../../../src/main/domain/timer/timer_elapsed.event";
-import { TimerStoppedEvent } from "../../../src/main/domain/timer/timer_stopped.event";
+} from "../../../src/shared/domain/timer.read_model";
+import { TimerStartedEvent } from "../../../src/shared/domain/timer/timer_started.event";
+import { TimerTickedEvent } from "../../../src/shared/domain/timer/timer_ticked.event";
+import { TimerElapsedEvent } from "../../../src/shared/domain/timer/timer_elapsed.event";
+import { TimerStoppedEvent } from "../../../src/shared/domain/timer/timer_stopped.event";
 
 describe("Get current interval", () => {
   it("should return empty result when view is initial state", async () => {

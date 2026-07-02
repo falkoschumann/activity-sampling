@@ -183,7 +183,7 @@ schema:
 ---
 apiVersion: schema.esdm.io/core/v1
 kind: query
-name: get-categories
+name: get-settings
 scope:
   domain: activity-sampling
   boundedContext: activity-sampling
@@ -191,12 +191,18 @@ readModel: settings
 result:
   type: object
   properties:
-    categories:
-    type: array
-    items:
+    capacity:
       type: string
-  required:
-    - categories
+      format: duration
+    categories:
+      type: array
+      items:
+        type: string
+    firstName:
+      type: string
+    lastName:
+      type: string
+  required: [capacity, categories]
 ---
 apiVersion: schema.esdm.io/core/v1
 kind: read-model

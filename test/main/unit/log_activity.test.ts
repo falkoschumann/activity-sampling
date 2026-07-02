@@ -4,8 +4,8 @@ import { type CommandStatus, EventBus, Success } from "@muspellheim/shared";
 import { describe, expect, it } from "vitest";
 
 import { LogActivityCommandHandler } from "../../../src/main/application/log_activity.command_handler";
-import { LogActivityCommand } from "../../../src/shared/domain/logged-activity/log_activity.command";
-import { ActivityLoggedEvent } from "../../../src/main/domain/logged-activity/activity_logged.event";
+import { LogActivityCommand } from "../../../src/shared/domain/activity/log_activity.command";
+import { ActivityLoggedEvent } from "../../../src/shared/domain/activity/activity_logged.event";
 import { EventStore } from "../../../src/main/infrastructure/event_store";
 
 describe("Log activity", () => {

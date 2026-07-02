@@ -7,16 +7,16 @@ import { GetTimesheetQueryHandler } from "../../../src/main/application/get_time
 import {
   createHoliday,
   type HolidayState,
-} from "../../../src/main/domain/holiday/holiday.aggregate";
-import { ActivityLoggedEvent } from "../../../src/main/domain/logged-activity/activity_logged.event";
+} from "../../../src/shared/domain/holiday/holiday.aggregate";
+import { ActivityLoggedEvent } from "../../../src/shared/domain/activity/activity_logged.event";
 import {
   createVacation,
   type VacationState,
-} from "../../../src/main/domain/vacation/vacation.aggregate";
+} from "../../../src/shared/domain/vacation/vacation.aggregate";
 import {
   createSettings,
   type SettingsState,
-} from "../../../src/main/domain/settings/settings.aggregate";
+} from "../../../src/shared/domain/settings/settings.aggregate";
 import {
   GetTimesheetQuery,
   GetTimesheetQueryResult,

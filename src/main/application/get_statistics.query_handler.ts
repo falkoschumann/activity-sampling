@@ -1,11 +1,14 @@
 // Copyright (c) 2026 Falko Schumann. All rights reserved. MIT license.
 
 import {
+  createReport,
+  projectReport,
+} from "../../shared/domain/report.read_model";
+import {
+  getStatistics,
   GetStatisticsQuery,
   type GetStatisticsQueryResult,
 } from "../../shared/domain/get_statistics.query";
-import { createReport, projectReport } from "../domain/report.read_model";
-import { getStatistics } from "../domain/get_statistics.query";
 import type { EventStore } from "../infrastructure/event_store";
 
 export class GetStatisticsQueryHandler {

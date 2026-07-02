@@ -4,12 +4,12 @@ import { EventBus, Success } from "@muspellheim/shared";
 import { describe, expect, it } from "vitest";
 
 import { ExportTimesheetCommandHandler } from "../../../src/main/application/export_timesheet.command_handler";
-import { ExportTimesheetCommand } from "../../../src/shared/domain/logged-activity/export_timesheet.command";
+import { ExportTimesheetCommand } from "../../../src/shared/domain/activity/export_timesheet.command";
 import { TimesheetEntry } from "../../../src/shared/domain/timesheet_entry";
-import { TimesheetExportedEvent } from "../../../src/main/domain/logged-activity/timesheet_exported.event";
-import { TimesheetData } from "../../../src/main/domain/timesheet_data";
+import { TimesheetExportedEvent } from "../../../src/shared/domain/activity/timesheet_exported.event";
+import { TimesheetData } from "../../../src/shared/domain/timesheet_data";
 import { SettingsProvider } from "../../../src/main/infrastructure/settings.provider";
-import { createTestSettings } from "../../../src/main/domain/settings/settings.aggregate";
+import { createTestSettings } from "../../../src/shared/domain/settings/settings.aggregate";
 
 describe("Export timesheet", () => {
   describe("Export timesheet in Harvest format", () => {

@@ -7,9 +7,10 @@ import {
 } from "@muspellheim/shared";
 
 import { TickTimerCommand } from "../../shared/domain/timer/tick_timer.command";
-import { TimerStartedEvent } from "../domain/timer/timer_started.event";
-import { TimerStoppedEvent } from "../domain/timer/timer_stopped.event";
-import { Clock, normalizeDuration } from "../../shared/domain/temporal";
+import { TimerStartedEvent } from "../../shared/domain/timer/timer_started.event";
+import { TimerStoppedEvent } from "../../shared/domain/timer/timer_stopped.event";
+import { normalizeDuration } from "../../shared/domain/temporal";
+import { Clock } from "../infrastructure/clock";
 
 export class TimerProcessManager extends EventTarget {
   static create({

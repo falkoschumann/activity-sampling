@@ -4,9 +4,9 @@ import { EventBus, Success } from "@muspellheim/shared";
 import { describe, expect, it } from "vitest";
 
 import { ChangeSettingsCommandHandler } from "../../../src/main/application/change_settings.command_handler";
-import { createTestSettings } from "../../../src/main/domain/settings/settings.aggregate";
+import { createTestSettings } from "../../../src/shared/domain/settings/settings.aggregate";
 import { ChangeSettingsCommand } from "../../../src/shared/domain/settings/change_settings.command";
-import { SettingsChangedEvent } from "../../../src/main/domain/settings/settings_changed.event";
+import { SettingsChangedEvent } from "../../../src/shared/domain/settings/settings_changed.event";
 import { SettingsProvider } from "../../../src/main/infrastructure/settings.provider";
 
 describe("Change settings", () => {

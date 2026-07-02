@@ -5,8 +5,8 @@ import { describe, expect, it } from "vitest";
 
 import { TimerProcessManager } from "../../../src/main/application/timer.process_manager";
 import { TickTimerCommand } from "../../../src/shared/domain/timer/tick_timer.command";
-import { TimerStartedEvent } from "../../../src/main/domain/timer/timer_started.event";
-import { TimerStoppedEvent } from "../../../src/main/domain/timer/timer_stopped.event";
+import { TimerStartedEvent } from "../../../src/shared/domain/timer/timer_started.event";
+import { TimerStoppedEvent } from "../../../src/shared/domain/timer/timer_stopped.event";
 
 describe("Timer", () => {
   it("should start the timer", async () => {

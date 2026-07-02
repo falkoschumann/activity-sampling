@@ -1,8 +1,8 @@
 // Copyright (c) 2026 Falko Schumann. All rights reserved. MIT license.
 
-import type { ActivityState } from "./logged-activity/activity.aggregate";
-import { ActivityLoggedEvent } from "./logged-activity/activity_logged.event";
-import { normalizeDuration } from "../../shared/domain/temporal";
+import type { ActivityState } from "./activity/activity.aggregate";
+import { ActivityLoggedEvent } from "./activity/activity_logged.event";
+import { normalizeDuration } from "./temporal";
 
 export type ReportView = {
   activities: ActivityState[];

@@ -8,7 +8,7 @@ import { beforeEach, describe, expect, it } from "vitest";
 import {
   createVacation,
   type VacationState,
-} from "../../../src/main/domain/vacation/vacation.aggregate";
+} from "../../../src/shared/domain/vacation/vacation.aggregate";
 import { VacationRepository } from "../../../src/main/infrastructure/vacation.repository";
 
 const NON_EXISTING_FILE = path.resolve(

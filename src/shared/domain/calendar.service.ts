@@ -2,7 +2,7 @@
 
 import type { HolidayState } from "./holiday/holiday.aggregate";
 import type { VacationState } from "./vacation/vacation.aggregate";
-import { normalizeDuration } from "../../shared/domain/temporal";
+import { normalizeDuration } from "./temporal";
 
 export function countWorkingHours(
   from: Temporal.PlainDateLike,

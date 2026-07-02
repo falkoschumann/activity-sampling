@@ -1,5 +1,7 @@
 // Copyright (c) 2026 Falko Schumann. All rights reserved. MIT license.
 
+import type { TimerView } from "./timer.read_model";
+
 export class GetCurrentIntervalQuery {
   static create(_data = null) {
     return new GetCurrentIntervalQuery();
@@ -37,4 +39,11 @@ export class GetCurrentIntervalQueryResult {
     this.elapsedTime = Temporal.Duration.from(elapsedTime);
     this.progress = progress;
   }
+}
+
+export function getCurrentInterval(
+  view: TimerView,
+  _query: GetCurrentIntervalQuery,
+): GetCurrentIntervalQueryResult {
+  return GetCurrentIntervalQueryResult.create(view);
 }

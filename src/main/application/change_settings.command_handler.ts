@@ -2,8 +2,10 @@
 
 import { EventBus, Success } from "@muspellheim/shared";
 
-import { ChangeSettingsCommand } from "../../shared/domain/settings/change_settings.command";
-import { changeSettings } from "../domain/settings/change_settings.command";
+import {
+  changeSettings,
+  ChangeSettingsCommand,
+} from "../../shared/domain/settings/change_settings.command";
 import type { SettingsProvider } from "../infrastructure/settings.provider";
 
 export class ChangeSettingsCommandHandler {

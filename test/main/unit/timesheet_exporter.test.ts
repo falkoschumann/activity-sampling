@@ -4,8 +4,8 @@ import { EventBus } from "@muspellheim/shared";
 import { describe, expect, it } from "vitest";
 
 import { TimesheetExportEventHandler } from "../../../src/main/application/timesheet_exporter.event_handler";
-import { TimesheetExportedEvent } from "../../../src/main/domain/logged-activity/timesheet_exported.event";
-import { TimesheetData } from "../../../src/main/domain/timesheet_data";
+import { TimesheetExportedEvent } from "../../../src/shared/domain/activity/timesheet_exported.event";
+import { TimesheetData } from "../../../src/shared/domain/timesheet_data";
 import { TimesheetExporterGateway } from "../../../src/main/infrastructure/timesheet_exporter.gateway";
 
 describe("Export timesheet", () => {

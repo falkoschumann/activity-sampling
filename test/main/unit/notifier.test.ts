@@ -4,11 +4,11 @@ import { EventBus, MessageRouter, MessageTracker } from "@muspellheim/shared";
 import { describe, expect, it } from "vitest";
 
 import { NotifierProcessManager } from "../../../src/main/application/notifier.process_manager";
-import { LogActivityCommand } from "../../../src/shared/domain/logged-activity/log_activity.command";
-import { TimerElapsedEvent } from "../../../src/main/domain/timer/timer_elapsed.event";
-import { ActivityLoggedEvent } from "../../../src/main/domain/logged-activity/activity_logged.event";
+import { LogActivityCommand } from "../../../src/shared/domain/activity/log_activity.command";
+import { TimerElapsedEvent } from "../../../src/shared/domain/timer/timer_elapsed.event";
+import { ActivityLoggedEvent } from "../../../src/shared/domain/activity/activity_logged.event";
 import { NotificationsGateway } from "../../../src/main/infrastructure/notifications.gateway";
-import { Clock } from "../../../src/shared/domain/temporal";
+import { Clock } from "../../../src/main/infrastructure/clock";
 
 describe("Notifier", () => {
   it("should notify without last activity", async () => {

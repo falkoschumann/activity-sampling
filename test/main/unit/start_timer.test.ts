@@ -5,7 +5,7 @@ import { describe, expect, it } from "vitest";
 
 import { StartTimerCommandHandler } from "../../../src/main/application/start_timer.command_handler";
 import { StartTimerCommand } from "../../../src/shared/domain/timer/start_timer.command";
-import { TimerStartedEvent } from "../../../src/main/domain/timer/timer_started.event";
+import { TimerStartedEvent } from "../../../src/shared/domain/timer/timer_started.event";
 
 describe("Start timer", () => {
   it("should start the timer", async () => {

@@ -2,8 +2,10 @@
 
 import { EventBus, Success } from "@muspellheim/shared";
 
-import { TickTimerCommand } from "../../shared/domain/timer/tick_timer.command";
-import { tickTimer } from "../domain/timer/tick_timer.command";
+import {
+  tickTimer,
+  TickTimerCommand,
+} from "../../shared/domain/timer/tick_timer.command";
 
 export class TickTimerCommandHandler {
   static create({ eventBus }: { eventBus: EventBus }) {

@@ -5,7 +5,7 @@ import fsPromise from "node:fs/promises";
 
 import { OutputTracker } from "@muspellheim/shared";
 import { type Options as StringifyOptions, stringify } from "csv-stringify";
-import type { TimesheetExportedEvent } from "../domain/logged-activity/timesheet_exported.event";
+import type { TimesheetExportedEvent } from "../../shared/domain/activity/timesheet_exported.event";
 
 export class TimesheetExporterGateway extends EventTarget {
   static create() {

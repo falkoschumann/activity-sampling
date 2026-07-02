@@ -2,8 +2,10 @@
 
 import { EventBus, Success } from "@muspellheim/shared";
 
-import { StartTimerCommand } from "../../shared/domain/timer/start_timer.command";
-import { startTimer } from "../domain/timer/start_timer.command";
+import {
+  startTimer,
+  StartTimerCommand,
+} from "../../shared/domain/timer/start_timer.command";
 
 export class StartTimerCommandHandler {
   static create({ eventBus }: { eventBus: EventBus }) {

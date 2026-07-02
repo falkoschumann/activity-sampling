@@ -1,11 +1,14 @@
 // Copyright (c) 2026 Falko Schumann. All rights reserved. MIT license.
 
-import { createReport, projectReport } from "../domain/report.read_model";
 import {
+  createReport,
+  projectReport,
+} from "../../shared/domain/report.read_model";
+import {
+  getReport,
   GetReportQuery,
   type GetReportQueryResult,
 } from "../../shared/domain/get_report.query";
-import { getReport } from "../domain/get_report.query";
 import type { EventStore } from "../infrastructure/event_store";
 
 export class GetReportQueryHandler {

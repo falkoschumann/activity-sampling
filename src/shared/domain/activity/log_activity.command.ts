@@ -1,5 +1,7 @@
 // Copyright (c) 2026 Falko Schumann. All rights reserved. MIT license.
 
+import { ActivityLoggedEvent } from "./activity_logged.event";
+
 export class LogActivityCommand {
   static create({
     timestamp,
@@ -79,4 +81,16 @@ export class LogActivityCommand {
       category: category,
     };
   }
+}
+
+export function logActivity(
+  command: LogActivityCommand,
+): ActivityLoggedEvent[] {
+  return [
+    ActivityLoggedEvent.create({
+      ...command.data,
+      timestamp: command.data.timestamp.round("seconds"),
+      duration: command.data.duration.round("minutes"),
+    }),
+  ];
 }

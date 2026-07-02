@@ -3,8 +3,8 @@
 import { describe, expect, it } from "vitest";
 
 import { GetRecentActivitiesQueryHandler } from "../../../src/main/application/get_recent_activities.query_handler";
-import { createTestSettings } from "../../../src/main/domain/settings/settings.aggregate";
-import { ActivityLoggedEvent } from "../../../src/main/domain/logged-activity/activity_logged.event";
+import { createTestSettings } from "../../../src/shared/domain/settings/settings.aggregate";
+import { ActivityLoggedEvent } from "../../../src/shared/domain/activity/activity_logged.event";
 import { RecentActivity } from "../../../src/shared/domain/recent_activity";
 import {
   GetRecentActivitiesQuery,

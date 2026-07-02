@@ -7,7 +7,7 @@ import { describe, expect, it } from "vitest";
 import {
   createSettings,
   createTestSettings,
-} from "../../../src/main/domain/settings/settings.aggregate";
+} from "../../../src/shared/domain/settings/settings.aggregate";
 import { SettingsProvider } from "../../../src/main/infrastructure/settings.provider";
 
 const MINIMAL_FILE = path.resolve(

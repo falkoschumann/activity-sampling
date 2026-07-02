@@ -3,23 +3,23 @@
 import {
   createSettings,
   type SettingsState,
-} from "../domain/settings/settings.aggregate";
+} from "../../shared/domain/settings/settings.aggregate";
 import {
-  GetCategoriesQuery,
-  GetCategoriesQueryResult,
-} from "../../shared/domain/get_categories.query";
-import { getCategories } from "../domain/get_categories.query";
+  getSettings,
+  GetSettingsQuery,
+  GetSettingsQueryResult,
+} from "../../shared/domain/get_settings.query";
 import { SettingsProvider } from "../infrastructure/settings.provider";
 
-export class GetCategoriesQueryHandler {
+export class GetSettingsQueryHandler {
   static create({ settingsProvider }: { settingsProvider: SettingsProvider }) {
-    return new GetCategoriesQueryHandler(settingsProvider);
+    return new GetSettingsQueryHandler(settingsProvider);
   }
 
   static createNull({
     settings = createSettings(),
   }: { settings?: SettingsState } = {}) {
-    return new GetCategoriesQueryHandler(
+    return new GetSettingsQueryHandler(
       SettingsProvider.createNull({ readFileResponses: [settings] }),
     );
   }
@@ -30,9 +30,9 @@ export class GetCategoriesQueryHandler {
     this.#settingsProvider = settingsProvider;
   }
 
-  async handle(query: GetCategoriesQuery): Promise<GetCategoriesQueryResult> {
-    query = GetCategoriesQuery.create(query.data);
+  async handle(query: GetSettingsQuery): Promise<GetSettingsQueryResult> {
+    query = GetSettingsQuery.create(query.data);
     const view = await this.#settingsProvider.load();
-    return getCategories(view, query);
+    return getSettings(view, query);
   }
 }

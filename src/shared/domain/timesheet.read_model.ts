@@ -2,7 +2,7 @@
 
 import { HolidaysChangedEvent } from "./holiday/holidays_changed.event";
 import type { HolidayState } from "./holiday/holiday.aggregate";
-import { ActivityLoggedEvent } from "./logged-activity/activity_logged.event";
+import { ActivityLoggedEvent } from "./activity/activity_logged.event";
 import { SettingsChangedEvent } from "./settings/settings_changed.event";
 import { VacationsChangedEvent } from "./vacation/vacations_changed.event";
 import type { VacationState } from "./vacation/vacation.aggregate";

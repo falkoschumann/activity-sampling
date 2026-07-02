@@ -1,5 +1,7 @@
 // Copyright (c) 2026 Falko Schumann. All rights reserved. MIT license.
 
+import { SettingsChangedEvent } from "./settings_changed.event";
+
 export class ChangeSettingsCommand {
   static create({
     capacity = "PT40H",
@@ -50,4 +52,10 @@ export class ChangeSettingsCommand {
       lastName,
     };
   }
+}
+
+export function changeSettings(
+  command: ChangeSettingsCommand,
+): SettingsChangedEvent[] {
+  return [SettingsChangedEvent.create(command.data)];
 }

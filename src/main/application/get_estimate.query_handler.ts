@@ -1,11 +1,14 @@
 // Copyright (c) 2026 Falko Schumann. All rights reserved. MIT license.
 
 import {
+  getEstimate,
   GetEstimateQuery,
   type GetEstimateQueryResult,
 } from "../../shared/domain/get_estimate.query";
-import { createReport, projectReport } from "../domain/report.read_model";
-import { getEstimate } from "../domain/get_estimate.query";
+import {
+  createReport,
+  projectReport,
+} from "../../shared/domain/report.read_model";
 import type { EventStore } from "../infrastructure/event_store";
 
 export class GetEstimateQueryHandler {

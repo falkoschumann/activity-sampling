@@ -6,8 +6,10 @@ import {
   Success,
 } from "@muspellheim/shared";
 
-import { ExportTimesheetCommand } from "../../shared/domain/logged-activity/export_timesheet.command";
-import { exportTimesheet } from "../domain/logged-activity/export_timesheet.command";
+import {
+  exportTimesheet,
+  ExportTimesheetCommand,
+} from "../../shared/domain/activity/export_timesheet.command";
 import type { SettingsProvider } from "../infrastructure/settings.provider";
 
 export class ExportTimesheetCommandHandler {

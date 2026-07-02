@@ -2,9 +2,9 @@
 
 import { describe, expect, it } from "vitest";
 
-import { countWorkingHours } from "../../../src/main/domain/calendar.service";
-import { createHoliday } from "../../../src/main/domain/holiday/holiday.aggregate";
-import { createVacation } from "../../../src/main/domain/vacation/vacation.aggregate";
+import { countWorkingHours } from "../../../src/shared/domain/calendar.service";
+import { createHoliday } from "../../../src/shared/domain/holiday/holiday.aggregate";
+import { createVacation } from "../../../src/shared/domain/vacation/vacation.aggregate";
 
 describe("Calendar", () => {
   it("should count business hours", () => {
