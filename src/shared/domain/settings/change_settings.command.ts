@@ -1,61 +1,41 @@
 // Copyright (c) 2026 Falko Schumann. All rights reserved. MIT license.
 
-import { SettingsChangedEvent } from "./settings_changed.event";
+import {
+  createSettingsChangedEvent,
+  type SettingsChangedEvent,
+} from "./settings_changed.event";
 
-export class ChangeSettingsCommand {
-  static create({
-    capacity = "PT40H",
-    categories = ["", "Feature", "Rework"],
-    firstName,
-    lastName,
-  }: {
-    capacity?: Temporal.DurationLike;
-    categories?: string[];
-    firstName?: string;
-    lastName?: string;
-  } = {}): ChangeSettingsCommand {
-    return new ChangeSettingsCommand(capacity, categories, firstName, lastName);
-  }
+export interface ChangeSettingsCommand {
+  readonly type: "change-settings";
+  readonly data: ChangeSettingsCommandData;
+}
 
-  static createTestInstance({
-    capacity = "PT32H",
-    categories = ["", "Feature", "Rework", "Training"],
-    firstName = "John",
-    lastName = "Doe",
-  }: {
-    capacity?: Temporal.DurationLike;
-    categories?: string[];
-    firstName?: string;
-    lastName?: string;
-  } = {}) {
-    return ChangeSettingsCommand.create({
-      capacity,
-      categories,
-      firstName,
-      lastName,
-    });
-  }
+export interface ChangeSettingsCommandData {
+  readonly capacity: Temporal.DurationLike;
+  readonly categories: string[];
+  readonly firstName?: string;
+  readonly lastName?: string;
+}
 
-  readonly type = "change-settings";
-  readonly data;
-
-  private constructor(
-    capacity: Temporal.DurationLike,
-    categories: string[],
-    firstName?: string,
-    lastName?: string,
-  ) {
-    this.data = {
-      capacity: Temporal.Duration.from(capacity),
-      categories,
-      firstName,
-      lastName,
-    };
-  }
+export function createChangeSettingsCommand({
+  capacity,
+  categories,
+  firstName,
+  lastName,
+}: {
+  capacity: Temporal.DurationLike;
+  categories: string[];
+  firstName?: string;
+  lastName?: string;
+}): ChangeSettingsCommand {
+  return {
+    type: "change-settings",
+    data: { capacity, categories, firstName, lastName },
+  };
 }
 
 export function changeSettings(
   command: ChangeSettingsCommand,
 ): SettingsChangedEvent[] {
-  return [SettingsChangedEvent.create(command.data)];
+  return [createSettingsChangedEvent(command.data)];
 }

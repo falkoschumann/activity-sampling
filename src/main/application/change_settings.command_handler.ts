@@ -4,7 +4,7 @@ import { EventBus, Success } from "@muspellheim/shared";
 
 import {
   changeSettings,
-  ChangeSettingsCommand,
+  type ChangeSettingsCommand,
 } from "../../shared/domain/settings/change_settings.command";
 import type { SettingsProvider } from "../infrastructure/settings.provider";
 
@@ -28,7 +28,6 @@ export class ChangeSettingsCommandHandler {
   }
 
   async handle(command: ChangeSettingsCommand) {
-    command = ChangeSettingsCommand.create(command.data);
     const events = changeSettings(command);
     for (const event of events) {
       await this.#settingsProvider.store(event.data);

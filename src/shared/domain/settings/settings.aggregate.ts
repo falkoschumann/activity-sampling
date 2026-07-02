@@ -1,11 +1,11 @@
 // Copyright (c) 2026 Falko Schumann. All rights reserved. MIT license.
 
-export type SettingsState = Readonly<{
-  capacity: Temporal.Duration;
-  categories: string[];
-  firstName?: string;
-  lastName?: string;
-}>;
+export interface SettingsState {
+  readonly capacity: Temporal.DurationLike;
+  readonly categories: string[];
+  readonly firstName?: string;
+  readonly lastName?: string;
+}
 
 export function createSettings({
   capacity = "PT40H",
@@ -19,23 +19,9 @@ export function createSettings({
   lastName?: string;
 } = {}): SettingsState {
   return {
-    capacity: Temporal.Duration.from(capacity),
+    capacity,
     categories,
     firstName,
     lastName,
   };
-}
-
-export function createTestSettings({
-  capacity = "PT32H",
-  categories = ["", "Feature", "Rework", "Training"],
-  firstName = "John",
-  lastName = "Doe",
-}: {
-  capacity?: Temporal.DurationLike;
-  categories?: string[];
-  firstName?: string;
-  lastName?: string;
-} = {}): SettingsState {
-  return createSettings({ capacity, categories, firstName, lastName });
 }
