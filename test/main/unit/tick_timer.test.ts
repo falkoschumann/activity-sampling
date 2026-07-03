@@ -4,31 +4,29 @@ import { EventBus, Success } from "@muspellheim/shared";
 import { describe, expect, it } from "vitest";
 
 import { TickTimerCommandHandler } from "../../../src/main/application/tick_timer.command_handler";
-import { TickTimerCommand } from "../../../src/shared/domain/timer/tick_timer.command";
-import { TimerTickedEvent } from "../../../src/shared/domain/timer/timer_ticked.event";
-import { TimerElapsedEvent } from "../../../src/shared/domain/timer/timer_elapsed.event";
+import { createTickTimerCommand } from "../../../src/shared/domain/timer/tick_timer.command";
+import { createTimerElapsedEvent } from "../../../src/shared/domain/timer/timer_elapsed.event";
+import { createTimerTickedEvent } from "../../../src/shared/domain/timer/timer_ticked.event";
 
 describe("Tick timer", () => {
   it("should tick the timer", async () => {
-    const eventBus = new EventBus();
-    const handler = TickTimerCommandHandler.create({ eventBus });
+    const { eventBus, handler } = configure();
 
     const status = await handler.handle(
-      TickTimerCommand.create({ progressedTime: "PT5M", duration: "PT30M" }),
+      createTickTimerCommand({ progressedTime: "PT5M", duration: "PT30M" }),
     );
 
     expect(status).toEqual(new Success());
     expect(eventBus.getEvents()).toEqual([
-      TimerTickedEvent.create({ progressedTime: "PT5M", duration: "PT30M" }),
+      createTimerTickedEvent({ progressedTime: "PT5M", duration: "PT30M" }),
     ]);
   });
 
   it("should elapse the timer", async () => {
-    const eventBus = new EventBus();
-    const handler = TickTimerCommandHandler.create({ eventBus });
+    const { eventBus, handler } = configure();
 
     const status = await handler.handle(
-      TickTimerCommand.create({
+      createTickTimerCommand({
         isElapsed: true,
         timestamp: "2026-06-13T11:00:00Z",
         duration: "PT30M",
@@ -37,10 +35,16 @@ describe("Tick timer", () => {
 
     expect(status).toEqual(new Success());
     expect(eventBus.getEvents()).toEqual([
-      TimerElapsedEvent.create({
+      createTimerElapsedEvent({
         timestamp: "2026-06-13T11:00:00Z",
         duration: "PT30M",
       }),
     ]);
   });
 });
+
+function configure() {
+  const eventBus = new EventBus();
+  const handler = TickTimerCommandHandler.create({ eventBus });
+  return { eventBus, handler };
+}

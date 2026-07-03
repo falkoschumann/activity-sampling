@@ -4,7 +4,7 @@ import { EventBus, Success } from "@muspellheim/shared";
 
 import {
   startTimer,
-  StartTimerCommand,
+  type StartTimerCommand,
 } from "../../shared/domain/timer/start_timer.command";
 
 export class StartTimerCommandHandler {
@@ -19,7 +19,6 @@ export class StartTimerCommandHandler {
   }
 
   async handle(command: StartTimerCommand) {
-    command = StartTimerCommand.create(command.data);
     const events = startTimer(command);
     events.forEach((event) => this.#eventBus.publish(event));
     return new Success();

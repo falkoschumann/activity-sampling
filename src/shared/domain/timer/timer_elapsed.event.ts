@@ -1,30 +1,27 @@
 // Copyright (c) 2026 Falko Schumann. All rights reserved. MIT license.
 
-export class TimerElapsedEvent {
-  static create({
-    timer = "default",
-    timestamp,
-    duration,
-  }: {
-    timer?: string;
-    timestamp: Temporal.InstantLike;
-    duration: Temporal.DurationLike;
-  }) {
-    return new TimerElapsedEvent(timer, timestamp, duration);
-  }
+export interface TimerElapsedEvent {
+  readonly type: "timer-elapsed";
+  readonly data: TimerElapsedEventData;
+}
 
-  readonly type = "timer-elapsed";
-  readonly data;
+export type TimerElapsedEventData = Readonly<{
+  timer: string;
+  timestamp: Temporal.InstantLike;
+  duration: Temporal.DurationLike;
+}>;
 
-  private constructor(
-    timer: string,
-    timestamp: Temporal.InstantLike,
-    duration: Temporal.DurationLike,
-  ) {
-    this.data = {
-      timer,
-      timestamp: Temporal.Instant.from(timestamp),
-      duration: Temporal.Duration.from(duration),
-    };
-  }
+export function createTimerElapsedEvent({
+  timer = "default",
+  timestamp,
+  duration,
+}: {
+  timer?: string;
+  timestamp: Temporal.InstantLike;
+  duration: Temporal.DurationLike;
+}): TimerElapsedEvent {
+  return {
+    type: "timer-elapsed",
+    data: { timer, timestamp, duration },
+  };
 }

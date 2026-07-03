@@ -1,55 +1,63 @@
 // Copyright (c) 2026 Falko Schumann. All rights reserved. MIT license.
 
-import { TimerTickedEvent } from "./timer_ticked.event";
-import { TimerElapsedEvent } from "./timer_elapsed.event";
+import {
+  createTimerTickedEvent,
+  type TimerTickedEvent,
+} from "./timer_ticked.event";
+import {
+  createTimerElapsedEvent,
+  type TimerElapsedEvent,
+} from "./timer_elapsed.event";
 
-export class TickTimerCommand {
-  static create({
-    isElapsed = false,
-    duration,
-    progressedTime,
-    timestamp,
-  }: {
-    isElapsed?: boolean;
-    duration: Temporal.DurationLike;
-    progressedTime?: Temporal.DurationLike;
-    timestamp?: Temporal.InstantLike;
-  }) {
-    return new TickTimerCommand(isElapsed, duration, progressedTime, timestamp);
-  }
+export interface TickTimerCommand {
+  readonly type: "tick-timer";
+  readonly data: TickTimerCommandData;
+}
 
-  readonly type = "tick-timer";
-  readonly data;
-
-  private constructor(
-    isElapsed: boolean,
-    duration: Temporal.DurationLike,
-    progressedTime?: Temporal.DurationLike,
-    timestamp?: Temporal.InstantLike,
-  ) {
-    if (isElapsed) {
-      if (timestamp == null) {
-        throw new TypeError("Timestamp is required when timer is elapsed");
-      }
-
-      this.data = {
-        isElapsed: isElapsed,
-        duration: Temporal.Duration.from(duration),
-        timestamp: Temporal.Instant.from(timestamp),
-      };
-    } else {
-      if (progressedTime == null) {
-        throw new TypeError(
-          "Elapsed time is required when timer is not elapsed",
-        );
-      }
-
-      this.data = {
-        isElapsed: isElapsed,
-        duration: Temporal.Duration.from(duration),
-        progressedTime: Temporal.Duration.from(progressedTime),
-      };
+export type TickTimerCommandData = Readonly<
+  | {
+      isElapsed: true;
+      duration: Temporal.DurationLike;
+      timestamp: Temporal.InstantLike;
     }
+  | {
+      isElapsed: false;
+      duration: Temporal.DurationLike;
+      progressedTime: Temporal.DurationLike;
+    }
+>;
+
+export function createTickTimerCommand({
+  isElapsed = false,
+  duration,
+  progressedTime,
+  timestamp,
+}: {
+  isElapsed?: boolean;
+  duration: Temporal.DurationLike;
+  progressedTime?: Temporal.DurationLike;
+  timestamp?: Temporal.InstantLike;
+}): TickTimerCommand {
+  if (isElapsed) {
+    if (timestamp == null) {
+      throw new TypeError("Timestamp is required when timer is elapsed");
+    }
+
+    return {
+      type: "tick-timer",
+      data: { isElapsed, duration, timestamp },
+    };
+  } else {
+    if (progressedTime == null) {
+      throw new TypeError(
+        "Progressed time is required when timer is not elapsed",
+      );
+    }
+
+    return {
+      type: "tick-timer",
+      data: { isElapsed, duration, progressedTime },
+    };
   }
 }
 
@@ -57,8 +65,8 @@ export function tickTimer(
   command: TickTimerCommand,
 ): (TimerTickedEvent | TimerElapsedEvent)[] {
   if (command.data.isElapsed) {
-    return [TimerElapsedEvent.create(command.data)];
+    return [createTimerElapsedEvent(command.data)];
   }
 
-  return [TimerTickedEvent.create(command.data)];
+  return [createTimerTickedEvent(command.data)];
 }

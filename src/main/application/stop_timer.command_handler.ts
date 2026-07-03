@@ -4,7 +4,7 @@ import { EventBus, Success } from "@muspellheim/shared";
 
 import {
   stopTimer,
-  StopTimerCommand,
+  type StopTimerCommand,
 } from "../../shared/domain/timer/stop_timer.command";
 
 export class StopTimerCommandHandler {
@@ -19,7 +19,6 @@ export class StopTimerCommandHandler {
   }
 
   async handle(command: StopTimerCommand) {
-    command = StopTimerCommand.create(command.data);
     const events = stopTimer(command);
     events.forEach((event) => this.#eventBus.publish(event));
     return new Success();

@@ -1,18 +1,21 @@
 // Copyright (c) 2026 Falko Schumann. All rights reserved. MIT license.
 
-import { TimerStoppedEvent } from "./timer_stopped.event";
+import {
+  createTimerStoppedEvent,
+  type TimerStoppedEvent,
+} from "./timer_stopped.event";
 
-export class StopTimerCommand {
-  static create(_data = null) {
-    return new StopTimerCommand();
-  }
+export type StopTimerCommand = Readonly<{
+  type: "stop-timer";
+  data: StopTimerCommandData;
+}>;
 
-  readonly type = "stop-timer";
-  readonly data = null;
+export type StopTimerCommandData = null;
 
-  private constructor() {}
+export function createStopTimerCommand(data = null): StopTimerCommand {
+  return { type: "stop-timer", data };
 }
 
 export function stopTimer(_command: StopTimerCommand): TimerStoppedEvent[] {
-  return [TimerStoppedEvent.create()];
+  return [createTimerStoppedEvent()];
 }

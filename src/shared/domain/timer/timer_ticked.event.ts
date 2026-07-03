@@ -1,30 +1,27 @@
 // Copyright (c) 2026 Falko Schumann. All rights reserved. MIT license.
 
-export class TimerTickedEvent {
-  static create({
-    timer = "default",
-    progressedTime,
-    duration,
-  }: {
-    timer?: string;
-    progressedTime: Temporal.DurationLike;
-    duration: Temporal.DurationLike;
-  }) {
-    return new TimerTickedEvent(timer, progressedTime, duration);
-  }
+export interface TimerTickedEvent {
+  readonly type: "timer-ticked";
+  readonly data: TimerTickedEventData;
+}
 
-  readonly type = "timer-ticked";
-  readonly data;
+export type TimerTickedEventData = Readonly<{
+  timer: string;
+  progressedTime: Temporal.DurationLike;
+  duration: Temporal.DurationLike;
+}>;
 
-  private constructor(
-    timer: string,
-    progressedTime: Temporal.DurationLike,
-    duration: Temporal.DurationLike,
-  ) {
-    this.data = {
-      timer,
-      progressedTime: Temporal.Duration.from(progressedTime),
-      duration: Temporal.Duration.from(duration),
-    };
-  }
+export function createTimerTickedEvent({
+  timer = "default",
+  progressedTime,
+  duration,
+}: {
+  timer?: string;
+  progressedTime: Temporal.DurationLike;
+  duration: Temporal.DurationLike;
+}): TimerTickedEvent {
+  return {
+    type: "timer-ticked",
+    data: { timer, progressedTime, duration },
+  };
 }

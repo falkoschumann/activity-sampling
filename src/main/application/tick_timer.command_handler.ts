@@ -4,7 +4,7 @@ import { EventBus, Success } from "@muspellheim/shared";
 
 import {
   tickTimer,
-  TickTimerCommand,
+  type TickTimerCommand,
 } from "../../shared/domain/timer/tick_timer.command";
 
 export class TickTimerCommandHandler {
@@ -19,7 +19,6 @@ export class TickTimerCommandHandler {
   }
 
   async handle(command: TickTimerCommand) {
-    command = TickTimerCommand.create(command.data);
     const events = tickTimer(command);
     events.forEach((event) => this.#eventBus.publish(event));
     return new Success();

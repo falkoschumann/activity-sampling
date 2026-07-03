@@ -4,21 +4,26 @@ import { EventBus, Success } from "@muspellheim/shared";
 import { describe, expect, it } from "vitest";
 
 import { StartTimerCommandHandler } from "../../../src/main/application/start_timer.command_handler";
-import { StartTimerCommand } from "../../../src/shared/domain/timer/start_timer.command";
-import { TimerStartedEvent } from "../../../src/shared/domain/timer/timer_started.event";
+import { createStartTimerCommand } from "../../../src/shared/domain/timer/start_timer.command";
+import { createTimerStartedEvent } from "../../../src/shared/domain/timer/timer_started.event";
 
 describe("Start timer", () => {
   it("should start the timer", async () => {
-    const eventBus = new EventBus();
-    const handler = StartTimerCommandHandler.create({ eventBus });
+    const { handler, eventBus } = configure();
 
     const status = await handler.handle(
-      StartTimerCommand.create({ interval: "PT30M" }),
+      createStartTimerCommand({ interval: "PT30M" }),
     );
 
     expect(status).toEqual(new Success());
     expect(eventBus.getEvents()).toEqual([
-      TimerStartedEvent.create({ interval: "PT30M" }),
+      createTimerStartedEvent({ interval: "PT30M" }),
     ]);
   });
 });
+
+function configure() {
+  const eventBus = new EventBus();
+  const handler = StartTimerCommandHandler.create({ eventBus });
+  return { handler, eventBus };
+}

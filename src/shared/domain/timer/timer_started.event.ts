@@ -1,23 +1,24 @@
 // Copyright (c) 2026 Falko Schumann. All rights reserved. MIT license.
 
-export class TimerStartedEvent {
-  static create({
-    timer = "default",
-    interval,
-  }: {
-    timer?: string;
-    interval: Temporal.DurationLike;
-  }) {
-    return new TimerStartedEvent(timer, interval);
-  }
+export interface TimerStartedEvent {
+  readonly type: "timer-started";
+  readonly data: TimerStartedEventData;
+}
 
-  readonly type = "timer-started";
-  readonly data;
+export type TimerStartedEventData = Readonly<{
+  timer: string;
+  interval: Temporal.DurationLike;
+}>;
 
-  private constructor(timer: string, interval: Temporal.DurationLike) {
-    this.data = {
-      timer,
-      interval: Temporal.Duration.from(interval),
-    };
-  }
+export function createTimerStartedEvent({
+  timer = "default",
+  interval,
+}: {
+  timer?: string;
+  interval: Temporal.DurationLike;
+}): TimerStartedEvent {
+  return {
+    type: "timer-started",
+    data: { timer, interval },
+  };
 }
