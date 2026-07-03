@@ -166,20 +166,7 @@ projections:
     event: changed
     rule: Update the settings.
 schema:
-  type: object
-  properties:
-    capacity:
-      type: string
-      format: duration
-    categories:
-      type: array
-      items:
-        type: string
-    firstName:
-      type: string
-    lastName:
-      type: string
-  required: [capacity, categories]
+  type: Settings
 ---
 apiVersion: schema.esdm.io/core/v1
 kind: query

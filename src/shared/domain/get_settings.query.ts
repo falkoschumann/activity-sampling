@@ -2,74 +2,41 @@
 
 import type { SettingsState } from "./settings/settings.aggregate";
 
-export class GetSettingsQuery {
-  static create(_data = null) {
-    return new GetSettingsQuery();
-  }
-
-  readonly type = "get-settings";
-  readonly data = null;
-
-  private constructor() {}
+export interface GetSettingsQuery {
+  readonly type: "get-settings";
+  readonly data: GetSettingsQueryData;
 }
 
-export class GetSettingsQueryResult {
-  static create({
-    capacity = "PT40H",
-    categories = ["", "Feature", "Rework"],
-    firstName,
-    lastName,
-  }: {
-    capacity?: Temporal.DurationLike | string;
-    categories?: string[];
-    firstName?: string;
-    lastName?: string;
-  } = {}) {
-    return new GetSettingsQueryResult(
-      capacity,
-      categories,
-      firstName,
-      lastName,
-    );
-  }
+export type GetSettingsQueryData = null;
 
-  static createTestInstance({
-    capacity = "PT32H",
-    categories = ["", "Feature", "Rework", "Training"],
-    firstName = "John",
-    lastName = "Doe",
-  }: {
-    capacity?: Temporal.DurationLike | string;
-    categories?: string[];
-    firstName?: string;
-    lastName?: string;
-  } = {}) {
-    return GetSettingsQueryResult.create({
-      capacity,
-      categories,
-      firstName,
-      lastName,
-    });
-  }
+export function createGetSettingsQuery(data = null): GetSettingsQuery {
+  return {
+    type: "get-settings",
+    data,
+  };
+}
 
-  readonly capacity;
-  readonly categories;
-  readonly firstName;
-  readonly lastName;
+export interface GetSettingsQueryResult {
+  readonly capacity: Temporal.DurationLike;
+  readonly categories: string[];
+  readonly firstName?: string;
+  readonly lastName?: string;
+}
 
-  private constructor(
-    capacity: Temporal.DurationLike | string,
-    categories: string[],
-    firstName?: string,
-    lastName?: string,
-  ) {
-    this.capacity = Temporal.Duration.from(capacity);
-    this.categories = categories;
-    this.firstName = firstName;
-    this.lastName = lastName;
-  }
+export function createGetSettingsQueryResult({
+  capacity = "PT40H",
+  categories = ["", "Feature", "Rework"],
+  firstName,
+  lastName,
+}: {
+  capacity?: Temporal.DurationLike | string;
+  categories?: string[];
+  firstName?: string;
+  lastName?: string;
+} = {}): GetSettingsQueryResult {
+  return { capacity, categories, firstName, lastName };
 }
 
 export function getSettings(view: SettingsState, _query: GetSettingsQuery) {
-  return GetSettingsQueryResult.create(view);
+  return createGetSettingsQueryResult(view);
 }
