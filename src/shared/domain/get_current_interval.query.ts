@@ -2,48 +2,47 @@
 
 import type { TimerView } from "./timer.read_model";
 
-export class GetCurrentIntervalQuery {
-  static create(_data = null) {
-    return new GetCurrentIntervalQuery();
-  }
-
-  readonly type = "get-current-interval";
-  readonly data = null;
-
-  private constructor() {}
+export interface GetCurrentIntervalQuery {
+  readonly type: "get-current-interval";
+  readonly data: GetCurrentIntervalQueryData;
 }
 
-export class GetCurrentIntervalQueryResult {
-  static create({
-    isRunning = false,
-    elapsedTime = Temporal.Duration.from("PT0S"),
-    progress = 0,
-  }: {
-    isRunning?: boolean;
-    elapsedTime?: Temporal.DurationLike;
-    progress?: number;
-  } = {}) {
-    return new GetCurrentIntervalQueryResult(isRunning, elapsedTime, progress);
-  }
+export type GetCurrentIntervalQueryData = null;
 
+export function createGetCurrentIntervalQuery(
+  data = null,
+): GetCurrentIntervalQuery {
+  return {
+    type: "get-current-interval",
+    data,
+  };
+}
+
+export interface GetCurrentIntervalQueryResult {
   readonly isRunning: boolean;
-  readonly elapsedTime: Temporal.Duration;
+  readonly elapsedTime: Temporal.DurationLike;
   readonly progress: number;
+}
 
-  private constructor(
-    isRunning: boolean,
-    elapsedTime: Temporal.DurationLike,
-    progress: number,
-  ) {
-    this.isRunning = isRunning;
-    this.elapsedTime = Temporal.Duration.from(elapsedTime);
-    this.progress = progress;
-  }
+export function createGetCurrentIntervalQueryResult({
+  isRunning = false,
+  elapsedTime = "PT0S",
+  progress = 0,
+}: {
+  isRunning?: boolean;
+  elapsedTime?: Temporal.DurationLike;
+  progress?: number;
+} = {}): GetCurrentIntervalQueryResult {
+  return {
+    isRunning,
+    elapsedTime,
+    progress,
+  };
 }
 
 export function getCurrentInterval(
   view: TimerView,
   _query: GetCurrentIntervalQuery,
 ): GetCurrentIntervalQueryResult {
-  return GetCurrentIntervalQueryResult.create(view);
+  return createGetCurrentIntervalQueryResult(view);
 }

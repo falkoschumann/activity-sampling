@@ -3,58 +3,58 @@
 import { describe, expect, it } from "vitest";
 
 import { GetCurrentIntervalQueryHandler } from "../../../src/main/application/get_current_interval.query_handler";
-import {
-  GetCurrentIntervalQuery,
-  GetCurrentIntervalQueryResult,
-} from "../../../src/shared/domain/get_current_interval.query";
+import { createTimerStartedEvent } from "../../../src/shared/domain/timer/timer_started.event";
+import { createTimerTickedEvent } from "../../../src/shared/domain/timer/timer_ticked.event";
+import { createTimerElapsedEvent } from "../../../src/shared/domain/timer/timer_elapsed.event";
+import { createTimerStoppedEvent } from "../../../src/shared/domain/timer/timer_stopped.event";
 import {
   createTimer,
   projectTimer,
 } from "../../../src/shared/domain/timer.read_model";
-import { TimerStartedEvent } from "../../../src/shared/domain/timer/timer_started.event";
-import { TimerTickedEvent } from "../../../src/shared/domain/timer/timer_ticked.event";
-import { TimerElapsedEvent } from "../../../src/shared/domain/timer/timer_elapsed.event";
-import { TimerStoppedEvent } from "../../../src/shared/domain/timer/timer_stopped.event";
+import {
+  createGetCurrentIntervalQuery,
+  createGetCurrentIntervalQueryResult,
+} from "../../../src/shared/domain/get_current_interval.query";
 
 describe("Get current interval", () => {
   it("should return empty result when view is initial state", async () => {
     const handler = GetCurrentIntervalQueryHandler.createNull();
 
-    const result = await handler.handle(GetCurrentIntervalQuery.create());
+    const result = await handler.handle(createGetCurrentIntervalQuery());
 
-    expect(result).toEqual(GetCurrentIntervalQueryResult.create());
+    expect(result).toEqual(createGetCurrentIntervalQueryResult());
   });
 
   it("should return started result when timer started ", async () => {
-    const state = [TimerStartedEvent.create({ interval: "PT15M" })].reduce(
+    const state = [createTimerStartedEvent({ interval: "PT15M" })].reduce(
       projectTimer,
       createTimer(),
     );
     const handler = GetCurrentIntervalQueryHandler.createNull({ state });
 
-    const result = await handler.handle(GetCurrentIntervalQuery.create());
+    const result = await handler.handle(createGetCurrentIntervalQuery());
 
     expect(result).toEqual(
-      GetCurrentIntervalQueryResult.create({ isRunning: true }),
+      createGetCurrentIntervalQueryResult({ isRunning: true }),
     );
   });
 
   it("should return ticked result when timer ticked ", async () => {
     const state = [
-      TimerStartedEvent.create({ interval: "PT20M" }),
-      TimerTickedEvent.create({
-        progressedTime: Temporal.Duration.from("PT5M"),
-        duration: Temporal.Duration.from("PT20M"),
+      createTimerStartedEvent({ interval: "PT20M" }),
+      createTimerTickedEvent({
+        progressedTime: "PT5M",
+        duration: "PT20M",
       }),
     ].reduce(projectTimer, createTimer());
     const handler = GetCurrentIntervalQueryHandler.createNull({ state });
 
-    const result = await handler.handle(GetCurrentIntervalQuery.create());
+    const result = await handler.handle(createGetCurrentIntervalQuery());
 
     expect(result).toEqual(
-      GetCurrentIntervalQueryResult.create({
+      createGetCurrentIntervalQueryResult({
         isRunning: true,
-        elapsedTime: Temporal.Duration.from("PT5M"),
+        elapsedTime: "PT5M",
         progress: 0.25,
       }),
     );
@@ -62,42 +62,42 @@ describe("Get current interval", () => {
 
   it("should return elapsed result when timer elapsed ", async () => {
     const state = [
-      TimerStartedEvent.create({ interval: "PT20M" }),
-      TimerElapsedEvent.create({
-        timestamp: Temporal.Now.instant(),
-        duration: Temporal.Duration.from("PT20M"),
+      createTimerStartedEvent({ interval: "PT20M" }),
+      createTimerElapsedEvent({
+        timestamp: Temporal.Now.instant().toString(),
+        duration: "PT20M",
       }),
     ].reduce(projectTimer, createTimer());
     const handler = GetCurrentIntervalQueryHandler.createNull({ state });
 
-    const result = await handler.handle(GetCurrentIntervalQuery.create());
+    const result = await handler.handle(createGetCurrentIntervalQuery());
 
     expect(result).toEqual(
-      GetCurrentIntervalQueryResult.create({
+      createGetCurrentIntervalQueryResult({
         isRunning: true,
-        elapsedTime: Temporal.Duration.from("PT0S"),
+        elapsedTime: "PT0S",
         progress: 0,
       }),
     );
   });
 
-  it("should return stopped result when timer stipped ", async () => {
+  it("should return stopped result when timer stopped ", async () => {
     const state = [
-      TimerStartedEvent.create({ interval: "PT20M" }),
-      TimerTickedEvent.create({
-        progressedTime: Temporal.Duration.from("PT15M"),
-        duration: Temporal.Duration.from("PT20M"),
+      createTimerStartedEvent({ interval: "PT20M" }),
+      createTimerTickedEvent({
+        progressedTime: "PT15M",
+        duration: "PT20M",
       }),
-      TimerStoppedEvent.create(),
+      createTimerStoppedEvent(),
     ].reduce(projectTimer, createTimer());
     const handler = GetCurrentIntervalQueryHandler.createNull({ state });
 
-    const result = await handler.handle(GetCurrentIntervalQuery.create());
+    const result = await handler.handle(createGetCurrentIntervalQuery());
 
     expect(result).toEqual(
-      GetCurrentIntervalQueryResult.create({
+      createGetCurrentIntervalQueryResult({
         isRunning: false,
-        elapsedTime: Temporal.Duration.from("PT15M"),
+        elapsedTime: "PT15M",
         progress: 0.75,
       }),
     );

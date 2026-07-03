@@ -1,15 +1,16 @@
 // Copyright (c) 2026 Falko Schumann. All rights reserved. MIT license.
 
-import {
-  getCurrentInterval,
-  GetCurrentIntervalQuery,
-  GetCurrentIntervalQueryResult,
-} from "../../shared/domain/get_current_interval.query";
 import { State } from "@muspellheim/shared";
+
 import {
   createTimer,
   type TimerView,
 } from "../../shared/domain/timer.read_model";
+import {
+  getCurrentInterval,
+  type GetCurrentIntervalQuery,
+  type GetCurrentIntervalQueryResult,
+} from "../../shared/domain/get_current_interval.query";
 
 export class GetCurrentIntervalQueryHandler {
   static create({ view }: { view: State<TimerView> }) {
@@ -29,10 +30,7 @@ export class GetCurrentIntervalQueryHandler {
   async handle(
     query: GetCurrentIntervalQuery,
   ): Promise<GetCurrentIntervalQueryResult> {
-    query = GetCurrentIntervalQuery.create(query.data);
-    let view = this.#view.get();
-    view = getCurrentInterval(view, query);
-    this.#view.put(view);
-    return GetCurrentIntervalQueryResult.create(view);
+    const view = this.#view.get();
+    return getCurrentInterval(view, query);
   }
 }

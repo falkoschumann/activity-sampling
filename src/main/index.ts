@@ -33,6 +33,7 @@ import { StopTimerCommandHandler } from "./application/stop_timer.command_handle
 import { TickTimerCommandHandler } from "./application/tick_timer.command_handler";
 import { TimerProcessManager } from "./application/timer.process_manager";
 import { TimesheetExportEventHandler } from "./application/timesheet_exporter.event_handler";
+import { createStopTimerCommand } from "../shared/domain/timer/stop_timer.command";
 import type { TimerStartedEvent } from "../shared/domain/timer/timer_started.event";
 import type { TimerStoppedEvent } from "../shared/domain/timer/timer_stopped.event";
 import type { TimerTickedEvent } from "../shared/domain/timer/timer_ticked.event";
@@ -50,7 +51,6 @@ import {
   EVENT_CHANNEL,
   MESSAGE_CHANNEL,
 } from "../shared/infrastructure/channels";
-import { StopTimerCommand } from "../shared/domain/timer/stop_timer.command";
 
 const isProduction = app.isPackaged;
 
@@ -297,5 +297,5 @@ function createWindow() {
 }
 
 function shutdownApplication() {
-  void messageRouter.route(StopTimerCommand.create());
+  void messageRouter.route(createStopTimerCommand());
 }
