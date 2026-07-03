@@ -1,10 +1,10 @@
 // Copyright (c) 2026 Falko Schumann. All rights reserved. MIT license.
 
-export type HolidayState = Readonly<{
-  date: Temporal.PlainDate;
-  title: string;
-  duration?: Temporal.Duration;
-}>;
+export interface HolidayState {
+  readonly date: Temporal.PlainDate;
+  readonly title: string;
+  readonly duration?: Temporal.Duration;
+}
 
 export function createHoliday({
   date,
