@@ -5,12 +5,12 @@ export interface SettingsChangedEvent {
   readonly data: SettingsChangedEventData;
 }
 
-export interface SettingsChangedEventData {
-  readonly capacity: Temporal.DurationLike;
-  readonly categories: string[];
-  readonly firstName?: string;
-  readonly lastName?: string;
-}
+export type SettingsChangedEventData = Readonly<{
+  capacity: Temporal.DurationLike;
+  categories: string[];
+  firstName?: string;
+  lastName?: string;
+}>;
 
 export function createSettingsChangedEvent({
   capacity = "PT40H",

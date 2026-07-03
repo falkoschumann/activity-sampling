@@ -4,12 +4,22 @@ import { EventBus, Success } from "@muspellheim/shared";
 import { describe, expect, it } from "vitest";
 
 import { ExportTimesheetCommandHandler } from "../../../src/main/application/export_timesheet.command_handler";
-import { ExportTimesheetCommand } from "../../../src/shared/domain/activity/export_timesheet.command";
-import { TimesheetEntry } from "../../../src/shared/domain/timesheet_entry";
-import { TimesheetExportedEvent } from "../../../src/shared/domain/activity/timesheet_exported.event";
+import { createExportTimesheetCommand } from "../../../src/shared/domain/activity/export_timesheet.command";
+import { createTimesheetExportedEvent } from "../../../src/shared/domain/activity/timesheet_exported.event";
+import {
+  createSettings,
+  type SettingsState,
+} from "../../../src/shared/domain/settings/settings.aggregate";
 import { TimesheetData } from "../../../src/shared/domain/timesheet_data";
+import { TimesheetEntry } from "../../../src/shared/domain/timesheet_entry";
 import { SettingsProvider } from "../../../src/main/infrastructure/settings.provider";
-import { createTestSettings } from "../../../src/shared/domain/settings/settings.aggregate";
+
+const testSettings: SettingsState = {
+  capacity: "PT32H",
+  categories: ["", "Feature", "Rework", "Training"],
+  firstName: "John",
+  lastName: "Doe",
+};
 
 describe("Export timesheet", () => {
   describe("Export timesheet in Harvest format", () => {
@@ -17,7 +27,7 @@ describe("Export timesheet", () => {
       const { handler, eventBus } = configure();
 
       const result = await handler.handle(
-        ExportTimesheetCommand.create({
+        createExportTimesheetCommand({
           filename: "export/null-timesheets.csv",
           timesheets: [TimesheetEntry.createTestInstance()],
         }),
@@ -25,7 +35,7 @@ describe("Export timesheet", () => {
 
       expect(result).toEqual(new Success());
       expect(eventBus.getEvents()).toEqual([
-        TimesheetExportedEvent.create({
+        createTimesheetExportedEvent({
           filename: "export/null-timesheets.csv",
           timesheets: [TimesheetData.createTestInstance()],
         }),
@@ -37,7 +47,7 @@ describe("Export timesheet", () => {
 function configure() {
   const eventBus = new EventBus();
   const settingsProvider = SettingsProvider.createNull({
-    readFileResponses: [createTestSettings()],
+    readFileResponses: [createSettings(testSettings)],
   });
   const handler = ExportTimesheetCommandHandler.create({
     eventBus,

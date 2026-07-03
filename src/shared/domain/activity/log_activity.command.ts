@@ -10,15 +10,15 @@ export interface LogActivityCommand {
   readonly data: LogActivityData;
 }
 
-export interface LogActivityData {
-  readonly timestamp: Temporal.InstantLike;
-  readonly duration: Temporal.DurationLike;
-  readonly client: string;
-  readonly project: string;
-  readonly task: string;
-  readonly notes?: string;
-  readonly category?: string;
-}
+export type LogActivityData = Readonly<{
+  timestamp: Temporal.InstantLike;
+  duration: Temporal.DurationLike;
+  client: string;
+  project: string;
+  task: string;
+  notes?: string;
+  category?: string;
+}>;
 
 export function createLogActivityCommand({
   timestamp,

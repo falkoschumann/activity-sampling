@@ -1,43 +1,34 @@
 // Copyright (c) 2026 Falko Schumann. All rights reserved. MIT license.
 
 import type { SettingsState } from "../settings/settings.aggregate";
-import { TimesheetExportedEvent } from "./timesheet_exported.event";
+import {
+  createTimesheetExportedEvent,
+  type TimesheetExportedEvent,
+} from "./timesheet_exported.event";
 import { TimesheetData } from "../timesheet_data";
 import { TimesheetEntry } from "../timesheet_entry";
 
-export class ExportTimesheetCommand {
-  static create({
-    filename,
-    timesheets,
-  }: {
-    filename: string;
-    timesheets: TimesheetEntry[];
-  }) {
-    return new ExportTimesheetCommand(filename, timesheets);
-  }
+export interface ExportTimesheetCommand {
+  readonly type: "export-timesheet";
+  readonly data: ExportTimesheetCommandData;
+}
 
-  static createTestInstance({
-    filename = "test-export.csv",
-    timesheets = [TimesheetEntry.createTestInstance()],
-  }: {
-    filename?: string;
-    timesheets?: TimesheetEntry[];
-  } = {}) {
-    return ExportTimesheetCommand.create({
-      filename,
-      timesheets,
-    });
-  }
+export type ExportTimesheetCommandData = Readonly<{
+  filename: string;
+  timesheets: TimesheetEntry[];
+}>;
 
-  readonly type = "export-timesheet";
-  readonly data;
-
-  private constructor(filename: string, timesheets: TimesheetEntry[]) {
-    this.data = {
-      filename,
-      timesheets: timesheets.map(TimesheetEntry.create),
-    };
-  }
+export function createExportTimesheetCommand({
+  filename,
+  timesheets,
+}: {
+  filename: string;
+  timesheets: TimesheetEntry[];
+}): ExportTimesheetCommand {
+  return {
+    type: "export-timesheet",
+    data: { filename, timesheets },
+  };
 }
 
 export function exportTimesheet(
@@ -53,7 +44,7 @@ export function exportTimesheet(
     }),
   );
   return [
-    TimesheetExportedEvent.create({
+    createTimesheetExportedEvent({
       filename: command.data.filename,
       timesheets,
     }),

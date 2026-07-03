@@ -8,7 +8,7 @@ import {
 
 import {
   exportTimesheet,
-  ExportTimesheetCommand,
+  type ExportTimesheetCommand,
 } from "../../shared/domain/activity/export_timesheet.command";
 import type { SettingsProvider } from "../infrastructure/settings.provider";
 
@@ -32,7 +32,6 @@ export class ExportTimesheetCommandHandler {
   }
 
   async handle(command: ExportTimesheetCommand): Promise<CommandStatus> {
-    command = ExportTimesheetCommand.create(command.data);
     const settings = await this.#settingsProvider.load();
     const events = exportTimesheet(settings, command);
     events.forEach((event) => this.#eventBus.publish(event));

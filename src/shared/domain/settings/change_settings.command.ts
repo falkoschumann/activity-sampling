@@ -10,12 +10,12 @@ export interface ChangeSettingsCommand {
   readonly data: ChangeSettingsCommandData;
 }
 
-export interface ChangeSettingsCommandData {
-  readonly capacity: Temporal.DurationLike;
-  readonly categories: string[];
-  readonly firstName?: string;
-  readonly lastName?: string;
-}
+export type ChangeSettingsCommandData = Readonly<{
+  capacity: Temporal.DurationLike;
+  categories: string[];
+  firstName?: string;
+  lastName?: string;
+}>;
 
 export function createChangeSettingsCommand({
   capacity,

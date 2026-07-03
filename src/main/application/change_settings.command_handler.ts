@@ -19,8 +19,8 @@ export class ChangeSettingsCommandHandler {
     return new ChangeSettingsCommandHandler(eventBus, settingsProvider);
   }
 
-  #eventBus;
-  #settingsProvider;
+  readonly #eventBus;
+  readonly #settingsProvider;
 
   private constructor(eventBus: EventBus, settingsProvider: SettingsProvider) {
     this.#eventBus = eventBus;

@@ -2,21 +2,25 @@
 
 import type { TimesheetData } from "../timesheet_data";
 
-export class TimesheetExportedEvent {
-  static create({
-    filename,
-    timesheets,
-  }: {
-    filename: string;
-    timesheets: TimesheetData[];
-  }) {
-    return new TimesheetExportedEvent(filename, timesheets);
-  }
+export interface TimesheetExportedEvent {
+  readonly type: "timesheet-exported";
+  readonly data: TimesheetExportedEventData;
+}
 
-  readonly type = "timesheet-exported";
-  readonly data;
+export type TimesheetExportedEventData = Readonly<{
+  filename: string;
+  timesheets: TimesheetData[];
+}>;
 
-  private constructor(filename: string, timesheets: TimesheetData[]) {
-    this.data = { filename, timesheets };
-  }
+export function createTimesheetExportedEvent({
+  filename,
+  timesheets,
+}: {
+  filename: string;
+  timesheets: TimesheetData[];
+}): TimesheetExportedEvent {
+  return {
+    type: "timesheet-exported",
+    data: { filename, timesheets },
+  };
 }
