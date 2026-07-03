@@ -1,9 +1,9 @@
 // Copyright (c) 2026 Falko Schumann. All rights reserved. MIT license.
 
-export type VacationState = Readonly<{
-  date: Temporal.PlainDate;
-  duration?: Temporal.Duration;
-}>;
+export interface VacationState {
+  readonly date: Temporal.PlainDate;
+  readonly duration?: Temporal.Duration;
+}
 
 export function createVacation({
   date,

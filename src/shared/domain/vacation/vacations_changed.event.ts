@@ -2,14 +2,22 @@
 
 import type { VacationState } from "./vacation.aggregate";
 
-export class VacationsChangedEvent {
-  static create({ vacations }: { vacations: VacationState[] }) {
-    return new VacationsChangedEvent(vacations);
-  }
+export interface VacationsChangedEvent {
+  readonly type: "vacations-changed";
+  readonly data: VacationsChangedEventData;
+}
 
-  readonly vacations: VacationState[];
+export type VacationsChangedEventData = Readonly<{
+  vacations: VacationState[];
+}>;
 
-  private constructor(vacations: VacationState[]) {
-    this.vacations = vacations;
-  }
+export function createVacationsChangedEvent({
+  vacations,
+}: {
+  vacations: VacationState[];
+}): VacationsChangedEvent {
+  return {
+    type: "vacations-changed",
+    data: { vacations },
+  };
 }
