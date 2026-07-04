@@ -12,7 +12,10 @@ import type { Options as ParseOptions } from "csv-parse";
 import type { Options as StringifyOptions } from "csv-stringify";
 import { stringify as syncStringify } from "csv-stringify/sync";
 
-import { ActivityLoggedEvent } from "../../shared/domain/activity/activity_logged.event";
+import {
+  type ActivityLoggedEvent,
+  createActivityLoggedEvent,
+} from "../../shared/domain/activity/activity_logged.event";
 
 export class EventStore extends EventTarget {
   static create({
@@ -72,7 +75,7 @@ export class EventStore extends EventTarget {
       const parser = file.createReadStream().pipe(parse(PARSE_CONFIGURATION));
       for await (const record of parser) {
         validateRecord(record);
-        const event = ActivityLoggedEvent.create(record);
+        const event = createActivityLoggedEvent(record);
         if (
           from != null &&
           Temporal.Instant.compare(event.data.timestamp, from) < 0

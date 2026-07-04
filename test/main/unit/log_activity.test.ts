@@ -13,18 +13,18 @@ import {
 import { EventStore } from "../../../src/main/infrastructure/event_store";
 
 const minimalActivity: ActivityLoggedEventData = {
-  timestamp: "2026-01-01T12:00:00Z",
-  duration: "PT1H",
-  client: "my client",
-  project: "my project",
-  task: "my task",
+  timestamp: "2025-08-14T11:00:00Z",
+  duration: "PT30M",
+  client: "Test client",
+  project: "Test project",
+  task: "Test task",
   notification: "notifier",
 };
 
 const fullActivity: ActivityLoggedEventData = {
   ...minimalActivity,
-  notes: "my notes",
-  category: "my category",
+  notes: "test notes",
+  category: "test category",
 };
 
 describe("Log activity", () => {

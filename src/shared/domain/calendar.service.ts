@@ -2,7 +2,6 @@
 
 import type { HolidayState } from "./holiday/holiday.aggregate";
 import type { VacationState } from "./vacation/vacation.aggregate";
-import { normalizeDuration } from "./temporal";
 
 export function countWorkingHours(
   from: Temporal.PlainDateLike,
@@ -44,7 +43,7 @@ export function countWorkingHours(
     }
     date = date.add({ days: 1 });
   }
-  return normalizeDuration(count);
+  return count.round({ smallestUnit: "minute", largestUnit: "hours" });
 }
 
 function isBusinessDay(

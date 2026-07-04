@@ -6,7 +6,10 @@ import fsPromise from "node:fs/promises";
 import { describe, expect, it } from "vitest";
 
 import { EventStore } from "../../../src/main/infrastructure/event_store";
-import { ActivityLoggedEvent } from "../../../src/shared/domain/activity/activity_logged.event";
+import {
+  type ActivityLoggedEventData,
+  createActivityLoggedEvent,
+} from "../../../src/shared/domain/activity/activity_logged.event";
 
 const TEST_FILE = path.resolve(
   import.meta.dirname,
@@ -35,15 +38,22 @@ const CORRUPT_FILE = path.resolve(
   "../data/events/corrupt.csv",
 );
 
+const testLoggedEvent: ActivityLoggedEventData = {
+  timestamp: "2025-08-14T11:00:00Z",
+  duration: "PT30M",
+  client: "Test client",
+  project: "Test project",
+  task: "Test task",
+  notification: "notifier",
+};
+
 describe("Event store", () => {
   it("should replay minimal event", async () => {
     const store = EventStore.create({ filename: MINIMAL_FILE });
 
     const events = await Array.fromAsync(store.replay());
 
-    expect(events).toEqual<ActivityLoggedEvent[]>([
-      ActivityLoggedEvent.createTestInstance(),
-    ]);
+    expect(events).toEqual([createActivityLoggedEvent(testLoggedEvent)]);
   });
 
   it("should replay full event", async () => {
@@ -51,8 +61,9 @@ describe("Event store", () => {
 
     const events = await Array.fromAsync(store.replay());
 
-    expect(events).toEqual<ActivityLoggedEvent[]>([
-      ActivityLoggedEvent.createTestInstance({
+    expect(events).toEqual([
+      createActivityLoggedEvent({
+        ...testLoggedEvent,
         notes: "Test notes",
         category: "Test category",
       }),
@@ -64,17 +75,21 @@ describe("Event store", () => {
 
     const events = await Array.fromAsync(store.replay());
 
-    expect(events).toEqual<ActivityLoggedEvent[]>([
-      ActivityLoggedEvent.createTestInstance({
+    expect(events).toEqual([
+      createActivityLoggedEvent({
+        ...testLoggedEvent,
         timestamp: "2026-06-15T10:00:00Z",
       }),
-      ActivityLoggedEvent.createTestInstance({
+      createActivityLoggedEvent({
+        ...testLoggedEvent,
         timestamp: "2026-06-16T10:00:00Z",
       }),
-      ActivityLoggedEvent.createTestInstance({
+      createActivityLoggedEvent({
+        ...testLoggedEvent,
         timestamp: "2026-06-18T10:00:00Z",
       }),
-      ActivityLoggedEvent.createTestInstance({
+      createActivityLoggedEvent({
+        ...testLoggedEvent,
         timestamp: "2026-06-19T10:00:00Z",
       }),
     ]);
@@ -87,14 +102,17 @@ describe("Event store", () => {
       store.replay({ from: "2026-06-16T10:00:00Z" }),
     );
 
-    expect(events).toEqual<ActivityLoggedEvent[]>([
-      ActivityLoggedEvent.createTestInstance({
+    expect(events).toEqual([
+      createActivityLoggedEvent({
+        ...testLoggedEvent,
         timestamp: "2026-06-16T10:00:00Z",
       }),
-      ActivityLoggedEvent.createTestInstance({
+      createActivityLoggedEvent({
+        ...testLoggedEvent,
         timestamp: "2026-06-18T10:00:00Z",
       }),
-      ActivityLoggedEvent.createTestInstance({
+      createActivityLoggedEvent({
+        ...testLoggedEvent,
         timestamp: "2026-06-19T10:00:00Z",
       }),
     ]);
@@ -107,14 +125,17 @@ describe("Event store", () => {
       store.replay({ to: "2026-06-18T10:00:00Z" }),
     );
 
-    expect(events).toEqual<ActivityLoggedEvent[]>([
-      ActivityLoggedEvent.createTestInstance({
+    expect(events).toEqual([
+      createActivityLoggedEvent({
+        ...testLoggedEvent,
         timestamp: "2026-06-15T10:00:00Z",
       }),
-      ActivityLoggedEvent.createTestInstance({
+      createActivityLoggedEvent({
+        ...testLoggedEvent,
         timestamp: "2026-06-16T10:00:00Z",
       }),
-      ActivityLoggedEvent.createTestInstance({
+      createActivityLoggedEvent({
+        ...testLoggedEvent,
         timestamp: "2026-06-18T10:00:00Z",
       }),
     ]);
@@ -130,11 +151,13 @@ describe("Event store", () => {
       }),
     );
 
-    expect(events).toEqual<ActivityLoggedEvent[]>([
-      ActivityLoggedEvent.createTestInstance({
+    expect(events).toEqual([
+      createActivityLoggedEvent({
+        ...testLoggedEvent,
         timestamp: "2026-06-16T10:00:00Z",
       }),
-      ActivityLoggedEvent.createTestInstance({
+      createActivityLoggedEvent({
+        ...testLoggedEvent,
         timestamp: "2026-06-18T10:00:00Z",
       }),
     ]);
@@ -145,7 +168,7 @@ describe("Event store", () => {
 
     const events = await Array.fromAsync(store.replay());
 
-    expect(events).toEqual<ActivityLoggedEvent[]>([]);
+    expect(events).toEqual([]);
   });
 
   it("should throw an error when file is corrupt", async () => {
@@ -160,12 +183,10 @@ describe("Event store", () => {
     await fsPromise.rm(TEST_FILE, { force: true });
     const store = EventStore.create({ filename: TEST_FILE });
 
-    await store.record(ActivityLoggedEvent.createTestInstance());
+    await store.record(createActivityLoggedEvent(testLoggedEvent));
     const events = await Array.fromAsync(store.replay());
 
-    expect(events).toEqual<ActivityLoggedEvent[]>([
-      ActivityLoggedEvent.createTestInstance(),
-    ]);
+    expect(events).toEqual([createActivityLoggedEvent(testLoggedEvent)]);
   });
 
   describe("Nullable", () => {
@@ -173,23 +194,21 @@ describe("Event store", () => {
       const store = EventStore.createNull();
       const recordEvents = store.trackRecorded();
 
-      await store.record(ActivityLoggedEvent.createTestInstance());
+      await store.record(createActivityLoggedEvent(testLoggedEvent));
 
-      expect(recordEvents.data).toEqual<ActivityLoggedEvent[]>([
-        ActivityLoggedEvent.createTestInstance(),
+      expect(recordEvents.data).toEqual([
+        createActivityLoggedEvent(testLoggedEvent),
       ]);
     });
 
     it("should replay events", async () => {
       const store = EventStore.createNull({
-        events: [ActivityLoggedEvent.createTestInstance()],
+        events: [createActivityLoggedEvent(testLoggedEvent)],
       });
 
       const events = await Array.fromAsync(store.replay());
 
-      expect(events).toEqual<ActivityLoggedEvent[]>([
-        ActivityLoggedEvent.createTestInstance(),
-      ]);
+      expect(events).toEqual([createActivityLoggedEvent(testLoggedEvent)]);
     });
   });
 });

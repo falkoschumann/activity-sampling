@@ -1,36 +1,36 @@
 // Copyright (c) 2026 Falko Schumann. All rights reserved. MIT license.
 
-import { HolidaysChangedEvent } from "./holiday/holidays_changed.event";
+import type { ActivityLoggedEvent } from "./activity/activity_logged.event";
 import type { HolidayState } from "./holiday/holiday.aggregate";
-import { ActivityLoggedEvent } from "./activity/activity_logged.event";
-import { SettingsChangedEvent } from "./settings/settings_changed.event";
-import { VacationsChangedEvent } from "./vacation/vacations_changed.event";
+import type { HolidaysChangedEvent } from "./holiday/holidays_changed.event";
+import type { SettingsChangedEvent } from "./settings/settings_changed.event";
 import type { VacationState } from "./vacation/vacation.aggregate";
+import type { VacationsChangedEvent } from "./vacation/vacations_changed.event";
 
-export type TimesheetView = {
-  entries: TimesheetViewEntry[];
-  holidays: HolidayState[];
-  vacations: VacationState[];
-  capacity: Temporal.Duration;
-  categories: string[];
-};
+export interface TimesheetView {
+  readonly entries: TimesheetViewEntry[];
+  readonly holidays: HolidayState[];
+  readonly vacations: VacationState[];
+  readonly capacity: Temporal.DurationLike;
+  readonly categories: string[];
+}
 
-export type TimesheetViewEntry = Readonly<{
-  timestamp: Temporal.PlainDateTime;
-  duration: Temporal.Duration;
-  client: string;
-  project: string;
-  task: string;
-  notes?: string;
-  category?: string;
-}>;
+export interface TimesheetViewEntry {
+  readonly timestamp: Temporal.PlainDateTimeLike;
+  readonly duration: Temporal.DurationLike;
+  readonly client: string;
+  readonly project: string;
+  readonly task: string;
+  readonly notes?: string;
+  readonly category?: string;
+}
 
 export function createTimesheet(): TimesheetView {
   return {
     entries: [],
     holidays: [],
     vacations: [],
-    capacity: Temporal.Duration.from("PT40H"),
+    capacity: "PT40H",
     categories: [],
   };
 }
@@ -44,34 +44,37 @@ export function projectTimesheet(
     | VacationsChangedEvent,
   { timeZone }: { timeZone: Temporal.TimeZoneLike },
 ): TimesheetView {
-  if (event instanceof ActivityLoggedEvent) {
-    const newEntry: TimesheetViewEntry = {
-      timestamp: event.data.timestamp
-        .toZonedDateTimeISO(timeZone)
-        .toPlainDateTime(),
-      duration: event.data.duration,
-      client: event.data.client,
-      project: event.data.project,
-      task: event.data.task,
-      notes: event.data.notes,
-      category: event.data.category,
-    };
-    const entries = [...view.entries, newEntry];
-    entries.sort((a, b) =>
-      Temporal.PlainDateTime.compare(a.timestamp, b.timestamp),
-    );
-    return { ...view, entries };
-  } else if (event instanceof HolidaysChangedEvent) {
-    return { ...view, holidays: event.holidays };
-  } else if (event instanceof VacationsChangedEvent) {
-    return { ...view, vacations: event.vacations };
-  } else if (event instanceof SettingsChangedEvent) {
-    return {
-      ...view,
-      capacity: event.data.capacity,
-      categories: event.data.categories,
-    };
-  } else {
-    return view;
+  switch (event.type) {
+    case "activity-logged": {
+      const newEntry: TimesheetViewEntry = {
+        timestamp: Temporal.Instant.from(event.data.timestamp)
+          .toZonedDateTimeISO(timeZone)
+          .toPlainDateTime()
+          .toString(),
+        duration: event.data.duration,
+        client: event.data.client,
+        project: event.data.project,
+        task: event.data.task,
+        notes: event.data.notes,
+        category: event.data.category,
+      };
+      const entries = [...view.entries, newEntry];
+      entries.sort((a, b) =>
+        Temporal.PlainDateTime.compare(a.timestamp, b.timestamp),
+      );
+      return { ...view, entries };
+    }
+    case "holidays-changed":
+      return { ...view, holidays: event.data.holidays };
+    case "change-settings":
+      return {
+        ...view,
+        capacity: event.data.capacity,
+        categories: event.data.categories,
+      };
+    case "vacations-changed":
+      return { ...view, vacations: event.data.vacations };
+    default:
+      return view;
   }
 }

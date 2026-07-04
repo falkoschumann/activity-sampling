@@ -5,7 +5,7 @@ import {
   GetRecentActivitiesQuery,
   GetRecentActivitiesQueryResult,
 } from "../../shared/domain/get_recent_activities.query";
-import { SettingsChangedEvent } from "../../shared/domain/settings/settings_changed.event";
+import { createSettingsChangedEvent } from "../../shared/domain/settings/settings_changed.event";
 import {
   createTimesheet,
   projectTimesheet,
@@ -38,13 +38,12 @@ export class GetRecentActivitiesQueryHandler {
   async handle(
     query: GetRecentActivitiesQuery,
   ): Promise<GetRecentActivitiesQueryResult> {
-    query = GetRecentActivitiesQuery.create(query.data);
     const { today, timeZone } = query.data;
 
     const settings = await this.#settingsProvider.load();
     let view = projectTimesheet(
       createTimesheet(),
-      SettingsChangedEvent.create(settings),
+      createSettingsChangedEvent(settings),
       { timeZone },
     );
 

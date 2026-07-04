@@ -6,12 +6,12 @@ import {
 } from "../../shared/domain/timesheet.read_model";
 import {
   getTimesheet,
-  GetTimesheetQuery,
+  type GetTimesheetQuery,
   type GetTimesheetQueryResult,
 } from "../../shared/domain/get_timesheet.query";
-import { SettingsChangedEvent } from "../../shared/domain/settings/settings_changed.event";
-import { HolidaysChangedEvent } from "../../shared/domain/holiday/holidays_changed.event";
-import { VacationsChangedEvent } from "../../shared/domain/vacation/vacations_changed.event";
+import { createSettingsChangedEvent } from "../../shared/domain/settings/settings_changed.event";
+import { createHolidaysChangedEvent } from "../../shared/domain/holiday/holidays_changed.event";
+import { createVacationsChangedEvent } from "../../shared/domain/vacation/vacations_changed.event";
 import type { EventStore } from "../infrastructure/event_store";
 import { HolidayRepository } from "../infrastructure/holiday.repository";
 import type { SettingsProvider } from "../infrastructure/settings.provider";
@@ -55,13 +55,12 @@ export class GetTimesheetQueryHandler {
   }
 
   async handle(query: GetTimesheetQuery): Promise<GetTimesheetQueryResult> {
-    query = GetTimesheetQuery.create(query.data);
     const { from: fromDate, to: toDate, timeZone } = query.data;
 
     const settings = await this.#settingsProvider.load();
     let readModel = projectTimesheet(
       createTimesheet(),
-      SettingsChangedEvent.create(settings),
+      createSettingsChangedEvent(settings),
       { timeZone },
     );
 
@@ -71,7 +70,7 @@ export class GetTimesheetQueryHandler {
     );
     readModel = projectTimesheet(
       readModel,
-      HolidaysChangedEvent.create({ holidays }),
+      createHolidaysChangedEvent({ holidays }),
       { timeZone },
     );
 
@@ -81,12 +80,17 @@ export class GetTimesheetQueryHandler {
     );
     readModel = projectTimesheet(
       readModel,
-      VacationsChangedEvent.create({ vacations }),
+      createVacationsChangedEvent({ vacations }),
       { timeZone },
     );
 
-    const from = fromDate.toZonedDateTime(timeZone).startOfDay();
-    const to = toDate.add("P1D").toZonedDateTime(timeZone).startOfDay();
+    const from = Temporal.PlainDate.from(fromDate)
+      .toZonedDateTime(timeZone)
+      .startOfDay();
+    const to = Temporal.PlainDate.from(toDate)
+      .add("P1D")
+      .toZonedDateTime(timeZone)
+      .startOfDay();
     for await (const event of this.#eventStore.replay({ from, to })) {
       readModel = projectTimesheet(readModel, event, { timeZone });
     }

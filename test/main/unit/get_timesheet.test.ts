@@ -1,6 +1,5 @@
 // Copyright (c) 2026 Falko Schumann. All rights reserved. MIT license.
 
-import { Temporal } from "@js-temporal/polyfill";
 import { describe, expect, it } from "vitest";
 
 import { GetTimesheetQueryHandler } from "../../../src/main/application/get_timesheet.query_handler";
@@ -8,7 +7,11 @@ import {
   createHoliday,
   type HolidayState,
 } from "../../../src/shared/domain/holiday/holiday.aggregate";
-import { ActivityLoggedEvent } from "../../../src/shared/domain/activity/activity_logged.event";
+import {
+  type ActivityLoggedEvent,
+  type ActivityLoggedEventData,
+  createActivityLoggedEvent,
+} from "../../../src/shared/domain/activity/activity_logged.event";
 import {
   createVacation,
   type VacationState,
@@ -18,15 +21,35 @@ import {
   type SettingsState,
 } from "../../../src/shared/domain/settings/settings.aggregate";
 import {
-  GetTimesheetQuery,
-  GetTimesheetQueryResult,
+  createGetTimesheetQuery,
+  createGetTimesheetQueryResult,
 } from "../../../src/shared/domain/get_timesheet.query";
-import { Capacity } from "../../../src/shared/domain/capacity";
-import { TimesheetEntry } from "../../../src/shared/domain/timesheet_entry";
+import { createCapacity } from "../../../src/shared/domain/capacity.value_object";
+import {
+  createTimesheetEntry,
+  type TimesheetEntry,
+} from "../../../src/shared/domain/timesheet_entry.value_object";
 import { EventStore } from "../../../src/main/infrastructure/event_store";
 import { HolidayRepository } from "../../../src/main/infrastructure/holiday.repository";
 import { VacationRepository } from "../../../src/main/infrastructure/vacation.repository";
 import { SettingsProvider } from "../../../src/main/infrastructure/settings.provider";
+
+const testLoggedEvent: ActivityLoggedEventData = {
+  timestamp: "2025-08-14T11:00:00Z",
+  duration: "PT30M",
+  client: "Test client",
+  project: "Test project",
+  task: "Test task",
+  notification: "notifier",
+};
+
+const testTimesheetEntry: TimesheetEntry = {
+  date: "2025-06-04",
+  client: "Test client",
+  project: "Test project",
+  task: "Test task",
+  hours: "PT2H",
+};
 
 describe("Get timesheet", () => {
   describe("Summarize hours worked on tasks", () => {
@@ -38,7 +61,7 @@ describe("Get timesheet", () => {
       });
 
       const result = await handler.handle(
-        GetTimesheetQuery.create({
+        createGetTimesheetQuery({
           from: "2025-09-15",
           to: "2025-09-21",
           today: "2025-09-19",
@@ -46,10 +69,10 @@ describe("Get timesheet", () => {
       );
 
       expect(result).toEqual(
-        GetTimesheetQueryResult.create({
+        createGetTimesheetQueryResult({
           entries: [],
           totalHours: "PT0S",
-          capacity: Capacity.create({
+          capacity: createCapacity({
             hours: "PT40H",
             offset: "-PT40H",
           }),
@@ -61,43 +84,53 @@ describe("Get timesheet", () => {
       const { handler } = configure({
         events: [
           // last sunday, excluded because last week
-          ActivityLoggedEvent.createTestInstance({
+          createActivityLoggedEvent({
+            ...testLoggedEvent,
             timestamp: "2025-06-01T10:00:00Z",
           }),
           // monday, same task
-          ActivityLoggedEvent.createTestInstance({
+          createActivityLoggedEvent({
+            ...testLoggedEvent,
             timestamp: "2025-06-02T10:00:00Z",
           }),
-          ActivityLoggedEvent.createTestInstance({
+          createActivityLoggedEvent({
+            ...testLoggedEvent,
             timestamp: "2025-06-02T10:30:00Z",
           }),
           // tuesday, different tasks
-          ActivityLoggedEvent.createTestInstance({
+          createActivityLoggedEvent({
+            ...testLoggedEvent,
             timestamp: "2025-06-03T10:00:00Z",
           }),
-          ActivityLoggedEvent.createTestInstance({
+          createActivityLoggedEvent({
+            ...testLoggedEvent,
             timestamp: "2025-06-03T10:30:00Z",
             task: "Other task",
           }),
           // wednesday, different projects
-          ActivityLoggedEvent.createTestInstance({
+          createActivityLoggedEvent({
+            ...testLoggedEvent,
             timestamp: "2025-06-04T10:00:00Z",
           }),
-          ActivityLoggedEvent.createTestInstance({
+          createActivityLoggedEvent({
+            ...testLoggedEvent,
             timestamp: "2025-06-04T10:30:00Z",
             project: "Other project",
           }),
           // thursday, different clients
-          ActivityLoggedEvent.createTestInstance({
+          createActivityLoggedEvent({
+            ...testLoggedEvent,
             timestamp: "2025-06-05T10:00:00Z",
           }),
-          ActivityLoggedEvent.createTestInstance({
+          createActivityLoggedEvent({
+            ...testLoggedEvent,
             timestamp: "2025-06-05T10:30:00Z",
             client: "Other client",
           }),
           // friday to sunday, no activities logged
           // next monday, excluded because next week
-          ActivityLoggedEvent.createTestInstance({
+          createActivityLoggedEvent({
+            ...testLoggedEvent,
             timestamp: "2025-06-09T10:00:00Z",
           }),
         ],
@@ -106,7 +139,7 @@ describe("Get timesheet", () => {
       });
 
       const result = await handler.handle(
-        GetTimesheetQuery.create({
+        createGetTimesheetQuery({
           from: "2025-06-02",
           to: "2025-06-08",
           today: "2025-11-19",
@@ -114,34 +147,41 @@ describe("Get timesheet", () => {
       );
 
       expect(result.entries).toEqual<TimesheetEntry[]>([
-        TimesheetEntry.createTestInstance({
+        createTimesheetEntry({
+          ...testTimesheetEntry,
           date: "2025-06-02",
           hours: "PT1H",
         }),
-        TimesheetEntry.createTestInstance({
+        createTimesheetEntry({
+          ...testTimesheetEntry,
           date: "2025-06-03",
           task: "Other task",
           hours: "PT30M",
         }),
-        TimesheetEntry.createTestInstance({
+        createTimesheetEntry({
+          ...testTimesheetEntry,
           date: "2025-06-03",
           hours: "PT30M",
         }),
-        TimesheetEntry.createTestInstance({
+        createTimesheetEntry({
+          ...testTimesheetEntry,
           date: "2025-06-04",
           project: "Other project",
           hours: "PT30M",
         }),
-        TimesheetEntry.createTestInstance({
+        createTimesheetEntry({
+          ...testTimesheetEntry,
           date: "2025-06-04",
           hours: "PT30M",
         }),
-        TimesheetEntry.createTestInstance({
+        createTimesheetEntry({
+          ...testTimesheetEntry,
           date: "2025-06-05",
           client: "Other client",
           hours: "PT30M",
         }),
-        TimesheetEntry.createTestInstance({
+        createTimesheetEntry({
+          ...testTimesheetEntry,
           date: "2025-06-05",
           hours: "PT30M",
         }),
@@ -153,13 +193,16 @@ describe("Get timesheet", () => {
     it("should summarize the total hours worked", async () => {
       const { handler } = configure({
         events: [
-          ActivityLoggedEvent.createTestInstance({
+          createActivityLoggedEvent({
+            ...testLoggedEvent,
             timestamp: "2025-06-02T10:00:00Z",
           }),
-          ActivityLoggedEvent.createTestInstance({
+          createActivityLoggedEvent({
+            ...testLoggedEvent,
             timestamp: "2025-06-02T10:30:00Z",
           }),
-          ActivityLoggedEvent.createTestInstance({
+          createActivityLoggedEvent({
+            ...testLoggedEvent,
             timestamp: "2025-06-02T11:00:00Z",
           }),
         ],
@@ -168,14 +211,14 @@ describe("Get timesheet", () => {
       });
 
       const result = await handler.handle(
-        GetTimesheetQuery.create({
+        createGetTimesheetQuery({
           from: "2025-06-02",
           to: "2025-06-08",
           today: "2025-11-19",
         }),
       );
 
-      expect(result.totalHours).toEqual(Temporal.Duration.from("PT1H30M"));
+      expect(result.totalHours).toEqual("PT1H30M");
     });
   });
 
@@ -183,19 +226,23 @@ describe("Get timesheet", () => {
     it("should return timesheet", async () => {
       const { handler } = configure({
         events: [
-          ActivityLoggedEvent.createTestInstance({
+          createActivityLoggedEvent({
+            ...testLoggedEvent,
             timestamp: "2025-06-08T15:00:00Z",
             duration: "PT8H",
           }),
-          ActivityLoggedEvent.createTestInstance({
+          createActivityLoggedEvent({
+            ...testLoggedEvent,
             timestamp: "2025-06-09T15:00:00Z",
             duration: "PT8H",
           }),
-          ActivityLoggedEvent.createTestInstance({
+          createActivityLoggedEvent({
+            ...testLoggedEvent,
             timestamp: "2025-06-15T15:00:00Z",
             duration: "PT8H",
           }),
-          ActivityLoggedEvent.createTestInstance({
+          createActivityLoggedEvent({
+            ...testLoggedEvent,
             timestamp: "2025-06-16T15:00:00Z",
             duration: "PT8H",
           }),
@@ -207,7 +254,7 @@ describe("Get timesheet", () => {
       });
 
       const result = await handler.handle(
-        GetTimesheetQuery.create({
+        createGetTimesheetQuery({
           from: "2025-06-09",
           to: "2025-06-15",
           today: "2025-06-11",
@@ -215,21 +262,23 @@ describe("Get timesheet", () => {
       );
 
       expect(result).toEqual(
-        GetTimesheetQueryResult.create({
+        createGetTimesheetQueryResult({
           entries: [
-            TimesheetEntry.createTestInstance({
+            createTimesheetEntry({
+              ...testTimesheetEntry,
               date: "2025-06-09",
               hours: "PT8H",
             }),
-            TimesheetEntry.createTestInstance({
+            createTimesheetEntry({
+              ...testTimesheetEntry,
               date: "2025-06-15",
               hours: "PT8H",
             }),
           ],
           totalHours: "PT16H",
-          capacity: Capacity.create({
+          capacity: createCapacity({
             hours: "PT32H",
-            offset: "PT0H",
+            offset: "PT0S",
           }),
         }),
       );
@@ -241,19 +290,23 @@ describe("Get timesheet", () => {
       const { handler } = configure({
         events: [
           // query a week on thursday
-          ActivityLoggedEvent.createTestInstance({
+          createActivityLoggedEvent({
+            ...testLoggedEvent,
             timestamp: "2025-06-09T14:00:00Z",
             duration: "PT8H",
           }),
-          ActivityLoggedEvent.createTestInstance({
+          createActivityLoggedEvent({
+            ...testLoggedEvent,
             timestamp: "2025-06-10T14:00:00Z",
             duration: "PT8H",
           }),
-          ActivityLoggedEvent.createTestInstance({
+          createActivityLoggedEvent({
+            ...testLoggedEvent,
             timestamp: "2025-06-11T14:00:00Z",
             duration: "PT8H",
           }),
-          ActivityLoggedEvent.createTestInstance({
+          createActivityLoggedEvent({
+            ...testLoggedEvent,
             timestamp: "2025-06-12T14:00:00Z",
             duration: "PT8H",
           }),
@@ -263,35 +316,39 @@ describe("Get timesheet", () => {
       });
 
       const result = await handler.handle(
-        GetTimesheetQuery.create({
+        createGetTimesheetQuery({
           from: "2025-06-09",
           to: "2025-06-15",
           today: "2025-06-12",
         }),
       );
 
-      expect(result.totalHours).toEqual(Temporal.Duration.from("PT32H"));
+      expect(result.totalHours).toEqual("PT32H");
       expect(result.capacity).toEqual(
-        Capacity.create({ hours: "PT40H", offset: "PT0S" }),
+        createCapacity({ hours: "PT40H", offset: "PT0S" }),
       );
     });
 
     it("should return a negative offset when hours is behind of the capacity", async () => {
       const { handler } = configure({
         events: [
-          ActivityLoggedEvent.createTestInstance({
+          createActivityLoggedEvent({
+            ...testLoggedEvent,
             timestamp: "2025-06-09T14:00:00Z",
             duration: "PT8H",
           }),
-          ActivityLoggedEvent.createTestInstance({
+          createActivityLoggedEvent({
+            ...testLoggedEvent,
             timestamp: "2025-06-10T14:00:00Z",
             duration: "PT6H",
           }),
-          ActivityLoggedEvent.createTestInstance({
+          createActivityLoggedEvent({
+            ...testLoggedEvent,
             timestamp: "2025-06-11T14:00:00Z",
             duration: "PT6H",
           }),
-          ActivityLoggedEvent.createTestInstance({
+          createActivityLoggedEvent({
+            ...testLoggedEvent,
             timestamp: "2025-06-12T14:00:00Z",
             duration: "PT6H",
           }),
@@ -301,7 +358,7 @@ describe("Get timesheet", () => {
       });
 
       const result = await handler.handle(
-        GetTimesheetQuery.create({
+        createGetTimesheetQuery({
           from: "2025-06-09",
           to: "2025-06-15",
           today: "2025-06-12",
@@ -309,26 +366,30 @@ describe("Get timesheet", () => {
       );
 
       expect(result.capacity).toEqual(
-        Capacity.create({ hours: "PT40H", offset: "-PT6H" }),
+        createCapacity({ hours: "PT40H", offset: "-PT6H" }),
       );
     });
 
     it("should return a positive offset when hours is ahead of the capacity", async () => {
       const { handler } = configure({
         events: [
-          ActivityLoggedEvent.createTestInstance({
+          createActivityLoggedEvent({
+            ...testLoggedEvent,
             timestamp: "2025-06-09T14:00:00Z",
             duration: "PT8H",
           }),
-          ActivityLoggedEvent.createTestInstance({
+          createActivityLoggedEvent({
+            ...testLoggedEvent,
             timestamp: "2025-06-10T14:00:00Z",
             duration: "PT10H",
           }),
-          ActivityLoggedEvent.createTestInstance({
+          createActivityLoggedEvent({
+            ...testLoggedEvent,
             timestamp: "2025-06-11T14:00:00Z",
             duration: "PT10H",
           }),
-          ActivityLoggedEvent.createTestInstance({
+          createActivityLoggedEvent({
+            ...testLoggedEvent,
             timestamp: "2025-06-12T14:00:00Z",
             duration: "PT10H",
           }),
@@ -338,7 +399,7 @@ describe("Get timesheet", () => {
       });
 
       const result = await handler.handle(
-        GetTimesheetQuery.create({
+        createGetTimesheetQuery({
           from: "2025-06-09",
           to: "2025-06-15",
           today: "2025-06-12",
@@ -346,7 +407,7 @@ describe("Get timesheet", () => {
       );
 
       expect(result.capacity).toEqual(
-        Capacity.create({ hours: "PT40H", offset: "PT6H" }),
+        createCapacity({ hours: "PT40H", offset: "PT6H" }),
       );
     });
 
@@ -354,19 +415,23 @@ describe("Get timesheet", () => {
       const { handler } = configure({
         events: [
           // query a week on thursday
-          ActivityLoggedEvent.createTestInstance({
+          createActivityLoggedEvent({
+            ...testLoggedEvent,
             timestamp: "2025-06-09T14:00:00Z",
             duration: "PT8H",
           }),
-          ActivityLoggedEvent.createTestInstance({
+          createActivityLoggedEvent({
+            ...testLoggedEvent,
             timestamp: "2025-06-10T14:00:00Z",
             duration: "PT8H",
           }),
-          ActivityLoggedEvent.createTestInstance({
+          createActivityLoggedEvent({
+            ...testLoggedEvent,
             timestamp: "2025-06-11T14:00:00Z",
             duration: "PT8H",
           }),
-          ActivityLoggedEvent.createTestInstance({
+          createActivityLoggedEvent({
+            ...testLoggedEvent,
             timestamp: "2025-06-12T14:00:00Z",
             duration: "PT8H",
           }),
@@ -376,16 +441,16 @@ describe("Get timesheet", () => {
       });
 
       const result = await handler.handle(
-        GetTimesheetQuery.create({
+        createGetTimesheetQuery({
           from: "2025-06-09",
           to: "2025-06-15",
           today: "2025-06-03",
         }),
       );
 
-      expect(result.totalHours).toEqual(Temporal.Duration.from("PT32H"));
+      expect(result.totalHours).toEqual("PT32H");
       expect(result.capacity).toEqual(
-        Capacity.create({ hours: "PT40H", offset: "PT24h" }),
+        createCapacity({ hours: "PT40H", offset: "PT24H" }),
       );
     });
   });
@@ -394,15 +459,18 @@ describe("Get timesheet", () => {
     it("should take holidays into account", async () => {
       const { handler } = configure({
         events: [
-          ActivityLoggedEvent.createTestInstance({
+          createActivityLoggedEvent({
+            ...testLoggedEvent,
             timestamp: "2025-06-10T14:00:00Z",
             duration: "PT8H",
           }),
-          ActivityLoggedEvent.createTestInstance({
+          createActivityLoggedEvent({
+            ...testLoggedEvent,
             timestamp: "2025-06-11T14:00:00Z",
             duration: "PT8H",
           }),
-          ActivityLoggedEvent.createTestInstance({
+          createActivityLoggedEvent({
+            ...testLoggedEvent,
             timestamp: "2025-06-12T14:00:00Z",
             duration: "PT8H",
           }),
@@ -414,7 +482,7 @@ describe("Get timesheet", () => {
       });
 
       const result = await handler.handle(
-        GetTimesheetQuery.create({
+        createGetTimesheetQuery({
           from: "2025-06-09",
           to: "2025-06-15",
           today: "2025-06-12",
@@ -422,7 +490,7 @@ describe("Get timesheet", () => {
       );
 
       expect(result.capacity).toEqual(
-        Capacity.create({ hours: "PT32H", offset: "PT0S" }),
+        createCapacity({ hours: "PT32H", offset: "PT0S" }),
       );
     });
   });
@@ -431,15 +499,18 @@ describe("Get timesheet", () => {
     it("should take vacation into account", async () => {
       const { handler } = configure({
         events: [
-          ActivityLoggedEvent.createTestInstance({
+          createActivityLoggedEvent({
+            ...testLoggedEvent,
             timestamp: "2025-09-08T14:00:00Z",
             duration: "PT8H",
           }),
-          ActivityLoggedEvent.createTestInstance({
+          createActivityLoggedEvent({
+            ...testLoggedEvent,
             timestamp: "2025-09-09T14:00:00Z",
             duration: "PT8H",
           }),
-          ActivityLoggedEvent.createTestInstance({
+          createActivityLoggedEvent({
+            ...testLoggedEvent,
             timestamp: "2025-09-11T14:00:00Z",
             duration: "PT8H",
           }),
@@ -449,7 +520,7 @@ describe("Get timesheet", () => {
       });
 
       const result = await handler.handle(
-        GetTimesheetQuery.create({
+        createGetTimesheetQuery({
           from: "2025-09-08",
           to: "2025-09-14",
           today: "2025-09-11",
@@ -457,7 +528,7 @@ describe("Get timesheet", () => {
       );
 
       expect(result.capacity).toEqual(
-        Capacity.create({ hours: "PT32H", offset: "PT0S" }),
+        createCapacity({ hours: "PT32H", offset: "PT0S" }),
       );
     });
   });

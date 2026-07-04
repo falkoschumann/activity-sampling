@@ -1,96 +1,59 @@
 // Copyright (c) 2026 Falko Schumann. All rights reserved. MIT license.
 
 import type { TimesheetView, TimesheetViewEntry } from "./timesheet.read_model";
-import { TimesheetEntry } from "./timesheet_entry";
-import { Capacity } from "./capacity";
-import { normalizeDuration } from "./temporal";
+import {
+  compareTimesheetEntry,
+  createTimesheetEntry,
+  type TimesheetEntry,
+} from "./timesheet_entry.value_object";
+import { type Capacity, createCapacity } from "./capacity.value_object";
 import { countWorkingHours } from "./calendar.service";
 
-export class GetTimesheetQuery {
-  static create({
-    from,
-    to,
-    today = Temporal.Now.plainDateISO(),
-    timeZone = Temporal.Now.timeZoneId(),
-  }: {
-    from: Temporal.PlainDateLike;
-    to: Temporal.PlainDateLike;
-    today?: Temporal.PlainDateLike;
-    timeZone?: Temporal.TimeZoneLike;
-  }) {
-    return new GetTimesheetQuery(from, to, today, timeZone);
-  }
-
-  static createTestInstance({
-    from = "2026-03-23",
-    to = "2026-03-29",
-    today = "2026-03-25",
-    timeZone = "Europe/Berlin",
-  }: {
-    from?: Temporal.PlainDateLike;
-    to?: Temporal.PlainDateLike;
-    today?: Temporal.PlainDateLike;
-    timeZone?: Temporal.TimeZoneLike;
-  } = {}) {
-    return GetTimesheetQuery.create({ from, to, today, timeZone });
-  }
-
-  readonly type = "get-timesheet";
-  readonly data;
-
-  private constructor(
-    from: Temporal.PlainDateLike,
-    to: Temporal.PlainDateLike,
-    today: Temporal.PlainDateLike,
-    timeZone: Temporal.TimeZoneLike,
-  ) {
-    this.data = {
-      from: Temporal.PlainDate.from(from),
-      to: Temporal.PlainDate.from(to),
-      today: Temporal.PlainDate.from(today),
-      timeZone: timeZone,
-    };
-  }
+export interface GetTimesheetQuery {
+  readonly type: "get-timesheet";
+  readonly data: GetTimesheetQueryData;
 }
 
-export class GetTimesheetQueryResult {
-  static create({
-    entries = [],
-    totalHours = "PT0S",
-    capacity = Capacity.create(),
-  }: {
-    entries?: TimesheetEntry[];
-    totalHours?: Temporal.DurationLike;
-    capacity?: Capacity;
-  } = {}) {
-    return new GetTimesheetQueryResult(entries, totalHours, capacity);
-  }
+export interface GetTimesheetQueryData {
+  readonly from: Temporal.PlainDateLike;
+  readonly to: Temporal.PlainDateLike;
+  readonly today: Temporal.PlainDateLike;
+  readonly timeZone: Temporal.TimeZoneLike;
+}
 
-  static createTestInstance({
-    entries = [TimesheetEntry.createTestInstance()],
-    totalHours = "PT2H",
-    capacity = Capacity.createTestInstance(),
-  }: {
-    entries?: TimesheetEntry[];
-    totalHours?: Temporal.DurationLike;
-    capacity?: Capacity;
-  } = {}) {
-    return GetTimesheetQueryResult.create({ entries, totalHours, capacity });
-  }
+export function createGetTimesheetQuery({
+  from,
+  to,
+  today = Temporal.Now.plainDateISO(),
+  timeZone = Temporal.Now.timeZoneId(),
+}: {
+  from: Temporal.PlainDateLike;
+  to: Temporal.PlainDateLike;
+  today?: Temporal.PlainDateLike;
+  timeZone?: Temporal.TimeZoneLike;
+}): GetTimesheetQuery {
+  return {
+    type: "get-timesheet",
+    data: { from, to, today, timeZone },
+  };
+}
 
-  readonly entries;
-  readonly totalHours;
-  readonly capacity;
+export interface GetTimesheetQueryResult {
+  readonly entries: TimesheetEntry[];
+  readonly totalHours: Temporal.DurationLike;
+  readonly capacity: Capacity;
+}
 
-  private constructor(
-    entries: TimesheetEntry[],
-    totalHours: Temporal.DurationLike,
-    capacity: Capacity,
-  ) {
-    this.entries = entries.map(TimesheetEntry.create);
-    this.totalHours = Temporal.Duration.from(totalHours);
-    this.capacity = Capacity.create(capacity);
-  }
+export function createGetTimesheetQueryResult({
+  entries = [],
+  totalHours = "PT0S",
+  capacity = createCapacity(),
+}: {
+  entries?: TimesheetEntry[];
+  totalHours?: Temporal.DurationLike;
+  capacity?: Capacity;
+} = {}): GetTimesheetQueryResult {
+  return { entries, totalHours, capacity };
 }
 
 export function getTimesheet(
@@ -101,7 +64,7 @@ export function getTimesheet(
   const entries = createEntries(view);
   const totalHours = sumTotalHours(entries);
   const capacity = determineCapacity(view, query, totalHours);
-  return GetTimesheetQueryResult.create({ entries, capacity, totalHours });
+  return createGetTimesheetQueryResult({ entries, capacity, totalHours });
 }
 
 function createEntries(readModel: TimesheetView) {
@@ -109,12 +72,12 @@ function createEntries(readModel: TimesheetView) {
   for (const entry of readModel.entries) {
     updateEntries(entries, entry);
   }
-  entries.sort(TimesheetEntry.compare);
+  entries.sort(compareTimesheetEntry);
   return entries;
 }
 
 function updateEntries(entries: TimesheetEntry[], entry: TimesheetViewEntry) {
-  const date = entry.timestamp.toPlainDate();
+  const date = Temporal.PlainDate.from(entry.timestamp).toString();
   const index = entries.findIndex(
     (e) =>
       Temporal.PlainDate.compare(e.date, date.toString()) === 0 &&
@@ -123,7 +86,7 @@ function updateEntries(entries: TimesheetEntry[], entry: TimesheetViewEntry) {
       e.task === entry.task,
   );
   if (index === -1) {
-    const newEntry = TimesheetEntry.create({
+    const newEntry = createTimesheetEntry({
       ...entry,
       date,
       hours: entry.duration,
@@ -131,32 +94,39 @@ function updateEntries(entries: TimesheetEntry[], entry: TimesheetViewEntry) {
     entries.push(newEntry);
   } else {
     const existingEntry = entries[index]!;
-    const accumulatedHours = normalizeDuration(
-      existingEntry.hours.add(entry.duration),
+    const accumulatedHours = Temporal.Duration.from(existingEntry.hours).add(
+      entry.duration,
     );
-    entries[index] = TimesheetEntry.create({
+    entries[index] = createTimesheetEntry({
       ...existingEntry,
-      hours: accumulatedHours,
+      hours: accumulatedHours
+        .round({ smallestUnit: "minute", largestUnit: "hour" })
+        .toString(),
     });
   }
 }
 
 function sumTotalHours(entries: TimesheetEntry[]) {
-  return entries.reduce(
-    (total, entry) => total.add(entry.hours),
-    Temporal.Duration.from("PT0S"),
-  );
+  return entries
+    .reduce(
+      (total, entry) => total.add(entry.hours),
+      Temporal.Duration.from("PT0S"),
+    )
+    .round({ smallestUnit: "minute", largestUnit: "hour" })
+    .toString();
 }
 
 function determineCapacity(
   view: TimesheetView,
   query: GetTimesheetQuery,
-  totalHours: Temporal.Duration,
+  totalHours: Temporal.DurationLike,
 ) {
   const { from, to, today } = query.data;
-  const hours = countWorkingHours(from, to, view);
+  const hours = countWorkingHours(from, to, view)
+    .round({ smallestUnit: "minute", largestUnit: "hour" })
+    .toString();
 
-  let end: Temporal.PlainDate;
+  let end: Temporal.PlainDateLike;
   if (Temporal.PlainDate.compare(today, from) < 0) {
     end = from;
   } else if (Temporal.PlainDate.compare(today, to) > 0) {
@@ -165,7 +135,10 @@ function determineCapacity(
     end = today;
   }
   const businessDays = countWorkingHours(from, end, view);
-  const offset = normalizeDuration(totalHours.subtract(businessDays));
+  const offset = Temporal.Duration.from(totalHours)
+    .subtract(businessDays)
+    .round({ smallestUnit: "minute", largestUnit: "hour" })
+    .toString();
 
   return { hours, offset };
 }
