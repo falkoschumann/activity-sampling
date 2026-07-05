@@ -9,7 +9,7 @@ import {
 import { createTickTimerCommand } from "../../shared/domain/timer/tick_timer.command";
 import type { TimerStartedEvent } from "../../shared/domain/timer/timer_started.event";
 import type { TimerStoppedEvent } from "../../shared/domain/timer/timer_stopped.event";
-import { normalizeDuration } from "../../shared/domain/activity.value_object";
+import { normalizeDuration } from "../../shared/domain/value_objects/activity.value_object";
 import { Clock } from "../infrastructure/clock";
 
 export class TimerProcessManager extends EventTarget {

@@ -11,8 +11,8 @@ import {
 import {
   createGetEstimateQuery,
   createGetEstimateQueryResult,
-} from "../../../src/shared/domain/get_estimate.query";
-import type { EstimateEntry } from "../../../src/shared/domain/estimate_entry.value_object";
+} from "../../../src/shared/domain/read_models/get_estimate.query";
+import type { EstimateEntry } from "../../../src/shared/domain/value_objects/estimate_entry.value_object";
 import { EventStore } from "../../../src/main/infrastructure/event_store";
 
 const testActivity: ActivityLoggedEventData = {

@@ -1,8 +1,8 @@
 // Copyright (c) 2026 Falko Schumann. All rights reserved. MIT license.
 
-import type { HolidayState } from "./holiday/holiday.aggregate";
-import type { VacationState } from "./vacation/vacation.aggregate";
-import { normalizeDuration } from "./activity.value_object";
+import type { HolidayState } from "../holiday/holiday.aggregate";
+import type { VacationState } from "../vacation/vacation.aggregate";
+import { normalizeDuration } from "../value_objects/activity.value_object";
 
 export function countWorkingHours(
   from: Temporal.PlainDateLike,

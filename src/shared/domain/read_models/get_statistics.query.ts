@@ -4,9 +4,15 @@ import type { ReportView } from "./report.read_model";
 import {
   type Activity,
   selectDistinctCategories,
-} from "./activity.value_object";
-import { createHistogram, type Histogram } from "./histogram.value_object";
-import { createMedian, type Median } from "./median.value_object";
+} from "../value_objects/activity.value_object";
+import {
+  createHistogram,
+  type Histogram,
+} from "../value_objects/histogram.value_object";
+import {
+  createMedian,
+  type Median,
+} from "../value_objects/median.value_object";
 
 export interface GetStatisticsQuery {
   readonly type: "get-statistics";

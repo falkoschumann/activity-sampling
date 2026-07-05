@@ -12,8 +12,8 @@ import {
   createGetReportQuery,
   createGetReportQueryResult,
   ReportScope,
-} from "../../../src/shared/domain/get_report.query";
-import { createActivity } from "../../../src/shared/domain/activity.value_object";
+} from "../../../src/shared/domain/read_models/get_report.query";
+import { createActivity } from "../../../src/shared/domain/value_objects/activity.value_object";
 import { EventStore } from "../../../src/main/infrastructure/event_store";
 
 const testActivity: ActivityLoggedEventData = {

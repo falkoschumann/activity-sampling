@@ -12,9 +12,9 @@ import {
   createGetStatisticsQuery,
   createGetStatisticsQueryResult,
   StatisticsScope,
-} from "../../../src/shared/domain/get_statistics.query";
-import { createHistogram } from "../../../src/shared/domain/histogram.value_object";
-import { createMedian } from "../../../src/shared/domain/median.value_object";
+} from "../../../src/shared/domain/read_models/get_statistics.query";
+import { createHistogram } from "../../../src/shared/domain/value_objects/histogram.value_object";
+import { createMedian } from "../../../src/shared/domain/value_objects/median.value_object";
 import { EventStore } from "../../../src/main/infrastructure/event_store";
 
 const testActivity: ActivityLoggedEventData = {

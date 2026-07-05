@@ -8,7 +8,7 @@ import {
   getSettings,
   type GetSettingsQuery,
   type GetSettingsQueryResult,
-} from "../../shared/domain/get_settings.query";
+} from "../../shared/domain/read_models/get_settings.query";
 import { SettingsProvider } from "../infrastructure/settings.provider";
 
 export class GetSettingsQueryHandler {

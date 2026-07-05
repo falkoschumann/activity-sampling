@@ -1,7 +1,10 @@
 // Copyright (c) 2026 Falko Schumann. All rights reserved. MIT license.
 
-import type { ActivityLoggedEvent } from "./activity/activity_logged.event";
-import { type Activity, normalizeDuration } from "./activity.value_object";
+import type { ActivityLoggedEvent } from "../activity/activity_logged.event";
+import {
+  type Activity,
+  normalizeDuration,
+} from "../value_objects/activity.value_object";
 
 export type ReportView = {
   activities: Activity[];

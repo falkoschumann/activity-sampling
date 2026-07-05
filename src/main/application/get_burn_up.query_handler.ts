@@ -4,11 +4,11 @@ import {
   getBurnUp,
   type GetBurnUpQuery,
   type GetBurnUpQueryResult,
-} from "../../shared/domain/get_burn_up.query";
+} from "../../shared/domain/read_models/get_burn_up.query";
 import {
   createReport,
   projectReport,
-} from "../../shared/domain/report.read_model";
+} from "../../shared/domain/read_models/report.read_model";
 import type { EventStore } from "../infrastructure/event_store";
 
 export class GetBurnUpQueryHandler {

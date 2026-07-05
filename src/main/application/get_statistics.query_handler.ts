@@ -3,12 +3,12 @@
 import {
   createReport,
   projectReport,
-} from "../../shared/domain/report.read_model";
+} from "../../shared/domain/read_models/report.read_model";
 import {
   getStatistics,
   type GetStatisticsQuery,
   type GetStatisticsQueryResult,
-} from "../../shared/domain/get_statistics.query";
+} from "../../shared/domain/read_models/get_statistics.query";
 import type { EventStore } from "../infrastructure/event_store";
 
 export class GetStatisticsQueryHandler {

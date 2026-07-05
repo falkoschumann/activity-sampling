@@ -1,9 +1,9 @@
 // Copyright (c) 2026 Falko Schumann. All rights reserved. MIT license.
 
-import type { TimerElapsedEvent } from "./timer/timer_elapsed.event";
-import type { TimerStartedEvent } from "./timer/timer_started.event";
-import type { TimerStoppedEvent } from "./timer/timer_stopped.event";
-import type { TimerTickedEvent } from "./timer/timer_ticked.event";
+import type { TimerElapsedEvent } from "../timer/timer_elapsed.event";
+import type { TimerStartedEvent } from "../timer/timer_started.event";
+import type { TimerStoppedEvent } from "../timer/timer_stopped.event";
+import type { TimerTickedEvent } from "../timer/timer_ticked.event";
 
 export type TimerView = {
   readonly isRunning: boolean;

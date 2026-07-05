@@ -4,12 +4,12 @@ import {
   getRecentActivities,
   type GetRecentActivitiesQuery,
   type GetRecentActivitiesQueryResult,
-} from "../../shared/domain/get_recent_activities.query";
+} from "../../shared/domain/read_models/get_recent_activities.query";
 import { createSettingsChangedEvent } from "../../shared/domain/settings/settings_changed.event";
 import {
   createTimesheet,
   projectTimesheet,
-} from "../../shared/domain/timesheet.read_model";
+} from "../../shared/domain/read_models/timesheet.read_model";
 import type { EventStore } from "../infrastructure/event_store";
 import type { SettingsProvider } from "../infrastructure/settings.provider";
 

@@ -9,7 +9,7 @@ import { TimesheetExporterGateway } from "../../../src/main/infrastructure/times
 import {
   createTimesheetData,
   type TimesheetData,
-} from "../../../src/shared/domain/timesheet_data.value_objects";
+} from "../../../src/shared/domain/value_objects/timesheet_data.value_objects";
 import { createTimesheetExportedEvent } from "../../../src/shared/domain/activity/timesheet_exported.event";
 
 const TEST_FILE = path.resolve(

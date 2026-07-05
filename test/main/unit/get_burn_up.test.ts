@@ -11,11 +11,11 @@ import {
 import {
   createGetBurnUpQuery,
   createGetBurnUpQueryResult,
-} from "../../../src/shared/domain/get_burn_up.query";
+} from "../../../src/shared/domain/read_models/get_burn_up.query";
 import {
   type BurnUpData,
   createBurnUpData,
-} from "../../../src/shared/domain/burn_up_data.value_object";
+} from "../../../src/shared/domain/value_objects/burn_up_data.value_object";
 import { EventStore } from "../../../src/main/infrastructure/event_store";
 
 const testActivity: ActivityLoggedEventData = {

@@ -15,12 +15,12 @@ import {
 import {
   createRecentActivity,
   type RecentActivity,
-} from "../../../src/shared/domain/recent_activity.value_object";
+} from "../../../src/shared/domain/value_objects/recent_activity.value_object";
 import {
   createGetRecentActivitiesQuery,
   createGetRecentActivitiesQueryResult,
-} from "../../../src/shared/domain/get_recent_activities.query";
-import type { WorkingDay } from "../../../src/shared/domain/working_day.value_object";
+} from "../../../src/shared/domain/read_models/get_recent_activities.query";
+import type { WorkingDay } from "../../../src/shared/domain/value_objects/working_day.value_object";
 import { EventStore } from "../../../src/main/infrastructure/event_store";
 import { SettingsProvider } from "../../../src/main/infrastructure/settings.provider";
 

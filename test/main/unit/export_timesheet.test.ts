@@ -13,11 +13,11 @@ import {
 import {
   createTimesheetData,
   type TimesheetData,
-} from "../../../src/shared/domain/timesheet_data.value_objects";
+} from "../../../src/shared/domain/value_objects/timesheet_data.value_objects";
 import {
   createTimesheetEntry,
   type TimesheetEntry,
-} from "../../../src/shared/domain/timesheet_entry.value_object";
+} from "../../../src/shared/domain/value_objects/timesheet_entry.value_object";
 import { SettingsProvider } from "../../../src/main/infrastructure/settings.provider";
 
 const testSettings: SettingsState = {

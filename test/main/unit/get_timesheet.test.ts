@@ -23,12 +23,12 @@ import {
 import {
   createGetTimesheetQuery,
   createGetTimesheetQueryResult,
-} from "../../../src/shared/domain/get_timesheet.query";
-import { createCapacity } from "../../../src/shared/domain/capacity.value_object";
+} from "../../../src/shared/domain/read_models/get_timesheet.query";
+import { createCapacity } from "../../../src/shared/domain/value_objects/capacity.value_object";
 import {
   createTimesheetEntry,
   type TimesheetEntry,
-} from "../../../src/shared/domain/timesheet_entry.value_object";
+} from "../../../src/shared/domain/value_objects/timesheet_entry.value_object";
 import { EventStore } from "../../../src/main/infrastructure/event_store";
 import { HolidayRepository } from "../../../src/main/infrastructure/holiday.repository";
 import { VacationRepository } from "../../../src/main/infrastructure/vacation.repository";

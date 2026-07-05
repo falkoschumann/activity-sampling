@@ -38,7 +38,10 @@ import type { TimerStartedEvent } from "../shared/domain/timer/timer_started.eve
 import type { TimerStoppedEvent } from "../shared/domain/timer/timer_stopped.event";
 import type { TimerTickedEvent } from "../shared/domain/timer/timer_ticked.event";
 import type { TimerElapsedEvent } from "../shared/domain/timer/timer_elapsed.event";
-import { createTimer, projectTimer } from "../shared/domain/timer.read_model";
+import {
+  createTimer,
+  projectTimer,
+} from "../shared/domain/read_models/timer.read_model";
 import { EventStore } from "./infrastructure/event_store";
 import { HolidayRepository } from "./infrastructure/holiday.repository";
 import { SettingsProvider } from "./infrastructure/settings.provider";

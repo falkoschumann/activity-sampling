@@ -8,7 +8,7 @@ import { createTimesheetExportedEvent } from "../../../src/shared/domain/activit
 import {
   createTimesheetData,
   type TimesheetData,
-} from "../../../src/shared/domain/timesheet_data.value_objects";
+} from "../../../src/shared/domain/value_objects/timesheet_data.value_objects";
 import { TimesheetExporterGateway } from "../../../src/main/infrastructure/timesheet_exporter.gateway";
 
 const testTimesheetData: TimesheetData = {

@@ -4,8 +4,11 @@ import type { ReportView } from "./report.read_model";
 import {
   type Activity,
   selectDistinctCategories,
-} from "./activity.value_object";
-import { type BurnUpData, createBurnUpData } from "./burn_up_data.value_object";
+} from "../value_objects/activity.value_object";
+import {
+  type BurnUpData,
+  createBurnUpData,
+} from "../value_objects/burn_up_data.value_object";
 
 export interface GetBurnUpQuery {
   readonly type: "get-burn-up";

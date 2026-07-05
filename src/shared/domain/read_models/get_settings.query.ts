@@ -1,6 +1,6 @@
 // Copyright (c) 2026 Falko Schumann. All rights reserved. MIT license.
 
-import type { SettingsState } from "./settings/settings.aggregate";
+import type { SettingsState } from "../settings/settings.aggregate";
 
 export interface GetSettingsQuery {
   readonly type: "get-settings";

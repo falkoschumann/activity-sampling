@@ -5,8 +5,8 @@ import {
   createTimesheetExportedEvent,
   type TimesheetExportedEvent,
 } from "./timesheet_exported.event";
-import { createTimesheetData } from "../timesheet_data.value_objects";
-import type { TimesheetEntry } from "../timesheet_entry.value_object";
+import { createTimesheetData } from "../value_objects/timesheet_data.value_objects";
+import type { TimesheetEntry } from "../value_objects/timesheet_entry.value_object";
 
 export interface ExportTimesheetCommand {
   readonly type: "export-timesheet";

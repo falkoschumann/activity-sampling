@@ -3,12 +3,12 @@
 import {
   createTimesheet,
   projectTimesheet,
-} from "../../shared/domain/timesheet.read_model";
+} from "../../shared/domain/read_models/timesheet.read_model";
 import {
   getTimesheet,
   type GetTimesheetQuery,
   type GetTimesheetQueryResult,
-} from "../../shared/domain/get_timesheet.query";
+} from "../../shared/domain/read_models/get_timesheet.query";
 import { createSettingsChangedEvent } from "../../shared/domain/settings/settings_changed.event";
 import { createHolidaysChangedEvent } from "../../shared/domain/holiday/holidays_changed.event";
 import { createVacationsChangedEvent } from "../../shared/domain/vacation/vacations_changed.event";

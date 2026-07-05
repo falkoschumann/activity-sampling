@@ -10,11 +10,11 @@ import { createTimerStoppedEvent } from "../../../src/shared/domain/timer/timer_
 import {
   createTimer,
   projectTimer,
-} from "../../../src/shared/domain/timer.read_model";
+} from "../../../src/shared/domain/read_models/timer.read_model";
 import {
   createGetCurrentIntervalQuery,
   createGetCurrentIntervalQueryResult,
-} from "../../../src/shared/domain/get_current_interval.query";
+} from "../../../src/shared/domain/read_models/get_current_interval.query";
 
 describe("Get current interval", () => {
   it("should return empty result when view is initial state", async () => {

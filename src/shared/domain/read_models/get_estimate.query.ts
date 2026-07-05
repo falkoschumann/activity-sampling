@@ -5,12 +5,12 @@
 import {
   type Activity,
   selectDistinctCategories,
-} from "./activity.value_object";
+} from "../value_objects/activity.value_object";
 import type { ReportView } from "./report.read_model";
 import {
   createEstimateEntry,
   type EstimateEntry,
-} from "./estimate_entry.value_object";
+} from "../value_objects/estimate_entry.value_object";
 
 export interface GetEstimateQuery {
   readonly type: "get-estimate";

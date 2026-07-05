@@ -11,7 +11,7 @@ import {
   createGetSettingsQuery,
   createGetSettingsQueryResult,
   type GetSettingsQueryResult,
-} from "../../../src/shared/domain/get_settings.query";
+} from "../../../src/shared/domain/read_models/get_settings.query";
 
 const testSettings: SettingsState = {
   capacity: "PT32H",

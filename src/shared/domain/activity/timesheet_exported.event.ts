@@ -1,6 +1,6 @@
 // Copyright (c) 2026 Falko Schumann. All rights reserved. MIT license.
 
-import type { TimesheetData } from "../timesheet_data.value_objects";
+import type { TimesheetData } from "../value_objects/timesheet_data.value_objects";
 
 export interface TimesheetExportedEvent {
   readonly type: "timesheet-exported";

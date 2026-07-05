@@ -5,12 +5,12 @@ import { State } from "@muspellheim/shared";
 import {
   createTimer,
   type TimerView,
-} from "../../shared/domain/timer.read_model";
+} from "../../shared/domain/read_models/timer.read_model";
 import {
   getCurrentInterval,
   type GetCurrentIntervalQuery,
   type GetCurrentIntervalQueryResult,
-} from "../../shared/domain/get_current_interval.query";
+} from "../../shared/domain/read_models/get_current_interval.query";
 
 export class GetCurrentIntervalQueryHandler {
   static create({ view }: { view: State<TimerView> }) {

@@ -3,12 +3,12 @@
 import {
   createReport,
   projectReport,
-} from "../../shared/domain/report.read_model";
+} from "../../shared/domain/read_models/report.read_model";
 import {
   getEstimate,
   type GetEstimateQuery,
   type GetEstimateQueryResult,
-} from "../../shared/domain/get_estimate.query";
+} from "../../shared/domain/read_models/get_estimate.query";
 import type { EventStore } from "../infrastructure/event_store";
 
 export class GetEstimateQueryHandler {

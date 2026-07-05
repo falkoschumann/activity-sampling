@@ -1,21 +1,21 @@
 // Copyright (c) 2026 Falko Schumann. All rights reserved. MIT license.
 
 import type { TimesheetView } from "./timesheet.read_model";
-import { normalizeDuration } from "./activity.value_object";
+import { normalizeDuration } from "../value_objects/activity.value_object";
 import {
   compareRecentActivity,
   createRecentActivity,
-} from "./recent_activity.value_object";
+} from "../value_objects/recent_activity.value_object";
 import {
   createTimeSummary,
   type TimeSummary,
-} from "./time_summary.value_object";
-import type { TimesheetViewEntry } from "./timesheet_view_entry.value_object";
+} from "../value_objects/time_summary.value_object";
+import type { TimesheetViewEntry } from "../value_objects/timesheet_view_entry.value_object";
 import {
   compareWorkingDay,
   createWorkingDay,
   type WorkingDay,
-} from "./working_day.value_object";
+} from "../value_objects/working_day.value_object";
 
 export interface GetRecentActivitiesQuery {
   readonly type: "get-recent-activities";

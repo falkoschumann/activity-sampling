@@ -5,7 +5,7 @@ import {
   type Activity,
   createActivity,
   normalizeDuration,
-} from "./activity.value_object";
+} from "../value_objects/activity.value_object";
 
 export interface GetReportQuery {
   readonly type: "get-report";

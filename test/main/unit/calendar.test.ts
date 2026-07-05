@@ -2,7 +2,7 @@
 
 import { describe, expect, it } from "vitest";
 
-import { countWorkingHours } from "../../../src/shared/domain/calendar.service";
+import { countWorkingHours } from "../../../src/shared/domain/services/calendar.service";
 import { createHoliday } from "../../../src/shared/domain/holiday/holiday.aggregate";
 import { createVacation } from "../../../src/shared/domain/vacation/vacation.aggregate";
 
