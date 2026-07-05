@@ -6,7 +6,7 @@ import {
 } from "../../shared/domain/report.read_model";
 import {
   getStatistics,
-  GetStatisticsQuery,
+  type GetStatisticsQuery,
   type GetStatisticsQueryResult,
 } from "../../shared/domain/get_statistics.query";
 import type { EventStore } from "../infrastructure/event_store";
@@ -23,7 +23,6 @@ export class GetStatisticsQueryHandler {
   }
 
   async handle(query: GetStatisticsQuery): Promise<GetStatisticsQueryResult> {
-    query = GetStatisticsQuery.create(query.data);
     const { timeZone } = query.data;
     let view = createReport();
     for await (const event of this.#eventStore.replay()) {

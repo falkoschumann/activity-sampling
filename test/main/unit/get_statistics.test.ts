@@ -3,15 +3,28 @@
 import { describe, expect, it } from "vitest";
 
 import { GetStatisticsQueryHandler } from "../../../src/main/application/get_statistics.query_handler";
-import { ActivityLoggedEvent } from "../../../src/shared/domain/activity/activity_logged.event";
 import {
-  GetStatisticsQuery,
-  GetStatisticsQueryResult,
+  type ActivityLoggedEvent,
+  type ActivityLoggedEventData,
+  createActivityLoggedEvent,
+} from "../../../src/shared/domain/activity/activity_logged.event";
+import {
+  createGetStatisticsQuery,
+  createGetStatisticsQueryResult,
   StatisticsScope,
 } from "../../../src/shared/domain/get_statistics.query";
-import { Histogram } from "../../../src/shared/domain/histogram";
-import { Median } from "../../../src/shared/domain/median";
+import { createHistogram } from "../../../src/shared/domain/histogram.value_object";
+import { createMedian } from "../../../src/shared/domain/median.value_object";
 import { EventStore } from "../../../src/main/infrastructure/event_store";
+
+const testActivity: ActivityLoggedEventData = {
+  timestamp: "2025-08-14T11:00:00Z",
+  duration: "PT30M",
+  client: "Test client",
+  project: "Test project",
+  task: "Test task",
+  notification: "notifier",
+};
 
 describe("Get statistics", () => {
   describe("Create histogram for hours worked on tasks", () => {
@@ -19,13 +32,13 @@ describe("Get statistics", () => {
       const { handler } = configure({ events: [] });
 
       const result = await handler.handle(
-        GetStatisticsQuery.create({
+        createGetStatisticsQuery({
           scope: StatisticsScope.WORKING_HOURS,
         }),
       );
 
       expect(result.histogram).toEqual(
-        Histogram.create({
+        createHistogram({
           binEdges: [],
           frequencies: [],
           xAxisLabel: "Duration (days)",
@@ -36,19 +49,22 @@ describe("Get statistics", () => {
 
     it("should return histogram for working hours", async () => {
       const events = [
-        ActivityLoggedEvent.createTestInstance({
+        createActivityLoggedEvent({
+          ...testActivity,
           timestamp: "2025-10-13T11:00:00Z",
           task: "Task A",
           duration: "PT24H",
           category: "Category 2",
         }),
-        ActivityLoggedEvent.createTestInstance({
+        createActivityLoggedEvent({
+          ...testActivity,
           timestamp: "2025-10-14T13:00:00Z",
           task: "Task B",
           duration: "PT40H",
           category: "Category 1",
         }),
-        ActivityLoggedEvent.createTestInstance({
+        createActivityLoggedEvent({
+          ...testActivity,
           timestamp: "2025-10-15T13:00:00Z",
           task: "Task C",
           duration: "PT40H",
@@ -58,13 +74,13 @@ describe("Get statistics", () => {
       const { handler } = configure({ events });
 
       const result = await handler.handle(
-        GetStatisticsQuery.create({
+        createGetStatisticsQuery({
           scope: StatisticsScope.WORKING_HOURS,
         }),
       );
 
       expect(result.histogram).toEqual(
-        Histogram.create({
+        createHistogram({
           binEdges: ["0", "0.5", "1", "2", "3", "5"],
           frequencies: [0, 0, 0, 1, 2],
           xAxisLabel: "Duration (days)",
@@ -75,17 +91,20 @@ describe("Get statistics", () => {
 
     it("should determine frequencies per bin with 3 tasks", async () => {
       const events = [
-        ActivityLoggedEvent.createTestInstance({
+        createActivityLoggedEvent({
+          ...testActivity,
           task: "Task A",
           duration: "PT24H", // 3 person days
           category: "Category 2",
         }),
-        ActivityLoggedEvent.createTestInstance({
+        createActivityLoggedEvent({
+          ...testActivity,
           task: "Task B",
           duration: "PT40H", // 5 person days
           category: "Category 2",
         }),
-        ActivityLoggedEvent.createTestInstance({
+        createActivityLoggedEvent({
+          ...testActivity,
           task: "Task C",
           duration: "PT16H", // 2 person days
           category: "Category 1",
@@ -94,13 +113,13 @@ describe("Get statistics", () => {
       const { handler } = configure({ events });
 
       const result = await handler.handle(
-        GetStatisticsQuery.create({
+        createGetStatisticsQuery({
           scope: StatisticsScope.WORKING_HOURS,
         }),
       );
 
       expect(result).toEqual(
-        GetStatisticsQueryResult.create({
+        createGetStatisticsQueryResult({
           histogram: {
             binEdges: ["0", "0.5", "1", "2", "3", "5"],
             frequencies: [0, 0, 1, 1, 1],
@@ -122,22 +141,26 @@ describe("Get statistics", () => {
 
     it("should determine frequencies per bin with even number of tasks", async () => {
       const events = [
-        ActivityLoggedEvent.createTestInstance({
+        createActivityLoggedEvent({
+          ...testActivity,
           task: "Task A",
           duration: "PT24H", // 3 person days
           category: "Category 2",
         }),
-        ActivityLoggedEvent.createTestInstance({
+        createActivityLoggedEvent({
+          ...testActivity,
           task: "Task B",
           duration: "PT40H", // 5 person days
           category: "Category 1",
         }),
-        ActivityLoggedEvent.createTestInstance({
+        createActivityLoggedEvent({
+          ...testActivity,
           task: "Task C",
           duration: "PT32H", // 4 person days
           category: "Category 1",
         }),
-        ActivityLoggedEvent.createTestInstance({
+        createActivityLoggedEvent({
+          ...testActivity,
           task: "Task D",
           duration: "PT4H", // 0.5 person days
           category: "Category 2",
@@ -146,13 +169,13 @@ describe("Get statistics", () => {
       const { handler } = configure({ events });
 
       const result = await handler.handle(
-        GetStatisticsQuery.create({
+        createGetStatisticsQuery({
           scope: StatisticsScope.WORKING_HOURS,
         }),
       );
 
       expect(result).toEqual(
-        GetStatisticsQueryResult.create({
+        createGetStatisticsQueryResult({
           histogram: {
             binEdges: ["0", "0.5", "1", "2", "3", "5"],
             frequencies: [1, 0, 0, 1, 2],
@@ -174,27 +197,32 @@ describe("Get statistics", () => {
 
     it("should determine frequencies per bin with odd number of tasks", async () => {
       const events = [
-        ActivityLoggedEvent.createTestInstance({
+        createActivityLoggedEvent({
+          ...testActivity,
           task: "Task A",
           duration: "PT24H", // 3 person days
           category: "Category 3",
         }),
-        ActivityLoggedEvent.createTestInstance({
+        createActivityLoggedEvent({
+          ...testActivity,
           task: "Task B",
           duration: "PT40H", // 5 person days
           category: "Category 2",
         }),
-        ActivityLoggedEvent.createTestInstance({
+        createActivityLoggedEvent({
+          ...testActivity,
           task: "Task C",
           duration: "PT32H", // 4 person days
           category: "Category 1",
         }),
-        ActivityLoggedEvent.createTestInstance({
+        createActivityLoggedEvent({
+          ...testActivity,
           task: "Task D",
           duration: "PT8H", // 1 person days
           category: "Category 3",
         }),
-        ActivityLoggedEvent.createTestInstance({
+        createActivityLoggedEvent({
+          ...testActivity,
           task: "Task E",
           duration: "PT16H", // 2 person days
           category: "Category 2",
@@ -203,13 +231,13 @@ describe("Get statistics", () => {
       const { handler } = configure({ events });
 
       const result = await handler.handle(
-        GetStatisticsQuery.create({
+        createGetStatisticsQuery({
           scope: StatisticsScope.WORKING_HOURS,
         }),
       );
 
       expect(result).toEqual(
-        GetStatisticsQueryResult.create({
+        createGetStatisticsQueryResult({
           histogram: {
             binEdges: ["0", "0.5", "1", "2", "3", "5"],
             frequencies: [0, 1, 1, 1, 2],
@@ -235,13 +263,13 @@ describe("Get statistics", () => {
       const { handler } = configure({ events: [] });
 
       const result = await handler.handle(
-        GetStatisticsQuery.create({
+        createGetStatisticsQuery({
           scope: StatisticsScope.CYCLE_TIMES,
         }),
       );
 
       expect(result.histogram).toEqual(
-        Histogram.create({
+        createHistogram({
           binEdges: [],
           frequencies: [],
           xAxisLabel: "Cycle time (days)",
@@ -252,27 +280,32 @@ describe("Get statistics", () => {
 
     it("should return histogram for cycle time", async () => {
       const events = [
-        ActivityLoggedEvent.createTestInstance({
+        createActivityLoggedEvent({
+          ...testActivity,
           timestamp: "2025-08-13T12:00:00Z",
           task: "Task A",
           category: "Category 1",
         }),
-        ActivityLoggedEvent.createTestInstance({
+        createActivityLoggedEvent({
+          ...testActivity,
           timestamp: "2025-08-13T12:00:00Z",
           task: "Task B",
           category: "Category 2",
         }),
-        ActivityLoggedEvent.createTestInstance({
+        createActivityLoggedEvent({
+          ...testActivity,
           timestamp: "2025-08-15T12:00:00Z",
           task: "Task C",
           category: "Category 1",
         }),
-        ActivityLoggedEvent.createTestInstance({
+        createActivityLoggedEvent({
+          ...testActivity,
           timestamp: "2025-08-16T12:00:00Z",
           task: "Task A",
           category: "Category 1",
         }),
-        ActivityLoggedEvent.createTestInstance({
+        createActivityLoggedEvent({
+          ...testActivity,
           timestamp: "2025-08-18T12:00:00Z",
           task: "Task B",
           category: "Category 2",
@@ -281,13 +314,13 @@ describe("Get statistics", () => {
       const { handler } = configure({ events });
 
       const result = await handler.handle(
-        GetStatisticsQuery.create({
+        createGetStatisticsQuery({
           scope: StatisticsScope.CYCLE_TIMES,
         }),
       );
 
       expect(result.histogram).toEqual(
-        Histogram.create({
+        createHistogram({
           binEdges: ["0", "1", "2", "3", "5", "8"],
           frequencies: [1, 0, 0, 1, 1],
           xAxisLabel: "Cycle time (days)",
@@ -298,37 +331,44 @@ describe("Get statistics", () => {
 
     it("should filter by category when category is provided", async () => {
       const events = [
-        ActivityLoggedEvent.createTestInstance({
+        createActivityLoggedEvent({
+          ...testActivity,
           timestamp: "2025-08-16T12:00:00Z",
           task: "Task A",
           category: "Category A",
         }),
-        ActivityLoggedEvent.createTestInstance({
+        createActivityLoggedEvent({
+          ...testActivity,
           timestamp: "2025-08-13T12:00:00Z",
           task: "Task A",
           category: "Category A",
         }),
-        ActivityLoggedEvent.createTestInstance({
+        createActivityLoggedEvent({
+          ...testActivity,
           timestamp: "2025-08-13T12:00:00Z",
           task: "Task B",
           category: "Category A",
         }),
-        ActivityLoggedEvent.createTestInstance({
+        createActivityLoggedEvent({
+          ...testActivity,
           timestamp: "2025-08-13T14:00:00Z",
           task: "Task B",
           category: "Category B",
         }),
-        ActivityLoggedEvent.createTestInstance({
+        createActivityLoggedEvent({
+          ...testActivity,
           timestamp: "2025-08-15T12:00:00Z",
           task: "Task C",
           category: "Category A",
         }),
-        ActivityLoggedEvent.createTestInstance({
+        createActivityLoggedEvent({
+          ...testActivity,
           timestamp: "2025-08-15T14:00:00Z",
           task: "Task C",
           category: "Category B",
         }),
-        ActivityLoggedEvent.createTestInstance({
+        createActivityLoggedEvent({
+          ...testActivity,
           timestamp: "2025-08-18T12:00:00Z",
           task: "Task B",
           category: "Category A",
@@ -337,14 +377,14 @@ describe("Get statistics", () => {
       const { handler } = configure({ events });
 
       const result = await handler.handle(
-        GetStatisticsQuery.create({
+        createGetStatisticsQuery({
           scope: StatisticsScope.CYCLE_TIMES,
           categories: ["Category A"],
         }),
       );
 
       expect(result).toEqual(
-        GetStatisticsQueryResult.create({
+        createGetStatisticsQueryResult({
           histogram: {
             binEdges: ["0", "1", "2", "3", "5", "8"],
             frequencies: [1, 0, 0, 1, 1],
@@ -370,13 +410,13 @@ describe("Get statistics", () => {
       const { handler } = configure({ events: [] });
 
       const result = await handler.handle(
-        GetStatisticsQuery.create({
+        createGetStatisticsQuery({
           scope: StatisticsScope.WORKING_HOURS,
         }),
       );
 
       expect(result.median).toEqual(
-        Median.create({
+        createMedian({
           edge0: 0,
           edge25: 0,
           edge50: 0,
@@ -388,19 +428,22 @@ describe("Get statistics", () => {
 
     it("should return median for working hours", async () => {
       const events = [
-        ActivityLoggedEvent.createTestInstance({
+        createActivityLoggedEvent({
+          ...testActivity,
           timestamp: "2025-10-13T11:00:00Z",
           task: "Task A",
           duration: "PT24H",
           category: "Category 2",
         }),
-        ActivityLoggedEvent.createTestInstance({
+        createActivityLoggedEvent({
+          ...testActivity,
           timestamp: "2025-10-14T13:00:00Z",
           task: "Task B",
           duration: "PT40H",
           category: "Category 1",
         }),
-        ActivityLoggedEvent.createTestInstance({
+        createActivityLoggedEvent({
+          ...testActivity,
           timestamp: "2025-10-15T13:00:00Z",
           task: "Task C",
           duration: "PT40H",
@@ -410,13 +453,13 @@ describe("Get statistics", () => {
       const { handler } = configure({ events });
 
       const result = await handler.handle(
-        GetStatisticsQuery.create({
+        createGetStatisticsQuery({
           scope: StatisticsScope.WORKING_HOURS,
         }),
       );
 
       expect(result.median).toEqual(
-        Median.create({
+        createMedian({
           edge0: 0,
           edge25: 3,
           edge50: 5,
@@ -432,13 +475,13 @@ describe("Get statistics", () => {
       const { handler } = configure({ events: [] });
 
       const result = await handler.handle(
-        GetStatisticsQuery.create({
+        createGetStatisticsQuery({
           scope: StatisticsScope.CYCLE_TIMES,
         }),
       );
 
       expect(result.median).toEqual(
-        Median.create({
+        createMedian({
           edge0: 0,
           edge25: 0,
           edge50: 0,
@@ -450,27 +493,32 @@ describe("Get statistics", () => {
 
     it("should return median for cycle time", async () => {
       const events = [
-        ActivityLoggedEvent.createTestInstance({
+        createActivityLoggedEvent({
+          ...testActivity,
           timestamp: "2025-08-13T12:00:00Z",
           task: "Task A",
           category: "Category 1",
         }),
-        ActivityLoggedEvent.createTestInstance({
+        createActivityLoggedEvent({
+          ...testActivity,
           timestamp: "2025-08-13T12:00:00Z",
           task: "Task B",
           category: "Category 2",
         }),
-        ActivityLoggedEvent.createTestInstance({
+        createActivityLoggedEvent({
+          ...testActivity,
           timestamp: "2025-08-15T12:00:00Z",
           task: "Task C",
           category: "Category 1",
         }),
-        ActivityLoggedEvent.createTestInstance({
+        createActivityLoggedEvent({
+          ...testActivity,
           timestamp: "2025-08-16T12:00:00Z",
           task: "Task A",
           category: "Category 1",
         }),
-        ActivityLoggedEvent.createTestInstance({
+        createActivityLoggedEvent({
+          ...testActivity,
           timestamp: "2025-08-18T12:00:00Z",
           task: "Task B",
           category: "Category 2",
@@ -479,13 +527,13 @@ describe("Get statistics", () => {
       const { handler } = configure({ events });
 
       const result = await handler.handle(
-        GetStatisticsQuery.create({
+        createGetStatisticsQuery({
           scope: StatisticsScope.CYCLE_TIMES,
         }),
       );
 
       expect(result.median).toEqual(
-        Median.create({
+        createMedian({
           edge0: 0,
           edge25: 1,
           edge50: 4,
@@ -499,22 +547,26 @@ describe("Get statistics", () => {
   describe("Filter statistic data by category", () => {
     it("should filter by category when category is provided", async () => {
       const events = [
-        ActivityLoggedEvent.createTestInstance({
+        createActivityLoggedEvent({
+          ...testActivity,
           task: "Task A",
           duration: "PT24H", // 3 person days
           category: "Category A",
         }),
-        ActivityLoggedEvent.createTestInstance({
+        createActivityLoggedEvent({
+          ...testActivity,
           task: "Task A",
           duration: "PT16H", // 2 person days
           category: "Category B",
         }),
-        ActivityLoggedEvent.createTestInstance({
+        createActivityLoggedEvent({
+          ...testActivity,
           task: "Task B",
           duration: "PT40H", // 5 person days
           category: "Category A",
         }),
-        ActivityLoggedEvent.createTestInstance({
+        createActivityLoggedEvent({
+          ...testActivity,
           task: "Task C",
           duration: "PT16H", // 2 person days
           category: "Category A",
@@ -523,14 +575,14 @@ describe("Get statistics", () => {
       const { handler } = configure({ events });
 
       const result = await handler.handle(
-        GetStatisticsQuery.create({
+        createGetStatisticsQuery({
           scope: StatisticsScope.WORKING_HOURS,
           categories: ["Category A"],
         }),
       );
 
       expect(result).toEqual(
-        GetStatisticsQueryResult.create({
+        createGetStatisticsQueryResult({
           histogram: {
             binEdges: ["0", "0.5", "1", "2", "3", "5"],
             frequencies: [0, 0, 1, 1, 1],
@@ -552,20 +604,24 @@ describe("Get statistics", () => {
 
     it("should filter by activities without a category", async () => {
       const events = [
-        ActivityLoggedEvent.createTestInstance({
+        createActivityLoggedEvent({
+          ...testActivity,
           timestamp: "2025-11-03T08:00:00Z",
           task: "Task A",
         }),
-        ActivityLoggedEvent.createTestInstance({
+        createActivityLoggedEvent({
+          ...testActivity,
           timestamp: "2025-11-03T08:00:00Z",
           task: "Task B",
         }),
-        ActivityLoggedEvent.createTestInstance({
+        createActivityLoggedEvent({
+          ...testActivity,
           timestamp: "2025-11-04T08:00:00Z",
           task: "Task C",
           category: "Testing Category",
         }),
-        ActivityLoggedEvent.createTestInstance({
+        createActivityLoggedEvent({
+          ...testActivity,
           timestamp: "2025-11-05T08:00:00Z",
           task: "Task A",
           category: "Testing Category",
@@ -574,14 +630,14 @@ describe("Get statistics", () => {
       const { handler } = configure({ events });
 
       const result = await handler.handle(
-        GetStatisticsQuery.create({
+        createGetStatisticsQuery({
           scope: StatisticsScope.CYCLE_TIMES,
           categories: [""],
         }),
       );
 
       expect(result).toEqual(
-        GetStatisticsQueryResult.create({
+        createGetStatisticsQueryResult({
           histogram: {
             binEdges: ["0", "1", "2"],
             frequencies: [2, 0],
@@ -603,17 +659,20 @@ describe("Get statistics", () => {
 
     it("should filter by no category and a category", async () => {
       const events = [
-        ActivityLoggedEvent.createTestInstance({
+        createActivityLoggedEvent({
+          ...testActivity,
           timestamp: "2025-11-03T08:00:00Z",
           task: "Task A",
           category: "Category A",
         }),
-        ActivityLoggedEvent.createTestInstance({
+        createActivityLoggedEvent({
+          ...testActivity,
           timestamp: "2025-11-03T08:00:00Z",
           task: "Task B",
           category: "Category B",
         }),
-        ActivityLoggedEvent.createTestInstance({
+        createActivityLoggedEvent({
+          ...testActivity,
           timestamp: "2025-11-04T08:00:00Z",
           task: "Task C",
         }),
@@ -621,14 +680,14 @@ describe("Get statistics", () => {
       const { handler } = configure({ events });
 
       const result = await handler.handle(
-        GetStatisticsQuery.create({
+        createGetStatisticsQuery({
           scope: StatisticsScope.CYCLE_TIMES,
           categories: ["", "Category A"],
         }),
       );
 
       expect(result).toEqual(
-        GetStatisticsQueryResult.create({
+        createGetStatisticsQueryResult({
           histogram: {
             binEdges: ["0", "1", "2"],
             frequencies: [2, 0],
@@ -650,17 +709,20 @@ describe("Get statistics", () => {
 
     it("should do not filter when query categories is an empty array", async () => {
       const events = [
-        ActivityLoggedEvent.createTestInstance({
+        createActivityLoggedEvent({
+          ...testActivity,
           timestamp: "2025-11-03T08:00:00Z",
           task: "Task A",
           category: "Category A",
         }),
-        ActivityLoggedEvent.createTestInstance({
+        createActivityLoggedEvent({
+          ...testActivity,
           timestamp: "2025-11-03T08:00:00Z",
           task: "Task B",
           category: "Category B",
         }),
-        ActivityLoggedEvent.createTestInstance({
+        createActivityLoggedEvent({
+          ...testActivity,
           timestamp: "2025-11-04T08:00:00Z",
           task: "Task C",
         }),
@@ -668,14 +730,14 @@ describe("Get statistics", () => {
       const { handler } = configure({ events });
 
       const result = await handler.handle(
-        GetStatisticsQuery.create({
+        createGetStatisticsQuery({
           scope: StatisticsScope.CYCLE_TIMES,
           categories: [],
         }),
       );
 
       expect(result).toEqual(
-        GetStatisticsQueryResult.create({
+        createGetStatisticsQueryResult({
           histogram: {
             binEdges: ["0", "1", "2"],
             frequencies: [3, 0],

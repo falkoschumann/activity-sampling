@@ -1,52 +1,37 @@
 // Copyright (c) 2026 Falko Schumann. All rights reserved. MIT license.
 
-import {
-  type ActivityState,
-  mergeCategories,
-} from "./activity/activity.aggregate";
 import type { ReportView } from "./report.read_model";
-import { Histogram } from "./histogram";
-import { Median } from "./median";
+import {
+  type Activity,
+  selectDistinctCategories,
+} from "./activity.value_object";
+import { createHistogram, type Histogram } from "./histogram.value_object";
+import { createMedian, type Median } from "./median.value_object";
 
-export class GetStatisticsQuery {
-  static create({
-    scope,
-    categories = [],
-    timeZone = Temporal.Now.timeZoneId(),
-  }: {
-    scope: StatisticsScope;
-    categories?: string[];
-    timeZone?: Temporal.TimeZoneLike;
-  }) {
-    return new GetStatisticsQuery(scope, categories, timeZone);
-  }
+export interface GetStatisticsQuery {
+  readonly type: "get-statistics";
+  readonly data: GetStatisticsQueryData;
+}
 
-  static createTestInstance({
-    scope = StatisticsScope.CYCLE_TIMES,
-    categories = ["Feature"],
-    timeZone = "Europe/Berlin",
-  }: {
-    scope?: StatisticsScope;
-    categories?: string[];
-    timeZone?: Temporal.TimeZoneLike;
-  } = {}) {
-    return GetStatisticsQuery.create({ scope, categories, timeZone });
-  }
+export type GetStatisticsQueryData = Readonly<{
+  scope: StatisticsScope;
+  categories: string[];
+  timeZone: Temporal.TimeZoneLike;
+}>;
 
-  readonly type = "get-statistics";
-  readonly data;
-
-  private constructor(
-    scope: StatisticsScope,
-    categories: string[],
-    timeZone: Temporal.TimeZoneLike,
-  ) {
-    this.data = {
-      scope,
-      categories,
-      timeZone,
-    };
-  }
+export function createGetStatisticsQuery({
+  scope,
+  categories = [],
+  timeZone = Temporal.Now.timeZoneId(),
+}: {
+  scope: StatisticsScope;
+  categories?: string[];
+  timeZone?: Temporal.TimeZoneLike;
+}): GetStatisticsQuery {
+  return {
+    type: "get-statistics",
+    data: { scope, categories, timeZone },
+  };
 }
 
 export const StatisticsScope = Object.freeze({
@@ -57,76 +42,48 @@ export const StatisticsScope = Object.freeze({
 export type StatisticsScope =
   (typeof StatisticsScope)[keyof typeof StatisticsScope];
 
-export class GetStatisticsQueryResult {
-  static create({
-    histogram = Histogram.create(),
-    median = Median.create(),
-    categories = [],
-    totalCount = 0,
-  }: {
-    histogram?: Histogram;
-    median?: Median;
-    categories?: string[];
-    totalCount?: number;
-  } = {}) {
-    return new GetStatisticsQueryResult(
-      Histogram.create(histogram),
-      Median.create(median),
-      categories,
-      totalCount,
-    );
-  }
-
-  static createTestInstance({
-    histogram = Histogram.createTestInstance(),
-    median = Median.createTestInstance(),
-    categories = ["Feature"],
-    totalCount = 1,
-  }: {
-    histogram?: Histogram;
-    median?: Median;
-    categories?: string[];
-    totalCount?: number;
-  } = {}) {
-    return GetStatisticsQueryResult.create({
-      histogram,
-      median,
-      categories,
-      totalCount,
-    });
-  }
-
+export interface GetStatisticsQueryResult {
   readonly histogram: Histogram;
   readonly median: Median;
   readonly categories: string[];
   readonly totalCount: number;
+}
 
-  private constructor(
-    histogram: Histogram,
-    median: Median,
-    categories: string[],
-    totalCount: number,
-  ) {
-    this.histogram = Histogram.create(histogram);
-    this.median = Median.create(median);
-    this.categories = categories;
-    this.totalCount = totalCount;
-  }
+export function createGetStatisticsQueryResult({
+  histogram = createHistogram(),
+  median = createMedian(),
+  categories = [],
+  totalCount = 0,
+}: {
+  histogram?: Histogram;
+  median?: Median;
+  categories?: string[];
+  totalCount?: number;
+} = {}): GetStatisticsQueryResult {
+  return {
+    histogram,
+    median,
+    categories,
+    totalCount,
+  };
 }
 
 export function getStatistics(
   view: ReportView,
   query: GetStatisticsQuery,
 ): GetStatisticsQueryResult {
-  const activities = mergeCategories(view.activities, query.data.categories);
+  const activities = selectDistinctCategories(
+    view.activities,
+    query.data.categories,
+  );
   const statistics = createDays(activities, query);
-  const histogram = createHistogram(
+  const histogram = calculateHistogram(
     statistics.xAxisLabel,
     statistics.days,
     query.data.scope,
   );
-  const median = createMedian(statistics.days);
-  return GetStatisticsQueryResult.create({
+  const median = calculateMedian(statistics.days);
+  return createGetStatisticsQueryResult({
     histogram,
     median,
     categories: view.categories,
@@ -134,7 +91,7 @@ export function getStatistics(
   });
 }
 
-function createDays(activities: ActivityState[], query: GetStatisticsQuery) {
+function createDays(activities: Activity[], query: GetStatisticsQuery) {
   switch (query.data.scope) {
     case StatisticsScope.WORKING_HOURS:
       return createWorkingHoursStatistics(activities);
@@ -143,31 +100,34 @@ function createDays(activities: ActivityState[], query: GetStatisticsQuery) {
   }
 }
 
-function createWorkingHoursStatistics(activities: ActivityState[]) {
+function createWorkingHoursStatistics(activities: Activity[]) {
   let totalCount = 0;
   let days: number[] = [];
   for (const activity of activities) {
     totalCount++;
-    const workDays = activity.hours.total("hours") / 8;
+    const workDays = Temporal.Duration.from(activity.hours).total("hours") / 8;
     days.push(workDays);
   }
   days = Object.values(days).sort((a, b) => a - b);
   return { xAxisLabel: "Duration (days)", days, totalCount };
 }
 
-function createCycleTimesStatistics(activities: ActivityState[]) {
+function createCycleTimesStatistics(activities: Activity[]) {
   let totalCount = 0;
   let days: number[] = [];
   for (const activity of activities) {
     totalCount++;
-    const cycleTime = activity.finish.since(activity.start).total("days") + 1;
+    const cycleTime =
+      Temporal.PlainDate.from(activity.finish)
+        .since(activity.start)
+        .total("days") + 1;
     days.push(cycleTime);
   }
   days = Object.values(days).sort((a, b) => a - b);
   return { xAxisLabel: "Cycle time (days)", days, totalCount };
 }
 
-function createHistogram(
+function calculateHistogram(
   xAxisLabel: string,
   days: number[],
   scope: StatisticsScope,
@@ -212,7 +172,7 @@ function createHistogram(
   };
 }
 
-function createMedian(days: number[]) {
+function calculateMedian(days: number[]) {
   const maxDay = days.at(-1) ?? 0;
   const edge0 = 0;
   let edge25 = 0;
