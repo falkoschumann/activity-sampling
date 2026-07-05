@@ -4,6 +4,7 @@ import { describe, expect, it } from "vitest";
 
 import { GetBurnUpQueryHandler } from "../../../src/main/application/get_burn_up.query_handler";
 import {
+  type ActivityLoggedEvent,
   type ActivityLoggedEventData,
   createActivityLoggedEvent,
 } from "../../../src/shared/domain/activity/activity_logged.event";

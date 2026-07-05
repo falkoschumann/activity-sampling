@@ -1,105 +1,81 @@
 // Copyright (c) 2026 Falko Schumann. All rights reserved. MIT license.
 
+// TODO make functional
+
 import {
-  type ActivityState,
-  mergeCategories,
-} from "./activity/activity.aggregate";
+  type Activity,
+  selectDistinctCategories,
+} from "./activity.value_object";
 import type { ReportView } from "./report.read_model";
-import { EstimateEntry } from "./estimate_entry";
+import {
+  createEstimateEntry,
+  type EstimateEntry,
+} from "./estimate_entry.value_object";
 
-export class GetEstimateQuery {
-  static create({
-    categories = [],
-    timeZone = Temporal.Now.timeZoneId(),
-  }: {
-    categories?: string[];
-    timeZone?: Temporal.TimeZoneLike;
-  }) {
-    return new GetEstimateQuery(categories, timeZone);
-  }
-
-  static createTestInstance({
-    categories = ["Feature"],
-    timeZone = "Europe/Berlin",
-  }: {
-    categories?: string[];
-    timeZone?: Temporal.TimeZoneLike;
-  } = {}) {
-    return GetEstimateQuery.create({ categories, timeZone });
-  }
-
-  readonly type = "get-estimate";
-  readonly data;
-
-  private constructor(categories: string[], timeZone: Temporal.TimeZoneLike) {
-    this.data = {
-      categories,
-      timeZone,
-    };
-  }
+export interface GetEstimateQuery {
+  readonly type: "get-estimate";
+  readonly data: GetEstimateQueryData;
 }
 
-export class GetEstimateQueryResult {
-  static create({
-    cycleTimes = [],
-    categories = [],
-    totalCount = 0,
-  }: {
-    cycleTimes?: EstimateEntry[];
-    categories?: string[];
-    totalCount?: number;
-  } = {}) {
-    return new GetEstimateQueryResult(cycleTimes, categories, totalCount);
-  }
+export type GetEstimateQueryData = Readonly<{
+  categories: string[];
+  timeZone: Temporal.TimeZoneLike;
+}>;
 
-  static createTestInstance({
-    cycleTimes = [EstimateEntry.createTestInstance()],
-    categories = ["Feature"],
-    totalCount = 1,
-  }: {
-    cycleTimes?: EstimateEntry[];
-    categories?: string[];
-    totalCount?: number;
-  } = {}) {
-    return GetEstimateQueryResult.create({
-      cycleTimes,
-      categories,
-      totalCount,
-    });
-  }
+export function createGetEstimateQuery({
+  categories = [],
+  timeZone = Temporal.Now.timeZoneId(),
+}: {
+  categories?: string[];
+  timeZone?: Temporal.TimeZoneLike;
+}): GetEstimateQuery {
+  return {
+    type: "get-estimate",
+    data: { categories, timeZone },
+  };
+}
 
-  readonly cycleTimes;
-  readonly categories;
-  readonly totalCount;
+export interface GetEstimateQueryResult {
+  readonly cycleTimes: EstimateEntry[];
+  readonly categories: string[];
+  readonly totalCount: number;
+}
 
-  private constructor(
-    cycleTimes: EstimateEntry[],
-    categories: string[],
-    totalCount: number,
-  ) {
-    this.cycleTimes = cycleTimes.map(EstimateEntry.create);
-    this.categories = categories;
-    this.totalCount = totalCount;
-  }
+export function createGetEstimateQueryResult({
+  cycleTimes = [],
+  categories = [],
+  totalCount = 0,
+}: {
+  cycleTimes?: EstimateEntry[];
+  categories?: string[];
+  totalCount?: number;
+} = {}): GetEstimateQueryResult {
+  return { cycleTimes, categories, totalCount };
 }
 
 export function getEstimate(
   view: ReportView,
   query: GetEstimateQuery,
 ): GetEstimateQueryResult {
-  const activities = mergeCategories(view.activities, query.data.categories);
+  const activities = selectDistinctCategories(
+    view.activities,
+    query.data.categories,
+  );
   const cycleTimes = determineCycleTimes(activities);
-  return GetEstimateQueryResult.create({
+  return createGetEstimateQueryResult({
     cycleTimes,
     categories: view.categories,
     totalCount: activities.length,
   });
 }
 
-function determineCycleTimes(activities: ActivityState[]) {
+function determineCycleTimes(activities: Activity[]) {
   const cycleTimeCounts = new Map<number, number>();
   for (const activity of activities) {
-    const cycleTime = activity.finish.since(activity.start).total("days") + 1;
+    const cycleTime =
+      Temporal.PlainDate.from(activity.finish)
+        .since(activity.start)
+        .total("days") + 1;
     const frequency = cycleTimeCounts.get(cycleTime) ?? 0;
     cycleTimeCounts.set(cycleTime, frequency + 1);
   }
@@ -115,7 +91,7 @@ function determineCycleTimes(activities: ActivityState[]) {
   return sortedCycleTimes.map(([cycleTime, frequency]) => {
     const probability = frequency / totalFrequencies;
     cumulativeProbability += probability;
-    return EstimateEntry.create({
+    return createEstimateEntry({
       cycleTime,
       frequency,
       probability,

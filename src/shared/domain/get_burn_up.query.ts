@@ -1,7 +1,10 @@
 // Copyright (c) 2026 Falko Schumann. All rights reserved. MIT license.
 
-import { type Activity, selectDistinctCategories } from "./activity.value_object";
 import type { ReportView } from "./report.read_model";
+import {
+  type Activity,
+  selectDistinctCategories,
+} from "./activity.value_object";
 import { type BurnUpData, createBurnUpData } from "./burn_up_data.value_object";
 
 export interface GetBurnUpQuery {

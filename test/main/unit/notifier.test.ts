@@ -5,7 +5,7 @@ import { describe, expect, it } from "vitest";
 
 import { NotifierProcessManager } from "../../../src/main/application/notifier.process_manager";
 import { LogActivityCommand } from "../../../src/shared/domain/activity/log_activity.command";
-import { TimerElapsedEvent } from "../../../src/shared/domain/timer/timer_elapsed.event";
+import { createTimerElapsedEvent } from "../../../src/shared/domain/timer/timer_elapsed.event";
 import { ActivityLoggedEvent } from "../../../src/shared/domain/activity/activity_logged.event";
 import { NotificationsGateway } from "../../../src/main/infrastructure/notifications.gateway";
 import { Clock } from "../../../src/main/infrastructure/clock";
@@ -16,7 +16,7 @@ describe("Notifier", () => {
     const showTracked = notificationsGateway.trackShow();
 
     eventBus.publish(
-      TimerElapsedEvent.create({
+      createTimerElapsedEvent({
         timestamp: "2026-06-13T11:00:00Z",
         duration: "PT30M",
       }),
@@ -43,7 +43,7 @@ describe("Notifier", () => {
       }),
     );
     eventBus.publish(
-      TimerElapsedEvent.create({
+      createTimerElapsedEvent({
         timestamp: "2026-06-13T11:00:00Z",
         duration: "PT30M",
       }),
@@ -64,7 +64,7 @@ describe("Notifier", () => {
     const messageTracker = MessageTracker.create(messageRouter, "log-activity");
     const showTracked = notificationsGateway.trackShow();
     eventBus.publish(
-      TimerElapsedEvent.create({
+      createTimerElapsedEvent({
         timestamp: "2026-06-13T11:00:00Z",
         duration: "PT30M",
       }),
@@ -90,7 +90,7 @@ describe("Notifier", () => {
       }),
     );
     eventBus.publish(
-      TimerElapsedEvent.create({
+      createTimerElapsedEvent({
         timestamp: "2026-06-13T11:00:00Z",
         duration: "PT20M",
       }),
