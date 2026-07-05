@@ -1,74 +1,57 @@
 // Copyright (c) 2026 Falko Schumann. All rights reserved. MIT license.
 
 import type { TimesheetView, TimesheetViewEntry } from "./timesheet.read_model";
-import { RecentActivity } from "./recent_activity";
-import { normalizeDuration } from "./temporal";
-import { TimeSummary } from "./time_summary";
-import { WorkingDay } from "./working_day";
+import {
+  compareRecentActivity,
+  createRecentActivity,
+} from "./recent_activity.value_object";
+import {
+  createTimeSummary,
+  type TimeSummary,
+} from "./time_summary.value_object";
+import {
+  compareWorkingDay,
+  createWorkingDay,
+  type WorkingDay,
+} from "./working_day.value_object";
+import { normalizeDuration } from "./activity";
 
-export class GetRecentActivitiesQuery {
-  static create({
-    today = Temporal.Now.plainDateISO(),
-    timeZone = Temporal.Now.timeZoneId(),
-  }: {
-    today?: Temporal.PlainDateLike;
-    timeZone?: Temporal.TimeZoneLike;
-  } = {}) {
-    return new GetRecentActivitiesQuery(today, timeZone);
-  }
-
-  static createTestInstance({
-    today = "2026-03-29T11:56",
-    timeZone = "Europe/Berlin",
-  }: {
-    today?: Temporal.PlainDateLike;
-    timeZone?: Temporal.TimeZoneLike;
-  } = {}) {
-    return GetRecentActivitiesQuery.create({ today, timeZone });
-  }
-
-  readonly type = "get-recent-activities";
-  readonly data;
-
-  private constructor(
-    today: Temporal.PlainDateLike,
-    timeZone: Temporal.TimeZoneLike,
-  ) {
-    this.data = {
-      today: Temporal.PlainDate.from(today),
-      timeZone,
-    };
-  }
+export interface GetRecentActivitiesQuery {
+  readonly type: "get-recent-activities";
+  readonly data: GetRecentActivitiesQueryData;
 }
 
-export class GetRecentActivitiesQueryResult {
-  static create({
-    workingDays = [],
-    timeSummary = TimeSummary.create(),
-  }: {
-    workingDays?: WorkingDay[];
-    timeSummary?: TimeSummary;
-  } = {}) {
-    return new GetRecentActivitiesQueryResult(workingDays, timeSummary);
-  }
+export type GetRecentActivitiesQueryData = Readonly<{
+  today: Temporal.PlainDateLike;
+  timeZone: Temporal.TimeZoneLike;
+}>;
 
-  static createTestInstance({
-    workingDays = [WorkingDay.createTestInstance()],
-    timeSummary = TimeSummary.createTestInstance(),
-  }: {
-    workingDays?: WorkingDay[];
-    timeSummary?: TimeSummary;
-  } = {}) {
-    return GetRecentActivitiesQueryResult.create({ workingDays, timeSummary });
-  }
+export function createGetRecentActivitiesQuery({
+  today = Temporal.Now.plainDateISO().toString(),
+  timeZone = Temporal.Now.timeZoneId(),
+}: {
+  today?: Temporal.PlainDateLike;
+  timeZone?: Temporal.TimeZoneLike;
+} = {}): GetRecentActivitiesQuery {
+  return {
+    type: "get-recent-activities",
+    data: { today, timeZone },
+  };
+}
 
-  readonly workingDays;
-  readonly timeSummary;
+export interface GetRecentActivitiesQueryResult {
+  readonly workingDays: WorkingDay[];
+  readonly timeSummary: TimeSummary;
+}
 
-  private constructor(workingDays: WorkingDay[], timeSummary: TimeSummary) {
-    this.workingDays = workingDays.map(WorkingDay.create);
-    this.timeSummary = TimeSummary.create(timeSummary);
-  }
+export function createGetRecentActivitiesQueryResult({
+  workingDays = [],
+  timeSummary = createTimeSummary(),
+}: {
+  workingDays?: WorkingDay[];
+  timeSummary?: TimeSummary;
+} = {}): GetRecentActivitiesQueryResult {
+  return { workingDays, timeSummary };
 }
 
 export function getRecentActivities(
@@ -77,8 +60,8 @@ export function getRecentActivities(
 ): GetRecentActivitiesQueryResult {
   // we assume the view is pre-filtered by last 30 days and end of current month
   const workingDays = createWorkingDays(view);
-  const timeSummary = createTimeSummary(view, query);
-  return GetRecentActivitiesQueryResult.create({
+  const timeSummary = calculateTimeSummary(view, query);
+  return createGetRecentActivitiesQueryResult({
     workingDays,
     timeSummary,
   });
@@ -89,7 +72,7 @@ function createWorkingDays(view: TimesheetView) {
   for (const entry of view.entries) {
     updateWorkingDays(workingDays, entry);
   }
-  return workingDays.sort(WorkingDay.compare).reverse();
+  return workingDays.sort(compareWorkingDay).reverse();
 }
 
 function updateWorkingDays(
@@ -99,14 +82,18 @@ function updateWorkingDays(
   let workingDay = workingDays.at(-1);
   if (
     workingDay?.date == null ||
-    !entry.timestamp.toPlainDate().equals(workingDay.date)
+    !Temporal.PlainDate.from(entry.timestamp).equals(workingDay.date)
   ) {
-    workingDay = WorkingDay.create({ date: entry.timestamp });
+    workingDay = createWorkingDay({
+      date: Temporal.PlainDate.from(entry.timestamp),
+    });
     workingDays.push(workingDay);
   }
   workingDay.activities.push(
-    RecentActivity.create({
-      time: entry.timestamp,
+    createRecentActivity({
+      time: Temporal.PlainDateTime.from(entry.timestamp)
+        .toPlainTime()
+        .toString(),
       client: entry.client,
       project: entry.project,
       task: entry.task,
@@ -114,26 +101,27 @@ function updateWorkingDays(
       category: entry.category,
     }),
   );
-  workingDay.activities.sort(RecentActivity.compare).reverse();
+  workingDay.activities.sort(compareRecentActivity).reverse();
 }
 
-function createTimeSummary(
+function calculateTimeSummary(
   view: TimesheetView,
   query: GetRecentActivitiesQuery,
 ) {
-  const yesterday = query.data.today.subtract("P1D");
-  const weekStart = query.data.today.subtract({
-    days: query.data.today.dayOfWeek - 1,
+  const today = Temporal.PlainDate.from(query.data.today);
+  const yesterday = today.subtract("P1D");
+  const weekStart = today.subtract({
+    days: today.dayOfWeek - 1,
   });
   const weekEnd = weekStart.add("P6D");
-  const monthStart = query.data.today.with({ day: 1 });
+  const monthStart = today.with({ day: 1 });
   const monthEnd = monthStart.add("P1M").subtract("P1D");
   let hoursToday = Temporal.Duration.from("PT0S");
   let hoursYesterday = Temporal.Duration.from("PT0S");
   let hoursThisWeek = Temporal.Duration.from("PT0S");
   let hoursThisMonth = Temporal.Duration.from("PT0S");
   for (const entry of view.entries) {
-    const date = entry.timestamp.toPlainDate();
+    const date = Temporal.PlainDate.from(entry.timestamp);
     const hours = entry.duration;
     if (date.equals(query.data.today)) {
       hoursToday = hoursToday.add(hours);
@@ -154,7 +142,7 @@ function createTimeSummary(
       hoursThisMonth = hoursThisMonth.add(hours);
     }
   }
-  return TimeSummary.create({
+  return createTimeSummary({
     today: normalizeDuration(hoursToday),
     yesterday: normalizeDuration(hoursYesterday),
     thisWeek: normalizeDuration(hoursThisWeek),

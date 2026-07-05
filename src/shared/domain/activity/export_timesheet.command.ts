@@ -5,8 +5,8 @@ import {
   createTimesheetExportedEvent,
   type TimesheetExportedEvent,
 } from "./timesheet_exported.event";
-import { TimesheetData } from "../timesheet_data";
-import { TimesheetEntry } from "../timesheet_entry";
+import { createTimesheetData } from "../timesheet_data";
+import type { TimesheetEntry } from "../timesheet_entry.value_object";
 
 export interface ExportTimesheetCommand {
   readonly type: "export-timesheet";
@@ -36,9 +36,9 @@ export function exportTimesheet(
   command: ExportTimesheetCommand,
 ): TimesheetExportedEvent[] {
   const timesheets = command.data.timesheets.map((entry) =>
-    TimesheetData.create({
+    createTimesheetData({
       ...entry,
-      hours: entry.hours.total("hours"),
+      hours: Temporal.Duration.from(entry.hours).total("hours"),
       firstName: settings.firstName ?? "",
       lastName: settings.lastName ?? "",
     }),

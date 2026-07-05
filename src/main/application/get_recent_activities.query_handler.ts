@@ -2,8 +2,8 @@
 
 import {
   getRecentActivities,
-  GetRecentActivitiesQuery,
-  GetRecentActivitiesQueryResult,
+  type GetRecentActivitiesQuery,
+  type GetRecentActivitiesQueryResult,
 } from "../../shared/domain/get_recent_activities.query";
 import { createSettingsChangedEvent } from "../../shared/domain/settings/settings_changed.event";
 import {
@@ -38,7 +38,8 @@ export class GetRecentActivitiesQueryHandler {
   async handle(
     query: GetRecentActivitiesQuery,
   ): Promise<GetRecentActivitiesQueryResult> {
-    const { today, timeZone } = query.data;
+    const today = Temporal.PlainDate.from(query.data.today);
+    const timeZone = query.data.timeZone;
 
     const settings = await this.#settingsProvider.load();
     let view = projectTimesheet(

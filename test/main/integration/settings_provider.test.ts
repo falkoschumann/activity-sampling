@@ -6,7 +6,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   createSettings,
-  createTestSettings,
+  type SettingsState,
 } from "../../../src/shared/domain/settings/settings.aggregate";
 import { SettingsProvider } from "../../../src/main/infrastructure/settings.provider";
 
@@ -40,6 +40,13 @@ const TEST_FILE = path.resolve(
   "../../../testdata/test-settings.csv",
 );
 
+const testSettings: SettingsState = {
+  capacity: "PT32H",
+  categories: ["", "Feature", "Rework", "Training"],
+  firstName: "John",
+  lastName: "Doe",
+};
+
 describe("Settings provider", () => {
   it("should load minimal example", async () => {
     const gateway = SettingsProvider.create({ filename: MINIMAL_FILE });
@@ -60,7 +67,8 @@ describe("Settings provider", () => {
     const settings = await gateway.load();
 
     expect(settings).toEqual(
-      createTestSettings({
+      createSettings({
+        ...testSettings,
         firstName: "John",
         lastName: "Doe",
       }),
@@ -93,30 +101,30 @@ describe("Settings provider", () => {
 
   it("should load stored settings", async () => {
     const gateway = SettingsProvider.create({ filename: TEST_FILE });
-    const settings = createTestSettings();
+    const settings = createSettings(testSettings);
 
     await gateway.store(settings);
 
-    expect(await gateway.load()).toEqual(createTestSettings());
+    expect(await gateway.load()).toEqual(createSettings(testSettings));
   });
 
   it("should load configurable responses when using nullable", async () => {
     const gateway = SettingsProvider.createNull({
-      readFileResponses: [createTestSettings()],
+      readFileResponses: [createSettings(testSettings)],
     });
 
     const settings = await gateway.load();
 
-    expect(settings).toEqual(createTestSettings());
+    expect(settings).toEqual(createSettings(testSettings));
   });
 
   it("should track stored settings when using nullable", async () => {
     const gateway = SettingsProvider.createNull();
     const trackedStored = gateway.trackStored();
 
-    await gateway.store(createTestSettings());
+    await gateway.store(createSettings(testSettings));
 
-    expect(trackedStored.data).toEqual([createTestSettings()]);
+    expect(trackedStored.data).toEqual([createSettings(testSettings)]);
   });
 
   it("should return default settings when using nullable", async () => {

@@ -93,3 +93,9 @@ function filterCategory(categories: string[]) {
     categories.length === 0 ||
     categories.includes(activity.category ?? NO_CATEGORY);
 }
+
+export function normalizeDuration(duration: Temporal.DurationLike) {
+  return Temporal.Duration.from(duration)
+    .round({ smallestUnit: "minute", largestUnit: "hour" })
+    .toString();
+}

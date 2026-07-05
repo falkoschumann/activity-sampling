@@ -10,13 +10,37 @@ import {
   createSettings,
   type SettingsState,
 } from "../../../src/shared/domain/settings/settings.aggregate";
-import { TimesheetData } from "../../../src/shared/domain/timesheet_data";
-import { TimesheetEntry } from "../../../src/shared/domain/timesheet_entry";
+import {
+  createTimesheetData,
+  type TimesheetData,
+} from "../../../src/shared/domain/timesheet_data";
+import {
+  createTimesheetEntry,
+  type TimesheetEntry,
+} from "../../../src/shared/domain/timesheet_entry.value_object";
 import { SettingsProvider } from "../../../src/main/infrastructure/settings.provider";
 
 const testSettings: SettingsState = {
   capacity: "PT32H",
   categories: ["", "Feature", "Rework", "Training"],
+  firstName: "John",
+  lastName: "Doe",
+};
+
+const testTimesheetEntry: TimesheetEntry = {
+  date: "2025-06-04",
+  client: "Test client",
+  project: "Test project",
+  task: "Test task",
+  hours: "PT2H",
+};
+
+const testTimesheetData: TimesheetData = {
+  date: "2025-06-04",
+  client: "Test client",
+  project: "Test project",
+  task: "Test task",
+  hours: 2,
   firstName: "John",
   lastName: "Doe",
 };
@@ -29,7 +53,7 @@ describe("Export timesheet", () => {
       const result = await handler.handle(
         createExportTimesheetCommand({
           filename: "export/null-timesheets.csv",
-          timesheets: [TimesheetEntry.createTestInstance()],
+          timesheets: [createTimesheetEntry(testTimesheetEntry)],
         }),
       );
 
@@ -37,7 +61,7 @@ describe("Export timesheet", () => {
       expect(eventBus.getEvents()).toEqual([
         createTimesheetExportedEvent({
           filename: "export/null-timesheets.csv",
-          timesheets: [TimesheetData.createTestInstance()],
+          timesheets: [createTimesheetData(testTimesheetData)],
         }),
       ]);
     });

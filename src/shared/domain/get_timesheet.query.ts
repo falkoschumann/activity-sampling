@@ -8,18 +8,19 @@ import {
 } from "./timesheet_entry.value_object";
 import { type Capacity, createCapacity } from "./capacity.value_object";
 import { countWorkingHours } from "./calendar.service";
+import { normalizeDuration } from "./activity";
 
 export interface GetTimesheetQuery {
   readonly type: "get-timesheet";
   readonly data: GetTimesheetQueryData;
 }
 
-export interface GetTimesheetQueryData {
-  readonly from: Temporal.PlainDateLike;
-  readonly to: Temporal.PlainDateLike;
-  readonly today: Temporal.PlainDateLike;
-  readonly timeZone: Temporal.TimeZoneLike;
-}
+export type GetTimesheetQueryData = Readonly<{
+  from: Temporal.PlainDateLike;
+  to: Temporal.PlainDateLike;
+  today: Temporal.PlainDateLike;
+  timeZone: Temporal.TimeZoneLike;
+}>;
 
 export function createGetTimesheetQuery({
   from,
@@ -99,21 +100,17 @@ function updateEntries(entries: TimesheetEntry[], entry: TimesheetViewEntry) {
     );
     entries[index] = createTimesheetEntry({
       ...existingEntry,
-      hours: accumulatedHours
-        .round({ smallestUnit: "minute", largestUnit: "hour" })
-        .toString(),
+      hours: normalizeDuration(accumulatedHours),
     });
   }
 }
 
 function sumTotalHours(entries: TimesheetEntry[]) {
-  return entries
-    .reduce(
-      (total, entry) => total.add(entry.hours),
-      Temporal.Duration.from("PT0S"),
-    )
-    .round({ smallestUnit: "minute", largestUnit: "hour" })
-    .toString();
+  const total = entries.reduce(
+    (total, entry) => total.add(entry.hours),
+    Temporal.Duration.from("PT0S"),
+  );
+  return normalizeDuration(total);
 }
 
 function determineCapacity(
@@ -122,10 +119,7 @@ function determineCapacity(
   totalHours: Temporal.DurationLike,
 ) {
   const { from, to, today } = query.data;
-  const hours = countWorkingHours(from, to, view)
-    .round({ smallestUnit: "minute", largestUnit: "hour" })
-    .toString();
-
+  const hours = countWorkingHours(from, to, view);
   let end: Temporal.PlainDateLike;
   if (Temporal.PlainDate.compare(today, from) < 0) {
     end = from;
@@ -135,10 +129,7 @@ function determineCapacity(
     end = today;
   }
   const businessDays = countWorkingHours(from, end, view);
-  const offset = Temporal.Duration.from(totalHours)
-    .subtract(businessDays)
-    .round({ smallestUnit: "minute", largestUnit: "hour" })
-    .toString();
+  const offset = Temporal.Duration.from(totalHours).subtract(businessDays);
 
-  return { hours, offset };
+  return { hours, offset: normalizeDuration(offset) };
 }
