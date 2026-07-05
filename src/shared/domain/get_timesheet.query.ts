@@ -1,14 +1,15 @@
 // Copyright (c) 2026 Falko Schumann. All rights reserved. MIT license.
 
-import type { TimesheetView, TimesheetViewEntry } from "./timesheet.read_model";
+import type { TimesheetView } from "./timesheet.read_model";
+import { normalizeDuration } from "./activity.value_object";
+import { type Capacity, createCapacity } from "./capacity.value_object";
 import {
   compareTimesheetEntry,
   createTimesheetEntry,
   type TimesheetEntry,
 } from "./timesheet_entry.value_object";
-import { type Capacity, createCapacity } from "./capacity.value_object";
+import type { TimesheetViewEntry } from "./timesheet_view_entry.value_object";
 import { countWorkingHours } from "./calendar.service";
-import { normalizeDuration } from "./activity";
 
 export interface GetTimesheetQuery {
   readonly type: "get-timesheet";

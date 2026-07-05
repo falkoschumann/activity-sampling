@@ -6,6 +6,7 @@ import type { HolidaysChangedEvent } from "./holiday/holidays_changed.event";
 import type { SettingsChangedEvent } from "./settings/settings_changed.event";
 import type { VacationState } from "./vacation/vacation.aggregate";
 import type { VacationsChangedEvent } from "./vacation/vacations_changed.event";
+import type { TimesheetViewEntry } from "./timesheet_view_entry.value_object";
 
 export interface TimesheetView {
   readonly entries: TimesheetViewEntry[];
@@ -13,16 +14,6 @@ export interface TimesheetView {
   readonly vacations: VacationState[];
   readonly capacity: Temporal.DurationLike;
   readonly categories: string[];
-}
-
-export interface TimesheetViewEntry {
-  readonly timestamp: Temporal.PlainDateTimeLike;
-  readonly duration: Temporal.DurationLike;
-  readonly client: string;
-  readonly project: string;
-  readonly task: string;
-  readonly notes?: string;
-  readonly category?: string;
 }
 
 export function createTimesheet(): TimesheetView {

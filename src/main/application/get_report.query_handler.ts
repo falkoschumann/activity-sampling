@@ -6,7 +6,7 @@ import {
 } from "../../shared/domain/report.read_model";
 import {
   getReport,
-  GetReportQuery,
+  type GetReportQuery,
   type GetReportQueryResult,
 } from "../../shared/domain/get_report.query";
 import type { EventStore } from "../infrastructure/event_store";
@@ -23,9 +23,14 @@ export class GetReportQueryHandler {
   }
 
   async handle(query: GetReportQuery): Promise<GetReportQueryResult> {
-    query = GetReportQuery.create(query.data);
-    const { from: fromDate, to: toDate, timeZone } = query.data;
+    const timeZone = query.data.timeZone;
+    const fromDate = query.data.from
+      ? Temporal.PlainDate.from(query.data.from)
+      : undefined;
     const from = fromDate?.toZonedDateTime(timeZone).startOfDay();
+    const toDate = query.data.to
+      ? Temporal.PlainDate.from(query.data.to)
+      : undefined;
     const to = toDate?.add("P1D").toZonedDateTime(timeZone).startOfDay();
     let view = createReport();
     for await (const event of this.#eventStore.replay({ from, to })) {

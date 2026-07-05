@@ -1,55 +1,39 @@
 // Copyright (c) 2026 Falko Schumann. All rights reserved. MIT license.
 
-import type { ActivityState } from "./activity/activity.aggregate";
 import type { ReportView } from "./report.read_model";
-import { ReportEntry } from "./report_entry";
-import { normalizeDuration } from "./temporal";
+import {
+  type Activity,
+  createActivity,
+  normalizeDuration,
+} from "./activity.value_object";
 
-export class GetReportQuery {
-  static create({
-    scope,
-    from,
-    to,
-    timeZone = Temporal.Now.timeZoneId(),
-  }: {
-    scope: ReportScope;
-    from?: Temporal.PlainDateLike;
-    to?: Temporal.PlainDateLike;
-    timeZone?: Temporal.TimeZoneLike;
-  }) {
-    return new GetReportQuery(scope, timeZone, from, to);
-  }
+export interface GetReportQuery {
+  readonly type: "get-report";
+  readonly data: GetReportQueryData;
+}
 
-  static createTestInstance({
-    scope = ReportScope.TASKS,
-    from = "2026-02-01",
-    to = "2026-02-28",
-    timeZone,
-  }: {
-    scope?: ReportScope;
-    from?: Temporal.PlainDateLike;
-    to?: Temporal.PlainDateLike;
-    timeZone?: Temporal.TimeZoneLike;
-  } = {}) {
-    return GetReportQuery.create({ scope, from, to, timeZone });
-  }
+export type GetReportQueryData = Readonly<{
+  scope: ReportScope;
+  timeZone: Temporal.TimeZoneLike;
+  from?: Temporal.PlainDateLike;
+  to?: Temporal.PlainDateLike;
+}>;
 
-  readonly type = "get-report";
-  readonly data;
-
-  private constructor(
-    scope: ReportScope,
-    timeZone: Temporal.TimeZoneLike,
-    from?: Temporal.PlainDateLike,
-    to?: Temporal.PlainDateLike,
-  ) {
-    this.data = {
-      scope,
-      from: from ? Temporal.PlainDate.from(from) : undefined,
-      to: to ? Temporal.PlainDate.from(to) : undefined,
-      timeZone,
-    };
-  }
+export function createGetReportQuery({
+  scope,
+  from,
+  to,
+  timeZone = Temporal.Now.timeZoneId(),
+}: {
+  scope: ReportScope;
+  from?: Temporal.PlainDateLike;
+  to?: Temporal.PlainDateLike;
+  timeZone?: Temporal.TimeZoneLike;
+}): GetReportQuery {
+  return {
+    type: "get-report",
+    data: { scope, timeZone, from, to },
+  };
 }
 
 export const ReportScope = Object.freeze({
@@ -61,37 +45,19 @@ export const ReportScope = Object.freeze({
 
 export type ReportScope = (typeof ReportScope)[keyof typeof ReportScope];
 
-export class GetReportQueryResult {
-  static create({
-    entries = [],
-    totalHours = "PT0S",
-  }: {
-    entries?: ReportEntry[];
-    totalHours?: Temporal.DurationLike;
-  } = {}) {
-    return new GetReportQueryResult(entries, totalHours);
-  }
+export interface GetReportQueryResult {
+  readonly entries: Activity[];
+  readonly totalHours: Temporal.DurationLike;
+}
 
-  static createTestInstance({
-    entries = [ReportEntry.createTestInstance()],
-    totalHours = "PT8H",
-  }: {
-    entries?: ReportEntry[];
-    totalHours?: Temporal.DurationLike;
-  } = {}) {
-    return GetReportQueryResult.create({ entries, totalHours });
-  }
-
-  readonly entries: ReportEntry[];
-  readonly totalHours: Temporal.Duration;
-
-  private constructor(
-    entries: ReportEntry[],
-    totalHours: Temporal.DurationLike,
-  ) {
-    this.entries = entries.map(ReportEntry.create);
-    this.totalHours = Temporal.Duration.from(totalHours);
-  }
+export function createGetReportQueryResult({
+  entries = [],
+  totalHours = "PT0S",
+}: {
+  entries?: Activity[];
+  totalHours?: Temporal.DurationLike;
+} = {}): GetReportQueryResult {
+  return { entries, totalHours };
 }
 
 export function getReport(
@@ -100,10 +66,10 @@ export function getReport(
 ): GetReportQueryResult {
   const entries = createEntries(view.activities, query);
   const totalHours = sumTotalHours(entries);
-  return GetReportQueryResult.create({ entries, totalHours });
+  return createGetReportQueryResult({ entries, totalHours });
 }
 
-function createEntries(activities: ActivityState[], query: GetReportQuery) {
+function createEntries(activities: Activity[], query: GetReportQuery) {
   switch (query.data.scope) {
     case ReportScope.CLIENTS:
       return createClientsReport(activities);
@@ -116,8 +82,8 @@ function createEntries(activities: ActivityState[], query: GetReportQuery) {
   }
 }
 
-function createClientsReport(activities: ActivityState[]) {
-  const entries: ReportEntry[] = [];
+function createClientsReport(activities: Activity[]) {
+  const entries: Activity[] = [];
   for (const activity of activities) {
     updateClientsReport(entries, activity);
   }
@@ -125,43 +91,55 @@ function createClientsReport(activities: ActivityState[]) {
   return entries;
 }
 
-function updateClientsReport(entries: ReportEntry[], activity: ActivityState) {
+function updateClientsReport(entries: Activity[], activity: Activity) {
   let { start, finish } = activity;
   const index = entries.findIndex((entry) => entry.client === activity.client);
   if (index == -1) {
-    entries.push(
-      ReportEntry.create({
-        start,
-        finish,
-        client: activity.client,
-        hours: activity.hours,
-        cycleTime: finish.since(start).total("days") + 1,
-      }),
-    );
-  } else {
-    const entry = entries[index]!;
-    start =
-      Temporal.PlainDate.compare(start, entry.start) < 0 ? start : entry.start;
-    finish =
-      Temporal.PlainDate.compare(finish, entry.finish) > 0
-        ? finish
-        : entry.finish;
-    entries[index] = ReportEntry.create({
+    const cycleTime =
+      Temporal.PlainDate.from(finish).since(start).total("days") + 1;
+    const newEntry = createActivity({
       start,
       finish,
       client: activity.client,
-      hours: normalizeDuration(activity.hours.add(entry.hours)),
-      cycleTime: finish.since(start).total("days") + 1,
+      project: "N/A",
+      task: "N/A",
+      hours: activity.hours,
+      cycleTime,
+    });
+    entries.push(newEntry);
+  } else {
+    const existingEntry = entries[index]!;
+    start =
+      Temporal.PlainDate.compare(start, existingEntry.start) < 0
+        ? start
+        : existingEntry.start;
+    finish =
+      Temporal.PlainDate.compare(finish, existingEntry.finish) > 0
+        ? finish
+        : existingEntry.finish;
+    const hours = normalizeDuration(
+      Temporal.Duration.from(activity.hours).add(existingEntry.hours),
+    );
+    const cycleTime =
+      Temporal.PlainDate.from(finish).since(start).total("days") + 1;
+    entries[index] = createActivity({
+      start,
+      finish,
+      client: activity.client,
+      project: "N/A",
+      task: "N/A",
+      hours,
+      cycleTime,
     });
   }
 }
 
-function compareClientsReport(a: ReportEntry, b: ReportEntry) {
+function compareClientsReport(a: Activity, b: Activity) {
   return a.client!.localeCompare(b.client!);
 }
 
-function createProjectsReport(activities: ActivityState[]) {
-  const entries: ReportEntry[] = [];
+function createProjectsReport(activities: Activity[]) {
+  const entries: Activity[] = [];
   for (const activity of activities) {
     updateProjectsReport(entries, activity);
   }
@@ -169,54 +147,64 @@ function createProjectsReport(activities: ActivityState[]) {
   return entries;
 }
 
-function updateProjectsReport(entries: ReportEntry[], activity: ActivityState) {
+function updateProjectsReport(entries: Activity[], activity: Activity) {
   let { start, finish } = activity;
   const index = entries.findIndex(
     (entry) => entry.project === activity.project,
   );
   if (index == -1) {
-    entries.push(
-      ReportEntry.create({
-        start,
-        finish,
-        client: activity.client,
-        project: activity.project,
-        hours: activity.hours,
-        cycleTime: finish.since(start).total("days") + 1,
-      }),
-    );
+    const cycleTime =
+      Temporal.PlainDate.from(finish).since(start).total("days") + 1;
+    const newEntry = createActivity({
+      start,
+      finish,
+      client: activity.client,
+      project: activity.project,
+      task: "N/A",
+      hours: activity.hours,
+      cycleTime,
+    });
+    entries.push(newEntry);
   } else {
-    const entry = entries[index]!;
+    const existingEntry = entries[index]!;
     start =
-      Temporal.PlainDate.compare(start, entry.start) < 0 ? start : entry.start;
+      Temporal.PlainDate.compare(start, existingEntry.start) < 0
+        ? start
+        : existingEntry.start;
     finish =
-      Temporal.PlainDate.compare(finish, entry.finish) > 0
+      Temporal.PlainDate.compare(finish, existingEntry.finish) > 0
         ? finish
-        : entry.finish;
-    let client = entry.client!;
+        : existingEntry.finish;
+    let client = existingEntry.client!;
     if (!client.includes(activity.client)) {
       const clients = client.split(", ");
       clients.push(activity.client);
       clients.sort();
       client = clients.join(", ");
     }
-    entries[index] = ReportEntry.create({
+    const hours = normalizeDuration(
+      Temporal.Duration.from(activity.hours).add(existingEntry.hours),
+    );
+    const cycleTime =
+      Temporal.PlainDate.from(finish).since(start).total("days") + 1;
+    entries[index] = createActivity({
       start,
       finish,
       client,
       project: activity.project,
-      hours: normalizeDuration(activity.hours.add(entry.hours)),
-      cycleTime: finish.since(start).total("days") + 1,
+      task: "N/A",
+      hours,
+      cycleTime,
     });
   }
 }
 
-function compareProjectsReport(a: ReportEntry, b: ReportEntry) {
+function compareProjectsReport(a: Activity, b: Activity) {
   return a.project!.localeCompare(b.project!);
 }
 
-function createTasksReport(activities: ActivityState[]) {
-  const entries: ReportEntry[] = [];
+function createTasksReport(activities: Activity[]) {
+  const entries: Activity[] = [];
   for (const activity of activities) {
     updateTasksReport(entries, activity);
   }
@@ -224,7 +212,7 @@ function createTasksReport(activities: ActivityState[]) {
   return entries;
 }
 
-function updateTasksReport(entries: ReportEntry[], activity: ActivityState) {
+function updateTasksReport(entries: Activity[], activity: Activity) {
   let { start, finish } = activity;
   const index = entries.findIndex(
     (entry) =>
@@ -233,27 +221,30 @@ function updateTasksReport(entries: ReportEntry[], activity: ActivityState) {
       entry.client === activity.client,
   );
   if (index == -1) {
-    entries.push(
-      ReportEntry.create({
-        start,
-        finish,
-        client: activity.client,
-        project: activity.project,
-        task: activity.task,
-        category: activity.category,
-        hours: activity.hours,
-        cycleTime: finish.since(start).total("days") + 1,
-      }),
-    );
+    const cycleTime =
+      Temporal.PlainDate.from(finish).since(start).total("days") + 1;
+    const newEntry = createActivity({
+      start,
+      finish,
+      client: activity.client,
+      project: activity.project,
+      task: activity.task,
+      category: activity.category,
+      hours: activity.hours,
+      cycleTime,
+    });
+    entries.push(newEntry);
   } else {
-    const entry = entries[index]!;
+    const existingEntry = entries[index]!;
     start =
-      Temporal.PlainDate.compare(start, entry.start) < 0 ? start : entry.start;
+      Temporal.PlainDate.compare(start, existingEntry.start) < 0
+        ? start
+        : existingEntry.start;
     finish =
-      Temporal.PlainDate.compare(finish, entry.finish) > 0
+      Temporal.PlainDate.compare(finish, existingEntry.finish) > 0
         ? finish
-        : entry.finish;
-    let category = entry.category!;
+        : existingEntry.finish;
+    let category = existingEntry.category!;
     if (
       category != null &&
       activity.category != null &&
@@ -264,20 +255,25 @@ function updateTasksReport(entries: ReportEntry[], activity: ActivityState) {
       categories.sort();
       category = categories.join(", ");
     }
-    entries[index] = ReportEntry.create({
+    const hours = normalizeDuration(
+      Temporal.Duration.from(activity.hours).add(existingEntry.hours),
+    );
+    const cycleTime =
+      Temporal.PlainDate.from(finish).since(start).total("days") + 1;
+    entries[index] = createActivity({
       start,
       finish,
       client: activity.client,
       project: activity.project,
       task: activity.task,
       category,
-      hours: normalizeDuration(activity.hours.add(entry.hours)),
-      cycleTime: finish.since(start).total("days") + 1,
+      hours,
+      cycleTime,
     });
   }
 }
 
-function compareTasksReport(a: ReportEntry, b: ReportEntry) {
+function compareTasksReport(a: Activity, b: Activity) {
   const taskComparison = a.task!.localeCompare(b.task!);
   if (taskComparison !== 0) {
     return taskComparison;
@@ -291,8 +287,8 @@ function compareTasksReport(a: ReportEntry, b: ReportEntry) {
   return a.client!.localeCompare(b.client!);
 }
 
-function createCategoriesReport(activities: ActivityState[]) {
-  const entries: ReportEntry[] = [];
+function createCategoriesReport(activities: Activity[]) {
+  const entries: Activity[] = [];
   for (const activity of activities) {
     updateCategoriesReport(entries, activity);
   }
@@ -300,47 +296,58 @@ function createCategoriesReport(activities: ActivityState[]) {
   return entries;
 }
 
-function updateCategoriesReport(
-  entries: ReportEntry[],
-  activity: ActivityState,
-) {
+function updateCategoriesReport(entries: Activity[], activity: Activity) {
   let { start, finish } = activity;
   const index = entries.findIndex(
     (entry) => entry.category === (activity.category ?? "N/A"),
   );
   if (index == -1) {
-    entries.push(
-      ReportEntry.create({
-        start,
-        finish,
-        category: activity.category ?? "N/A",
-        hours: activity.hours,
-        cycleTime: finish.since(start).total("days") + 1,
-      }),
-    );
-  } else {
-    const entry = entries[index]!;
-    start =
-      Temporal.PlainDate.compare(start, entry.start) < 0 ? start : entry.start;
-    finish =
-      Temporal.PlainDate.compare(finish, entry.finish) > 0
-        ? finish
-        : entry.finish;
-    entries[index] = ReportEntry.create({
+    const cycleTime =
+      Temporal.PlainDate.from(finish).since(start).total("days") + 1;
+    const newEntry = createActivity({
       start,
       finish,
+      client: "N/A",
+      project: "N/A",
+      task: "N/A",
+      category: activity.category ?? "N/A",
+      hours: activity.hours,
+      cycleTime,
+    });
+    entries.push(newEntry);
+  } else {
+    const existingEntry = entries[index]!;
+    start =
+      Temporal.PlainDate.compare(start, existingEntry.start) < 0
+        ? start
+        : existingEntry.start;
+    finish =
+      Temporal.PlainDate.compare(finish, existingEntry.finish) > 0
+        ? finish
+        : existingEntry.finish;
+    const hours = normalizeDuration(
+      Temporal.Duration.from(activity.hours).add(existingEntry.hours),
+    );
+    const cycleTime =
+      Temporal.PlainDate.from(finish).since(start).total("days") + 1;
+    entries[index] = createActivity({
+      start,
+      finish,
+      client: "N/A",
+      project: "N/A",
+      task: "N/A",
       category: activity.category,
-      hours: normalizeDuration(activity.hours.add(entry.hours)),
-      cycleTime: finish.since(start).total("days") + 1,
+      hours,
+      cycleTime,
     });
   }
 }
 
-function compareCategoriesReport(a: ReportEntry, b: ReportEntry) {
+function compareCategoriesReport(a: Activity, b: Activity) {
   return a.category!.localeCompare(b.category!);
 }
 
-function sumTotalHours(entries: ReportEntry[]) {
+function sumTotalHours(entries: Activity[]) {
   const totalHours = entries.reduce(
     (total, entry) => total.add(entry.hours),
     Temporal.Duration.from("PT0S"),

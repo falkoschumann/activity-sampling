@@ -14,7 +14,7 @@ import {
   createWorkingDay,
   type WorkingDay,
 } from "./working_day.value_object";
-import { normalizeDuration } from "./activity";
+import { normalizeDuration } from "./activity.value_object";
 
 export interface GetRecentActivitiesQuery {
   readonly type: "get-recent-activities";

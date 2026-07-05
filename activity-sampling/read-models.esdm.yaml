@@ -27,25 +27,7 @@ schema:
     entries:
       type: array
       items:
-        type: object
-        properties:
-          timestamp:
-            type: string
-            format: date-time
-          duration:
-            type: string
-            format: duration
-          client:
-            type: string
-          project:
-            type: string
-          task:
-            type: string
-          notes:
-            type: string
-          category:
-            type: string
-        required: [timestamp, duration, client, project, task]
+        type: TimesheetViewModel
     holidays:
       type: array
       items:
