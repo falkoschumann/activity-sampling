@@ -2,8 +2,8 @@
 
 import { app, Menu, type MenuItemConstructorOptions } from "electron/main";
 
-import { StartTimerCommand } from "../../shared/domain/timer/start_timer.command";
-import { StopTimerCommand } from "../../shared/domain/timer/stop_timer.command";
+import { createStartTimerCommand } from "../../shared/domain/timer/start_timer.command";
+import { createStopTimerCommand } from "../../shared/domain/timer/stop_timer.command";
 import { chooseDataDirectory, openWindow } from "./actions";
 import type { MessageRouter } from "@muspellheim/shared";
 
@@ -119,56 +119,56 @@ export function createMenu({
               label: "5 min",
               click: () =>
                 messageRouter.route(
-                  StartTimerCommand.create({ interval: "PT5M" }),
+                  createStartTimerCommand({ interval: "PT5M" }),
                 ),
             },
             {
               label: "10 min",
               click: () =>
                 messageRouter.route(
-                  StartTimerCommand.create({ interval: "PT10M" }),
+                  createStartTimerCommand({ interval: "PT10M" }),
                 ),
             },
             {
               label: "15 min",
               click: () =>
                 messageRouter.route(
-                  StartTimerCommand.create({ interval: "PT15M" }),
+                  createStartTimerCommand({ interval: "PT15M" }),
                 ),
             },
             {
               label: "20 min",
               click: () =>
                 messageRouter.route(
-                  StartTimerCommand.create({ interval: "PT20M" }),
+                  createStartTimerCommand({ interval: "PT20M" }),
                 ),
             },
             {
               label: "30 min",
               click: () =>
                 messageRouter.route(
-                  StartTimerCommand.create({ interval: "PT30M" }),
+                  createStartTimerCommand({ interval: "PT30M" }),
                 ),
             },
             {
               label: "60 min",
               click: () =>
                 messageRouter.route(
-                  StartTimerCommand.create({ interval: "PT1H" }),
+                  createStartTimerCommand({ interval: "PT1H" }),
                 ),
             },
             {
               label: "1 min",
               click: () =>
                 messageRouter.route(
-                  StartTimerCommand.create({ interval: "PT1M" }),
+                  createStartTimerCommand({ interval: "PT1M" }),
                 ),
             },
           ],
         },
         {
           label: "Stop",
-          click: () => messageRouter.route(StopTimerCommand.create()),
+          click: () => messageRouter.route(createStopTimerCommand()),
         },
       ],
     },

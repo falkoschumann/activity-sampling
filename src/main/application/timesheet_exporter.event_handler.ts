@@ -2,7 +2,7 @@
 
 import type { EventBus } from "@muspellheim/shared";
 
-import { TimesheetExportedEvent } from "../../shared/domain/activity/timesheet_exported.event";
+import type { TimesheetExportedEvent } from "../../shared/domain/activity/timesheet_exported.event";
 import type { TimesheetExporterGateway } from "../infrastructure/timesheet_exporter.gateway";
 
 export class TimesheetExportEventHandler {

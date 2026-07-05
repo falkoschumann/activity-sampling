@@ -6,10 +6,10 @@ import {
   OutputTracker,
 } from "@muspellheim/shared";
 
-import { TickTimerCommand } from "../../shared/domain/timer/tick_timer.command";
-import { TimerStartedEvent } from "../../shared/domain/timer/timer_started.event";
-import { TimerStoppedEvent } from "../../shared/domain/timer/timer_stopped.event";
-import { normalizeDuration } from "../../shared/domain/temporal";
+import { createTickTimerCommand } from "../../shared/domain/timer/tick_timer.command";
+import type { TimerStartedEvent } from "../../shared/domain/timer/timer_started.event";
+import type { TimerStoppedEvent } from "../../shared/domain/timer/timer_stopped.event";
+import { normalizeDuration } from "../../shared/domain/activity.value_object";
 import { Clock } from "../infrastructure/clock";
 
 export class TimerProcessManager extends EventTarget {
@@ -53,7 +53,7 @@ export class TimerProcessManager extends EventTarget {
   readonly #timer;
   #progressTimerId?: ReturnType<typeof setInterval>;
 
-  #interval!: Temporal.Duration;
+  #interval!: Temporal.DurationLike;
   #nextElapsedAt!: Temporal.Instant;
 
   private constructor(
@@ -119,15 +119,15 @@ export class TimerProcessManager extends EventTarget {
 
   #tick() {
     const start = this.#nextElapsedAt.subtract(this.#interval);
-    const timestamp = this.#clock.instant();
+    const timestamp = this.#clock.instant().toString();
     const progressedTime = normalizeDuration(start.until(timestamp));
     const command =
       Temporal.Duration.compare(progressedTime, this.#interval) < 0
-        ? TickTimerCommand.create({
+        ? createTickTimerCommand({
             progressedTime,
             duration: this.#interval,
           })
-        : TickTimerCommand.create({
+        : createTickTimerCommand({
             isElapsed: true,
             timestamp,
             duration: this.#interval,

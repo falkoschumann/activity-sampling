@@ -2,9 +2,9 @@
 
 import type { EventBus, MessageRouter } from "@muspellheim/shared";
 
-import { LogActivityCommand } from "../../shared/domain/activity/log_activity.command";
-import { ActivityLoggedEvent } from "../../shared/domain/activity/activity_logged.event";
-import { TimerElapsedEvent } from "../../shared/domain/timer/timer_elapsed.event";
+import { createLogActivityCommand } from "../../shared/domain/activity/log_activity.command";
+import type { ActivityLoggedEvent } from "../../shared/domain/activity/activity_logged.event";
+import type { TimerElapsedEvent } from "../../shared/domain/timer/timer_elapsed.event";
 import { Clock } from "../infrastructure/clock";
 import { NotificationsGateway } from "../infrastructure/notifications.gateway";
 
@@ -33,7 +33,7 @@ export class NotifierProcessManager {
   readonly #clock;
 
   #lastActivity?: ActivityLoggedEvent;
-  #duration?: Temporal.Duration;
+  #duration?: Temporal.DurationLike;
 
   private constructor(
     eventBus: EventBus,
@@ -88,7 +88,7 @@ export class NotifierProcessManager {
     }
 
     this.#messageRouter.route(
-      LogActivityCommand.create({
+      createLogActivityCommand({
         ...this.#lastActivity.data,
         timestamp: this.#clock.instant(),
         duration: this.#duration ?? this.#lastActivity.data.duration,

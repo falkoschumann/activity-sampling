@@ -4,9 +4,22 @@ import { EventBus } from "@muspellheim/shared";
 import { describe, expect, it } from "vitest";
 
 import { TimesheetExportEventHandler } from "../../../src/main/application/timesheet_exporter.event_handler";
-import { TimesheetExportedEvent } from "../../../src/shared/domain/activity/timesheet_exported.event";
-import { TimesheetData } from "../../../src/shared/domain/timesheet_data";
+import { createTimesheetExportedEvent } from "../../../src/shared/domain/activity/timesheet_exported.event";
+import {
+  createTimesheetData,
+  type TimesheetData,
+} from "../../../src/shared/domain/timesheet_data.value_objects";
 import { TimesheetExporterGateway } from "../../../src/main/infrastructure/timesheet_exporter.gateway";
+
+const testTimesheetData: TimesheetData = {
+  date: "2025-06-04",
+  client: "Test client",
+  project: "Test project",
+  task: "Test task",
+  hours: 2,
+  firstName: "",
+  lastName: "",
+};
 
 describe("Export timesheet", () => {
   describe("Export timesheet in Harvest format", () => {
@@ -15,23 +28,15 @@ describe("Export timesheet", () => {
       const exported = timesheetExporterGateway.trackExported();
 
       eventBus.publish(
-        TimesheetExportedEvent.create({
+        createTimesheetExportedEvent({
           filename: "export/null-timesheets.csv",
-          timesheets: [
-            {
-              ...TimesheetData.createTestInstance(),
-              firstName: "",
-              lastName: "",
-            },
-          ],
+          timesheets: [createTimesheetData(testTimesheetData)],
         }),
       );
 
       await expect
         .poll(() => exported.data)
-        .toEqual([
-          [TimesheetData.createTestInstance({ firstName: "", lastName: "" })],
-        ]);
+        .toEqual([[createTimesheetData(testTimesheetData)]]);
     });
   });
 });

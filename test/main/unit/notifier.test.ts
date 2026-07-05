@@ -4,11 +4,23 @@ import { EventBus, MessageRouter, MessageTracker } from "@muspellheim/shared";
 import { describe, expect, it } from "vitest";
 
 import { NotifierProcessManager } from "../../../src/main/application/notifier.process_manager";
-import { LogActivityCommand } from "../../../src/shared/domain/activity/log_activity.command";
+import { createLogActivityCommand } from "../../../src/shared/domain/activity/log_activity.command";
 import { createTimerElapsedEvent } from "../../../src/shared/domain/timer/timer_elapsed.event";
-import { ActivityLoggedEvent } from "../../../src/shared/domain/activity/activity_logged.event";
+import {
+  type ActivityLoggedEventData,
+  createActivityLoggedEvent,
+} from "../../../src/shared/domain/activity/activity_logged.event";
 import { NotificationsGateway } from "../../../src/main/infrastructure/notifications.gateway";
 import { Clock } from "../../../src/main/infrastructure/clock";
+
+const testActivity: ActivityLoggedEventData = {
+  timestamp: "2025-08-14T11:00:00Z",
+  duration: "PT30M",
+  client: "Test client",
+  project: "Test project",
+  task: "Test task",
+  notification: "notifier",
+};
 
 describe("Notifier", () => {
   it("should notify without last activity", async () => {
@@ -36,10 +48,11 @@ describe("Notifier", () => {
     const showTracked = notificationsGateway.trackShow();
 
     eventBus.publish(
-      ActivityLoggedEvent.createTestInstance({
-        client: "my-client",
-        project: "my-project",
-        task: "my-task",
+      createActivityLoggedEvent({
+        ...testActivity,
+        client: "Test client",
+        project: "Test project",
+        task: "Test task",
       }),
     );
     eventBus.publish(
@@ -54,7 +67,7 @@ describe("Notifier", () => {
       .toEqual([
         {
           title: "What are you working on?",
-          body: "my-project (my-client) my-task",
+          body: "Test project (Test client) Test task",
         },
       ]);
   });
@@ -82,10 +95,11 @@ describe("Notifier", () => {
     const messageTracker = MessageTracker.create(messageRouter, "log-activity");
     const showTracked = notificationsGateway.trackShow();
     eventBus.publish(
-      ActivityLoggedEvent.createTestInstance({
-        client: "my-client",
-        project: "my-project",
-        task: "my-task",
+      createActivityLoggedEvent({
+        ...testActivity,
+        client: "Test client",
+        project: "Test project",
+        task: "Test task",
         duration: "PT30M",
       }),
     );
@@ -100,11 +114,11 @@ describe("Notifier", () => {
     notificationsGateway.simulateClick();
 
     expect(messageTracker.messages).toEqual([
-      LogActivityCommand.createTestInstance({
+      createLogActivityCommand({
         timestamp: clock.instant(),
-        client: "my-client",
-        project: "my-project",
-        task: "my-task",
+        client: "Test client",
+        project: "Test project",
+        task: "Test task",
         duration: "PT20M",
       }),
     ]);

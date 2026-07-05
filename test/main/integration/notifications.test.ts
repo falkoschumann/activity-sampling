@@ -9,14 +9,14 @@ describe("Notifications", () => {
     const adapter = NotificationsGateway.createNull();
     const showTracked = adapter.trackShow();
 
-    await adapter.show({ title: "my-title" });
+    await adapter.show({ title: "Test title" });
 
-    expect(showTracked.data).toEqual([{ title: "my-title" }]);
+    expect(showTracked.data).toEqual([{ title: "Test title" }]);
   });
 
   it("should hide notification when showing another one", async () => {
     const adapter = NotificationsGateway.createNull();
-    await adapter.show({ title: "my-title" });
+    await adapter.show({ title: "Test title" });
     const hideTracked = adapter.trackHide();
 
     await adapter.hide();
@@ -37,7 +37,7 @@ describe("Notifications", () => {
     const adapter = NotificationsGateway.createNull();
     let clicked = false;
     await adapter.show({
-      title: "my-title",
+      title: "Test title",
       onClick: () => (clicked = true),
     });
 

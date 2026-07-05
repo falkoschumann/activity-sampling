@@ -13,7 +13,7 @@ import {
 import {
   createTimesheetData,
   type TimesheetData,
-} from "../../../src/shared/domain/timesheet_data";
+} from "../../../src/shared/domain/timesheet_data.value_objects";
 import {
   createTimesheetEntry,
   type TimesheetEntry,
