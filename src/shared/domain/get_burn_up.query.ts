@@ -1,115 +1,75 @@
 // Copyright (c) 2026 Falko Schumann. All rights reserved. MIT license.
 
-import {
-  type ActivityState,
-  mergeCategories,
-} from "./activity/activity.aggregate";
+import { type Activity, selectDistinctCategories } from "./activity.value_object";
 import type { ReportView } from "./report.read_model";
-import { BurnUpData } from "./burn_up_data";
+import { type BurnUpData, createBurnUpData } from "./burn_up_data.value_object";
 
-export class GetBurnUpQuery {
-  static create({
-    from,
-    to,
-    categories = [],
-    timeZone = Temporal.Now.timeZoneId(),
-  }: {
-    from: Temporal.PlainDateLike;
-    to: Temporal.PlainDateLike;
-    categories?: string[];
-    timeZone?: Temporal.TimeZoneLike;
-  }) {
-    return new GetBurnUpQuery(from, to, categories, timeZone);
-  }
-
-  static createTestInstance({
-    from = "2026-03-23",
-    to = "2026-03-29",
-    categories = ["Feature"],
-    timeZone = "Europe/Berlin",
-  }: {
-    from?: Temporal.PlainDateLike;
-    to?: Temporal.PlainDateLike;
-    categories?: string[];
-    timeZone?: Temporal.TimeZoneLike;
-  } = {}) {
-    return GetBurnUpQuery.create({ from, to, categories, timeZone });
-  }
-
-  readonly type = "get-burn-up";
-  readonly data;
-
-  private constructor(
-    from: Temporal.PlainDateLike,
-    to: Temporal.PlainDateLike,
-    categories: string[],
-    timeZone: Temporal.TimeZoneLike,
-  ) {
-    this.data = {
-      from: Temporal.PlainDate.from(from),
-      to: Temporal.PlainDate.from(to),
-      categories: categories,
-      timeZone: timeZone,
-    };
-  }
+export interface GetBurnUpQuery {
+  readonly type: "get-burn-up";
+  readonly data: GetBurnUpQueryData;
 }
 
-export class GetBurnUpQueryResult {
-  static create({
-    data = [],
-    totalThroughput = 0,
-    categories = [],
-  }: {
-    data?: BurnUpData[];
-    totalThroughput?: number;
-    categories?: string[];
-  } = {}) {
-    return new GetBurnUpQueryResult(data, totalThroughput, categories);
-  }
+export type GetBurnUpQueryData = Readonly<{
+  from: Temporal.PlainDateLike;
+  to: Temporal.PlainDateLike;
+  categories: string[];
+  timeZone: Temporal.TimeZoneLike;
+}>;
 
-  static createTestInstance({
-    data = [BurnUpData.createTestInstance()],
-    totalThroughput = 1,
-    categories = ["Feature"],
-  }: {
-    data?: BurnUpData[];
-    totalThroughput?: number;
-    categories?: string[];
-  } = {}) {
-    return GetBurnUpQueryResult.create({ data, totalThroughput, categories });
-  }
+export function createGetBurnUpQuery({
+  from,
+  to,
+  categories = [],
+  timeZone = Temporal.Now.timeZoneId(),
+}: {
+  from: Temporal.PlainDateLike;
+  to: Temporal.PlainDateLike;
+  categories?: string[];
+  timeZone?: Temporal.TimeZoneLike;
+}): GetBurnUpQuery {
+  return {
+    type: "get-burn-up",
+    data: { from, to, categories, timeZone },
+  };
+}
 
-  readonly data;
-  readonly totalThroughput;
-  readonly categories;
+export interface GetBurnUpQueryResult {
+  readonly data: BurnUpData[];
+  readonly totalThroughput: number;
+  readonly categories: string[];
+}
 
-  private constructor(
-    data: BurnUpData[],
-    totalThroughput: number,
-    categories: string[],
-  ) {
-    this.data = data.map(BurnUpData.create);
-    this.totalThroughput = totalThroughput;
-    this.categories = categories;
-  }
+export function createGetBurnUpQueryResult({
+  data = [],
+  totalThroughput = 0,
+  categories = [],
+}: {
+  data?: BurnUpData[];
+  totalThroughput?: number;
+  categories?: string[];
+} = {}): GetBurnUpQueryResult {
+  return { data, totalThroughput, categories };
 }
 
 export function getBurnUp(
   view: ReportView,
   query: GetBurnUpQuery,
 ): GetBurnUpQueryResult {
-  const activities = mergeCategories(view.activities, query.data.categories);
+  const activities = selectDistinctCategories(
+    view.activities,
+    query.data.categories,
+  );
   const throughputs = determineThroughputs(activities);
   const data = fillPeriod(throughputs, query.data.from, query.data.to);
   const totalThroughput = determineTotalThroughput(data);
-  return GetBurnUpQueryResult.create({
+  return createGetBurnUpQueryResult({
     data,
     totalThroughput,
     categories: view.categories,
   });
 }
 
-function determineThroughputs(activities: ActivityState[]) {
+function determineThroughputs(activities: Activity[]) {
   const throughputs = new Map<string, number>();
   for (const activity of activities) {
     const date = activity.finish.toString();
@@ -121,8 +81,8 @@ function determineThroughputs(activities: ActivityState[]) {
 
 function fillPeriod(
   throughputs: Map<string, number>,
-  from: Temporal.PlainDate,
-  to: Temporal.PlainDate,
+  from: Temporal.PlainDateLike,
+  to: Temporal.PlainDateLike,
 ) {
   if (throughputs.size === 0) {
     return [];
@@ -133,27 +93,25 @@ function fillPeriod(
   for (
     let date = from;
     Temporal.PlainDate.compare(date, to) <= 0;
-    date = date.add({ days: 1 })
+    date = Temporal.PlainDate.from(date).add({ days: 1 })
   ) {
     const dateStr = date.toString();
     if (throughputs.has(dateStr)) {
       const throughput = throughputs.get(dateStr)!;
       cumulativeThroughput += throughput;
-      data.push(
-        BurnUpData.create({
-          date,
-          throughput,
-          cumulativeThroughput,
-        }),
-      );
+      const updatedData = createBurnUpData({
+        date: date.toString(),
+        throughput,
+        cumulativeThroughput,
+      });
+      data.push(updatedData);
     } else {
-      data.push(
-        BurnUpData.create({
-          date,
-          throughput: 0,
-          cumulativeThroughput,
-        }),
-      );
+      const newData = createBurnUpData({
+        date: date.toString(),
+        throughput: 0,
+        cumulativeThroughput,
+      });
+      data.push(newData);
     }
   }
   return data;

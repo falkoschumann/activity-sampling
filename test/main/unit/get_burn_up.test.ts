@@ -3,13 +3,28 @@
 import { describe, expect, it } from "vitest";
 
 import { GetBurnUpQueryHandler } from "../../../src/main/application/get_burn_up.query_handler";
-import { ActivityLoggedEvent } from "../../../src/shared/domain/activity/activity_logged.event";
 import {
-  GetBurnUpQuery,
-  GetBurnUpQueryResult,
+  type ActivityLoggedEventData,
+  createActivityLoggedEvent,
+} from "../../../src/shared/domain/activity/activity_logged.event";
+import {
+  createGetBurnUpQuery,
+  createGetBurnUpQueryResult,
 } from "../../../src/shared/domain/get_burn_up.query";
-import { BurnUpData } from "../../../src/shared/domain/burn_up_data";
+import {
+  type BurnUpData,
+  createBurnUpData,
+} from "../../../src/shared/domain/burn_up_data.value_object";
 import { EventStore } from "../../../src/main/infrastructure/event_store";
+
+const testActivity: ActivityLoggedEventData = {
+  timestamp: "2025-08-14T11:00:00Z",
+  duration: "PT30M",
+  client: "Test client",
+  project: "Test project",
+  task: "Test task",
+  notification: "notifier",
+};
 
 describe("Get burn-up", () => {
   describe("Determine tasks done over time", () => {
@@ -17,7 +32,7 @@ describe("Get burn-up", () => {
       const { handler } = configure({ events: [] });
 
       const result = await handler.handle(
-        GetBurnUpQuery.create({
+        createGetBurnUpQuery({
           from: "2021-10-11",
           to: "2021-10-22",
         }),
@@ -28,61 +43,73 @@ describe("Get burn-up", () => {
 
     it("should return data for a given period", async () => {
       const events = [
-        ActivityLoggedEvent.createTestInstance({
+        createActivityLoggedEvent({
+          ...testActivity,
           timestamp: "2021-10-12T16:00:00Z",
           task: "task-1",
           category: "category-3",
         }),
-        ActivityLoggedEvent.createTestInstance({
+        createActivityLoggedEvent({
+          ...testActivity,
           timestamp: "2021-10-13T16:00:00Z",
           task: "task-2",
           category: "category-2",
         }),
-        ActivityLoggedEvent.createTestInstance({
+        createActivityLoggedEvent({
+          ...testActivity,
           timestamp: "2021-10-14T16:00:00Z",
           task: "task-3",
           category: "category-1",
         }),
-        ActivityLoggedEvent.createTestInstance({
+        createActivityLoggedEvent({
+          ...testActivity,
           timestamp: "2021-10-15T16:00:00Z",
           task: "task-4",
           category: "category-1",
         }),
-        ActivityLoggedEvent.createTestInstance({
+        createActivityLoggedEvent({
+          ...testActivity,
           timestamp: "2021-10-18T12:00:00Z",
           task: "task-5",
           category: "category-1",
         }),
-        ActivityLoggedEvent.createTestInstance({
+        createActivityLoggedEvent({
+          ...testActivity,
           timestamp: "2021-10-18T16:00:00Z",
           task: "task-6",
           category: "category-2",
         }),
-        ActivityLoggedEvent.createTestInstance({
+        createActivityLoggedEvent({
+          ...testActivity,
           timestamp: "2021-10-19T12:00:00Z",
           task: "task-7",
         }),
-        ActivityLoggedEvent.createTestInstance({
+        createActivityLoggedEvent({
+          ...testActivity,
           timestamp: "2021-10-19T16:00:00Z",
           task: "task-8",
           category: "category-2",
         }),
-        ActivityLoggedEvent.createTestInstance({
+        createActivityLoggedEvent({
+          ...testActivity,
           timestamp: "2021-10-20T16:00:00Z",
           task: "task-9",
           category: "category-2",
         }),
-        ActivityLoggedEvent.createTestInstance({
+        createActivityLoggedEvent({
+          ...testActivity,
           timestamp: "2021-10-21T16:00:00Z",
           task: "task-10",
           category: "category-3",
         }),
-        ActivityLoggedEvent.createTestInstance({
+        createActivityLoggedEvent({
+          ...testActivity,
           timestamp: "2021-10-22T12:00:00Z",
           task: "task-11",
           category: "category-1",
         }),
-        ActivityLoggedEvent.createTestInstance({
+        createActivityLoggedEvent({
+          ...testActivity,
           timestamp: "2021-10-22T16:00:00Z",
           task: "task-12",
           category: "category-3",
@@ -91,69 +118,69 @@ describe("Get burn-up", () => {
       const { handler } = configure({ events });
 
       const result = await handler.handle(
-        GetBurnUpQuery.create({
+        createGetBurnUpQuery({
           from: "2021-10-11",
           to: "2021-10-22",
         }),
       );
 
       expect(result.data).toEqual<BurnUpData[]>([
-        BurnUpData.create({
+        createBurnUpData({
           date: "2021-10-11",
           throughput: 0,
           cumulativeThroughput: 0,
         }),
-        BurnUpData.create({
+        createBurnUpData({
           date: "2021-10-12",
           throughput: 1,
           cumulativeThroughput: 1,
         }),
-        BurnUpData.create({
+        createBurnUpData({
           date: "2021-10-13",
           throughput: 1,
           cumulativeThroughput: 2,
         }),
-        BurnUpData.create({
+        createBurnUpData({
           date: "2021-10-14",
           throughput: 1,
           cumulativeThroughput: 3,
         }),
-        BurnUpData.create({
+        createBurnUpData({
           date: "2021-10-15",
           throughput: 1,
           cumulativeThroughput: 4,
         }),
-        BurnUpData.create({
+        createBurnUpData({
           date: "2021-10-16",
           throughput: 0,
           cumulativeThroughput: 4,
         }),
-        BurnUpData.create({
+        createBurnUpData({
           date: "2021-10-17",
           throughput: 0,
           cumulativeThroughput: 4,
         }),
-        BurnUpData.create({
+        createBurnUpData({
           date: "2021-10-18",
           throughput: 2,
           cumulativeThroughput: 6,
         }),
-        BurnUpData.create({
+        createBurnUpData({
           date: "2021-10-19",
           throughput: 2,
           cumulativeThroughput: 8,
         }),
-        BurnUpData.create({
+        createBurnUpData({
           date: "2021-10-20",
           throughput: 1,
           cumulativeThroughput: 9,
         }),
-        BurnUpData.create({
+        createBurnUpData({
           date: "2021-10-21",
           throughput: 1,
           cumulativeThroughput: 10,
         }),
-        BurnUpData.create({
+        createBurnUpData({
           date: "2021-10-22",
           throughput: 2,
           cumulativeThroughput: 12,
@@ -171,7 +198,7 @@ describe("Get burn-up", () => {
       const { handler } = configure({ events: [] });
 
       const result = await handler.handle(
-        GetBurnUpQuery.create({
+        createGetBurnUpQuery({
           from: "2021-10-11",
           to: "2021-10-22",
         }),
@@ -182,61 +209,73 @@ describe("Get burn-up", () => {
 
     it("should return data for a given period", async () => {
       const events = [
-        ActivityLoggedEvent.createTestInstance({
+        createActivityLoggedEvent({
+          ...testActivity,
           timestamp: "2021-10-12T16:00:00Z",
           task: "task-1",
           category: "category-3",
         }),
-        ActivityLoggedEvent.createTestInstance({
+        createActivityLoggedEvent({
+          ...testActivity,
           timestamp: "2021-10-13T16:00:00Z",
           task: "task-2",
           category: "category-2",
         }),
-        ActivityLoggedEvent.createTestInstance({
+        createActivityLoggedEvent({
+          ...testActivity,
           timestamp: "2021-10-14T16:00:00Z",
           task: "task-3",
           category: "category-1",
         }),
-        ActivityLoggedEvent.createTestInstance({
+        createActivityLoggedEvent({
+          ...testActivity,
           timestamp: "2021-10-15T16:00:00Z",
           task: "task-4",
           category: "category-1",
         }),
-        ActivityLoggedEvent.createTestInstance({
+        createActivityLoggedEvent({
+          ...testActivity,
           timestamp: "2021-10-18T12:00:00Z",
           task: "task-5",
           category: "category-1",
         }),
-        ActivityLoggedEvent.createTestInstance({
+        createActivityLoggedEvent({
+          ...testActivity,
           timestamp: "2021-10-18T16:00:00Z",
           task: "task-6",
           category: "category-2",
         }),
-        ActivityLoggedEvent.createTestInstance({
+        createActivityLoggedEvent({
+          ...testActivity,
           timestamp: "2021-10-19T12:00:00Z",
           task: "task-7",
         }),
-        ActivityLoggedEvent.createTestInstance({
+        createActivityLoggedEvent({
+          ...testActivity,
           timestamp: "2021-10-19T16:00:00Z",
           task: "task-8",
           category: "category-2",
         }),
-        ActivityLoggedEvent.createTestInstance({
+        createActivityLoggedEvent({
+          ...testActivity,
           timestamp: "2021-10-20T16:00:00Z",
           task: "task-9",
           category: "category-2",
         }),
-        ActivityLoggedEvent.createTestInstance({
+        createActivityLoggedEvent({
+          ...testActivity,
           timestamp: "2021-10-21T16:00:00Z",
           task: "task-10",
           category: "category-3",
         }),
-        ActivityLoggedEvent.createTestInstance({
+        createActivityLoggedEvent({
+          ...testActivity,
           timestamp: "2021-10-22T12:00:00Z",
           task: "task-11",
           category: "category-1",
         }),
-        ActivityLoggedEvent.createTestInstance({
+        createActivityLoggedEvent({
+          ...testActivity,
           timestamp: "2021-10-22T16:00:00Z",
           task: "task-12",
           category: "category-3",
@@ -245,7 +284,7 @@ describe("Get burn-up", () => {
       const { handler } = configure({ events });
 
       const result = await handler.handle(
-        GetBurnUpQuery.create({
+        createGetBurnUpQuery({
           from: "2021-10-11",
           to: "2021-10-22",
         }),
@@ -260,72 +299,84 @@ describe("Get burn-up", () => {
       const { handler } = configure({ events: [] });
 
       const result = await handler.handle(
-        GetBurnUpQuery.create({
+        createGetBurnUpQuery({
           from: "2021-10-11",
           to: "2021-10-22",
         }),
       );
 
-      expect(result).toEqual(GetBurnUpQueryResult.create());
+      expect(result).toEqual(createGetBurnUpQueryResult());
     });
 
     it("should return data for a given period", async () => {
       const events = [
-        ActivityLoggedEvent.createTestInstance({
+        createActivityLoggedEvent({
+          ...testActivity,
           timestamp: "2021-10-12T16:00:00Z",
           task: "task-1",
           category: "category-3",
         }),
-        ActivityLoggedEvent.createTestInstance({
+        createActivityLoggedEvent({
+          ...testActivity,
           timestamp: "2021-10-13T16:00:00Z",
           task: "task-2",
           category: "category-2",
         }),
-        ActivityLoggedEvent.createTestInstance({
+        createActivityLoggedEvent({
+          ...testActivity,
           timestamp: "2021-10-14T16:00:00Z",
           task: "task-3",
           category: "category-1",
         }),
-        ActivityLoggedEvent.createTestInstance({
+        createActivityLoggedEvent({
+          ...testActivity,
           timestamp: "2021-10-15T16:00:00Z",
           task: "task-4",
           category: "category-1",
         }),
-        ActivityLoggedEvent.createTestInstance({
+        createActivityLoggedEvent({
+          ...testActivity,
           timestamp: "2021-10-18T12:00:00Z",
           task: "task-5",
           category: "category-1",
         }),
-        ActivityLoggedEvent.createTestInstance({
+        createActivityLoggedEvent({
+          ...testActivity,
           timestamp: "2021-10-18T16:00:00Z",
           task: "task-6",
           category: "category-2",
         }),
-        ActivityLoggedEvent.createTestInstance({
+        createActivityLoggedEvent({
+          ...testActivity,
           timestamp: "2021-10-19T12:00:00Z",
           task: "task-7",
         }),
-        ActivityLoggedEvent.createTestInstance({
+        createActivityLoggedEvent({
+          ...testActivity,
           timestamp: "2021-10-19T16:00:00Z",
           task: "task-8",
           category: "category-2",
         }),
-        ActivityLoggedEvent.createTestInstance({
+        createActivityLoggedEvent({
+          ...testActivity,
           timestamp: "2021-10-20T16:00:00Z",
           task: "task-9",
           category: "category-2",
         }),
-        ActivityLoggedEvent.createTestInstance({
+        createActivityLoggedEvent({
+          ...testActivity,
           timestamp: "2021-10-21T16:00:00Z",
           task: "task-10",
           category: "category-3",
         }),
-        ActivityLoggedEvent.createTestInstance({
+        createActivityLoggedEvent({
+          ...testActivity,
           timestamp: "2021-10-22T12:00:00Z",
           task: "task-11",
           category: "category-1",
         }),
-        ActivityLoggedEvent.createTestInstance({
+        createActivityLoggedEvent({
+          ...testActivity,
           timestamp: "2021-10-22T16:00:00Z",
           task: "task-12",
           category: "category-3",
@@ -334,71 +385,71 @@ describe("Get burn-up", () => {
       const { handler } = configure({ events });
 
       const result = await handler.handle(
-        GetBurnUpQuery.create({
+        createGetBurnUpQuery({
           from: "2021-10-11",
           to: "2021-10-22",
         }),
       );
 
       expect(result).toEqual(
-        GetBurnUpQueryResult.create({
+        createGetBurnUpQueryResult({
           data: [
-            BurnUpData.create({
+            createBurnUpData({
               date: "2021-10-11",
               throughput: 0,
               cumulativeThroughput: 0,
             }),
-            BurnUpData.create({
+            createBurnUpData({
               date: "2021-10-12",
               throughput: 1,
               cumulativeThroughput: 1,
             }),
-            BurnUpData.create({
+            createBurnUpData({
               date: "2021-10-13",
               throughput: 1,
               cumulativeThroughput: 2,
             }),
-            BurnUpData.create({
+            createBurnUpData({
               date: "2021-10-14",
               throughput: 1,
               cumulativeThroughput: 3,
             }),
-            BurnUpData.create({
+            createBurnUpData({
               date: "2021-10-15",
               throughput: 1,
               cumulativeThroughput: 4,
             }),
-            BurnUpData.create({
+            createBurnUpData({
               date: "2021-10-16",
               throughput: 0,
               cumulativeThroughput: 4,
             }),
-            BurnUpData.create({
+            createBurnUpData({
               date: "2021-10-17",
               throughput: 0,
               cumulativeThroughput: 4,
             }),
-            BurnUpData.create({
+            createBurnUpData({
               date: "2021-10-18",
               throughput: 2,
               cumulativeThroughput: 6,
             }),
-            BurnUpData.create({
+            createBurnUpData({
               date: "2021-10-19",
               throughput: 2,
               cumulativeThroughput: 8,
             }),
-            BurnUpData.create({
+            createBurnUpData({
               date: "2021-10-20",
               throughput: 1,
               cumulativeThroughput: 9,
             }),
-            BurnUpData.create({
+            createBurnUpData({
               date: "2021-10-21",
               throughput: 1,
               cumulativeThroughput: 10,
             }),
-            BurnUpData.create({
+            createBurnUpData({
               date: "2021-10-22",
               throughput: 2,
               cumulativeThroughput: 12,
@@ -416,7 +467,7 @@ describe("Get burn-up", () => {
       const { handler } = configure({ events: [] });
 
       const result = await handler.handle(
-        GetBurnUpQuery.create({
+        createGetBurnUpQuery({
           from: "2021-10-11",
           to: "2021-10-22",
         }),
@@ -427,17 +478,20 @@ describe("Get burn-up", () => {
 
     it("should filter by categories", async () => {
       const events = [
-        ActivityLoggedEvent.createTestInstance({
+        createActivityLoggedEvent({
+          ...testActivity,
           timestamp: "2021-10-12T16:00:00Z",
           task: "task-1",
           category: "category-1",
         }),
-        ActivityLoggedEvent.createTestInstance({
+        createActivityLoggedEvent({
+          ...testActivity,
           timestamp: "2021-10-13T16:00:00Z",
           task: "task-2",
           category: "category-2",
         }),
-        ActivityLoggedEvent.createTestInstance({
+        createActivityLoggedEvent({
+          ...testActivity,
           timestamp: "2021-10-14T16:00:00Z",
           task: "task-1",
           category: "category-2",
@@ -446,7 +500,7 @@ describe("Get burn-up", () => {
       const { handler } = configure({ events });
 
       const result = await handler.handle(
-        GetBurnUpQuery.create({
+        createGetBurnUpQuery({
           from: "2021-10-12",
           to: "2021-10-14",
           categories: ["category-1"],
@@ -454,19 +508,19 @@ describe("Get burn-up", () => {
       );
 
       expect(result).toEqual(
-        GetBurnUpQueryResult.create({
+        createGetBurnUpQueryResult({
           data: [
-            BurnUpData.create({
+            createBurnUpData({
               date: "2021-10-12",
               throughput: 1,
               cumulativeThroughput: 1,
             }),
-            BurnUpData.create({
+            createBurnUpData({
               date: "2021-10-13",
               throughput: 0,
               cumulativeThroughput: 1,
             }),
-            BurnUpData.create({
+            createBurnUpData({
               date: "2021-10-14",
               throughput: 0,
               cumulativeThroughput: 1,

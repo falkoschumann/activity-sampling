@@ -2,8 +2,8 @@
 
 import {
   getBurnUp,
-  GetBurnUpQuery,
-  GetBurnUpQueryResult,
+  type GetBurnUpQuery,
+  type GetBurnUpQueryResult,
 } from "../../shared/domain/get_burn_up.query";
 import {
   createReport,
@@ -23,10 +23,15 @@ export class GetBurnUpQueryHandler {
   }
 
   async handle(query: GetBurnUpQuery): Promise<GetBurnUpQueryResult> {
-    query = GetBurnUpQuery.create(query.data);
-    const { from: fromDate, to: toDate, timeZone } = query.data;
-    const from = fromDate.toZonedDateTime(timeZone).startOfDay();
-    const to = toDate.add("P1D").toZonedDateTime(timeZone).startOfDay();
+    const timeZone = query.data.timeZone;
+    const fromDate = query.data.from
+      ? Temporal.PlainDate.from(query.data.from)
+      : undefined;
+    const from = fromDate?.toZonedDateTime(timeZone).startOfDay();
+    const toDate = query.data.to
+      ? Temporal.PlainDate.from(query.data.to)
+      : undefined;
+    const to = toDate?.add("P1D").toZonedDateTime(timeZone).startOfDay();
     let view = createReport();
     for await (const event of this.#eventStore.replay({ from, to })) {
       view = projectReport(view, event, { timeZone });
