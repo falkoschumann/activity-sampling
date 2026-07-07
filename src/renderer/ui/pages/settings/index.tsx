@@ -1,39 +1,39 @@
 // Copyright (c) 2026 Falko Schumann. All rights reserved. MIT license.
 
-import { Temporal } from "@js-temporal/polyfill";
-import { type SubmitEvent, useState } from "react";
+import { type SubmitEvent, useEffect, useState } from "react";
 
-import { SettingsQueryResult } from "../../../../shared/domain/settings_query";
-import { UpdateSettingsCommand } from "../../../../shared/domain/update_settings_command";
-import { useMessageHandler } from "../../components/message_handler_context";
+import {
+  createGetSettingsQuery,
+  type GetSettingsQueryResult,
+} from "../../../../shared/domain/read_models/get_settings.query";
+import { createChangeSettingsCommand } from "../../../../shared/domain/settings/change_settings.command";
 
 export default function SettingsPage() {
-  const [result, setResult] = useState(SettingsQueryResult.create());
-  const [dataDir, setDataDir] = useState(result.dataDir);
-  const [capacity, setCapacity] = useState(result.capacity.total("hours"));
-  const [categories, setCategories] = useState(result.categories);
-  const messageHandler = useMessageHandler();
+  const [capacity, setCapacity] = useState(40);
+  const [categories, setCategories] = useState<string[]>([]);
+  const [firstName, setFirstName] = useState<string>();
+  const [lastName, setLastName] = useState<string>();
 
-  async function handleOpenDataDir() {
-    const { canceled, filePaths } = await window.activitySampling.showOpenDialog({
-      title: "Choose data directory",
-      properties: ["openDirectory", "createDirectory"],
-    });
+  useEffect(() => {
+    const getSettingsAsync = async () => {
+      const result = await window.activitySampling.routeMessage<GetSettingsQueryResult>(createGetSettingsQuery());
+      setCapacity(Temporal.Duration.from(result.capacity).total("hours"));
+      setCategories(result.categories);
+      setFirstName(result.firstName);
+      setLastName(result.lastName);
+    };
 
-    if (canceled || filePaths.length === 0) {
-      return;
-    }
-
-    setResult({ ...result, dataDir: filePaths[0] });
-  }
+    void getSettingsAsync();
+  }, []);
 
   async function handleSubmit(event: SubmitEvent) {
     event.preventDefault();
-    await messageHandler.updateSettings(
-      UpdateSettingsCommand.create({
-        dataDir,
+    await window.activitySampling.routeMessage(
+      createChangeSettingsCommand({
         capacity: Temporal.Duration.from({ hours: capacity }),
         categories,
+        firstName,
+        lastName,
       }),
     );
   }
@@ -41,23 +41,6 @@ export default function SettingsPage() {
   return (
     <main className="container my-4">
       <form onSubmit={handleSubmit}>
-        <div className="mb-3">
-          <label htmlFor="dataDir" className="form-label">
-            Data directory
-          </label>
-          <div className="d-flex gap-2">
-            <input
-              id="dataDir"
-              type="string"
-              className="form-control"
-              value={dataDir}
-              onChange={(e) => setDataDir(e.target.value)}
-            />
-            <button className="btn btn-primary" type="button" onClick={handleOpenDataDir}>
-              Choose...
-            </button>
-          </div>
-        </div>
         <div className="mb-3">
           <label htmlFor="capacity" className="form-label">
             Capacity in hours per week
@@ -80,6 +63,30 @@ export default function SettingsPage() {
             className="form-control"
             value={categories}
             onChange={(e) => setCategories(e.target.value.split(",").map((c) => c.trim()))}
+          />
+        </div>
+        <div className="mb-3">
+          <label htmlFor="firstName" className="form-label">
+            First Name
+          </label>
+          <input
+            id="firstName"
+            type="text"
+            className="form-control"
+            value={firstName}
+            onChange={(e) => setFirstName(e.target.value)}
+          />
+        </div>
+        <div className="mb-3">
+          <label htmlFor="lastName" className="form-label">
+            Last Name
+          </label>
+          <input
+            id="lastName"
+            type="text"
+            className="form-control"
+            value={lastName}
+            onChange={(e) => setLastName(e.target.value)}
           />
         </div>
         <button type="submit" className="btn btn-primary">
