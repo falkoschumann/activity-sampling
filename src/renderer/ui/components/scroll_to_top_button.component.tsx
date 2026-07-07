@@ -5,7 +5,7 @@ import { useEffect, useRef } from "react";
 const HIDE_CLASSES = "btn btn-secondary position-fixed bottom-0 end-0 me-3 fade";
 const SHOW_CLASSES = HIDE_CLASSES + " show";
 
-export default function ScrollToTopButton() {
+function ScrollToTopButtonComponent() {
   const ref = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
@@ -44,3 +44,5 @@ export default function ScrollToTopButton() {
     </button>
   );
 }
+
+export default ScrollToTopButtonComponent;

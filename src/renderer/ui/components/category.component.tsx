@@ -2,8 +2,7 @@
 
 import type { ChangeEvent } from "react";
 
-// TODO rename file to category_component.tsx
-export default function CategoryComponent({
+function CategoryComponent({
   categories,
   // WORKAROUND: set categories and value same, when value is not provided
   //   categories value must not be [] to get this working
@@ -66,3 +65,5 @@ export default function CategoryComponent({
     </>
   );
 }
+
+export default CategoryComponent;

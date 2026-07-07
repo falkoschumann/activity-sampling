@@ -11,19 +11,19 @@ import type { TimerElapsedEvent } from "../../../../shared/domain/timer/timer_el
 import {
   createGetCurrentIntervalQuery,
   createGetCurrentIntervalQueryResult,
-  type GetCurrentIntervalQueryResult,
+  type GetCurrentIntervalQueryResult
 } from "../../../../shared/domain/read_models/get_current_interval.query";
 import {
   createGetRecentActivitiesQuery,
   createGetRecentActivitiesQueryResult,
-  type GetRecentActivitiesQueryResult,
+  type GetRecentActivitiesQueryResult
 } from "../../../../shared/domain/read_models/get_recent_activities.query";
 import {
   createGetSettingsQuery,
-  type GetSettingsQueryResult,
+  type GetSettingsQueryResult
 } from "../../../../shared/domain/read_models/get_settings.query";
 import type { RecentActivity } from "../../../../shared/domain/value_objects/recent_activity.value_object";
-import ScrollToTopButton from "../../components/scroll_to_top_button";
+import ScrollToTopButtonComponent from "../../components/scroll_to_top_button.component";
 import CountdownComponent from "./countdown.component";
 import TimeSummaryComponent from "./time_summary.component";
 import WorkingDaysComponent from "./working_days.component";
@@ -121,7 +121,7 @@ export default function LogPage() {
 
   return (
     <>
-      <ScrollToTopButton />
+      <ScrollToTopButtonComponent />
       <aside className="container my-4">
         <ActivityFormComponent
           client={client}

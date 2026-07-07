@@ -3,7 +3,7 @@
 import { formatDate } from "./formatter";
 import { PeriodUnit, type PeriodUnitType } from "./period";
 
-export function PeriodComponent({
+function PeriodComponent({
   from,
   to,
   unit,
@@ -72,3 +72,5 @@ export function PeriodComponent({
     </div>
   );
 }
+
+export default PeriodComponent;
