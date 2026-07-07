@@ -27,12 +27,7 @@ describe("Notifier", () => {
     const { eventBus, notificationsGateway } = configure();
     const showTracked = notificationsGateway.trackShow();
 
-    eventBus.publish(
-      createTimerElapsedEvent({
-        timestamp: "2026-06-13T11:00:00Z",
-        duration: "PT30M",
-      }),
-    );
+    eventBus.publish(createTimerElapsedEvent({ duration: "PT30M" }));
 
     await expect
       .poll(() => showTracked.data)
@@ -55,12 +50,7 @@ describe("Notifier", () => {
         task: "Test task",
       }),
     );
-    eventBus.publish(
-      createTimerElapsedEvent({
-        timestamp: "2026-06-13T11:00:00Z",
-        duration: "PT30M",
-      }),
-    );
+    eventBus.publish(createTimerElapsedEvent({ duration: "PT30M" }));
 
     await expect
       .poll(() => showTracked.data)
@@ -76,12 +66,7 @@ describe("Notifier", () => {
     const { eventBus, messageRouter, notificationsGateway } = configure();
     const messageTracker = MessageTracker.create(messageRouter, "log-activity");
     const showTracked = notificationsGateway.trackShow();
-    eventBus.publish(
-      createTimerElapsedEvent({
-        timestamp: "2026-06-13T11:00:00Z",
-        duration: "PT30M",
-      }),
-    );
+    eventBus.publish(createTimerElapsedEvent({ duration: "PT30M" }));
     await expect.poll(() => showTracked.data).toEqual([expect.anything()]);
 
     notificationsGateway.simulateClick();
@@ -103,12 +88,7 @@ describe("Notifier", () => {
         duration: "PT30M",
       }),
     );
-    eventBus.publish(
-      createTimerElapsedEvent({
-        timestamp: "2026-06-13T11:00:00Z",
-        duration: "PT20M",
-      }),
-    );
+    eventBus.publish(createTimerElapsedEvent({ duration: "PT20M" }));
     await expect.poll(() => showTracked.data).toEqual([expect.anything()]);
 
     notificationsGateway.simulateClick();

@@ -28,7 +28,6 @@ describe("Tick timer", () => {
     const status = await handler.handle(
       createTickTimerCommand({
         isElapsed: true,
-        timestamp: "2026-06-13T11:00:00Z",
         duration: "PT30M",
       }),
     );
@@ -36,7 +35,6 @@ describe("Tick timer", () => {
     expect(status).toEqual(new Success());
     expect(eventBus.getEvents()).toEqual([
       createTimerElapsedEvent({
-        timestamp: "2026-06-13T11:00:00Z",
         duration: "PT30M",
       }),
     ]);

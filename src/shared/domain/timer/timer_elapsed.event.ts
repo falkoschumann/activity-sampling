@@ -7,21 +7,21 @@ export interface TimerElapsedEvent {
 
 export type TimerElapsedEventData = Readonly<{
   timer: string;
-  timestamp: Temporal.InstantLike;
+  notification: string;
   duration: Temporal.DurationLike;
 }>;
 
 export function createTimerElapsedEvent({
   timer = "default",
-  timestamp,
+  notification = "notifier",
   duration,
 }: {
   timer?: string;
-  timestamp: Temporal.InstantLike;
+  notification?: string;
   duration: Temporal.DurationLike;
 }): TimerElapsedEvent {
   return {
     type: "timer-elapsed",
-    data: { timer, timestamp, duration },
+    data: { timer, notification, duration },
   };
 }

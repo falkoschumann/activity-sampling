@@ -29,7 +29,7 @@ export function createGetSettingsQueryResult({
   firstName,
   lastName,
 }: {
-  capacity?: Temporal.DurationLike | string;
+  capacity?: Temporal.DurationLike;
   categories?: string[];
   firstName?: string;
   lastName?: string;

@@ -5,7 +5,7 @@ import type { Message } from "@muspellheim/shared";
 export type Unsubscriber = () => void;
 
 export interface ActivitySampling {
-  routeMessage<M = Message, R = unknown>(message: M): Promise<R>;
+  routeMessage<R = unknown>(message: Message): Promise<R>;
 
   subscribeEvents<E = Message>(eventHandler: (event: E) => void): Unsubscriber;
 }

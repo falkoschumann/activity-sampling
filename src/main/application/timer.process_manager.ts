@@ -129,7 +129,6 @@ export class TimerProcessManager extends EventTarget {
           })
         : createTickTimerCommand({
             isElapsed: true,
-            timestamp,
             duration: this.#interval,
           });
     this.#messageRouter.route(command);

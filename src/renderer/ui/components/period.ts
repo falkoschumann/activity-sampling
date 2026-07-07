@@ -7,7 +7,7 @@ import type { FluxStandardActionAuto } from "flux-standard-action";
 const GO_TO_NEXT_PERIOD_ACTION = "goToNextPeriod";
 
 interface GoToNextPeriodPayload {
-  today?: Temporal.PlainDateLike | string;
+  today?: Temporal.PlainDateLike;
 }
 
 export function goToNextPeriod(
@@ -22,7 +22,7 @@ export function goToNextPeriod(
 const GO_TO_PREVIOUS_PERIOD_ACTION = "goToPreviousPeriod";
 
 interface GoToPreviousPeriodPayload {
-  today?: Temporal.PlainDateLike | string;
+  today?: Temporal.PlainDateLike;
 }
 
 export function goToPreviousPeriod(
@@ -38,7 +38,7 @@ const CHANGE_PERIOD_ACTION = "changePeriod";
 
 interface ChangePeriodPayload {
   unit: PeriodUnitType;
-  today?: Temporal.PlainDateLike | string;
+  today?: Temporal.PlainDateLike;
 }
 
 export function changePeriod(
@@ -78,7 +78,7 @@ export function init({
   today,
   unit,
 }: {
-  today?: Temporal.PlainDateLike | string;
+  today?: Temporal.PlainDateLike;
   unit: PeriodUnitType;
 }): State {
   const todayDate = parseToday(today);
@@ -231,7 +231,7 @@ export function reducer(state: State, action: Action): State {
 function getCurrent(
   from: Temporal.PlainDateLike,
   to: Temporal.PlainDateLike,
-  today?: Temporal.PlainDateLike | string,
+  today?: Temporal.PlainDateLike,
 ): boolean {
   today = parseToday(today);
   return (
@@ -240,9 +240,7 @@ function getCurrent(
   );
 }
 
-function parseToday(
-  today?: Temporal.PlainDateLike | string,
-): Temporal.PlainDate {
+function parseToday(today?: Temporal.PlainDateLike): Temporal.PlainDate {
   return today != null
     ? Temporal.PlainDate.from(today)
     : Temporal.Now.plainDateISO();

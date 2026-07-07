@@ -18,7 +18,6 @@ export type TickTimerCommandData = Readonly<
   | {
       isElapsed: true;
       duration: Temporal.DurationLike;
-      timestamp: Temporal.InstantLike;
     }
   | {
       isElapsed: false;
@@ -31,21 +30,15 @@ export function createTickTimerCommand({
   isElapsed = false,
   duration,
   progressedTime,
-  timestamp,
 }: {
   isElapsed?: boolean;
   duration: Temporal.DurationLike;
   progressedTime?: Temporal.DurationLike;
-  timestamp?: Temporal.InstantLike;
 }): TickTimerCommand {
   if (isElapsed) {
-    if (timestamp == null) {
-      throw new TypeError("Timestamp is required when timer is elapsed");
-    }
-
     return {
       type: "tick-timer",
-      data: { isElapsed, duration, timestamp },
+      data: { isElapsed, duration },
     };
   } else {
     if (progressedTime == null) {

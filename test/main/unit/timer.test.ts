@@ -55,7 +55,6 @@ describe("Timer", () => {
       createTickTimerCommand({
         isElapsed: true,
         duration: "PT30M",
-        timestamp: "2026-06-12T10:30:00Z",
       }),
     ]);
   });

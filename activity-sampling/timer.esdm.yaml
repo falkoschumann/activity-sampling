@@ -61,10 +61,6 @@ data:
     progressedTime:
       type: string
       format: duration
-    timestamp:
-      type: string
-      format: date-time
-      description: The elapse time in UTC.
   required: [isElapsed, duration]
 constraints:
   - name: tick-or-elapse
@@ -139,10 +135,7 @@ data:
       type: string
     notification:
       type: string
-    timestamp:
-      type: string
-      format: date-time
     duration:
       type: string
       format: duration
-  required: [timer, notification, timestamp, duration]
+  required: [timer, notification, duration]

@@ -13,12 +13,12 @@ import {
 } from "../shared/infrastructure/channels";
 
 contextBridge.exposeInMainWorld("activitySampling", {
-  routeMessage: async <M = Message, R = unknown>(message: M): Promise<R> =>
+  routeMessage: async <R = unknown>(message: Message): Promise<R> =>
     ipcRenderer.invoke(MESSAGE_CHANNEL, message),
 
   subscribeEvents: <E = Message>(eventHandler: (event: E) => void) => {
-    function listener(_event: IpcRendererEvent, args: unknown) {
-      eventHandler(args as E);
+    function listener(_event: IpcRendererEvent, message: E) {
+      eventHandler(message);
     }
 
     ipcRenderer.on(EVENT_CHANNEL, listener);

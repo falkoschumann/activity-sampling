@@ -20,22 +20,26 @@ export function createGetCurrentIntervalQuery(
 
 export interface GetCurrentIntervalQueryResult {
   readonly isRunning: boolean;
-  readonly elapsedTime: Temporal.DurationLike;
+  readonly interval: Temporal.DurationLike;
+  readonly remainingTime: Temporal.DurationLike;
   readonly progress: number;
 }
 
 export function createGetCurrentIntervalQueryResult({
   isRunning = false,
-  elapsedTime = "PT0S",
+  interval = "PT30M",
+  remainingTime = "PT30M",
   progress = 0,
 }: {
   isRunning?: boolean;
-  elapsedTime?: Temporal.DurationLike;
+  interval?: Temporal.DurationLike;
+  remainingTime?: Temporal.DurationLike;
   progress?: number;
 } = {}): GetCurrentIntervalQueryResult {
   return {
     isRunning,
-    elapsedTime,
+    interval,
+    remainingTime,
     progress,
   };
 }

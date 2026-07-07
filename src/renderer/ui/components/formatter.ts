@@ -5,9 +5,9 @@ export const FormatStyle = Object.freeze({
   FULL: "full",
   // Example: 28. Juni 2025
   LONG: "long",
-  // Examples: 28.06.2025, 12:02:38
+  // Examples: 28.06.2025 or 12:02:38
   MEDIUM: "medium",
-  // Examples: 28.06.25, 12:02
+  // Examples: 28.06.25 or 12:02
   SHORT: "short",
 });
 
@@ -56,7 +56,7 @@ export function formatDuration(
     minutes: "2-digit",
     seconds: "2-digit",
   });
-  if (format === "medium") {
+  if (format === FormatStyle.MEDIUM) {
     return s.slice(0, -3);
   }
   return s;

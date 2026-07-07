@@ -35,7 +35,11 @@ describe("Get current interval", () => {
     const result = await handler.handle(createGetCurrentIntervalQuery());
 
     expect(result).toEqual(
-      createGetCurrentIntervalQueryResult({ isRunning: true }),
+      createGetCurrentIntervalQueryResult({
+        isRunning: true,
+        interval: "PT15M",
+        remainingTime: "PT15M",
+      }),
     );
   });
 
@@ -54,7 +58,8 @@ describe("Get current interval", () => {
     expect(result).toEqual(
       createGetCurrentIntervalQueryResult({
         isRunning: true,
-        elapsedTime: "PT5M",
+        interval: "PT20M",
+        remainingTime: "PT15M",
         progress: 0.25,
       }),
     );
@@ -63,10 +68,7 @@ describe("Get current interval", () => {
   it("should return elapsed result when timer elapsed ", async () => {
     const state = [
       createTimerStartedEvent({ interval: "PT20M" }),
-      createTimerElapsedEvent({
-        timestamp: Temporal.Now.instant().toString(),
-        duration: "PT20M",
-      }),
+      createTimerElapsedEvent({ duration: "PT20M" }),
     ].reduce(projectTimer, createTimer());
     const handler = GetCurrentIntervalQueryHandler.createNull({ state });
 
@@ -75,7 +77,8 @@ describe("Get current interval", () => {
     expect(result).toEqual(
       createGetCurrentIntervalQueryResult({
         isRunning: true,
-        elapsedTime: "PT0S",
+        interval: "PT20M",
+        remainingTime: "PT20M",
         progress: 0,
       }),
     );
@@ -97,7 +100,8 @@ describe("Get current interval", () => {
     expect(result).toEqual(
       createGetCurrentIntervalQueryResult({
         isRunning: false,
-        elapsedTime: "PT15M",
+        interval: "PT20M",
+        remainingTime: "PT5M",
         progress: 0.75,
       }),
     );

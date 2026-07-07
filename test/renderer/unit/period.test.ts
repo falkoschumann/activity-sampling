@@ -10,7 +10,7 @@ import {
   PeriodUnit,
   reducer,
   type State,
-} from "../../../src/renderer/domain/period";
+} from "../../../src/renderer/ui/components/period";
 
 describe("Period", () => {
   it("should ignore unknown action", () => {

@@ -2,14 +2,14 @@
 
 import { useCallback, useRef } from "react";
 
-import type { LoggedActivity } from "../../../../shared/domain/logged_activity";
+import type { RecentActivity } from "../../../../shared/domain/value_objects/recent_activity.value_object";
 
 export function useNotification({
   lastActivity,
   onClicked,
 }: {
-  lastActivity?: LoggedActivity;
-  onClicked: (activity?: LoggedActivity) => void;
+  lastActivity?: RecentActivity;
+  onClicked: (activity?: RecentActivity) => void;
 }): [() => void, () => void] {
   const notificationRef = useRef<Notification>(undefined);
 

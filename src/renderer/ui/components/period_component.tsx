@@ -1,9 +1,7 @@
 // Copyright (c) 2026 Falko Schumann. All rights reserved. MIT license.
 
-import { Temporal } from "@js-temporal/polyfill";
-
-import { formatDate } from "../../../shared/domain/temporal";
-import { PeriodUnit, type PeriodUnitType } from "../../domain/period";
+import { formatDate } from "./formatter";
+import { PeriodUnit, type PeriodUnitType } from "./period";
 
 export function PeriodComponent({
   from,

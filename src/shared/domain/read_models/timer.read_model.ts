@@ -4,17 +4,20 @@ import type { TimerElapsedEvent } from "../timer/timer_elapsed.event";
 import type { TimerStartedEvent } from "../timer/timer_started.event";
 import type { TimerStoppedEvent } from "../timer/timer_stopped.event";
 import type { TimerTickedEvent } from "../timer/timer_ticked.event";
+import { normalizeDuration } from "../value_objects/activity.value_object";
 
 export type TimerView = {
   readonly isRunning: boolean;
-  readonly elapsedTime: Temporal.DurationLike;
+  readonly interval: Temporal.DurationLike;
+  readonly remainingTime: Temporal.DurationLike;
   readonly progress: number;
 };
 
 export function createTimer(): TimerView {
   return {
     isRunning: false,
-    elapsedTime: "PT0S",
+    interval: "PT30M",
+    remainingTime: "PT30M",
     progress: 0,
   };
 }
@@ -32,7 +35,8 @@ export function projectTimer(
       return {
         ...view,
         isRunning: true,
-        elapsedTime: "PT0S",
+        interval: event.data.interval,
+        remainingTime: event.data.interval,
         progress: 0,
       };
     case "timer-stopped":
@@ -40,7 +44,11 @@ export function projectTimer(
     case "timer-ticked":
       return {
         ...view,
-        elapsedTime: event.data.progressedTime,
+        remainingTime: normalizeDuration(
+          Temporal.Duration.from(event.data.duration).subtract(
+            event.data.progressedTime,
+          ),
+        ),
         progress:
           Temporal.Duration.from(event.data.progressedTime).total("seconds") /
           Temporal.Duration.from(event.data.duration).total("seconds"),
@@ -48,7 +56,7 @@ export function projectTimer(
     case "timer-elapsed":
       return {
         ...view,
-        elapsedTime: "PT0S",
+        remainingTime: view.interval,
         progress: 0,
       };
     default:
