@@ -97,20 +97,20 @@ describe("Get recent Activities", () => {
 
     expect(result.workingDays).toEqual<WorkingDay[]>([
       {
-        date: Temporal.PlainDate.from("2025-06-05"),
+        date: "2025-06-05",
         activities: [
           createRecentActivity({ ...testRecentActivity, time: "11:00:00" }),
           createRecentActivity({ ...testRecentActivity, time: "10:30:00" }),
         ],
       },
       {
-        date: Temporal.PlainDate.from("2025-06-04"),
+        date: "2025-06-04",
         activities: [
           createRecentActivity({ ...testRecentActivity, time: "16:00:00" }),
         ],
       },
       {
-        date: Temporal.PlainDate.from("2025-05-06"),
+        date: "2025-05-06",
         activities: [
           createRecentActivity({ ...testRecentActivity, time: "16:00:00" }),
         ],

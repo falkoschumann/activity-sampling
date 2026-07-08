@@ -86,7 +86,7 @@ function updateWorkingDays(
     !Temporal.PlainDate.from(entry.timestamp).equals(workingDay.date)
   ) {
     workingDay = createWorkingDay({
-      date: Temporal.PlainDate.from(entry.timestamp),
+      date: Temporal.PlainDate.from(entry.timestamp).toString(),
     });
     workingDays.push(workingDay);
   }
