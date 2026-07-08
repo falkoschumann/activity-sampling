@@ -2,32 +2,36 @@
 
 import { useEffect, useReducer, useState } from "react";
 
-import { BurnUpQuery, BurnUpQueryResult } from "../../../../shared/domain/burn_up_query";
-import * as period from "../../../domain/period";
-import CategoryComponent from "../../components/category";
-import { useMessageHandler } from "../../components/message_handler_context";
-import { PeriodComponent } from "../../components/period_component";
-import BurnUpChartComponent from "./burn_up_chart";
-import TotalThroughputComponent from "./total_throughput";
+import {
+  createGetBurnUpQuery,
+  createGetBurnUpQueryResult,
+  type GetBurnUpQueryResult
+} from "../../../../shared/domain/read_models/get_burn_up.query";
+import * as period from "../../components/period";
+import CategoryComponent from "../../components/category.component";
+import PeriodComponent from "../../components/period.component";
+import BurnUpChartComponent from "./burn_up_chart.component";
+import TotalThroughputComponent from "./total_throughput.component";
 
 export default function BurnUpChartPage() {
   const [state, dispatch] = useReducer(period.reducer, { unit: period.PeriodUnit.MONTH }, period.init);
   const [categories, setCategories] = useState<string[]>([]);
-  const [result, setResult] = useState(BurnUpQueryResult.create());
-  const messageHandler = useMessageHandler();
+  const [result, setResult] = useState(createGetBurnUpQueryResult());
 
   useEffect(() => {
-    (async function () {
-      const result = await messageHandler.queryBurnUp(
-        BurnUpQuery.create({
+    const getBurnUpAsync = async () => {
+      const result = await window.activitySampling.routeMessage<GetBurnUpQueryResult>(
+        createGetBurnUpQuery({
           from: state.from,
           to: state.to,
           categories,
         }),
       );
       setResult(result);
-    })();
-  }, [messageHandler, categories, state.from, state.to]);
+    };
+
+    void getBurnUpAsync();
+  }, [categories, state.from, state.to]);
 
   return (
     <>

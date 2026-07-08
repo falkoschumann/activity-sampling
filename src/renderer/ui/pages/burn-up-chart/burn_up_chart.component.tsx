@@ -1,10 +1,11 @@
 // Copyright (c) 2026 Falko Schumann. All rights reserved. MIT license.
 
-import { useEffect, useRef } from "react";
 import Chart from "chart.js/auto";
-import type { BurnUpData } from "../../../../shared/domain/burn_up_query";
+import { useEffect, useRef } from "react";
 
-export default function BurnUpChartComponent({ data }: { data: BurnUpData[] }) {
+import type { BurnUpData } from "../../../../shared/domain/value_objects/burn_up_data.value_object";
+
+function BurnUpChartComponent({ data }: { data: BurnUpData[] }) {
   const chartRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -48,3 +49,5 @@ export default function BurnUpChartComponent({ data }: { data: BurnUpData[] }) {
 
   return <canvas ref={chartRef}></canvas>;
 }
+
+export default BurnUpChartComponent;

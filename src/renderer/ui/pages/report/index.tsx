@@ -20,7 +20,7 @@ export default function ReportPage() {
   const [report, setReport] = useState(createGetReportQueryResult());
 
   useEffect(() => {
-    async function runAsync() {
+    async function runGetReportAsync() {
       const result = await window.activitySampling.routeMessage<GetReportQueryResult>(
         createGetReportQuery({
           scope,
@@ -31,7 +31,7 @@ export default function ReportPage() {
       setReport(result);
     }
 
-    void runAsync();
+    void runGetReportAsync();
   }, [scope, state.from, state.to]);
 
   return (

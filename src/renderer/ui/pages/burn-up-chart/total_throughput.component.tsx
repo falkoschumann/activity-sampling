@@ -1,6 +1,6 @@
 // Copyright (c) 2026 Falko Schumann. All rights reserved. MIT license.
 
-export default function TotalThroughputComponent({ totalThroughput, unit }: { totalThroughput: number; unit: string }) {
+function TotalThroughputComponent({ totalThroughput, unit }: { totalThroughput: number; unit: string }) {
   return (
     <div className="mt-3 mb-2">
       <p className="text-end">
@@ -9,3 +9,5 @@ export default function TotalThroughputComponent({ totalThroughput, unit }: { to
     </div>
   );
 }
+
+export default TotalThroughputComponent;

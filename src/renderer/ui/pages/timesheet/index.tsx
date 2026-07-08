@@ -18,7 +18,7 @@ export default function TimesheetPage() {
   const [result, setResult] = useState(createGetTimesheetQueryResult());
 
   useEffect(() => {
-    (async function () {
+    const getTimesheetAsync = async () => {
       const result = await window.activitySampling.routeMessage<GetTimesheetQueryResult>(
         createGetTimesheetQuery({
           from: state.from,
@@ -26,7 +26,9 @@ export default function TimesheetPage() {
         }),
       );
       setResult(result);
-    })();
+    };
+
+    void getTimesheetAsync();
   }, [state.from, state.to]);
 
   async function handleExport() {
