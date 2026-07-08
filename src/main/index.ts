@@ -270,6 +270,8 @@ async function installDevTools() {
   }
 }
 
+let unsubscribeEventBus: () => void;
+
 function createWindow() {
   const mainWindow = openWindow({
     rendererFile: "log.html",
@@ -294,11 +296,12 @@ function createWindow() {
   ipcMain.handle(MESSAGE_CHANNEL, async (_event, message: Message) =>
     messageRouter.route(message),
   );
-  eventBus.subscribe((event) =>
+  unsubscribeEventBus = eventBus.subscribe((event) =>
     mainWindow.webContents.send(EVENT_CHANNEL, event),
   );
 }
 
 function shutdownApplication() {
+  unsubscribeEventBus();
   void messageRouter.route(createStopTimerCommand());
 }
