@@ -3,7 +3,7 @@
 import Chart from "chart.js/auto";
 import { useEffect, useRef } from "react";
 
-import type { Histogram } from "../../../../shared/domain/statistics_query";
+import type { Histogram } from "../../../../shared/domain/value_objects/histogram.value_object";
 
 export default function HistogramComponent({ histogram }: { histogram: Histogram }) {
   const histogramRef = useRef<HTMLCanvasElement>(null);

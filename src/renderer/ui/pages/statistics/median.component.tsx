@@ -1,8 +1,8 @@
 // Copyright (c) 2026 Falko Schumann. All rights reserved. MIT license.
 
-import type { Median } from "../../../../shared/domain/statistics_query";
+import type { Median } from "../../../../shared/domain/value_objects/median.value_object";
 
-export default function MedianComponent({ median }: { median: Median }) {
+function MedianComponent({ median }: { median: Median }) {
   return (
     <>
       <h2>Median</h2>
@@ -59,3 +59,5 @@ export default function MedianComponent({ median }: { median: Median }) {
     </>
   );
 }
+
+export default MedianComponent;

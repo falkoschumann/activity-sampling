@@ -5,7 +5,7 @@ import { useEffect, useReducer, useState } from "react";
 import {
   createGetBurnUpQuery,
   createGetBurnUpQueryResult,
-  type GetBurnUpQueryResult
+  type GetBurnUpQueryResult,
 } from "../../../../shared/domain/read_models/get_burn_up.query";
 import * as period from "../../components/period";
 import CategoryComponent from "../../components/category.component";

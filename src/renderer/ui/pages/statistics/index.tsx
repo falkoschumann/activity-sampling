@@ -2,31 +2,31 @@
 
 import { useEffect, useState } from "react";
 
-import { StatisticsQuery, StatisticsQueryResult, StatisticsScope } from "../../../../shared/domain/statistics_query";
-import CategoryComponent from "../../components/category";
-import { useMessageHandler } from "../../components/message_handler_context";
-import TotalCountComponent from "../../components/total_count_component";
-import HistogramComponent from "./histogram";
-import MedianComponent from "./median";
-import ScopeComponent from "./scope";
+import {
+  createGetStatisticsQuery,
+  createGetStatisticsQueryResult,
+  type GetStatisticsQueryResult,
+  StatisticsScope,
+} from "../../../../shared/domain/read_models/get_statistics.query";
+import CategoryComponent from "../../components/category.component";
+import TotalCountComponent from "../../components/total_count.component";
+import HistogramComponent from "./histogram.component";
+import MedianComponent from "./median.component";
+import ScopeComponent from "./scope.component";
 
 export default function StatisticsPage() {
   const [scope, setScope] = useState<StatisticsScope>(StatisticsScope.WORKING_HOURS);
   const [categories, setCategories] = useState<string[]>([]);
-  const [result, setResult] = useState(StatisticsQueryResult.create());
-  const messageHandler = useMessageHandler();
+  const [result, setResult] = useState(createGetStatisticsQueryResult());
 
   useEffect(() => {
     (async function () {
-      const result = await messageHandler.queryStatistics(
-        StatisticsQuery.create({
-          categories,
-          scope,
-        }),
+      const result = await window.activitySampling.routeMessage<GetStatisticsQueryResult>(
+        createGetStatisticsQuery({ categories, scope }),
       );
       setResult(result);
     })();
-  }, [categories, scope, messageHandler]);
+  }, [categories, scope]);
 
   return (
     <>
