@@ -1,20 +1,18 @@
 // Copyright (c) 2026 Falko Schumann. All rights reserved. MIT license.
 
-import { Temporal } from "@js-temporal/polyfill";
+import { formatDuration } from "../../components/formatter";
 
-import { formatDuration } from "../../../../shared/domain/temporal";
-
-export default function CapacityComponent({
+function CapacityComponent({
   totalHours,
   capacity,
   offset,
 }: {
-  totalHours: Temporal.Duration;
-  capacity: Temporal.Duration;
-  offset: Temporal.Duration;
+  totalHours: Temporal.DurationLike;
+  capacity: Temporal.DurationLike;
+  offset: Temporal.DurationLike;
 }) {
-  const totalHoursInSeconds = totalHours.total("seconds");
-  const offsetInSeconds = offset.total("seconds");
+  const totalHoursInSeconds = Temporal.Duration.from(totalHours).total("seconds");
+  const offsetInSeconds = Temporal.Duration.from(offset).total("seconds");
   const capacityInSeconds = Temporal.Duration.from(capacity).total("seconds");
   const progress = (totalHoursInSeconds / capacityInSeconds) * 100;
   const isBehind = offsetInSeconds < 0;
@@ -43,3 +41,5 @@ export default function CapacityComponent({
     </div>
   );
 }
+
+export default CapacityComponent;

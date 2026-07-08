@@ -1,9 +1,9 @@
 // Copyright (c) 2026 Falko Schumann. All rights reserved. MIT license.
 
-import { formatDate, formatDuration } from "../../../../shared/domain/temporal";
-import type { TimesheetEntry } from "../../../../shared/domain/timesheet_query";
+import type { TimesheetEntry } from "../../../../shared/domain/value_objects/timesheet_entry.value_object";
+import { formatDate, formatDuration } from "../../components/formatter";
 
-export default function TimesheetComponent({ entries }: { entries: TimesheetEntry[] }) {
+function TimesheetComponent({ entries }: { entries: TimesheetEntry[] }) {
   return (
     <table className="table">
       <thead className="sticky-top" style={{ top: "2.9375rem" }}>
@@ -39,3 +39,5 @@ export default function TimesheetComponent({ entries }: { entries: TimesheetEntr
     </table>
   );
 }
+
+export default TimesheetComponent;

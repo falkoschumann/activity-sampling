@@ -2,34 +2,36 @@
 
 import { useEffect, useReducer, useState } from "react";
 
-import { ExportTimesheetCommand } from "../../../../shared/domain/export_timesheet_command";
-import { TimesheetQuery, TimesheetQueryResult } from "../../../../shared/domain/timesheet_query";
-import { changePeriod, goToNextPeriod, goToPreviousPeriod, init, PeriodUnit, reducer } from "../../../domain/period";
-import { useMessageHandler } from "../../components/message_handler_context";
-import { PeriodComponent } from "../../components/period_component";
-import CapacityComponent from "./capacity";
-import TimesheetComponent from "./timesheet";
+import { createExportTimesheetCommand } from "../../../../shared/domain/activity/export_timesheet.command";
+import {
+  createGetTimesheetQuery,
+  createGetTimesheetQueryResult,
+  type GetTimesheetQueryResult,
+} from "../../../../shared/domain/read_models/get_timesheet.query";
+import { changePeriod, goToNextPeriod, goToPreviousPeriod, init, PeriodUnit, reducer } from "../../components/period";
+import PeriodComponent from "../../components/period.component";
+import CapacityComponent from "./capacity.component";
+import TimesheetComponent from "./timesheet.component";
 
 export default function TimesheetPage() {
   const [state, dispatch] = useReducer(reducer, { unit: PeriodUnit.WEEK }, init);
-  const [result, setResult] = useState(TimesheetQueryResult.create());
-  const messageHandler = useMessageHandler();
+  const [result, setResult] = useState(createGetTimesheetQueryResult());
 
   useEffect(() => {
     (async function () {
-      const result = await messageHandler.queryTimesheet(
-        TimesheetQuery.create({
+      const result = await window.activitySampling.routeMessage<GetTimesheetQueryResult>(
+        createGetTimesheetQuery({
           from: state.from,
           to: state.to,
         }),
       );
       setResult(result);
     })();
-  }, [messageHandler, state.from, state.to]);
+  }, [state.from, state.to]);
 
   async function handleExport() {
-    await messageHandler.exportTimesheet(
-      ExportTimesheetCommand.create({ timesheets: result.entries, fileName: "timesheets.csv" }),
+    await window.activitySampling.routeMessage(
+      createExportTimesheetCommand({ timesheets: result.entries, filename: "timesheets.csv" }),
     );
   }
 
