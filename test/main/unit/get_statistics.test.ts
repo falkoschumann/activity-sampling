@@ -39,8 +39,6 @@ describe("Get statistics", () => {
 
       expect(result.histogram).toEqual(
         createHistogram({
-          binEdges: [],
-          frequencies: [],
           xAxisLabel: "Duration (days)",
           yAxisLabel: "Number of Tasks",
         }),
@@ -270,8 +268,6 @@ describe("Get statistics", () => {
 
       expect(result.histogram).toEqual(
         createHistogram({
-          binEdges: [],
-          frequencies: [],
           xAxisLabel: "Cycle time (days)",
           yAxisLabel: "Number of Tasks",
         }),
@@ -415,15 +411,7 @@ describe("Get statistics", () => {
         }),
       );
 
-      expect(result.median).toEqual(
-        createMedian({
-          edge0: 0,
-          edge25: 0,
-          edge50: 0,
-          edge75: 0,
-          edge100: 0,
-        }),
-      );
+      expect(result.median).toEqual(createMedian());
     });
 
     it("should return median for working hours", async () => {

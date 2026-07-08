@@ -22,6 +22,14 @@ describe("Tick timer", () => {
     ]);
   });
 
+  it("should throw exception when tick timer without progressed time", async () => {
+    const factory = () => createTickTimerCommand({ duration: "PT30M" });
+
+    expect(factory).toThrow(
+      new TypeError("Progressed time is required when timer is not elapsed"),
+    );
+  });
+
   it("should elapse the timer", async () => {
     const { eventBus, handler } = configure();
 

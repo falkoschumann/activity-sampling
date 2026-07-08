@@ -13,16 +13,16 @@ export type SettingsChangedEventData = Readonly<{
 }>;
 
 export function createSettingsChangedEvent({
-  capacity = "PT40H",
-  categories = ["", "Feature", "Rework"],
+  capacity,
+  categories,
   firstName,
   lastName,
 }: {
-  capacity?: Temporal.DurationLike;
-  categories?: string[];
+  capacity: Temporal.DurationLike;
+  categories: string[];
   firstName?: string;
   lastName?: string;
-} = {}): SettingsChangedEvent {
+}): SettingsChangedEvent {
   return {
     type: "change-settings",
     data: { capacity, categories, firstName, lastName },

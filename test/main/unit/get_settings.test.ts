@@ -37,4 +37,12 @@ describe("Get settings", () => {
 
     expect(result).toEqual(createGetSettingsQueryResult(testResult));
   });
+
+  it("should return default settings when settings are not stored", async () => {
+    const handler = GetSettingsQueryHandler.createNull({ settings: null });
+
+    const result = await handler.handle(createGetSettingsQuery());
+
+    expect(result).toEqual(createGetSettingsQueryResult());
+  });
 });

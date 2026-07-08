@@ -68,16 +68,7 @@ describe("Get timesheet", () => {
         }),
       );
 
-      expect(result).toEqual(
-        createGetTimesheetQueryResult({
-          entries: [],
-          totalHours: "PT0S",
-          capacity: createCapacity({
-            hours: "PT40H",
-            offset: "-PT40H",
-          }),
-        }),
-      );
+      expect(result).toEqual(createGetTimesheetQueryResult());
     });
 
     it("should summarize hours worked", async () => {

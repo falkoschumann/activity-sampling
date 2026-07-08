@@ -29,7 +29,7 @@ export type GetTimesheetQueryData = Readonly<{
 export function createGetTimesheetQuery({
   from,
   to,
-  today = Temporal.Now.plainDateISO(),
+  today = Temporal.Now.plainDateISO().toString(),
   timeZone = Temporal.Now.timeZoneId(),
 }: {
   from: Temporal.PlainDateLike;

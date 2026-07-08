@@ -10,13 +10,13 @@ export interface Histogram {
 export function createHistogram({
   binEdges = [],
   frequencies = [],
-  xAxisLabel = "",
-  yAxisLabel = "",
+  xAxisLabel,
+  yAxisLabel,
 }: {
   binEdges?: string[];
   frequencies?: number[];
-  xAxisLabel?: string;
-  yAxisLabel?: string;
-} = {}): Histogram {
+  xAxisLabel: string;
+  yAxisLabel: string;
+}): Histogram {
   return { binEdges, frequencies, xAxisLabel, yAxisLabel };
 }

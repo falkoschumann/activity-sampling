@@ -12,7 +12,6 @@ import {
   createGetEstimateQuery,
   createGetEstimateQueryResult,
 } from "../../../src/shared/domain/read_models/get_estimate.query";
-import type { EstimateEntry } from "../../../src/shared/domain/value_objects/estimate_entry.value_object";
 import { EventStore } from "../../../src/main/infrastructure/event_store";
 
 const testActivity: ActivityLoggedEventData = {
@@ -25,314 +24,310 @@ const testActivity: ActivityLoggedEventData = {
 };
 
 describe("get estimate", () => {
-  describe("Estimate tasks with cycle times", () => {
-    it("should return an empty list when no activity is logged", async () => {
-      const { handler } = configure({ events: [] });
+  it("should return an empty list when no activity is logged", async () => {
+    const { handler } = configure({ events: [] });
 
-      const result = await handler.handle(createGetEstimateQuery({}));
+    const result = await handler.handle(createGetEstimateQuery({}));
 
-      expect(result.cycleTimes).toEqual<EstimateEntry[]>([]);
-    });
-
-    it("should calculate the probability of cycle times", async () => {
-      const events = [
-        createActivityLoggedEvent({
-          ...testActivity,
-          timestamp: "2025-11-03T09:00:00Z",
-          task: "Task A",
-          category: "Category 3",
-        }),
-        createActivityLoggedEvent({
-          ...testActivity,
-          timestamp: "2025-11-03T09:00:00Z",
-          task: "Task B",
-          category: "Category 2",
-        }),
-        createActivityLoggedEvent({
-          ...testActivity,
-          timestamp: "2025-11-03T09:00:00Z",
-          task: "Task C",
-          category: "Category 1",
-        }),
-        createActivityLoggedEvent({
-          ...testActivity,
-          timestamp: "2025-11-04T09:00:00Z",
-          task: "Task C",
-          category: "Category 1",
-        }),
-        createActivityLoggedEvent({
-          ...testActivity,
-          timestamp: "2025-11-05T09:00:00Z",
-          task: "Task D",
-          category: "Category 3",
-        }),
-        createActivityLoggedEvent({
-          ...testActivity,
-          timestamp: "2025-11-03T09:00:00Z",
-          task: "Task D",
-          category: "Category 3",
-        }),
-      ];
-      const { handler } = configure({ events });
-
-      const result = await handler.handle(createGetEstimateQuery({}));
-
-      expect(result).toEqual(
-        createGetEstimateQueryResult({
-          cycleTimes: [
-            {
-              cycleTime: 1,
-              frequency: 2,
-              probability: 0.5,
-              cumulativeProbability: 0.5,
-            },
-            {
-              cycleTime: 2,
-              frequency: 1,
-              probability: 0.25,
-              cumulativeProbability: 0.75,
-            },
-            {
-              cycleTime: 3,
-              frequency: 1,
-              probability: 0.25,
-              cumulativeProbability: 1.0,
-            },
-          ],
-          categories: ["Category 1", "Category 2", "Category 3"],
-          totalCount: 4,
-        }),
-      );
-    });
-
-    it("should join the cycle time of an activity with multiple categories", async () => {
-      const events = [
-        createActivityLoggedEvent({
-          ...testActivity,
-          timestamp: "2025-11-03T09:00:00Z",
-          task: "Task A",
-          category: "Category 1",
-        }),
-        createActivityLoggedEvent({
-          ...testActivity,
-          timestamp: "2025-11-03T09:00:00Z",
-          task: "Task B",
-          category: "Category 2",
-        }),
-        createActivityLoggedEvent({
-          ...testActivity,
-          timestamp: "2025-11-04T09:00:00Z",
-          task: "Task A",
-          category: "Category 2",
-        }),
-      ];
-      const { handler } = configure({ events });
-
-      const result = await handler.handle(createGetEstimateQuery({}));
-
-      expect(result).toEqual(
-        createGetEstimateQueryResult({
-          cycleTimes: [
-            {
-              cycleTime: 1,
-              frequency: 1,
-              probability: 0.5,
-              cumulativeProbability: 0.5,
-            },
-            {
-              cycleTime: 2,
-              frequency: 1,
-              probability: 0.5,
-              cumulativeProbability: 1.0,
-            },
-          ],
-          categories: ["Category 1", "Category 2"],
-          totalCount: 2,
-        }),
-      );
-    });
+    expect(result).toEqual(createGetEstimateQueryResult());
   });
 
-  describe("Filter tasks by category", () => {
-    it("should filter activities by category", async () => {
-      const events = [
-        createActivityLoggedEvent({
-          ...testActivity,
-          timestamp: "2025-11-03T09:00:00Z",
-          task: "Task A",
-          category: "Category A",
-        }),
-        createActivityLoggedEvent({
-          ...testActivity,
-          timestamp: "2025-11-03T09:00:00Z",
-          task: "Task B",
-          category: "Category A",
-        }),
-        createActivityLoggedEvent({
-          ...testActivity,
-          timestamp: "2025-11-04T09:00:00Z",
-          task: "Task C",
-          category: "Category B",
-        }),
-        createActivityLoggedEvent({
-          ...testActivity,
-          timestamp: "2025-11-05T09:00:00Z",
-          task: "Task A",
-          category: "Category B",
-        }),
-      ];
-      const { handler } = configure({ events });
+  it("should calculate the probability of cycle times", async () => {
+    const events = [
+      createActivityLoggedEvent({
+        ...testActivity,
+        timestamp: "2025-11-03T09:00:00Z",
+        task: "Task A",
+        category: "Category 3",
+      }),
+      createActivityLoggedEvent({
+        ...testActivity,
+        timestamp: "2025-11-03T09:00:00Z",
+        task: "Task B",
+        category: "Category 2",
+      }),
+      createActivityLoggedEvent({
+        ...testActivity,
+        timestamp: "2025-11-03T09:00:00Z",
+        task: "Task C",
+        category: "Category 1",
+      }),
+      createActivityLoggedEvent({
+        ...testActivity,
+        timestamp: "2025-11-04T09:00:00Z",
+        task: "Task C",
+        category: "Category 1",
+      }),
+      createActivityLoggedEvent({
+        ...testActivity,
+        timestamp: "2025-11-05T09:00:00Z",
+        task: "Task D",
+        category: "Category 3",
+      }),
+      createActivityLoggedEvent({
+        ...testActivity,
+        timestamp: "2025-11-03T09:00:00Z",
+        task: "Task D",
+        category: "Category 3",
+      }),
+    ];
+    const { handler } = configure({ events });
 
-      const result = await handler.handle(
-        createGetEstimateQuery({ categories: ["Category A"] }),
-      );
+    const result = await handler.handle(createGetEstimateQuery({}));
 
-      expect(result).toEqual(
-        createGetEstimateQueryResult({
-          cycleTimes: [
-            {
-              cycleTime: 1,
-              frequency: 2,
-              probability: 1.0,
-              cumulativeProbability: 1.0,
-            },
-          ],
-          categories: ["Category A", "Category B"],
-          totalCount: 2,
-        }),
-      );
-    });
+    expect(result).toEqual(
+      createGetEstimateQueryResult({
+        cycleTimes: [
+          {
+            cycleTime: 1,
+            frequency: 2,
+            probability: 0.5,
+            cumulativeProbability: 0.5,
+          },
+          {
+            cycleTime: 2,
+            frequency: 1,
+            probability: 0.25,
+            cumulativeProbability: 0.75,
+          },
+          {
+            cycleTime: 3,
+            frequency: 1,
+            probability: 0.25,
+            cumulativeProbability: 1.0,
+          },
+        ],
+        categories: ["Category 1", "Category 2", "Category 3"],
+        totalCount: 4,
+      }),
+    );
+  });
 
-    it("should filter activities without a category", async () => {
-      const events = [
-        createActivityLoggedEvent({
-          ...testActivity,
-          timestamp: "2025-11-03T09:00:00Z",
-          task: "Task A",
-        }),
-        createActivityLoggedEvent({
-          ...testActivity,
-          timestamp: "2025-11-03T09:00:00Z",
-          task: "Task B",
-        }),
-        createActivityLoggedEvent({
-          ...testActivity,
-          timestamp: "2025-11-04T09:00:00Z",
-          task: "Task C",
-          category: "Testing Category",
-        }),
-        createActivityLoggedEvent({
-          ...testActivity,
-          timestamp: "2025-11-05T09:00:00Z",
-          task: "Task A",
-          category: "Testing Category",
-        }),
-      ];
-      const { handler } = configure({ events });
+  it("should join the cycle time of an activity with multiple categories", async () => {
+    const events = [
+      createActivityLoggedEvent({
+        ...testActivity,
+        timestamp: "2025-11-03T09:00:00Z",
+        task: "Task A",
+        category: "Category 1",
+      }),
+      createActivityLoggedEvent({
+        ...testActivity,
+        timestamp: "2025-11-03T09:00:00Z",
+        task: "Task B",
+        category: "Category 2",
+      }),
+      createActivityLoggedEvent({
+        ...testActivity,
+        timestamp: "2025-11-04T09:00:00Z",
+        task: "Task A",
+        category: "Category 2",
+      }),
+    ];
+    const { handler } = configure({ events });
 
-      const result = await handler.handle(
-        createGetEstimateQuery({ categories: [""] }),
-      );
+    const result = await handler.handle(createGetEstimateQuery({}));
 
-      expect(result).toEqual(
-        createGetEstimateQueryResult({
-          cycleTimes: [
-            {
-              cycleTime: 1,
-              frequency: 2,
-              probability: 1.0,
-              cumulativeProbability: 1.0,
-            },
-          ],
-          categories: ["", "Testing Category"],
-          totalCount: 2,
-        }),
-      );
-    });
+    expect(result).toEqual(
+      createGetEstimateQueryResult({
+        cycleTimes: [
+          {
+            cycleTime: 1,
+            frequency: 1,
+            probability: 0.5,
+            cumulativeProbability: 0.5,
+          },
+          {
+            cycleTime: 2,
+            frequency: 1,
+            probability: 0.5,
+            cumulativeProbability: 1.0,
+          },
+        ],
+        categories: ["Category 1", "Category 2"],
+        totalCount: 2,
+      }),
+    );
+  });
 
-    it("should filter activities with and without category", async () => {
-      const events = [
-        createActivityLoggedEvent({
-          ...testActivity,
-          timestamp: "2025-11-03T09:00:00Z",
-          task: "Task A",
-          category: "Category A",
-        }),
-        createActivityLoggedEvent({
-          ...testActivity,
-          timestamp: "2025-11-03T09:00:00Z",
-          task: "Task B",
-          category: "Category B",
-        }),
-        createActivityLoggedEvent({
-          ...testActivity,
-          timestamp: "2025-11-04T09:00:00Z",
-          task: "Task C",
-        }),
-      ];
-      const { handler } = configure({ events });
+  it("should filter activities by category", async () => {
+    const events = [
+      createActivityLoggedEvent({
+        ...testActivity,
+        timestamp: "2025-11-03T09:00:00Z",
+        task: "Task A",
+        category: "Category A",
+      }),
+      createActivityLoggedEvent({
+        ...testActivity,
+        timestamp: "2025-11-03T09:00:00Z",
+        task: "Task B",
+        category: "Category A",
+      }),
+      createActivityLoggedEvent({
+        ...testActivity,
+        timestamp: "2025-11-04T09:00:00Z",
+        task: "Task C",
+        category: "Category B",
+      }),
+      createActivityLoggedEvent({
+        ...testActivity,
+        timestamp: "2025-11-05T09:00:00Z",
+        task: "Task A",
+        category: "Category B",
+      }),
+    ];
+    const { handler } = configure({ events });
 
-      const result = await handler.handle(
-        createGetEstimateQuery({ categories: ["", "Category A"] }),
-      );
+    const result = await handler.handle(
+      createGetEstimateQuery({ categories: ["Category A"] }),
+    );
 
-      expect(result).toEqual(
-        createGetEstimateQueryResult({
-          cycleTimes: [
-            {
-              cycleTime: 1,
-              frequency: 2,
-              probability: 1.0,
-              cumulativeProbability: 1.0,
-            },
-          ],
-          categories: ["", "Category A", "Category B"],
-          totalCount: 2,
-        }),
-      );
-    });
+    expect(result).toEqual(
+      createGetEstimateQueryResult({
+        cycleTimes: [
+          {
+            cycleTime: 1,
+            frequency: 2,
+            probability: 1.0,
+            cumulativeProbability: 1.0,
+          },
+        ],
+        categories: ["Category A", "Category B"],
+        totalCount: 2,
+      }),
+    );
+  });
 
-    it("should do not filter by category when an empty array is given", async () => {
-      const events = [
-        createActivityLoggedEvent({
-          ...testActivity,
-          timestamp: "2025-11-03T09:00:00Z",
-          task: "Task A",
-          category: "Category A",
-        }),
-        createActivityLoggedEvent({
-          ...testActivity,
-          timestamp: "2025-11-03T09:00:00Z",
-          task: "Task B",
-          category: "Category B",
-        }),
-        createActivityLoggedEvent({
-          ...testActivity,
-          timestamp: "2025-11-04T09:00:00Z",
-          task: "Task C",
-        }),
-      ];
-      const { handler } = configure({ events });
+  it("should filter activities without a category", async () => {
+    const events = [
+      createActivityLoggedEvent({
+        ...testActivity,
+        timestamp: "2025-11-03T09:00:00Z",
+        task: "Task A",
+      }),
+      createActivityLoggedEvent({
+        ...testActivity,
+        timestamp: "2025-11-03T09:00:00Z",
+        task: "Task B",
+      }),
+      createActivityLoggedEvent({
+        ...testActivity,
+        timestamp: "2025-11-04T09:00:00Z",
+        task: "Task C",
+        category: "Testing Category",
+      }),
+      createActivityLoggedEvent({
+        ...testActivity,
+        timestamp: "2025-11-05T09:00:00Z",
+        task: "Task A",
+        category: "Testing Category",
+      }),
+    ];
+    const { handler } = configure({ events });
 
-      const result = await handler.handle(
-        createGetEstimateQuery({ categories: [] }),
-      );
+    const result = await handler.handle(
+      createGetEstimateQuery({ categories: [""] }),
+    );
 
-      expect(result).toEqual(
-        createGetEstimateQueryResult({
-          cycleTimes: [
-            {
-              cycleTime: 1,
-              frequency: 3,
-              probability: 1.0,
-              cumulativeProbability: 1.0,
-            },
-          ],
-          categories: ["", "Category A", "Category B"],
-          totalCount: 3,
-        }),
-      );
-    });
+    expect(result).toEqual(
+      createGetEstimateQueryResult({
+        cycleTimes: [
+          {
+            cycleTime: 1,
+            frequency: 2,
+            probability: 1.0,
+            cumulativeProbability: 1.0,
+          },
+        ],
+        categories: ["", "Testing Category"],
+        totalCount: 2,
+      }),
+    );
+  });
+
+  it("should filter activities with and without category", async () => {
+    const events = [
+      createActivityLoggedEvent({
+        ...testActivity,
+        timestamp: "2025-11-03T09:00:00Z",
+        task: "Task A",
+        category: "Category A",
+      }),
+      createActivityLoggedEvent({
+        ...testActivity,
+        timestamp: "2025-11-03T09:00:00Z",
+        task: "Task B",
+        category: "Category B",
+      }),
+      createActivityLoggedEvent({
+        ...testActivity,
+        timestamp: "2025-11-04T09:00:00Z",
+        task: "Task C",
+      }),
+    ];
+    const { handler } = configure({ events });
+
+    const result = await handler.handle(
+      createGetEstimateQuery({ categories: ["", "Category A"] }),
+    );
+
+    expect(result).toEqual(
+      createGetEstimateQueryResult({
+        cycleTimes: [
+          {
+            cycleTime: 1,
+            frequency: 2,
+            probability: 1.0,
+            cumulativeProbability: 1.0,
+          },
+        ],
+        categories: ["", "Category A", "Category B"],
+        totalCount: 2,
+      }),
+    );
+  });
+
+  it("should do not filter by category when an empty array is given", async () => {
+    const events = [
+      createActivityLoggedEvent({
+        ...testActivity,
+        timestamp: "2025-11-03T09:00:00Z",
+        task: "Task A",
+        category: "Category A",
+      }),
+      createActivityLoggedEvent({
+        ...testActivity,
+        timestamp: "2025-11-03T09:00:00Z",
+        task: "Task B",
+        category: "Category B",
+      }),
+      createActivityLoggedEvent({
+        ...testActivity,
+        timestamp: "2025-11-04T09:00:00Z",
+        task: "Task C",
+      }),
+    ];
+    const { handler } = configure({ events });
+
+    const result = await handler.handle(
+      createGetEstimateQuery({ categories: [] }),
+    );
+
+    expect(result).toEqual(
+      createGetEstimateQueryResult({
+        cycleTimes: [
+          {
+            cycleTime: 1,
+            frequency: 3,
+            probability: 1.0,
+            cumulativeProbability: 1.0,
+          },
+        ],
+        categories: ["", "Category A", "Category B"],
+        totalCount: 3,
+      }),
+    );
   });
 });
 

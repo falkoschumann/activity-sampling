@@ -34,12 +34,7 @@ describe("Get report", () => {
         createGetReportQuery({ scope: ReportScope.CLIENTS }),
       );
 
-      expect(result).toEqual(
-        createGetReportQueryResult({
-          entries: [],
-          totalHours: "PT0S",
-        }),
-      );
+      expect(result).toEqual(createGetReportQueryResult());
     });
 
     it("should summarize hours worked on clients", async () => {
@@ -674,12 +669,14 @@ describe("Get report", () => {
           createActivityLoggedEvent({
             ...testActivity,
             timestamp: "2025-06-26T15:00:00Z",
+            client: "Client 1",
             category: "Feature",
             duration: "PT5H",
           }),
           createActivityLoggedEvent({
             ...testActivity,
             timestamp: "2025-06-27T15:00:00Z",
+            client: "Client 2",
             category: "Feature",
             duration: "PT3H",
           }),

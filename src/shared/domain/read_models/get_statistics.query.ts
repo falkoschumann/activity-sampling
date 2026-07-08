@@ -56,7 +56,7 @@ export interface GetStatisticsQueryResult {
 }
 
 export function createGetStatisticsQueryResult({
-  histogram = createHistogram(),
+  histogram = createHistogram({ xAxisLabel: "", yAxisLabel: "" }),
   median = createMedian(),
   categories = [],
   totalCount = 0,

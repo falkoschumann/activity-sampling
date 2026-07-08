@@ -18,7 +18,7 @@ export class GetSettingsQueryHandler {
 
   static createNull({
     settings = createSettings(),
-  }: { settings?: SettingsState } = {}) {
+  }: { settings?: SettingsState | null } = {}) {
     return new GetSettingsQueryHandler(
       SettingsProvider.createNull({ readFileResponses: [settings] }),
     );
