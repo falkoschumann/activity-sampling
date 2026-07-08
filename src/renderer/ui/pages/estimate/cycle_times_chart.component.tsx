@@ -3,10 +3,10 @@
 import { useEffect, useRef } from "react";
 import Chart from "chart.js/auto";
 
-import { EstimateEntry } from "../../../../shared/domain/estimate_query";
-import { thresholdPlugin, type ThresholdPluginOptions } from "./chart_threshold_plugin";
+import type { EstimateEntry } from "../../../../shared/domain/value_objects/estimate_entry.value_object";
+import { thresholdPlugin, type ThresholdPluginOptions } from "./threshold.plugin";
 
-export default function CycleTimesChart({ cycleTimes }: { cycleTimes: EstimateEntry[] }) {
+function CycleTimesChartComponent({ cycleTimes }: { cycleTimes: EstimateEntry[] }) {
   const chartRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -82,3 +82,5 @@ export default function CycleTimesChart({ cycleTimes }: { cycleTimes: EstimateEn
 
   return <canvas ref={chartRef}></canvas>;
 }
+
+export default CycleTimesChartComponent;

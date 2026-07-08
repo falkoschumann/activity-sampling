@@ -1,8 +1,8 @@
 // Copyright (c) 2026 Falko Schumann. All rights reserved. MIT license.
 
-import { EstimateEntry } from "../../../../shared/domain/estimate_query";
+import type { EstimateEntry } from "../../../../shared/domain/value_objects/estimate_entry.value_object";
 
-export default function CycleTimesTable({ cycleTimes }: { cycleTimes: EstimateEntry[] }) {
+function CycleTimesTableComponent({ cycleTimes }: { cycleTimes: EstimateEntry[] }) {
   return (
     <table className="table mt-3">
       <thead className="sticky-top">
@@ -26,3 +26,5 @@ export default function CycleTimesTable({ cycleTimes }: { cycleTimes: EstimateEn
     </table>
   );
 }
+
+export default CycleTimesTableComponent;

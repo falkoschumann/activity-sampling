@@ -2,24 +2,30 @@
 
 import { useEffect, useState } from "react";
 
-import { EstimateQuery, EstimateQueryResult } from "../../../../shared/domain/estimate_query";
-import CategoryComponent from "../../components/category";
-import { useMessageHandler } from "../../components/message_handler_context";
-import TotalCountComponent from "../../components/total_count_component";
-import CycleTimesChart from "./cycle_times_chart";
-import CycleTimesTable from "./cycle_times_table";
+import {
+  createGetEstimateQuery,
+  createGetEstimateQueryResult,
+  type GetEstimateQueryResult,
+} from "../../../../shared/domain/read_models/get_estimate.query";
+import CategoryComponent from "../../components/category.component";
+import TotalCountComponent from "../../components/total_count.component";
+import CycleTimesChart from "./cycle_times_chart.component";
+import CycleTimesTable from "./cycle_times_table.component";
 
 export default function EstimatePage() {
   const [categories, setCategories] = useState<string[]>([]);
-  const [result, setResult] = useState(EstimateQueryResult.create());
-  const messageHandler = useMessageHandler();
+  const [result, setResult] = useState(createGetEstimateQueryResult());
 
   useEffect(() => {
-    (async function () {
-      const result = await messageHandler.queryEstimate(EstimateQuery.create({ categories }));
+    const getEstimateAsync = async () => {
+      const result = await window.activitySampling.routeMessage<GetEstimateQueryResult>(
+        createGetEstimateQuery({ categories }),
+      );
       setResult(result);
-    })();
-  }, [messageHandler, categories]);
+    };
+
+    void getEstimateAsync();
+  }, [categories]);
 
   return (
     <>
