@@ -1,14 +1,8 @@
 // Copyright (c) 2026 Falko Schumann. All rights reserved. MIT license.
 
-import { ReportScope } from "../../../../shared/domain/report_query";
+import { ReportScope } from "../../../../shared/domain/read_models/get_report.query";
 
-export default function ScopeComponent({
-  scope,
-  onChangeScope,
-}: {
-  scope: ReportScope;
-  onChangeScope: (scope: ReportScope) => void;
-}) {
+function ScopeComponent({ scope, onChangeScope }: { scope: ReportScope; onChangeScope: (scope: ReportScope) => void }) {
   return (
     <div className="btn-toolbar py-2 gap-2" role="toolbar" aria-label="Toolbar with scope buttons">
       <div className="btn-group btn-group-sm" role="group" aria-label="Select report scope">
@@ -26,3 +20,5 @@ export default function ScopeComponent({
     </div>
   );
 }
+
+export default ScopeComponent;

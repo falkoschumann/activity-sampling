@@ -1,9 +1,10 @@
 // Copyright (c) 2026 Falko Schumann. All rights reserved. MIT license.
 
-import { ReportEntry, ReportScope } from "../../../../shared/domain/report_query";
-import { formatDate, formatDuration } from "../../../../shared/domain/temporal";
+import { ReportScope } from "../../../../shared/domain/read_models/get_report.query";
+import type { Activity } from "../../../../shared/domain/value_objects/activity.value_object";
+import { formatDate, formatDuration } from "../../components/formatter";
 
-export default function TimeReportComponent({ scope, entries }: { scope: ReportScope; entries: ReportEntry[] }) {
+function TimeReportComponent({ scope, entries }: { scope: ReportScope; entries: Activity[] }) {
   return (
     <table className="table">
       <thead className="sticky-top" style={{ top: "5.875rem" }}>
@@ -59,3 +60,5 @@ export default function TimeReportComponent({ scope, entries }: { scope: ReportS
     </table>
   );
 }
+
+export default TimeReportComponent;

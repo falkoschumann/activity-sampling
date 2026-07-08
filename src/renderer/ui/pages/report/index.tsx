@@ -2,34 +2,37 @@
 
 import { useEffect, useReducer, useState } from "react";
 
-import { ReportQuery, ReportQueryResult, ReportScope } from "../../../../shared/domain/report_query";
-import * as period from "../../../domain/period";
-import { useMessageHandler } from "../../components/message_handler_context";
-import { PeriodComponent } from "../../components/period_component";
-import ScopeComponent from "./scope";
-import TimeReportComponent from "./time_report";
-import TotalHoursComponent from "./total_hours";
+import {
+  createGetReportQuery,
+  createGetReportQueryResult,
+  type GetReportQueryResult,
+  ReportScope,
+} from "../../../../shared/domain/read_models/get_report.query";
+import * as period from "../../components/period";
+import PeriodComponent from "../../components/period.component";
+import ScopeComponent from "./scope.component";
+import TimeReportComponent from "./time_report.component";
+import TotalHoursComponent from "./total_hours.component";
 
 export default function ReportPage() {
   const [state, dispatch] = useReducer(period.reducer, { unit: period.PeriodUnit.MONTH }, period.init);
   const [scope, setScope] = useState<ReportScope>(ReportScope.PROJECTS);
-  const [result, setResult] = useState(ReportQueryResult.create());
-  const messageHandler = useMessageHandler();
+  const [report, setReport] = useState(createGetReportQueryResult());
 
   useEffect(() => {
     async function runAsync() {
-      const result = await messageHandler.queryReport(
-        ReportQuery.create({
+      const result = await window.activitySampling.routeMessage<GetReportQueryResult>(
+        createGetReportQuery({
           scope,
           from: state.from,
           to: state.to,
         }),
       );
-      setResult(result);
+      setReport(result);
     }
 
     void runAsync();
-  }, [messageHandler, scope, state.from, state.to]);
+  }, [scope, state.from, state.to]);
 
   return (
     <>
@@ -56,11 +59,11 @@ export default function ReportPage() {
         </div>
       </aside>
       <main className="container-fluid my-4" style={{ paddingTop: "6rem", paddingBottom: "2.5rem" }}>
-        <TimeReportComponent scope={scope} entries={result.entries} />
+        <TimeReportComponent scope={scope} entries={report.entries} />
       </main>
       <footer className="fixed-bottom bg-body-secondary">
         <div className="container-fluid py-2">
-          <TotalHoursComponent totalHours={result.totalHours} />
+          <TotalHoursComponent totalHours={report.totalHours} />
         </div>
       </footer>
     </>
