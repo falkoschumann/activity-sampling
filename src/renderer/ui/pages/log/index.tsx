@@ -87,12 +87,13 @@ export default function LogPage() {
   }, []);
 
   useEffect(() => {
-    const getGetCurrentIntervalAsync = async () => {
+    const getCurrentIntervalAsync = async () => {
       const result = await window.activitySampling.routeMessage<GetCurrentIntervalQueryResult>(currentIntervalQuery);
+      console.log(result);
       setCurrentInterval(result);
     };
 
-    void getGetCurrentIntervalAsync();
+    void getCurrentIntervalAsync();
   }, [currentIntervalQuery]);
 
   const selectActivity = (activity: RecentActivity) => {

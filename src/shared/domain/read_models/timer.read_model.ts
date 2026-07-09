@@ -4,7 +4,6 @@ import type { TimerElapsedEvent } from "../timer/timer_elapsed.event";
 import type { TimerStartedEvent } from "../timer/timer_started.event";
 import type { TimerStoppedEvent } from "../timer/timer_stopped.event";
 import type { TimerTickedEvent } from "../timer/timer_ticked.event";
-import { normalizeDuration } from "../value_objects/activity.value_object";
 
 export type TimerView = {
   readonly isRunning: boolean;
@@ -44,14 +43,14 @@ export function projectTimer(
     case "timer-ticked":
       return {
         ...view,
-        remainingTime: normalizeDuration(
-          Temporal.Duration.from(event.data.duration).subtract(
-            event.data.progressedTime,
-          ),
-        ),
+        remainingTime: Temporal.Duration.from(event.data.duration)
+          .subtract(event.data.progressedTime)
+          .round({ smallestUnit: "second", largestUnit: "hour" })
+          .toString(),
         progress:
-          Temporal.Duration.from(event.data.progressedTime).total("seconds") /
-          Temporal.Duration.from(event.data.duration).total("seconds"),
+          (Temporal.Duration.from(event.data.progressedTime).total("seconds") /
+            Temporal.Duration.from(event.data.duration).total("seconds")) *
+          100,
       };
     case "timer-elapsed":
       return {

@@ -11,16 +11,16 @@ import { createChangeSettingsCommand } from "../../../../shared/domain/settings/
 export default function SettingsPage() {
   const [capacity, setCapacity] = useState(40);
   const [categories, setCategories] = useState<string[]>([]);
-  const [firstName, setFirstName] = useState<string>();
-  const [lastName, setLastName] = useState<string>();
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
 
   useEffect(() => {
     const getSettingsAsync = async () => {
       const result = await window.activitySampling.routeMessage<GetSettingsQueryResult>(createGetSettingsQuery());
       setCapacity(Temporal.Duration.from(result.capacity).total("hours"));
       setCategories(result.categories);
-      setFirstName(result.firstName);
-      setLastName(result.lastName);
+      setFirstName(result.firstName ?? "");
+      setLastName(result.lastName ?? "");
     };
 
     void getSettingsAsync();

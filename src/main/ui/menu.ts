@@ -31,8 +31,8 @@ export function createMenu({
                 click: () =>
                   openWindow({
                     rendererFile: "settings.html",
-                    width: 800,
-                    height: 390,
+                    width: 640,
+                    height: 480,
                   }),
               },
               { type: "separator" },

@@ -9,7 +9,6 @@ import {
 import { createTickTimerCommand } from "../../shared/domain/timer/tick_timer.command";
 import type { TimerStartedEvent } from "../../shared/domain/timer/timer_started.event";
 import type { TimerStoppedEvent } from "../../shared/domain/timer/timer_stopped.event";
-import { normalizeDuration } from "../../shared/domain/value_objects/activity.value_object";
 import { Clock } from "../infrastructure/clock";
 
 export class TimerProcessManager extends EventTarget {
@@ -78,7 +77,7 @@ export class TimerProcessManager extends EventTarget {
         this.#handleTimerStarted(event);
         break;
       case "timer-stopped":
-        this.#handleTimerStopped();
+        this.#handleTimerStopped(event);
         break;
     }
   }
@@ -110,7 +109,7 @@ export class TimerProcessManager extends EventTarget {
     );
   }
 
-  #handleTimerStopped() {
+  #handleTimerStopped(_event: TimerStoppedEvent) {
     this.#timer.clearInterval(this.#progressTimerId);
     this.dispatchEvent(
       new CustomEvent("cancelTimers", { detail: { name: "progress" } }),
@@ -120,7 +119,10 @@ export class TimerProcessManager extends EventTarget {
   #tick() {
     const start = this.#nextElapsedAt.subtract(this.#interval);
     const timestamp = this.#clock.instant().toString();
-    const progressedTime = normalizeDuration(start.until(timestamp));
+    const progressedTime = start
+      .until(timestamp)
+      .round({ smallestUnit: "second", largestUnit: "hour" })
+      .toString();
     const command =
       Temporal.Duration.compare(progressedTime, this.#interval) < 0
         ? createTickTimerCommand({

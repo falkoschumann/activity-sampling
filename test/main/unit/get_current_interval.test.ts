@@ -60,7 +60,7 @@ describe("Get current interval", () => {
         isRunning: true,
         interval: "PT20M",
         remainingTime: "PT15M",
-        progress: 0.25,
+        progress: 25,
       }),
     );
   });
@@ -102,7 +102,7 @@ describe("Get current interval", () => {
         isRunning: false,
         interval: "PT20M",
         remainingTime: "PT5M",
-        progress: 0.75,
+        progress: 75,
       }),
     );
   });
