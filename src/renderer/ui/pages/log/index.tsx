@@ -89,7 +89,6 @@ export default function LogPage() {
   useEffect(() => {
     const getCurrentIntervalAsync = async () => {
       const result = await window.activitySampling.routeMessage<GetCurrentIntervalQueryResult>(currentIntervalQuery);
-      console.log(result);
       setCurrentInterval(result);
     };
 

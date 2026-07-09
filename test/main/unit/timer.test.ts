@@ -58,6 +58,26 @@ describe("Timer", () => {
       }),
     ]);
   });
+
+  it("should reset elapsed timer", async () => {
+    const { manager, eventBus, messageRouter } = configure();
+    eventBus.publish(createTimerStartedEvent({ interval: "PT20M" }));
+    const messageTracker = MessageTracker.create(messageRouter, "tick-timer");
+
+    await manager.simulateTick("PT30M");
+    await manager.simulateTick("PT1M");
+
+    expect(messageTracker.messages).toEqual([
+      createTickTimerCommand({
+        isElapsed: true,
+        duration: "PT20M",
+      }),
+      createTickTimerCommand({
+        duration: "PT20M",
+        progressedTime: "PT11M",
+      }),
+    ]);
+  });
 });
 
 function configure() {

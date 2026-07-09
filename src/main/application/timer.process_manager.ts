@@ -52,8 +52,8 @@ export class TimerProcessManager extends EventTarget {
   readonly #timer;
   #progressTimerId?: ReturnType<typeof setInterval>;
 
-  #interval!: Temporal.DurationLike;
-  #nextElapsedAt!: Temporal.Instant;
+  #interval!: Temporal.Duration;
+  #start!: Temporal.Instant;
 
   private constructor(
     eventBus: EventBus,
@@ -101,8 +101,8 @@ export class TimerProcessManager extends EventTarget {
   #handleTimerStarted(event: TimerStartedEvent) {
     this.#timer.clearInterval(this.#progressTimerId);
 
-    this.#interval = event.data.interval;
-    this.#nextElapsedAt = this.#clock.instant().add(this.#interval);
+    this.#interval = Temporal.Duration.from(event.data.interval);
+    this.#start = this.#clock.instant();
     this.#progressTimerId = this.#timer.setInterval(() => this.#tick(), 1000);
     this.dispatchEvent(
       new CustomEvent("setTimers", { detail: { name: "progress" } }),
@@ -117,22 +117,29 @@ export class TimerProcessManager extends EventTarget {
   }
 
   #tick() {
-    const start = this.#nextElapsedAt.subtract(this.#interval);
     const timestamp = this.#clock.instant().toString();
-    const progressedTime = start
-      .until(timestamp)
-      .round({ smallestUnit: "second", largestUnit: "hour" })
-      .toString();
-    const command =
-      Temporal.Duration.compare(progressedTime, this.#interval) < 0
-        ? createTickTimerCommand({
-            progressedTime,
-            duration: this.#interval,
-          })
-        : createTickTimerCommand({
-            isElapsed: true,
-            duration: this.#interval,
-          });
+    const progressedTime = this.#start.until(timestamp);
+    let command;
+    if (Temporal.Duration.compare(progressedTime, this.#interval) < 0) {
+      command = createTickTimerCommand({
+        progressedTime: progressedTime
+          .round({ smallestUnit: "second", largestUnit: "hour" })
+          .toString(),
+        duration: this.#interval.toString(),
+      });
+    } else {
+      const progressedMillis = progressedTime.total("milliseconds");
+      const intervalMillis = this.#interval.total("milliseconds");
+      const millisUntilStart =
+        Math.trunc(progressedMillis / intervalMillis) * intervalMillis;
+      this.#start = this.#start.add(
+        Temporal.Duration.from({ milliseconds: millisUntilStart }),
+      );
+      command = createTickTimerCommand({
+        isElapsed: true,
+        duration: this.#interval.toString(),
+      });
+    }
     this.#messageRouter.route(command);
   }
 }
