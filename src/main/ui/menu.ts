@@ -183,7 +183,7 @@ export function createMenu({
             openWindow({
               rendererFile: "report.html",
               width: 1000,
-              height: 800,
+              height: 900,
             }),
         },
         {
@@ -193,7 +193,7 @@ export function createMenu({
             openWindow({
               rendererFile: "statistics.html",
               width: 1000,
-              height: 800,
+              height: 850,
             }),
         },
         {
@@ -203,7 +203,7 @@ export function createMenu({
             openWindow({
               rendererFile: "estimate.html",
               width: 1000,
-              height: 800,
+              height: 900,
             }),
         },
         {
@@ -213,7 +213,7 @@ export function createMenu({
             openWindow({
               rendererFile: "burn-up-chart.html",
               width: 1000,
-              height: 800,
+              height: 750,
             }),
         },
         {
@@ -223,7 +223,7 @@ export function createMenu({
             openWindow({
               rendererFile: "timesheet.html",
               width: 1000,
-              height: 800,
+              height: 900,
             }),
         },
       ],

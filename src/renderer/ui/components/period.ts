@@ -68,8 +68,8 @@ export const PeriodUnit = Object.freeze({
 export type PeriodUnitType = (typeof PeriodUnit)[keyof typeof PeriodUnit];
 
 export interface State {
-  from: Temporal.PlainDate;
-  to: Temporal.PlainDate;
+  from: Temporal.PlainDateLike;
+  to: Temporal.PlainDateLike;
   unit: PeriodUnitType;
   isCurrent: boolean;
 }
@@ -82,8 +82,8 @@ export function init({
   unit: PeriodUnitType;
 }): State {
   const todayDate = parseToday(today);
-  let from: Temporal.PlainDate;
-  let to: Temporal.PlainDate;
+  let from: Temporal.PlainDateLike;
+  let to: Temporal.PlainDateLike;
   switch (unit) {
     case PeriodUnit.DAY:
       from = todayDate;
@@ -134,8 +134,8 @@ export function init({
   }
 
   return {
-    from,
-    to,
+    from: from.toString(),
+    to: to.toString(),
     unit,
     isCurrent: true,
   };
@@ -147,8 +147,8 @@ export function init({
 export function reducer(state: State, action: Action): State {
   switch (action.type) {
     case GO_TO_NEXT_PERIOD_ACTION: {
-      let from = state.from;
-      let to = state.to;
+      let from = Temporal.PlainDate.from(state.from);
+      let to = Temporal.PlainDate.from(state.to);
       switch (state.unit) {
         case PeriodUnit.DAY:
           from = from.add({ days: 1 });
@@ -176,14 +176,14 @@ export function reducer(state: State, action: Action): State {
       }
       return {
         ...state,
-        from,
-        to,
+        from: from.toString(),
+        to: to.toString(),
         isCurrent: getCurrent(from, to, action.payload.today),
       };
     }
     case GO_TO_PREVIOUS_PERIOD_ACTION: {
-      let from = state.from;
-      let to = state.to;
+      let from = Temporal.PlainDate.from(state.from);
+      let to = Temporal.PlainDate.from(state.to);
       switch (state.unit) {
         case PeriodUnit.DAY:
           from = from.subtract({ days: 1 });
@@ -211,8 +211,8 @@ export function reducer(state: State, action: Action): State {
       }
       return {
         ...state,
-        from,
-        to,
+        from: from.toString(),
+        to: to.toString(),
         isCurrent: getCurrent(from, to, action.payload.today),
       };
     }

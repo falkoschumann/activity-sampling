@@ -27,8 +27,8 @@ describe("Period", () => {
       const state = init({ unit: PeriodUnit.DAY });
 
       expect(state).toEqual<State>({
-        from: Temporal.Now.plainDateISO(),
-        to: Temporal.Now.plainDateISO(),
+        from: Temporal.Now.plainDateISO().toString(),
+        to: Temporal.Now.plainDateISO().toString(),
         unit: PeriodUnit.DAY,
         isCurrent: true,
       });
@@ -38,8 +38,8 @@ describe("Period", () => {
       const state = init({ today: "2025-08-13", unit: PeriodUnit.DAY });
 
       expect(state).toEqual<State>({
-        from: Temporal.PlainDate.from("2025-08-13"),
-        to: Temporal.PlainDate.from("2025-08-13"),
+        from: "2025-08-13",
+        to: "2025-08-13",
         unit: PeriodUnit.DAY,
         isCurrent: true,
       });
@@ -49,8 +49,8 @@ describe("Period", () => {
       const state = init({ today: "2025-08-13", unit: PeriodUnit.WEEK });
 
       expect(state).toEqual<State>({
-        from: Temporal.PlainDate.from("2025-08-11"),
-        to: Temporal.PlainDate.from("2025-08-17"),
+        from: "2025-08-11",
+        to: "2025-08-17",
         unit: PeriodUnit.WEEK,
         isCurrent: true,
       });
@@ -60,8 +60,8 @@ describe("Period", () => {
       const state = init({ today: "2025-09-29", unit: PeriodUnit.WEEK });
 
       expect(state).toEqual<State>({
-        from: Temporal.PlainDate.from("2025-09-29"),
-        to: Temporal.PlainDate.from("2025-10-05"),
+        from: "2025-09-29",
+        to: "2025-10-05",
         unit: PeriodUnit.WEEK,
         isCurrent: true,
       });
@@ -71,8 +71,8 @@ describe("Period", () => {
       const state = init({ today: "2025-09-28", unit: PeriodUnit.WEEK });
 
       expect(state).toEqual<State>({
-        from: Temporal.PlainDate.from("2025-09-22"),
-        to: Temporal.PlainDate.from("2025-09-28"),
+        from: "2025-09-22",
+        to: "2025-09-28",
         unit: PeriodUnit.WEEK,
         isCurrent: true,
       });
@@ -82,8 +82,8 @@ describe("Period", () => {
       const state = init({ today: "2025-09-20", unit: PeriodUnit.MONTH });
 
       expect(state).toEqual<State>({
-        from: Temporal.PlainDate.from("2025-09-01"),
-        to: Temporal.PlainDate.from("2025-09-30"),
+        from: "2025-09-01",
+        to: "2025-09-30",
         unit: PeriodUnit.MONTH,
         isCurrent: true,
       });
@@ -93,8 +93,8 @@ describe("Period", () => {
       const state = init({ today: "2025-08-20", unit: PeriodUnit.MONTH });
 
       expect(state).toEqual<State>({
-        from: Temporal.PlainDate.from("2025-08-01"),
-        to: Temporal.PlainDate.from("2025-08-31"),
+        from: "2025-08-01",
+        to: "2025-08-31",
         unit: PeriodUnit.MONTH,
         isCurrent: true,
       });
@@ -104,8 +104,8 @@ describe("Period", () => {
       const state = init({ today: "2025-02-20", unit: PeriodUnit.MONTH });
 
       expect(state).toEqual<State>({
-        from: Temporal.PlainDate.from("2025-02-01"),
-        to: Temporal.PlainDate.from("2025-02-28"),
+        from: "2025-02-01",
+        to: "2025-02-28",
         unit: PeriodUnit.MONTH,
         isCurrent: true,
       });
@@ -115,8 +115,8 @@ describe("Period", () => {
       const state = init({ today: "2025-10-19", unit: PeriodUnit.QUARTER });
 
       expect(state).toEqual<State>({
-        from: Temporal.PlainDate.from("2025-10-01"),
-        to: Temporal.PlainDate.from("2025-12-31"),
+        from: "2025-10-01",
+        to: "2025-12-31",
         unit: PeriodUnit.QUARTER,
         isCurrent: true,
       });
@@ -126,8 +126,8 @@ describe("Period", () => {
       const state = init({ today: "2025-04-01", unit: PeriodUnit.HALF_YEAR });
 
       expect(state).toEqual<State>({
-        from: Temporal.PlainDate.from("2025-01-01"),
-        to: Temporal.PlainDate.from("2025-06-30"),
+        from: "2025-01-01",
+        to: "2025-06-30",
         unit: PeriodUnit.HALF_YEAR,
         isCurrent: true,
       });
@@ -137,8 +137,8 @@ describe("Period", () => {
       const state = init({ today: "2025-08-13", unit: PeriodUnit.YEAR });
 
       expect(state).toEqual<State>({
-        from: Temporal.PlainDate.from("2025-01-01"),
-        to: Temporal.PlainDate.from("2025-12-31"),
+        from: "2025-01-01",
+        to: "2025-12-31",
         unit: PeriodUnit.YEAR,
         isCurrent: true,
       });
@@ -148,8 +148,8 @@ describe("Period", () => {
   describe("Change period", () => {
     it("should change to day", () => {
       let state: State = {
-        from: Temporal.PlainDate.from("2025-08-11"),
-        to: Temporal.PlainDate.from("2025-08-17"),
+        from: "2025-08-11",
+        to: "2025-08-17",
         unit: PeriodUnit.WEEK,
         isCurrent: false,
       };
@@ -160,8 +160,8 @@ describe("Period", () => {
       );
 
       expect(state).toEqual<State>({
-        from: Temporal.PlainDate.from("2025-09-13"),
-        to: Temporal.PlainDate.from("2025-09-13"),
+        from: "2025-09-13",
+        to: "2025-09-13",
         unit: PeriodUnit.DAY,
         isCurrent: true,
       });
@@ -169,8 +169,8 @@ describe("Period", () => {
 
     it("should change to week", () => {
       let state: State = {
-        from: Temporal.PlainDate.from("2025-09-13"),
-        to: Temporal.PlainDate.from("2025-09-13"),
+        from: "2025-09-13",
+        to: "2025-09-13",
         unit: PeriodUnit.DAY,
         isCurrent: true,
       };
@@ -181,8 +181,8 @@ describe("Period", () => {
       );
 
       expect(state).toEqual<State>({
-        from: Temporal.PlainDate.from("2025-09-08"),
-        to: Temporal.PlainDate.from("2025-09-14"),
+        from: "2025-09-08",
+        to: "2025-09-14",
         unit: PeriodUnit.WEEK,
         isCurrent: true,
       });
@@ -190,8 +190,8 @@ describe("Period", () => {
 
     it("should change to month", () => {
       let state: State = {
-        from: Temporal.PlainDate.from("2025-08-11"),
-        to: Temporal.PlainDate.from("2025-08-17"),
+        from: "2025-08-11",
+        to: "2025-08-17",
         unit: PeriodUnit.WEEK,
         isCurrent: false,
       };
@@ -202,8 +202,8 @@ describe("Period", () => {
       );
 
       expect(state).toEqual<State>({
-        from: Temporal.PlainDate.from("2025-09-01"),
-        to: Temporal.PlainDate.from("2025-09-30"),
+        from: "2025-09-01",
+        to: "2025-09-30",
         unit: PeriodUnit.MONTH,
         isCurrent: true,
       });
@@ -211,8 +211,8 @@ describe("Period", () => {
 
     it("should change to quarter", () => {
       let state: State = {
-        from: Temporal.PlainDate.from("2025-07-01"),
-        to: Temporal.PlainDate.from("2025-07-31"),
+        from: "2025-07-01",
+        to: "2025-07-31",
         unit: PeriodUnit.MONTH,
         isCurrent: false,
       };
@@ -223,8 +223,8 @@ describe("Period", () => {
       );
 
       expect(state).toEqual<State>({
-        from: Temporal.PlainDate.from("2025-10-01"),
-        to: Temporal.PlainDate.from("2025-12-31"),
+        from: "2025-10-01",
+        to: "2025-12-31",
         unit: PeriodUnit.QUARTER,
         isCurrent: true,
       });
@@ -232,8 +232,8 @@ describe("Period", () => {
 
     it("should change to half year", () => {
       let state: State = {
-        from: Temporal.PlainDate.from("2025-09-13"),
-        to: Temporal.PlainDate.from("2025-09-13"),
+        from: "2025-09-13",
+        to: "2025-09-13",
         unit: PeriodUnit.DAY,
         isCurrent: true,
       };
@@ -244,8 +244,8 @@ describe("Period", () => {
       );
 
       expect(state).toEqual<State>({
-        from: Temporal.PlainDate.from("2025-07-01"),
-        to: Temporal.PlainDate.from("2025-12-31"),
+        from: "2025-07-01",
+        to: "2025-12-31",
         unit: PeriodUnit.HALF_YEAR,
         isCurrent: true,
       });
@@ -253,8 +253,8 @@ describe("Period", () => {
 
     it("should change to year", () => {
       let state: State = {
-        from: Temporal.PlainDate.from("2025-09-01"),
-        to: Temporal.PlainDate.from("2025-09-30"),
+        from: "2025-09-01",
+        to: "2025-09-30",
         unit: PeriodUnit.MONTH,
         isCurrent: false,
       };
@@ -265,8 +265,8 @@ describe("Period", () => {
       );
 
       expect(state).toEqual<State>({
-        from: Temporal.PlainDate.from("2025-01-01"),
-        to: Temporal.PlainDate.from("2025-12-31"),
+        from: "2025-01-01",
+        to: "2025-12-31",
         unit: PeriodUnit.YEAR,
         isCurrent: true,
       });
@@ -274,8 +274,8 @@ describe("Period", () => {
 
     it("should change to all the time", () => {
       let state: State = {
-        from: Temporal.PlainDate.from("2025-09-01"),
-        to: Temporal.PlainDate.from("2025-09-30"),
+        from: "2025-09-01",
+        to: "2025-09-30",
         unit: PeriodUnit.MONTH,
         isCurrent: false,
       };
@@ -286,8 +286,8 @@ describe("Period", () => {
       );
 
       expect(state).toEqual<State>({
-        from: Temporal.PlainDate.from("0000-01-01"),
-        to: Temporal.PlainDate.from("9999-12-31"),
+        from: "0000-01-01",
+        to: "9999-12-31",
         unit: PeriodUnit.ALL_TIME,
         isCurrent: true,
       });
@@ -301,8 +301,8 @@ describe("Period", () => {
       state = reducer(state, goToNextPeriod({ today: "2025-09-20" }));
 
       expect(state).toEqual<State>({
-        from: Temporal.PlainDate.from("2025-09-21"),
-        to: Temporal.PlainDate.from("2025-09-21"),
+        from: "2025-09-21",
+        to: "2025-09-21",
         unit: PeriodUnit.DAY,
         isCurrent: false,
       });
@@ -310,8 +310,8 @@ describe("Period", () => {
 
     it("should go to the next day when next day is today", () => {
       let state: State = {
-        from: Temporal.PlainDate.from("2025-09-21"),
-        to: Temporal.PlainDate.from("2025-09-21"),
+        from: "2025-09-21",
+        to: "2025-09-21",
         unit: PeriodUnit.DAY,
         isCurrent: false,
       };
@@ -319,8 +319,8 @@ describe("Period", () => {
       state = reducer(state, goToNextPeriod({ today: "2025-09-22" }));
 
       expect(state).toEqual<State>({
-        from: Temporal.PlainDate.from("2025-09-22"),
-        to: Temporal.PlainDate.from("2025-09-22"),
+        from: "2025-09-22",
+        to: "2025-09-22",
         unit: PeriodUnit.DAY,
         isCurrent: true,
       });
@@ -332,8 +332,8 @@ describe("Period", () => {
       state = reducer(state, goToNextPeriod({ today: "2025-10-01" }));
 
       expect(state).toEqual<State>({
-        from: Temporal.PlainDate.from("2025-10-06"),
-        to: Temporal.PlainDate.from("2025-10-12"),
+        from: "2025-10-06",
+        to: "2025-10-12",
         unit: PeriodUnit.WEEK,
         isCurrent: false,
       });
@@ -341,8 +341,8 @@ describe("Period", () => {
 
     it("should go to the next week when next week contains today", () => {
       let state: State = {
-        from: Temporal.PlainDate.from("2025-10-06"),
-        to: Temporal.PlainDate.from("2025-10-12"),
+        from: "2025-10-06",
+        to: "2025-10-12",
         unit: PeriodUnit.WEEK,
         isCurrent: false,
       };
@@ -350,8 +350,8 @@ describe("Period", () => {
       state = reducer(state, goToNextPeriod({ today: "2025-10-15" }));
 
       expect(state).toEqual<State>({
-        from: Temporal.PlainDate.from("2025-10-13"),
-        to: Temporal.PlainDate.from("2025-10-19"),
+        from: "2025-10-13",
+        to: "2025-10-19",
         unit: PeriodUnit.WEEK,
         isCurrent: true,
       });
@@ -363,8 +363,8 @@ describe("Period", () => {
       state = reducer(state, goToNextPeriod({ today: "2025-09-15" }));
 
       expect(state).toEqual<State>({
-        from: Temporal.PlainDate.from("2025-10-01"),
-        to: Temporal.PlainDate.from("2025-10-31"),
+        from: "2025-10-01",
+        to: "2025-10-31",
         unit: PeriodUnit.MONTH,
         isCurrent: false,
       });
@@ -372,8 +372,8 @@ describe("Period", () => {
 
     it("should go to the next month when next month contains today", () => {
       let state: State = {
-        from: Temporal.PlainDate.from("2025-10-01"),
-        to: Temporal.PlainDate.from("2025-10-31"),
+        from: "2025-10-01",
+        to: "2025-10-31",
         unit: PeriodUnit.MONTH,
         isCurrent: false,
       };
@@ -381,8 +381,8 @@ describe("Period", () => {
       state = reducer(state, goToNextPeriod({ today: "2025-11-12" }));
 
       expect(state).toEqual<State>({
-        from: Temporal.PlainDate.from("2025-11-01"),
-        to: Temporal.PlainDate.from("2025-11-30"),
+        from: "2025-11-01",
+        to: "2025-11-30",
         unit: PeriodUnit.MONTH,
         isCurrent: true,
       });
@@ -394,8 +394,8 @@ describe("Period", () => {
       state = reducer(state, goToNextPeriod({ today: "2025-09-15" }));
 
       expect(state).toEqual<State>({
-        from: Temporal.PlainDate.from("2025-10-01"),
-        to: Temporal.PlainDate.from("2025-12-31"),
+        from: "2025-10-01",
+        to: "2025-12-31",
         unit: PeriodUnit.QUARTER,
         isCurrent: false,
       });
@@ -403,8 +403,8 @@ describe("Period", () => {
 
     it("should go to the next quarter when next quarter contains today", () => {
       let state: State = {
-        from: Temporal.PlainDate.from("2025-07-01"),
-        to: Temporal.PlainDate.from("2025-09-30"),
+        from: "2025-07-01",
+        to: "2025-09-30",
         unit: PeriodUnit.QUARTER,
         isCurrent: false,
       };
@@ -412,8 +412,8 @@ describe("Period", () => {
       state = reducer(state, goToNextPeriod({ today: "2025-10-19" }));
 
       expect(state).toEqual<State>({
-        from: Temporal.PlainDate.from("2025-10-01"),
-        to: Temporal.PlainDate.from("2025-12-31"),
+        from: "2025-10-01",
+        to: "2025-12-31",
         unit: PeriodUnit.QUARTER,
         isCurrent: true,
       });
@@ -425,8 +425,8 @@ describe("Period", () => {
       state = reducer(state, goToNextPeriod({ today: "2025-04-01" }));
 
       expect(state).toEqual<State>({
-        from: Temporal.PlainDate.from("2025-07-01"),
-        to: Temporal.PlainDate.from("2025-12-31"),
+        from: "2025-07-01",
+        to: "2025-12-31",
         unit: PeriodUnit.HALF_YEAR,
         isCurrent: false,
       });
@@ -434,8 +434,8 @@ describe("Period", () => {
 
     it("should go to the next half year when next half year contains today", () => {
       let state: State = {
-        from: Temporal.PlainDate.from("2025-01-01"),
-        to: Temporal.PlainDate.from("2025-06-30"),
+        from: "2025-01-01",
+        to: "2025-06-30",
         unit: PeriodUnit.HALF_YEAR,
         isCurrent: false,
       };
@@ -443,8 +443,8 @@ describe("Period", () => {
       state = reducer(state, goToNextPeriod({ today: "2025-10-19" }));
 
       expect(state).toEqual<State>({
-        from: Temporal.PlainDate.from("2025-07-01"),
-        to: Temporal.PlainDate.from("2025-12-31"),
+        from: "2025-07-01",
+        to: "2025-12-31",
         unit: PeriodUnit.HALF_YEAR,
         isCurrent: true,
       });
@@ -456,8 +456,8 @@ describe("Period", () => {
       state = reducer(state, goToNextPeriod({ today: "2025-09-15" }));
 
       expect(state).toEqual<State>({
-        from: Temporal.PlainDate.from("2026-01-01"),
-        to: Temporal.PlainDate.from("2026-12-31"),
+        from: "2026-01-01",
+        to: "2026-12-31",
         unit: PeriodUnit.YEAR,
         isCurrent: false,
       });
@@ -465,8 +465,8 @@ describe("Period", () => {
 
     it("should go to the next year when next year contains today", () => {
       let state: State = {
-        from: Temporal.PlainDate.from("2026-01-01"),
-        to: Temporal.PlainDate.from("2026-12-31"),
+        from: "2026-01-01",
+        to: "2026-12-31",
         unit: PeriodUnit.YEAR,
         isCurrent: false,
       };
@@ -474,8 +474,8 @@ describe("Period", () => {
       state = reducer(state, goToNextPeriod({ today: "2027-04-01" }));
 
       expect(state).toEqual<State>({
-        from: Temporal.PlainDate.from("2027-01-01"),
-        to: Temporal.PlainDate.from("2027-12-31"),
+        from: "2027-01-01",
+        to: "2027-12-31",
         unit: PeriodUnit.YEAR,
         isCurrent: true,
       });
@@ -489,8 +489,8 @@ describe("Period", () => {
       state = reducer(state, goToPreviousPeriod({ today: "2025-09-20" }));
 
       expect(state).toEqual<State>({
-        from: Temporal.PlainDate.from("2025-09-19"),
-        to: Temporal.PlainDate.from("2025-09-19"),
+        from: "2025-09-19",
+        to: "2025-09-19",
         unit: PeriodUnit.DAY,
         isCurrent: false,
       });
@@ -498,8 +498,8 @@ describe("Period", () => {
 
     it("should go to the previous day when previous day is today", () => {
       let state: State = {
-        from: Temporal.PlainDate.from("2025-09-19"),
-        to: Temporal.PlainDate.from("2025-09-19"),
+        from: "2025-09-19",
+        to: "2025-09-19",
         unit: PeriodUnit.DAY,
         isCurrent: false,
       };
@@ -507,8 +507,8 @@ describe("Period", () => {
       state = reducer(state, goToPreviousPeriod({ today: "2025-09-18" }));
 
       expect(state).toEqual<State>({
-        from: Temporal.PlainDate.from("2025-09-18"),
-        to: Temporal.PlainDate.from("2025-09-18"),
+        from: "2025-09-18",
+        to: "2025-09-18",
         unit: PeriodUnit.DAY,
         isCurrent: true,
       });
@@ -520,8 +520,8 @@ describe("Period", () => {
       state = reducer(state, goToPreviousPeriod({ today: "2025-10-01" }));
 
       expect(state).toEqual<State>({
-        from: Temporal.PlainDate.from("2025-09-22"),
-        to: Temporal.PlainDate.from("2025-09-28"),
+        from: "2025-09-22",
+        to: "2025-09-28",
         unit: PeriodUnit.WEEK,
         isCurrent: false,
       });
@@ -529,8 +529,8 @@ describe("Period", () => {
 
     it("should go to the previous week when previous week contains today", () => {
       let state: State = {
-        from: Temporal.PlainDate.from("2025-09-22"),
-        to: Temporal.PlainDate.from("2025-09-28"),
+        from: "2025-09-22",
+        to: "2025-09-28",
         unit: PeriodUnit.WEEK,
         isCurrent: false,
       };
@@ -538,8 +538,8 @@ describe("Period", () => {
       state = reducer(state, goToPreviousPeriod({ today: "2025-09-19" }));
 
       expect(state).toEqual<State>({
-        from: Temporal.PlainDate.from("2025-09-15"),
-        to: Temporal.PlainDate.from("2025-09-21"),
+        from: "2025-09-15",
+        to: "2025-09-21",
         unit: PeriodUnit.WEEK,
         isCurrent: true,
       });
@@ -551,8 +551,8 @@ describe("Period", () => {
       state = reducer(state, goToPreviousPeriod({ today: "2025-10-15" }));
 
       expect(state).toEqual<State>({
-        from: Temporal.PlainDate.from("2025-09-01"),
-        to: Temporal.PlainDate.from("2025-09-30"),
+        from: "2025-09-01",
+        to: "2025-09-30",
         unit: PeriodUnit.MONTH,
         isCurrent: false,
       });
@@ -560,8 +560,8 @@ describe("Period", () => {
 
     it("should go to the previous month when previous month contains today", () => {
       let state: State = {
-        from: Temporal.PlainDate.from("2025-09-01"),
-        to: Temporal.PlainDate.from("2025-09-30"),
+        from: "2025-09-01",
+        to: "2025-09-30",
         unit: PeriodUnit.MONTH,
         isCurrent: false,
       };
@@ -569,8 +569,8 @@ describe("Period", () => {
       state = reducer(state, goToPreviousPeriod({ today: "2025-08-31" }));
 
       expect(state).toEqual<State>({
-        from: Temporal.PlainDate.from("2025-08-01"),
-        to: Temporal.PlainDate.from("2025-08-31"),
+        from: "2025-08-01",
+        to: "2025-08-31",
         unit: PeriodUnit.MONTH,
         isCurrent: true,
       });
@@ -582,8 +582,8 @@ describe("Period", () => {
       state = reducer(state, goToPreviousPeriod({ today: "2025-03-01" }));
 
       expect(state).toEqual<State>({
-        from: Temporal.PlainDate.from("2024-10-01"),
-        to: Temporal.PlainDate.from("2024-12-31"),
+        from: "2024-10-01",
+        to: "2024-12-31",
         unit: PeriodUnit.QUARTER,
         isCurrent: false,
       });
@@ -591,8 +591,8 @@ describe("Period", () => {
 
     it("should go to the previous quarter when previous quarter contains today", () => {
       let state: State = {
-        from: Temporal.PlainDate.from("2024-10-01"),
-        to: Temporal.PlainDate.from("2024-12-31"),
+        from: "2024-10-01",
+        to: "2024-12-31",
         unit: PeriodUnit.QUARTER,
         isCurrent: false,
       };
@@ -600,8 +600,8 @@ describe("Period", () => {
       state = reducer(state, goToPreviousPeriod({ today: "2024-08-21" }));
 
       expect(state).toEqual<State>({
-        from: Temporal.PlainDate.from("2024-07-01"),
-        to: Temporal.PlainDate.from("2024-09-30"),
+        from: "2024-07-01",
+        to: "2024-09-30",
         unit: PeriodUnit.QUARTER,
         isCurrent: true,
       });
@@ -613,8 +613,8 @@ describe("Period", () => {
       state = reducer(state, goToPreviousPeriod({ today: "2025-04-01" }));
 
       expect(state).toEqual<State>({
-        from: Temporal.PlainDate.from("2024-07-01"),
-        to: Temporal.PlainDate.from("2024-12-31"),
+        from: "2024-07-01",
+        to: "2024-12-31",
         unit: PeriodUnit.HALF_YEAR,
         isCurrent: false,
       });
@@ -622,8 +622,8 @@ describe("Period", () => {
 
     it("should go to the previous half year when previous half year contains today", () => {
       let state: State = {
-        from: Temporal.PlainDate.from("2025-07-01"),
-        to: Temporal.PlainDate.from("2025-12-31"),
+        from: "2025-07-01",
+        to: "2025-12-31",
         unit: PeriodUnit.HALF_YEAR,
         isCurrent: false,
       };
@@ -631,8 +631,8 @@ describe("Period", () => {
       state = reducer(state, goToPreviousPeriod({ today: "2025-05-21" }));
 
       expect(state).toEqual<State>({
-        from: Temporal.PlainDate.from("2025-01-01"),
-        to: Temporal.PlainDate.from("2025-06-30"),
+        from: "2025-01-01",
+        to: "2025-06-30",
         unit: PeriodUnit.HALF_YEAR,
         isCurrent: true,
       });
@@ -644,8 +644,8 @@ describe("Period", () => {
       state = reducer(state, goToPreviousPeriod({ today: "2025-09-15" }));
 
       expect(state).toEqual<State>({
-        from: Temporal.PlainDate.from("2024-01-01"),
-        to: Temporal.PlainDate.from("2024-12-31"),
+        from: "2024-01-01",
+        to: "2024-12-31",
         unit: PeriodUnit.YEAR,
         isCurrent: false,
       });
@@ -653,8 +653,8 @@ describe("Period", () => {
 
     it("should go to the previous year when previous year contains today", () => {
       let state: State = {
-        from: Temporal.PlainDate.from("2024-01-01"),
-        to: Temporal.PlainDate.from("2024-12-31"),
+        from: "2024-01-01",
+        to: "2024-12-31",
         unit: PeriodUnit.YEAR,
         isCurrent: false,
       };
@@ -662,8 +662,8 @@ describe("Period", () => {
       state = reducer(state, goToPreviousPeriod({ today: "2023-05-21" }));
 
       expect(state).toEqual<State>({
-        from: Temporal.PlainDate.from("2023-01-01"),
-        to: Temporal.PlainDate.from("2023-12-31"),
+        from: "2023-01-01",
+        to: "2023-12-31",
         unit: PeriodUnit.YEAR,
         isCurrent: true,
       });

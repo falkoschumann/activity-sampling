@@ -21,13 +21,12 @@ export default function ReportPage() {
 
   useEffect(() => {
     async function runGetReportAsync() {
-      const result = await window.activitySampling.routeMessage<GetReportQueryResult>(
-        createGetReportQuery({
-          scope,
-          from: state.from,
-          to: state.to,
-        }),
-      );
+      const query = createGetReportQuery({
+        scope,
+        from: state.from,
+        to: state.to,
+      });
+      const result = await window.activitySampling.routeMessage<GetReportQueryResult>(query);
       setReport(result);
     }
 

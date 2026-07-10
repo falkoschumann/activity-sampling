@@ -13,8 +13,8 @@ function PeriodComponent({
   onNextPeriod,
   onChangePeriod,
 }: {
-  from: Temporal.PlainDate;
-  to: Temporal.PlainDate;
+  from: Temporal.PlainDateLike;
+  to: Temporal.PlainDateLike;
   unit: PeriodUnitType;
   isCurrent: boolean;
   units: PeriodUnitType[];
