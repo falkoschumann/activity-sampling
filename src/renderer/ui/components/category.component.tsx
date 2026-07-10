@@ -6,11 +6,11 @@ function CategoryComponent({
   categories,
   // WORKAROUND: set categories and value same, when value is not provided
   //   categories value must not be [] to get this working
-  value = [...categories],
+  value,
   onChange,
 }: {
   categories: string[];
-  value?: string[];
+  value: string[];
   onChange: (categories: string[]) => void;
 }) {
   let title = "All categories";
@@ -21,14 +21,13 @@ function CategoryComponent({
   }
 
   function handleChange(event: ChangeEvent<HTMLInputElement>, category: string) {
-    // TODO move to category reducer
-    const filter = value;
+    const newValue = [...value];
     if (event.target.checked) {
-      filter.push(category);
+      newValue.push(category);
     } else {
-      filter.splice(filter.indexOf(category), 1);
+      newValue.splice(newValue.indexOf(category), 1);
     }
-    onChange(filter);
+    onChange(newValue);
   }
 
   return (
@@ -44,9 +43,9 @@ function CategoryComponent({
       </button>
       <div className="dropdown-menu">
         <h6 className="dropdown-item">Categories</h6>
-        <div className="dropdown-item">
-          {categories.map((category) => (
-            <div key={`category-${category}`} className="form-check">
+        {categories.map((category) => (
+          <div key={`category-${category}`} className="dropdown-item">
+            <div className="form-check">
               <input
                 type="checkbox"
                 className="form-check-input"
@@ -59,8 +58,8 @@ function CategoryComponent({
                 {category.length === 0 ? <em>No category</em> : category}
               </label>
             </div>
-          ))}
-        </div>
+          </div>
+        ))}
       </div>
     </>
   );
