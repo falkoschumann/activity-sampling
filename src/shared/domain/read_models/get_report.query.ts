@@ -336,7 +336,7 @@ function updateCategoriesReport(entries: Activity[], activity: Activity) {
       client: "N/A",
       project: "N/A",
       task: "N/A",
-      category: activity.category,
+      category: existingEntry.category,
       hours,
       cycleTime,
     });
