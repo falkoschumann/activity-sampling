@@ -50,9 +50,6 @@ function CycleTimesChartComponent({ cycleTimes }: { cycleTimes: EstimateEntry[] 
           },
           y: {
             beginAtZero: true,
-            ticks: {
-              stepSize: 1,
-            },
             title: {
               display: true,
               text: "Frequency",
@@ -60,9 +57,6 @@ function CycleTimesChartComponent({ cycleTimes }: { cycleTimes: EstimateEntry[] 
           },
           y1: {
             beginAtZero: true,
-            ticks: {
-              stepSize: 5,
-            },
             position: "right",
             title: {
               display: true,

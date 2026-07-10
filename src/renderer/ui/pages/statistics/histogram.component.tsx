@@ -32,9 +32,6 @@ export default function HistogramComponent({ histogram }: { histogram: Histogram
           },
           y: {
             beginAtZero: true,
-            ticks: {
-              stepSize: 1,
-            },
             title: {
               display: true,
               text: histogram.yAxisLabel,
