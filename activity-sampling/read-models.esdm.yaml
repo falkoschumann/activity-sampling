@@ -237,7 +237,6 @@ parameters:
     scope:
       type: string
       enum: [clients, projects, tasks, categories]
-    # TODO remove from and to parameters because start and finish can be before or after and hours or cycle time are only relevant for done activities
     from:
       type: string
       format: date

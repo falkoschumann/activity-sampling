@@ -4,8 +4,6 @@ import type { ChangeEvent } from "react";
 
 function CategoryComponent({
   categories,
-  // WORKAROUND: set categories and value same, when value is not provided
-  //   categories value must not be [] to get this working
   value,
   onChange,
 }: {

@@ -32,6 +32,7 @@ export default function TimesheetPage() {
   }, [state.from, state.to]);
 
   async function handleExport() {
+    // TODO select export directory and file
     await window.activitySampling.routeMessage(
       createExportTimesheetCommand({ timesheets: result.entries, filename: "timesheets.csv" }),
     );
