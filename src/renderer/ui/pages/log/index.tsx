@@ -28,6 +28,9 @@ import CountdownComponent from "./countdown.component";
 import TimeSummaryComponent from "./time_summary.component";
 import WorkingDaysComponent from "./working_days.component";
 import ActivityFormComponent from "./activity_form.component";
+import type { CommandStatus } from "@muspellheim/shared";
+
+// FIXME renderer process uses 100% cpu
 
 export default function LogPage() {
   const [client, setClient] = useState("");
@@ -36,8 +39,7 @@ export default function LogPage() {
   const [notes, setNotes] = useState("");
   const [category, setCategory] = useState("");
   const [categories, setCategories] = useState<string[]>([]);
-  // TODO form is disabled when timer is running and current interval is logged
-  const isFormDisabled = false;
+  const [isFormDisabled, setFormDisabled] = useState(false);
 
   const [currentIntervalQuery, setCurrentIntervalQuery] = useState(createGetCurrentIntervalQuery());
   const [currentInterval, setCurrentInterval] = useState(createGetCurrentIntervalQueryResult());
@@ -54,8 +56,8 @@ export default function LogPage() {
     void getSettingsAsync();
   }, []);
 
-  const logActivity = () => {
-    void window.activitySampling.routeMessage(
+  const logActivity = async () => {
+    const status = await window.activitySampling.routeMessage<CommandStatus>(
       createLogActivityCommand({
         timestamp: Temporal.Now.instant().toString(),
         duration: currentInterval.interval,
@@ -66,6 +68,9 @@ export default function LogPage() {
         category,
       }),
     );
+    if (status.isSuccess) {
+      setFormDisabled(currentInterval.isRunning);
+    }
   };
 
   useEffect(() => {
@@ -73,18 +78,28 @@ export default function LogPage() {
       (event: ActivityLoggedEvent | TimerStartedEvent | TimerStoppedEvent | TimerTickedEvent | TimerElapsedEvent) => {
         switch (event.type) {
           case "activity-logged":
+            setFormDisabled(currentInterval.isRunning);
             setRecentActivitiesQuery(createGetRecentActivitiesQuery());
             break;
           case "timer-started":
+            setFormDisabled(true);
+            setCurrentIntervalQuery(createGetCurrentIntervalQuery());
+            break;
           case "timer-stopped":
+            setFormDisabled(false);
+            setCurrentIntervalQuery(createGetCurrentIntervalQuery());
+            break;
           case "timer-ticked":
+            setCurrentIntervalQuery(createGetCurrentIntervalQuery());
+            break;
           case "timer-elapsed":
+            setFormDisabled(false);
             setCurrentIntervalQuery(createGetCurrentIntervalQuery());
             break;
         }
       },
     );
-  }, []);
+  }, [currentInterval.isRunning]);
 
   useEffect(() => {
     const getCurrentIntervalAsync = async () => {
