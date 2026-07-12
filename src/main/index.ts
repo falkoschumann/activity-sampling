@@ -147,6 +147,7 @@ messageRouter.register(
 
 // Integration
 NotifierProcessManager.create({
+  eventStore,
   eventBus,
   messageRouter,
   notificationsGateway,

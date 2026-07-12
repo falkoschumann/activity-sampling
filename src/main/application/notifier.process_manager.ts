@@ -7,20 +7,24 @@ import type { ActivityLoggedEvent } from "../../shared/domain/activity/activity_
 import type { TimerElapsedEvent } from "../../shared/domain/timer/timer_elapsed.event";
 import { Clock } from "../infrastructure/clock";
 import { NotificationsGateway } from "../infrastructure/notifications.gateway";
+import type { EventStore } from "../infrastructure/event_store";
 
 export class NotifierProcessManager {
   static create({
+    eventStore,
     eventBus,
     messageRouter,
     notificationsGateway,
     clock = Clock.systemUtc(),
   }: {
+    eventStore: EventStore;
     eventBus: EventBus;
     messageRouter: MessageRouter;
     notificationsGateway: NotificationsGateway;
     clock?: Clock;
   }) {
     return new NotifierProcessManager(
+      eventStore,
       eventBus,
       messageRouter,
       notificationsGateway,
@@ -28,6 +32,7 @@ export class NotifierProcessManager {
     );
   }
 
+  readonly #eventStore;
   readonly #messageRouter;
   readonly #notificationsGateway;
   readonly #clock;
@@ -36,11 +41,13 @@ export class NotifierProcessManager {
   #duration?: Temporal.DurationLike;
 
   private constructor(
+    eventStore: EventStore,
     eventBus: EventBus,
     messageRouter: MessageRouter,
     notificationsGateway: NotificationsGateway,
     clock: Clock,
   ) {
+    this.#eventStore = eventStore;
     this.#messageRouter = messageRouter;
     this.#notificationsGateway = notificationsGateway;
     this.#clock = clock;
@@ -67,6 +74,17 @@ export class NotifierProcessManager {
 
   async #handleTimerElapsed(event: TimerElapsedEvent) {
     await this.#notificationsGateway.hide();
+
+    if (this.#lastActivity == null) {
+      const events = this.#eventStore.replay();
+      let lastActivity;
+      for await (const event of events) {
+        lastActivity = event;
+      }
+      if (lastActivity != null) {
+        this.#lastActivity = lastActivity;
+      }
+    }
 
     this.#duration = event.data.duration;
     const title = "What are you working on?";
