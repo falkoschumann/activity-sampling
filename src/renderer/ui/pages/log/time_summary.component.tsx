@@ -1,5 +1,7 @@
 // Copyright (c) 2026 Falko Schumann. All rights reserved. MIT license.
 
+import { memo } from "react";
+
 import { formatDuration } from "../../components/formatter";
 
 function TimeSummaryComponent({
@@ -35,4 +37,4 @@ function TimeSummaryComponent({
   );
 }
 
-export default TimeSummaryComponent;
+export default memo(TimeSummaryComponent);

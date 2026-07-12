@@ -1,10 +1,11 @@
 // Copyright (c) 2026 Falko Schumann. All rights reserved. MIT license.
 
+import { memo, type SubmitEvent } from "react";
+
 import FormInputComponent from "./form_input.component";
 import FormSelectComponent from "./form_select.component";
-import type { SubmitEvent } from "react";
 
-export function ActivityFormComponent({
+function ActivityFormComponent({
   client,
   project,
   task,
@@ -88,4 +89,4 @@ export function ActivityFormComponent({
   );
 }
 
-export default ActivityFormComponent;
+export default memo(ActivityFormComponent);

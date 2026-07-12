@@ -1,6 +1,6 @@
 // Copyright (c) 2026 Falko Schumann. All rights reserved. MIT license.
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import { createLogActivityCommand } from "../../../../shared/domain/activity/log_activity.command";
 import type { ActivityLoggedEvent } from "../../../../shared/domain/activity/activity_logged.event";
@@ -30,8 +30,6 @@ import WorkingDaysComponent from "./working_days.component";
 import ActivityFormComponent from "./activity_form.component";
 import type { CommandStatus } from "@muspellheim/shared";
 
-// FIXME renderer process uses 100% cpu
-
 export default function LogPage() {
   const [client, setClient] = useState("");
   const [project, setProject] = useState("");
@@ -56,7 +54,7 @@ export default function LogPage() {
     void getSettingsAsync();
   }, []);
 
-  const logActivity = async () => {
+  const logActivity = useCallback(async () => {
     const status = await window.activitySampling.routeMessage<CommandStatus>(
       createLogActivityCommand({
         timestamp: Temporal.Now.instant().toString(),
@@ -71,7 +69,7 @@ export default function LogPage() {
     if (status.isSuccess) {
       setFormDisabled(currentInterval.isRunning);
     }
-  };
+  }, [category, client, currentInterval.interval, currentInterval.isRunning, notes, project, task]);
 
   useEffect(() => {
     return window.activitySampling.subscribeEvents(
@@ -110,13 +108,13 @@ export default function LogPage() {
     void getCurrentIntervalAsync();
   }, [currentIntervalQuery]);
 
-  const selectActivity = (activity: RecentActivity) => {
+  const selectActivity = useCallback((activity: RecentActivity) => {
     setClient(activity.client);
     setProject(activity.project);
     setTask(activity.task);
     setNotes(activity.notes ?? "");
     setCategory(activity.category ?? "");
-  };
+  }, []);
 
   useEffect(() => {
     const getRecentActivitiesAsync = async () => {
@@ -130,9 +128,7 @@ export default function LogPage() {
     };
 
     void getRecentActivitiesAsync();
-  }, [recentActivitiesQuery]);
-
-  // TODO add notification handling
+  }, [recentActivitiesQuery, selectActivity]);
 
   return (
     <>
@@ -167,10 +163,7 @@ export default function LogPage() {
             <i className="bi bi-arrow-clockwise"></i>
           </button>
         </h5>
-        <WorkingDaysComponent
-          workingDays={recentActivities.workingDays}
-          onSelectActivity={(activity) => selectActivity(activity)}
-        />
+        <WorkingDaysComponent workingDays={recentActivities.workingDays} onSelectActivity={selectActivity} />
       </main>
       <footer className="fixed-bottom bg-body-secondary">
         <div className="container">
