@@ -1,21 +1,26 @@
 # Contributing
 
-Requirements:
+## Requirements
 
 - [Node.js](https://nodejs.org/en/download) >= 24 LTS
+- [Bun](https://bun.com) >= 1.2
 - Make
+- [esdm](https://www.esdm.io/getting-started/installing-esdm/)
 - [PlantUML](https://plantuml.com/en/starting)
 
-Make Targets:
+## Make Targets
+
+The most important targets are:
 
 - `make` - Run full build
-- `make dev` - Start dev environment
+- `make domain` - Show domain overview
 - `make format` - Apply coding style
+- `make dev` - Start dev environment
 - `make doc` - Update diagrams
 
-## Build for Apple macOS
+## Build for macOS
 
-Create a file `.env.local` with:
+Create a file `.env.local` with Apple Developer credentials for signing:
 
 ```bash
 APPLE_ID=<your-apple-id>
@@ -23,6 +28,4 @@ APPLE_APP_SPECIFIC_PASSWORD=<your-app-specific-password>
 APPLE_TEAM_ID=<your-team-id>
 ```
 
-References:
-
-- https://www.sqlstyle.guide
+Build with `MAC_SIGN=true make`

@@ -9,77 +9,19 @@ analysis.
 
 ## Installation
 
-### Authentication
-
-Go to https://entra.microsoft.com.
-
-Create a new _app registration_ "Activity Sampling" under _applications_. Under
-_authentication_ add an SPA platform with redirect URI your start page or
-`http://localhost:3000` for local testing. Select neither _access tokens_ nor
-_ID tokens_ under _Implicit grant and hybrid flows_. Under _token configuration_
-add the claim _groups ID_ for each type. Create the _app roles_ `user` and
-`admin`.
-
-Add _users and groups_ in _enterprise applications_ under _applications_ and
-assign app roles.
-
-Set the following environment variables for `api-app`:
-
-- AZURE_CLIENT_ID=your-client-id
-- AZURE_APP_ID_URI=your-app-id-uri
-
-or the proper values in the `application.properties` file:
-
-```properties
-spring.cloud.azure.active-directory.credential.client-id = your-client-id
-spring.cloud.azure.active-directory.app-id-uri = api://your-app-id-uri
-```
-
-Create a `.env.local` file in the `web-api` directory with the following
-content:
-
-```env
-VITE_CLIENT_ID=your-client-id
-VITE_TENANT_ID=your-tenant-id
-VITE_SCOPES=${VITE_CLIENT_ID}/.default
-```
-
-Create `.env` in the root directory for Docker Compose with the following
-content:
-
-```env
-AZURE_CLIENT_ID=your-client-id
-AZURE_APP_ID_URI=your-app-id-uri
-```
+Download the distribution file for your platform from
+https://github.com/falkoschumann/activity-sampling/releases/.
 
 ## Usage
 
-## Contributing
+The main window displays the recent activities of the last 30 days and is used
+to log your current activity. In the _Notifications_ menu, you start a timer
+that reminds you to record your activity.
 
-The `Makefile` runs the built as default task. Other tasks are
+In menu _Reports_, you will find various analyses:
 
-- `start`: start the server
-- `test`: run all tests,
-- `format`: format source code
-
-## Credits
-
-## Open Issues
-
-- Store view parameters in URL query
-- Add return to "this month" button when period is not this month, same for
-  other units
-- Create detailed timesheet with timestamp instead of only date
-- Import holidays from an iCalendar file (currently via `CalenderReader.main()`)
-- Use the list of vacation days to automatically create activity entries
-- Handle null or non-null values
-- use 20-minute sampling interval
-- create a report with normalized start time and end time for 30 minutes
-- center duration around timestamp
-- use a task as category:
-    - fix, feat, build, chore, ci, docs, style, refactor, perf, test
-      (conventional commits)
-    - business development, design, marketing, programming, project management,
-      vacation (Harvest)
-    - epic, story, task, bug (Jira)
-    - vacation, illness, meeting
+- Reports
+- Statistics
+- Estimate
+- Burn-up chart
+- Timesheet
