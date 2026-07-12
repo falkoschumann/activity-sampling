@@ -12,6 +12,9 @@ analysis.
 Download the distribution file for your platform from
 https://github.com/falkoschumann/activity-sampling/releases/.
 
+When starting the first time, you will be asked for the directory to save you
+data.
+
 ## Usage
 
 The main window displays the recent activities of the last 30 days and is used
