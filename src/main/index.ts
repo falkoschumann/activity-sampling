@@ -241,6 +241,11 @@ async function loadPreferences(): Promise<Preferences> {
     const json = await fs.readFile(preferencesFile, "utf-8");
     return JSON.parse(json);
   } catch (error) {
+    if ((error as NodeJS.ErrnoException).code === "ENOENT") {
+      // No preferences stored yet
+      return {};
+    }
+
     dialog.showErrorBox("Could not load preferences:", String(error));
     return {};
   }
