@@ -263,7 +263,7 @@ async function installDevTools() {
   try {
     const extensions = await installExtension([REACT_DEVELOPER_TOOLS]);
     console.info(
-      `Added Extensions:  ${extensions.map((e) => e.name).join(", ")}`,
+      `Added Extensions: ${extensions.map((e) => e.name).join(", ")}`,
     );
   } catch (error) {
     console.error("An error occurred: ", error);
