@@ -4,7 +4,13 @@ import react from "@vitejs/plugin-react";
 import { defineConfig } from "electron-vite";
 
 export default defineConfig({
-  main: {},
+  main: {
+    server: {
+      watch: {
+        ignored: ["data", "testdata"],
+      },
+    },
+  },
   preload: {},
   renderer: {
     build: {
