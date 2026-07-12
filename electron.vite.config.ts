@@ -8,9 +8,9 @@ export default defineConfig({
   preload: {},
   renderer: {
     build: {
-      rollupOptions: {
+      rolldownOptions: {
         input: {
-          burnUpChart: "src/renderer/burn-up-chart.html",
+          burn_up_chart: "src/renderer/burn-up-chart.html",
           estimate: "src/renderer/estimate.html",
           log: "src/renderer/log.html",
           report: "src/renderer/report.html",
