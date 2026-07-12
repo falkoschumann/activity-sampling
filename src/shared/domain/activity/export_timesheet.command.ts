@@ -38,7 +38,9 @@ export function exportTimesheet(
   const timesheets = command.data.timesheets.map((entry) =>
     createTimesheetData({
       ...entry,
-      hours: Temporal.Duration.from(entry.hours).total("hours"),
+      hours: Number(
+        Temporal.Duration.from(entry.hours).total("hours").toFixed(2),
+      ),
       firstName: settings.firstName ?? "",
       lastName: settings.lastName ?? "",
     }),
