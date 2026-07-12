@@ -15,7 +15,7 @@ import TimesheetComponent from "./timesheet.component";
 
 export default function TimesheetPage() {
   const [state, dispatch] = useReducer(reducer, { unit: PeriodUnit.WEEK }, init);
-  const [result, setResult] = useState(createGetTimesheetQueryResult());
+  const [timesheet, setTimesheet] = useState(createGetTimesheetQueryResult());
 
   useEffect(() => {
     const getTimesheetAsync = async () => {
@@ -25,17 +25,25 @@ export default function TimesheetPage() {
           to: state.to,
         }),
       );
-      setResult(result);
+      setTimesheet(result);
     };
 
     void getTimesheetAsync();
   }, [state.from, state.to]);
 
   async function handleExport() {
-    // TODO select export directory and file
-    await window.activitySampling.routeMessage(
-      createExportTimesheetCommand({ timesheets: result.entries, filename: "timesheets.csv" }),
-    );
+    const returnValue = await window.activitySampling.showSaveDialog({
+      title: "Export timesheet",
+      defaultPath: "timesheet.csv",
+      filters: [{ name: "CSV Files", extensions: ["csv"] }],
+      properties: ["createDirectory"],
+    });
+    if (returnValue.canceled) {
+      return;
+    }
+
+    const command = createExportTimesheetCommand({ timesheets: timesheet.entries, filename: returnValue.filePath });
+    await window.activitySampling.routeMessage(command);
   }
 
   return (
@@ -69,14 +77,14 @@ export default function TimesheetPage() {
         </div>
       </aside>
       <main className="container my-4" style={{ paddingTop: "6rem", paddingBottom: "3rem" }}>
-        <TimesheetComponent entries={result.entries} />
+        <TimesheetComponent entries={timesheet.entries} />
       </main>
       <footer className="fixed-bottom bg-body">
         <div className="container py-2">
           <CapacityComponent
-            totalHours={result.totalHours}
-            capacity={result.capacity.hours}
-            offset={result.capacity.offset}
+            totalHours={timesheet.totalHours}
+            capacity={timesheet.capacity.hours}
+            offset={timesheet.capacity.offset}
           />
         </div>
       </footer>

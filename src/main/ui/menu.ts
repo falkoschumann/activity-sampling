@@ -1,11 +1,12 @@
 // Copyright (c) 2026 Falko Schumann. All rights reserved. MIT license.
 
+import type { MessageRouter } from "@muspellheim/shared";
+
 import { app, Menu, type MenuItemConstructorOptions } from "electron/main";
 
 import { createStartTimerCommand } from "../../shared/domain/timer/start_timer.command";
 import { createStopTimerCommand } from "../../shared/domain/timer/stop_timer.command";
 import { chooseDataDirectory, openWindow } from "./actions";
-import type { MessageRouter } from "@muspellheim/shared";
 
 const isMac = process.platform === "darwin";
 

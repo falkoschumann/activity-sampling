@@ -5,11 +5,13 @@ import {
   contextBridge,
   ipcRenderer,
   type IpcRendererEvent,
+  type SaveDialogOptions,
 } from "electron/renderer";
 
 import {
   EVENT_CHANNEL,
   MESSAGE_CHANNEL,
+  SHOW_SAVE_DIALOG_CHANNEL,
 } from "../shared/infrastructure/channels";
 
 contextBridge.exposeInMainWorld("activitySampling", {
@@ -26,4 +28,7 @@ contextBridge.exposeInMainWorld("activitySampling", {
       ipcRenderer.off(EVENT_CHANNEL, listener);
     };
   },
+
+  showSaveDialog: (options: SaveDialogOptions) =>
+    ipcRenderer.invoke(SHOW_SAVE_DIALOG_CHANNEL, options),
 });

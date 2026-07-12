@@ -10,7 +10,14 @@ import {
   State,
 } from "@muspellheim/shared";
 import { shell } from "electron/common";
-import { app, BrowserWindow, dialog, ipcMain, Menu } from "electron/main";
+import {
+  app,
+  BrowserWindow,
+  dialog,
+  ipcMain,
+  Menu,
+  type SaveDialogOptions,
+} from "electron/main";
 import {
   installExtension,
   REACT_DEVELOPER_TOOLS,
@@ -53,6 +60,7 @@ import { createMenu } from "./ui/menu";
 import {
   EVENT_CHANNEL,
   MESSAGE_CHANNEL,
+  SHOW_SAVE_DIALOG_CHANNEL,
 } from "../shared/infrastructure/channels";
 
 const isProduction = app.isPackaged;
@@ -299,6 +307,11 @@ function createWindow() {
   );
   unsubscribeEventBus = eventBus.subscribe((event) =>
     mainWindow.webContents.send(EVENT_CHANNEL, event),
+  );
+  ipcMain.handle(
+    SHOW_SAVE_DIALOG_CHANNEL,
+    async (_event, options: SaveDialogOptions) =>
+      dialog.showSaveDialog(options),
   );
 }
 

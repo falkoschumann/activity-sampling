@@ -3,3 +3,5 @@
 export const MESSAGE_CHANNEL = "messageChannel";
 
 export const EVENT_CHANNEL = "eventChannel";
+
+export const SHOW_SAVE_DIALOG_CHANNEL = "showSaveDialog";
