@@ -30,7 +30,7 @@ export default function SettingsPage() {
     event.preventDefault();
     await window.activitySampling.routeMessage(
       createChangeSettingsCommand({
-        capacity: Temporal.Duration.from({ hours: capacity }),
+        capacity: Temporal.Duration.from({ hours: capacity }).toString(),
         categories,
         firstName,
         lastName,
