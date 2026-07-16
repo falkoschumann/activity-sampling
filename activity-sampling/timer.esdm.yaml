@@ -8,7 +8,7 @@ identifiedBy:
   source: static
   value: default
 state:
-  type: null
+  type: {}
 ---
 apiVersion: schema.esdm.io/core/v1
 kind: command
@@ -37,7 +37,7 @@ scope:
   boundedContext: activity-sampling
   aggregate: timer
 data:
-  type: null
+  type: {}
 publishes:
   - stopped
 actors:

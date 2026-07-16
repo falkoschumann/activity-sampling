@@ -8,7 +8,7 @@ identifiedBy:
   source: static
   value: nothing
 state:
-  type: null
+  type: {}
 ---
 apiVersion: schema.esdm.io/core/v1
 kind: command
