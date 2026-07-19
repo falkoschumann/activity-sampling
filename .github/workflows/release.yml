@@ -17,18 +17,20 @@ jobs:
       - name: Checkout source code
         uses: actions/checkout@v7
       - name: Create release
-        run: |
-          gh release create ${{ github.ref_name }} \
-            --verify-tag \
-            --generate-notes \
-            --draft
+        run: gh release create ${{ github.ref_name }} --verify-tag --generate-notes --draft
   upload-assets:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: [macos-latest, ubuntu-latest, windows-latest]
     env:
+      CSC_LINK: ${{ secrets.MAC_CSC_LINK }}
+      CSC_KEY_PASSWORD: ${{ secrets.MAC_CSC_KEY_PASSWORD }}
+      APPLE_ID: ${{ secrets.APPLE_ID }}
+      APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+      APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
       GH_TOKEN: ${{ github.token }}
+      MAC_SIGN: true
     steps:
       - name: Checkout source code
         uses: actions/checkout@v7
