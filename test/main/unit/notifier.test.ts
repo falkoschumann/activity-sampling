@@ -137,6 +137,18 @@ describe("Notifier", () => {
       }),
     ]);
   });
+
+  it("should hide notification when activity is logged", async () => {
+    const { eventBus, notificationsGateway } = configure({ events: [] });
+    const hideTracked = notificationsGateway.trackHide();
+    const showTracked = notificationsGateway.trackShow();
+    eventBus.publish(createTimerElapsedEvent({ duration: "PT30M" }));
+    await expect.poll(() => showTracked.data).toEqual([expect.anything()]);
+
+    eventBus.publish(createActivityLoggedEvent({ ...testActivity }));
+
+    await expect.poll(() => hideTracked.data).toEqual([expect.anything()]);
+  });
 });
 
 function configure({

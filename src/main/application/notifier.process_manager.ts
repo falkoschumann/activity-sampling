@@ -70,6 +70,7 @@ export class NotifierProcessManager {
 
   #handleActivityLog(event: ActivityLoggedEvent) {
     this.#lastActivity = event;
+    void this.#notificationsGateway.hide();
   }
 
   async #handleTimerElapsed(event: TimerElapsedEvent) {
@@ -105,7 +106,7 @@ export class NotifierProcessManager {
       return;
     }
 
-    this.#messageRouter.route(
+    void this.#messageRouter.route(
       createLogActivityCommand({
         ...this.#lastActivity.data,
         timestamp: this.#clock.instant(),
