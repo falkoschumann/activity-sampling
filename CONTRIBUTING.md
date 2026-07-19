@@ -28,4 +28,18 @@ APPLE_APP_SPECIFIC_PASSWORD=<your-app-specific-password>
 APPLE_TEAM_ID=<your-team-id>
 ```
 
+For CI/CD signing export your _Developer ID Application_ certificate from Xcode
+and create a Bas64 encoded file from it:
+
+```bash
+base64 -i certificate.p12 -o certificate.txt
+```
+
+Set environment variables:
+
+```bash
+CSC_LINK=<base64-encoded-certificate>
+CSC_KEY_PASSWORD=<your-certificate-password>
+```
+
 Build with `MAC_SIGN=true make`

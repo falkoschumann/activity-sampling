@@ -45,11 +45,13 @@ const options: Configuration = {
     createDesktopShortcut: "always",
   },
   mac: {
+    entitlements: "build/entitlements.mac.plist",
     entitlementsInherit: "build/entitlements.mac.plist",
     extendInfo: [
       "NSDocumentsFolderUsageDescription: Application requests access to the user's Documents folder.",
       "NSDownloadsFolderUsageDescription: Application requests access to the user's Downloads folder.",
     ],
+    hardenedRuntime: true,
     notarize: process.env["MAC_SIGN"] === "true",
     identity: process.env["MAC_SIGN"] === "true" ? undefined : null,
   },
