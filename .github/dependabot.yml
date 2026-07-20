@@ -4,12 +4,10 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
-    merge-strategy: "rebase"
   - package-ecosystem: "bun"
     directory: "/"
     schedule:
       interval: "weekly"
-    merge-strategy: "rebase"
     groups:
       minor-and-patch:
         patterns:
