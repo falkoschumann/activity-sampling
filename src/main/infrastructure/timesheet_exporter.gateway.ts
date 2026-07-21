@@ -57,15 +57,6 @@ const STRINGIFY_CONFIGURATION: StringifyOptions = {
     { key: "firstName", header: "First name" },
     { key: "lastName", header: "Last name" },
   ],
-  cast: {
-    object: (value, context) => {
-      if (context.column === "date") {
-        return value.toString();
-      } else {
-        return JSON.stringify(value);
-      }
-    },
-  },
 };
 
 class FsPromiseStub {

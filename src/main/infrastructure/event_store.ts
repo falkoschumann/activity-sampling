@@ -5,7 +5,7 @@ import path from "node:path";
 import stream from "node:stream";
 
 import { ConfigurableResponses, OutputTracker } from "@muspellheim/shared";
-import Ajv from "ajv";
+import Ajv, { type JSONSchemaType } from "ajv";
 import addFormats from "ajv-formats";
 import { parse, stringify } from "csv";
 import type { Options as ParseOptions } from "csv-parse";
@@ -14,6 +14,7 @@ import { stringify as syncStringify } from "csv-stringify/sync";
 
 import {
   type ActivityLoggedEvent,
+  type ActivityLoggedEventData,
   createActivityLoggedEvent,
 } from "../../shared/domain/activity/activity_logged.event";
 
@@ -167,7 +168,7 @@ const STRINGIFY_CONFIGURATION: StringifyOptions = {
   },
 };
 
-const SCHEMA = {
+const SCHEMA: JSONSchemaType<ActivityLoggedEventData> = {
   type: "object",
   properties: {
     timestamp: { type: "string", format: "iso-date-time" },
@@ -175,8 +176,9 @@ const SCHEMA = {
     client: { type: "string" },
     project: { type: "string" },
     task: { type: "string" },
-    notes: { type: "string" },
-    category: { type: "string" },
+    notes: { type: "string", nullable: true },
+    category: { type: "string", nullable: true },
+    notification: { type: "string", default: "notifier" },
   },
   required: ["timestamp", "duration", "client", "project", "task"],
   additionalProperties: false,

@@ -27,12 +27,12 @@ const TEST_FILE = path.resolve(
 );
 
 const VACATION_DAY_1: VacationState = {
-  date: Temporal.PlainDate.from("2025-09-11"),
-  duration: Temporal.Duration.from("PT8H"),
+  date: Temporal.PlainDate.from("2025-09-11").toString(),
+  duration: Temporal.Duration.from("PT8H").toString(),
 };
 
 const VACATION_DAY_2: VacationState = {
-  date: Temporal.PlainDate.from("2025-09-12"),
+  date: Temporal.PlainDate.from("2025-09-12").toString(),
 };
 
 describe("Vacation repository", () => {

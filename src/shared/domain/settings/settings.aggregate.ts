@@ -19,7 +19,7 @@ export function createSettings({
   lastName?: string;
 } = {}): SettingsState {
   return {
-    capacity,
+    capacity: Temporal.Duration.from(capacity).toString(),
     categories,
     firstName,
     lastName,

@@ -4,7 +4,7 @@ import fsPromise from "node:fs/promises";
 import path from "node:path";
 
 import { ConfigurableResponses, OutputTracker } from "@muspellheim/shared";
-import Ajv from "ajv";
+import Ajv, { type JSONSchemaType } from "ajv";
 import addFormats from "ajv-formats";
 
 import {
@@ -70,14 +70,16 @@ export class SettingsProvider extends EventTarget {
   }
 }
 
-const SCHEMA = {
+const SCHEMA: JSONSchemaType<SettingsState> = {
   type: "object",
   properties: {
     capacity: { type: "string", format: "duration" },
     categories: { type: "array", items: { type: "string" } },
-    firstName: { type: "string" },
-    lastName: { type: "string" },
+    firstName: { type: "string", nullable: true },
+    lastName: { type: "string", nullable: true },
   },
+  required: ["capacity", "categories"],
+  additionalProperties: false,
 };
 
 const ajv = new Ajv();

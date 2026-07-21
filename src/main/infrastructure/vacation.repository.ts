@@ -4,7 +4,7 @@ import fsPromise from "node:fs/promises";
 import path from "node:path";
 
 import { ConfigurableResponses } from "@muspellheim/shared";
-import Ajv from "ajv";
+import Ajv, { type JSONSchemaType } from "ajv";
 import addFormats from "ajv-formats";
 import { parse } from "csv";
 import { stringify } from "csv/sync";
@@ -122,22 +122,13 @@ const STRINGIFY_CONFIGURATION: StringifyOptions = {
     { key: "date", header: "Date" },
     { key: "duration", header: "Duration" },
   ],
-  cast: {
-    object: (value, context) => {
-      if (context.column === "date" || context.column === "duration") {
-        return value.toString();
-      } else {
-        return JSON.stringify(value);
-      }
-    },
-  },
 };
 
-const SCHEMA = {
+const SCHEMA: JSONSchemaType<VacationState> = {
   type: "object",
   properties: {
     date: { type: "string", format: "date" },
-    duration: { type: "string", format: "duration" },
+    duration: { type: "string", format: "duration", nullable: true },
   },
   required: ["date"],
   additionalProperties: false,

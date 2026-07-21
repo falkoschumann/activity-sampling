@@ -27,19 +27,19 @@ const TEST_FILE = path.resolve(
 );
 
 const KARFREITAG: HolidayState = {
-  date: Temporal.PlainDate.from("2025-04-18"),
+  date: Temporal.PlainDate.from("2025-04-18").toString(),
   title: "Karfreitag",
 };
 
 const OSTERSONNTAG: HolidayState = {
-  date: Temporal.PlainDate.from("2025-04-20"),
+  date: Temporal.PlainDate.from("2025-04-20").toString(),
   title: "Ostersonntag",
 };
 
 const OSTERMONTAG: HolidayState = {
-  date: Temporal.PlainDate.from("2025-04-21"),
+  date: Temporal.PlainDate.from("2025-04-21").toString(),
   title: "Ostermontag",
-  duration: Temporal.Duration.from("PT8H"),
+  duration: Temporal.Duration.from("PT8H").toString(),
 };
 
 describe("Holiday repository", () => {
