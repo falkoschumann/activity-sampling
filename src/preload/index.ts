@@ -1,6 +1,6 @@
 // Copyright (c) 2026 Falko Schumann. All rights reserved. MIT license.
 
-import type { Message } from "@muspellheim/shared";
+import type { Message, MessageHandler } from "@muspellheim/shared";
 import {
   contextBridge,
   ipcRenderer,
@@ -18,9 +18,15 @@ contextBridge.exposeInMainWorld("activitySampling", {
   routeMessage: async <R = unknown>(message: Message): Promise<R> =>
     ipcRenderer.invoke(MESSAGE_CHANNEL, message),
 
-  subscribeEvents: <E = Message>(eventHandler: (event: E) => void) => {
-    function listener(_event: IpcRendererEvent, message: E) {
-      eventHandler(message);
+  subscribeEvents: <E extends Message>(
+    eventHandler: MessageHandler<E, void>,
+  ) => {
+    function listener(_event: IpcRendererEvent, event: E) {
+      if (typeof eventHandler === "function") {
+        eventHandler(event);
+      } else {
+        eventHandler.handle(event);
+      }
     }
 
     ipcRenderer.on(EVENT_CHANNEL, listener);

@@ -1,6 +1,6 @@
 // Copyright (c) 2026 Falko Schumann. All rights reserved. MIT license.
 
-import type { Message } from "@muspellheim/shared";
+import type { Message, MessageHandler } from "@muspellheim/shared";
 import type { SaveDialogOptions, SaveDialogReturnValue } from "electron/common";
 
 export type Unsubscriber = () => void;
@@ -8,7 +8,9 @@ export type Unsubscriber = () => void;
 export interface ActivitySampling {
   routeMessage<R = unknown>(message: Message): Promise<R>;
 
-  subscribeEvents<E = Message>(eventHandler: (event: E) => void): Unsubscriber;
+  subscribeEvents<E extends Message>(
+    eventHandler: MessageHandler<E, void>,
+  ): Unsubscriber;
 
   showSaveDialog(options: SaveDialogOptions): Promise<SaveDialogReturnValue>;
 }
