@@ -1,7 +1,6 @@
 # Activity Sampling
 
-Periodically asks the user about their current activity and logs it for
-analysis.
+Periodically ask the user about their current activity and log it for analysis.
 
 ## Domain
 
