@@ -51,27 +51,19 @@ export type StatisticsScope =
 export interface GetStatisticsQueryResult {
   readonly histogram: Histogram;
   readonly median: Median;
-  readonly categories: string[];
   readonly totalCount: number;
 }
 
 export function createGetStatisticsQueryResult({
   histogram = createHistogram({ xAxisLabel: "", yAxisLabel: "" }),
   median = createMedian(),
-  categories = [],
   totalCount = 0,
 }: {
   histogram?: Histogram;
   median?: Median;
-  categories?: string[];
   totalCount?: number;
 } = {}): GetStatisticsQueryResult {
-  return {
-    histogram,
-    median,
-    categories,
-    totalCount,
-  };
+  return { histogram, median, totalCount };
 }
 
 export function getStatistics(
@@ -92,7 +84,6 @@ export function getStatistics(
   return createGetStatisticsQueryResult({
     histogram,
     median,
-    categories: view.categories,
     totalCount: statistics.totalCount,
   });
 }

@@ -35,20 +35,17 @@ export function createGetEstimateQuery({
 
 export interface GetEstimateQueryResult {
   readonly cycleTimes: EstimateEntry[];
-  readonly categories: string[];
   readonly totalCount: number;
 }
 
 export function createGetEstimateQueryResult({
   cycleTimes = [],
-  categories = [],
   totalCount = 0,
 }: {
   cycleTimes?: EstimateEntry[];
-  categories?: string[];
   totalCount?: number;
 } = {}): GetEstimateQueryResult {
-  return { cycleTimes, categories, totalCount };
+  return { cycleTimes, totalCount };
 }
 
 export function getEstimate(
@@ -62,7 +59,6 @@ export function getEstimate(
   const cycleTimes = determineCycleTimes(activities);
   return createGetEstimateQueryResult({
     cycleTimes,
-    categories: view.categories,
     totalCount: activities.length,
   });
 }

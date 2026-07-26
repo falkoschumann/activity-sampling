@@ -7,6 +7,11 @@ import {
   createGetBurnUpQueryResult,
   type GetBurnUpQueryResult,
 } from "../../../../shared/domain/read_models/get_burn_up.query";
+import {
+  createGetCategoriesQuery,
+  createGetCategoriesQueryResult,
+  type GetCategoriesQueryResult,
+} from "../../../../shared/domain/read_models/get_categories.query";
 import * as period from "../../components/period";
 import CategoryComponent from "../../components/category.component";
 import PeriodComponent from "../../components/period.component";
@@ -15,23 +20,30 @@ import TotalThroughputComponent from "./total_throughput.component";
 
 export default function BurnUpChartPage() {
   const [state, dispatch] = useReducer(period.reducer, { unit: period.PeriodUnit.MONTH }, period.init);
-  const [categories, setCategories] = useState<string[]>([]);
-  const [result, setResult] = useState(createGetBurnUpQueryResult());
+  const [categoryFilter, setCategoryFilter] = useState<string[]>([]);
+  const [categories, setCategories] = useState(createGetCategoriesQueryResult());
+  const [burnUp, setBurnUp] = useState(createGetBurnUpQueryResult());
 
   useEffect(() => {
+    const getCategoriesAsync = async () => {
+      const result = await window.activitySampling.routeMessage<GetCategoriesQueryResult>(createGetCategoriesQuery());
+      setCategories(result);
+    };
+
     const getBurnUpAsync = async () => {
       const result = await window.activitySampling.routeMessage<GetBurnUpQueryResult>(
         createGetBurnUpQuery({
           from: state.from,
           to: state.to,
-          categories,
+          categories: categoryFilter,
         }),
       );
-      setResult(result);
+      setBurnUp(result);
     };
 
+    void getCategoriesAsync();
     void getBurnUpAsync();
-  }, [categories, state.from, state.to]);
+  }, [categoryFilter, state.from, state.to]);
 
   return (
     <>
@@ -56,9 +68,9 @@ export default function BurnUpChartPage() {
           <div className="btn-toolbar py-2 gap-2" role="toolbar" aria-label="Toolbar with query parameters">
             <div className="btn-group btn-group-sm" role="group" aria-label="Select category">
               <CategoryComponent
-                categories={result.categories}
-                value={categories}
-                onChange={(categories) => setCategories(categories)}
+                categories={categories.categories}
+                value={categoryFilter}
+                onChange={(categories) => setCategoryFilter(categories)}
               />
             </div>
           </div>
@@ -66,8 +78,8 @@ export default function BurnUpChartPage() {
       </aside>
       <main className="container my-4" style={{ paddingTop: "6rem" }}>
         <h2>Burn-up Chart</h2>
-        <BurnUpChartComponent data={result.data} />
-        <TotalThroughputComponent totalThroughput={result.totalThroughput} unit={state.unit} />
+        <BurnUpChartComponent data={burnUp.data} />
+        <TotalThroughputComponent totalThroughput={burnUp.totalThroughput} unit={state.unit} />
       </main>
     </>
   );

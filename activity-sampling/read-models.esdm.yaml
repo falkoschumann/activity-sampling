@@ -150,29 +150,6 @@ schema:
     - capacity
     - categories
 ---
-# TODO implement get-categories and replace property `categories` in queries
-apiVersion: schema.esdm.io/core/v1
-kind: query
-name: get-categories
-scope:
-  domain: activity-sampling
-  boundedContext: activity-sampling
-readModel: report
-result:
-  type: object
-  properties:
-    categories:
-      type: array
-      items:
-        type: string
-  required: [categories]
-actors:
-  - software-developer
-  - product-owner
-constraints:
-  - name: all-categories
-    rule: Determine the distinct list of all categories used in logged activities.
----
 apiVersion: schema.esdm.io/core/v1
 kind: query
 name: get-burn-up
@@ -208,12 +185,7 @@ result:
     totalThroughput:
       type: integer
       default: 0
-    categories:
-      type: array
-      items:
-        type: string
-      default: []
-  required: [data, totalThroughput, categories]
+  required: [data, totalThroughput]
 actors:
   - product-owner
 constraints:
@@ -221,6 +193,27 @@ constraints:
     rule: Filter activities by the specified time range.
   - name: filter-category
     rule: Filter activities by the specified categories.
+---
+apiVersion: schema.esdm.io/core/v1
+kind: query
+name: get-categories
+scope:
+  domain: activity-sampling
+  boundedContext: activity-sampling
+readModel: report
+result:
+  type: object
+  properties:
+    categories:
+      type: array
+      items:
+        type: string
+  required: [categories]
+actors:
+  - product-owner
+constraints:
+  - name: all-categories
+    rule: Determine the distinct list of all categories used in logged activities.
 ---
 apiVersion: schema.esdm.io/core/v1
 kind: query
@@ -274,15 +267,10 @@ result:
       items:
         type: EstimateEntry
       default: []
-    categories:
-      type: array
-      items:
-        type: string
-      default: []
     totalCount:
       type: integer
       default: 0
-  required: [cycleTimes, categories, totalCount]
+  required: [cycleTimes, totalCount]
 actors:
   - product-owner
 constraints:
@@ -417,13 +405,9 @@ result:
         type: Histogram
     median:
       type: Median
-    categories:
-      type: array
-      items:
-        type: string
     totalCount:
       type: integer
-  required: [histogram, median, categories, totalCount]
+  required: [histogram, median, totalCount]
 actors:
   - product-owner
 constraints:

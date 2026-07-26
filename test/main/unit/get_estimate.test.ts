@@ -97,7 +97,6 @@ describe("get estimate", () => {
             cumulativeProbability: 1.0,
           },
         ],
-        categories: ["Category 1", "Category 2", "Category 3"],
         totalCount: 4,
       }),
     );
@@ -144,7 +143,6 @@ describe("get estimate", () => {
             cumulativeProbability: 1.0,
           },
         ],
-        categories: ["Category 1", "Category 2"],
         totalCount: 2,
       }),
     );
@@ -193,7 +191,6 @@ describe("get estimate", () => {
             cumulativeProbability: 1.0,
           },
         ],
-        categories: ["Category A", "Category B"],
         totalCount: 2,
       }),
     );
@@ -240,7 +237,6 @@ describe("get estimate", () => {
             cumulativeProbability: 1.0,
           },
         ],
-        categories: ["", "Testing Category"],
         totalCount: 2,
       }),
     );
@@ -282,7 +278,6 @@ describe("get estimate", () => {
             cumulativeProbability: 1.0,
           },
         ],
-        categories: ["", "Category A", "Category B"],
         totalCount: 2,
       }),
     );
@@ -324,7 +319,6 @@ describe("get estimate", () => {
             cumulativeProbability: 1.0,
           },
         ],
-        categories: ["", "Category A", "Category B"],
         totalCount: 3,
       }),
     );

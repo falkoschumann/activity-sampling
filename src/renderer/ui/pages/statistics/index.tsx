@@ -13,20 +13,34 @@ import TotalCountComponent from "../../components/total_count.component";
 import HistogramComponent from "./histogram.component";
 import MedianComponent from "./median.component";
 import ScopeComponent from "./scope.component";
+import {
+  createGetCategoriesQuery,
+  createGetCategoriesQueryResult,
+  type GetCategoriesQueryResult,
+} from "../../../../shared/domain/read_models/get_categories.query";
 
 export default function StatisticsPage() {
   const [scope, setScope] = useState<StatisticsScope>(StatisticsScope.WORKING_HOURS);
-  const [categories, setCategories] = useState<string[]>([]);
-  const [result, setResult] = useState(createGetStatisticsQueryResult());
+  const [categoryFilter, setCategoryFilter] = useState<string[]>([]);
+  const [categories, setCategories] = useState(createGetCategoriesQueryResult());
+  const [statistics, setStatistics] = useState(createGetStatisticsQueryResult());
 
   useEffect(() => {
-    (async function () {
+    const getCategoriesAsync = async () => {
+      const result = await window.activitySampling.routeMessage<GetCategoriesQueryResult>(createGetCategoriesQuery());
+      setCategories(result);
+    };
+
+    const getStatisticsAsync = async () => {
       const result = await window.activitySampling.routeMessage<GetStatisticsQueryResult>(
-        createGetStatisticsQuery({ categories, scope }),
+        createGetStatisticsQuery({ scope, categories: categoryFilter }),
       );
-      setResult(result);
-    })();
-  }, [categories, scope]);
+      setStatistics(result);
+    };
+
+    void getCategoriesAsync();
+    void getStatisticsAsync();
+  }, [categoryFilter, scope]);
 
   return (
     <>
@@ -35,17 +49,17 @@ export default function StatisticsPage() {
           <div className="btn-toolbar py-2 gap-2" role="toolbar" aria-label="Toolbar with query parameters">
             <ScopeComponent value={scope} onChange={(scope) => setScope(scope)} />
             <CategoryComponent
-              categories={result.categories}
-              value={categories}
-              onChange={(categories) => setCategories(categories)}
+              categories={categories.categories}
+              value={categoryFilter}
+              onChange={(categories) => setCategoryFilter(categories)}
             />
           </div>
         </div>
       </aside>
       <main className="container my-4" style={{ paddingTop: "3rem" }}>
-        <HistogramComponent histogram={result.histogram} />
-        <TotalCountComponent totalCount={result.totalCount} />
-        <MedianComponent median={result.median} />
+        <HistogramComponent histogram={statistics.histogram} />
+        <TotalCountComponent totalCount={statistics.totalCount} />
+        <MedianComponent median={statistics.median} />
       </main>
     </>
   );

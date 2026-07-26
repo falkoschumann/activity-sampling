@@ -42,19 +42,16 @@ export function createGetBurnUpQuery({
 export interface GetBurnUpQueryResult {
   readonly data: BurnUpData[];
   readonly totalThroughput: number;
-  readonly categories: string[];
 }
 
 export function createGetBurnUpQueryResult({
   data = [],
   totalThroughput = 0,
-  categories = [],
 }: {
   data?: BurnUpData[];
   totalThroughput?: number;
-  categories?: string[];
 } = {}): GetBurnUpQueryResult {
-  return { data, totalThroughput, categories };
+  return { data, totalThroughput };
 }
 
 export function getBurnUp(
@@ -71,7 +68,6 @@ export function getBurnUp(
   return createGetBurnUpQueryResult({
     data,
     totalThroughput,
-    categories: view.categories,
   });
 }
 

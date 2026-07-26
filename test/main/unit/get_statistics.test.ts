@@ -131,7 +131,6 @@ describe("Get statistics", () => {
             edge75: 4,
             edge100: 5,
           },
-          categories: ["Category 1", "Category 2"],
           totalCount: 3,
         }),
       );
@@ -187,7 +186,6 @@ describe("Get statistics", () => {
             edge75: 4,
             edge100: 5,
           },
-          categories: ["Category 1", "Category 2"],
           totalCount: 4,
         }),
       );
@@ -249,7 +247,6 @@ describe("Get statistics", () => {
             edge75: 3.5,
             edge100: 5,
           },
-          categories: ["Category 1", "Category 2", "Category 3"],
           totalCount: 5,
         }),
       );
@@ -394,7 +391,6 @@ describe("Get statistics", () => {
             edge75: 5,
             edge100: 6,
           },
-          categories: ["Category A", "Category B"],
           totalCount: 3,
         }),
       );
@@ -584,7 +580,6 @@ describe("Get statistics", () => {
             edge75: 4,
             edge100: 5,
           },
-          categories: ["Category A", "Category B"],
           totalCount: 3,
         }),
       );
@@ -639,7 +634,6 @@ describe("Get statistics", () => {
             edge75: 1,
             edge100: 1,
           },
-          categories: ["", "Testing Category"],
           totalCount: 2,
         }),
       );
@@ -689,7 +683,6 @@ describe("Get statistics", () => {
             edge75: 1,
             edge100: 1,
           },
-          categories: ["", "Category A", "Category B"],
           totalCount: 2,
         }),
       );
@@ -739,7 +732,6 @@ describe("Get statistics", () => {
             edge75: 1,
             edge100: 1,
           },
-          categories: ["", "Category A", "Category B"],
           totalCount: 3,
         }),
       );

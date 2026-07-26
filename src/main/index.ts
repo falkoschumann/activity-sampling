@@ -62,6 +62,7 @@ import {
   MESSAGE_CHANNEL,
   SHOW_SAVE_DIALOG_CHANNEL,
 } from "../shared/infrastructure/channels";
+import { GetCategoriesQueryHandler } from "./application/get_categories.query_handler";
 
 const isProduction = app.isPackaged;
 
@@ -110,6 +111,10 @@ messageRouter.register(
 messageRouter.register(
   "get-burn-up",
   GetBurnUpQueryHandler.create({ eventStore }),
+);
+messageRouter.register(
+  "get-categories",
+  GetCategoriesQueryHandler.create({ eventStore }),
 );
 messageRouter.register(
   "get-settings",
