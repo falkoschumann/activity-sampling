@@ -1,7 +1,7 @@
 {
   "name": "activity-sampling",
   "version": "1.0.5",
-  "description": "Periodically asks the user about their current activity and logs it for analysis.",
+  "description": "Periodically ask the user about their current activity and log it for analysis.",
   "keywords": [
     "pomodoro",
     "time-tracking",

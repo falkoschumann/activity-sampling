@@ -28,6 +28,245 @@ schema:
 ---
 apiVersion: schema.esdm.io/core/v1
 kind: value-object
+name: burn-up-data
+scope:
+  domain: activity-sampling
+  boundedContext: activity-sampling
+schema:
+  type: object
+  properties:
+    date:
+      type: string
+      format: date
+    throughput:
+      type: integer
+    cumulativeThroughput:
+      type: number
+  required: [date, throughput, cumulativeThroughput]
+---
+apiVersion: schema.esdm.io/core/v1
+kind: value-object
+name: capacity
+scope:
+  domain: activity-sampling
+  boundedContext: activity-sampling
+schema:
+  type: object
+  properties:
+    hours:
+      type: string
+      format: duration
+      default: "PT40H"
+    offset:
+      type: string
+      format: duration
+      default: "-PT40H"
+  required: [hours, offset]
+---
+apiVersion: schema.esdm.io/core/v1
+kind: value-object
+name: estimate-entry
+scope:
+  domain: activity-sampling
+  boundedContext: activity-sampling
+schema:
+  type: object
+  properties:
+    cycleTime:
+      type: integer
+    frequency:
+      type: integer
+    probability:
+      type: number
+    cumulativeProbability:
+      type: number
+  required: [cycleTime, frequency, probability, cumulativeProbability]
+---
+apiVersion: schema.esdm.io/core/v1
+kind: value-object
+name: histogram
+scope:
+  domain: activity-sampling
+  boundedContext: activity-sampling
+schema:
+  type: object
+  properties:
+    binEdges:
+      type: array
+      items:
+        type: string
+      default: []
+    frequencies:
+      type: array
+      items:
+        type: integer
+      default: []
+    xAxisLabel:
+      type: string
+    yAxisLabel:
+      type: string
+  required: [binEdges, frequencies, xAxisLabel, yAxisLabel]
+---
+apiVersion: schema.esdm.io/core/v1
+kind: value-object
+name: median
+scope:
+  domain: activity-sampling
+  boundedContext: activity-sampling
+schema:
+  type: object
+  properties:
+    edge0:
+      type: number
+      default: 0
+    edge25:
+      type: number
+      default: 0
+    edge50:
+      type: number
+      default: 0
+    edge75:
+      type: number
+      default: 0
+    edge100:
+      type: number
+      default: 0
+  required: [edge0, edge25, edge50, edge75, edge100]
+---
+apiVersion: schema.esdm.io/core/v1
+kind: value-object
+name: recent-activity
+scope:
+  domain: activity-sampling
+  boundedContext: activity-sampling
+schema:
+  type: object
+  properties:
+    time:
+      type: string
+      format: time
+    client:
+      type: string
+    project:
+      type: string
+    task:
+      type: string
+    notes:
+      type: string
+    category:
+      type: string
+  required: [time, client, project, task]
+---
+apiVersion: schema.esdm.io/core/v1
+kind: value-object
+name: report-entry
+scope:
+  domain: activity-sampling
+  boundedContext: activity-sampling
+schema:
+  type: object
+  properties:
+    start:
+      type: string
+      format: date
+    finish:
+      type: string
+      format: date
+    client:
+      type: string
+    project:
+      type: string
+    task:
+      type: string
+    category:
+      type: string
+    hours:
+      type: string
+      format: duration
+    cycleTime:
+      type: integer
+  required: [start, finish, hours, cycleTime]
+---
+apiVersion: schema.esdm.io/core/v1
+kind: value-object
+name: time-summary
+scope:
+  domain: activity-sampling
+  boundedContext: activity-sampling
+schema:
+  type: object
+  properties:
+    today:
+      type: string
+      format: duration
+      default: "PT0H"
+    yesterday:
+      type: string
+      format: duration
+      default: "PT0H"
+    thisWeek:
+      type: string
+      format: duration
+      default: "PT0H"
+    thisMonth:
+      type: string
+      format: duration
+      default: "PT0H"
+  required: [today, yesterday, thisWeek, thisMonth]
+---
+apiVersion: schema.esdm.io/core/v1
+kind: value-object
+name: timesheet-data
+scope:
+  domain: activity-sampling
+  boundedContext: activity-sampling
+schema:
+  type: object
+  properties:
+    date:
+      type: string
+      format: date
+    client:
+      type: string
+    project:
+      type: string
+    task:
+      type: string
+    notes:
+      type: string
+    hours:
+      type: number
+    firstName:
+      type: string
+    lastName:
+      type: string
+  required: [date, client, project, task, hours, firstName, lastName]
+---
+apiVersion: schema.esdm.io/core/v1
+kind: value-object
+name: timesheet-entry
+scope:
+  domain: activity-sampling
+  boundedContext: activity-sampling
+schema:
+  type: object
+  properties:
+    date:
+      type: string
+      format: date
+    client:
+      type: string
+    project:
+      type: string
+    task:
+      type: string
+    hours:
+      type: string
+      format: duration
+  required: [date, client, project, task, hours]
+---
+apiVersion: schema.esdm.io/core/v1
+kind: value-object
 name: timesheet-view-entry
 scope:
   domain: activity-sampling
@@ -69,229 +308,5 @@ schema:
       type: array
       items:
         type: RecentActivity
----
-apiVersion: schema.esdm.io/core/v1
-kind: value-object
-name: recent-activity
-scope:
-  domain: activity-sampling
-  boundedContext: activity-sampling
-schema:
-  type: object
-  properties:
-    time:
-      type: string
-      format: time
-    client:
-      type: string
-    project:
-      type: string
-    task:
-      type: string
-    notes:
-      type: string
-    category:
-      type: string
-  required: [time, client, project, task]
----
-apiVersion: schema.esdm.io/core/v1
-kind: value-object
-name: time-summary
-scope:
-  domain: activity-sampling
-  boundedContext: activity-sampling
-schema:
-  type: object
-  properties:
-    today:
-      type: string
-      format: duration
-    yesterday:
-      type: string
-      format: duration
-    thisWeek:
-      type: string
-      format: duration
-    thisMonth:
-      type: string
-      format: duration
-  required: [today, yesterday, thisWeek, thisMonth]
----
-apiVersion: schema.esdm.io/core/v1
-kind: value-object
-name: timesheet-entry
-scope:
-  domain: activity-sampling
-  boundedContext: activity-sampling
-schema:
-  type: object
-  properties:
-    date:
-      type: string
-      format: date
-    client:
-      type: string
-    project:
-      type: string
-    task:
-      type: string
-    hours:
-      type: string
-      format: duration
-  required: [date, client, project, task, hours]
----
-apiVersion: schema.esdm.io/core/v1
-kind: value-object
-name: capacity
-scope:
-  domain: activity-sampling
-  boundedContext: activity-sampling
-schema:
-  type: object
-  properties:
-    hours:
-      type: string
-      format: duration
-    offset:
-      type: string
-      format: duration
-  required: [hours, offset]
----
-apiVersion: schema.esdm.io/core/v1
-kind: value-object
-name: timesheet-data
-scope:
-  domain: activity-sampling
-  boundedContext: activity-sampling
-schema:
-  type: object
-  properties:
-    date:
-      type: string
-      format: date
-    client:
-      type: string
-    project:
-      type: string
-    task:
-      type: string
-    notes:
-      type: string
-    hours:
-      type: number
-    firstName:
-      type: string
-    lastName:
-      type: string
-  required: [date, client, project, task, hours, firstName, lastName]
----
-apiVersion: schema.esdm.io/core/v1
-kind: value-object
-name: report-entry
-scope:
-  domain: activity-sampling
-  boundedContext: activity-sampling
-schema:
-  type: object
-  properties:
-    start:
-      type: string
-      format: date
-    finish:
-      type: string
-      format: date
-    client:
-      type: string
-    project:
-      type: string
-    task:
-      type: string
-    category:
-      type: string
-    hours:
-      type: string
-      format: duration
-    cycleTime:
-      type: integer
-  required: [start, finish, hours, cycleTime]
----
-apiVersion: schema.esdm.io/core/v1
-kind: value-object
-name: burn-up-data
-scope:
-  domain: activity-sampling
-  boundedContext: activity-sampling
-schema:
-  type: object
-  properties:
-    date:
-      type: string
-      format: date
-    throughput:
-      type: integer
-    cumulativeThroughput:
-      type: number
-  required: [date, throughput, cumulativeThroughput]
----
-apiVersion: schema.esdm.io/core/v1
-kind: value-object
-name: estimate-entry
-scope:
-  domain: activity-sampling
-  boundedContext: activity-sampling
-schema:
-  type: object
-  properties:
-    cycleTime:
-      type: integer
-    frequency:
-      type: integer
-    probability:
-      type: number
-    cumulativeProbability:
-      type: number
-  required: [cycleTime, frequency, probability, cumulativeProbability]
----
-apiVersion: schema.esdm.io/core/v1
-kind: value-object
-name: histogram
-scope:
-  domain: activity-sampling
-  boundedContext: activity-sampling
-schema:
-  type: object
-  properties:
-    binEdges:
-      type: array
-      items:
-        type: string
-    frequencies:
-      type: array
-      items:
-        type: integer
-    xAxisLabel:
-      type: string
-    yAxisLabel:
-      type: string
-  required: [binEdges, frequencies, xAxisLabel, yAxisLabel]
----
-apiVersion: schema.esdm.io/core/v1
-kind: value-object
-name: median
-scope:
-  domain: activity-sampling
-  boundedContext: activity-sampling
-schema:
-  type: object
-  properties:
-    edge0:
-      type: number
-    edge25:
-      type: number
-    edge50:
-      type: number
-    edge75:
-      type: number
-    edge100:
-      type: number
-  required: [edge0, edge25, edge50, edge75, edge100]
+      default: []
+    required: [date, activities]

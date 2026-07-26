@@ -8,7 +8,7 @@ title "System Context Diagram for Activity Sampling System"
 Person(softwareDeveloper, "Software Developer", "Wants to track his/her activities.")
 Person(productOwner, "Product Owner", "Wants to analyze the effort.")
 
-System(activitySampling, "Activity Sampling", "Periodically asks the user about their current activity and log it for analysis.")
+System(activitySampling, "Activity Sampling", "Periodically asks the user about their current activity and logs it for analysis.")
 
 SystemDb_Ext(eventStore, "Event Store", "Stores the logged activities.")
 

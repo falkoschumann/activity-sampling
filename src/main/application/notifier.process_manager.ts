@@ -60,7 +60,7 @@ export class NotifierProcessManager {
   async #react(event: ActivityLoggedEvent | TimerElapsedEvent) {
     switch (event.type) {
       case "activity-logged":
-        this.#handleActivityLog(event);
+        this.#handleActivityLogged(event);
         break;
       case "timer-elapsed":
         await this.#handleTimerElapsed(event);
@@ -68,7 +68,7 @@ export class NotifierProcessManager {
     }
   }
 
-  #handleActivityLog(event: ActivityLoggedEvent) {
+  #handleActivityLogged(event: ActivityLoggedEvent) {
     this.#lastActivity = event;
     void this.#notificationsGateway.hide();
   }

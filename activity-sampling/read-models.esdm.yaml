@@ -1,180 +1,5 @@
 apiVersion: schema.esdm.io/core/v1
 kind: read-model
-name: timesheet
-scope:
-  domain: activity-sampling
-  boundedContext: activity-sampling
-projections:
-  - boundedContext: activity-sampling
-    aggregate: activity
-    event: logged
-    rule: Append the activity entry to the timesheet.
-  - boundedContext: activity-sampling
-    aggregate: settings
-    event: changed
-    rule: Memorize the capacity and categories.
-  - boundedContext: activity-sampling
-    aggregate: holiday
-    event: holidays-changed
-    rule: Update the holidays list used for capacity calculation.
-  - boundedContext: activity-sampling
-    aggregate: vacation
-    event: vacations-changed
-    rule: Update the vacation list used for capacity calculation.
-schema:
-  type: object
-  properties:
-    entries:
-      type: array
-      items:
-        type: TimesheetViewModel
-    holidays:
-      type: array
-      items:
-        type: Holiday
-    vacations:
-      type: array
-      items:
-        type: Vacation
-    capacity:
-      type: string
-      format: duration
-    categories:
-      type: array
-      items:
-        type: string
-  required:
-    - entries
-    - holidays
-    - vacations
-    - capacity
-    - categories
----
-apiVersion: schema.esdm.io/core/v1
-kind: query
-name: get-recent-activities
-scope:
-  domain: activity-sampling
-  boundedContext: activity-sampling
-readModel: timesheet
-parameters:
-  type: object
-  properties:
-    today:
-      type: string
-      format: date
-    timezone:
-      type: string
-  required: [today, timezone]
-result:
-  type: array
-  items:
-    type: object
-    properties:
-      workingDays:
-        type: array
-        items: WorkingDay
-      timeSummary:
-        type: TimeSummary
-    required: [workingDays, timeSummary]
-actors:
-  - software-developer
----
-apiVersion: schema.esdm.io/core/v1
-kind: read-model
-name: timer
-scope:
-  domain: activity-sampling
-  boundedContext: activity-sampling
-projections:
-  - boundedContext: activity-sampling
-    aggregate: timer
-    event: started
-    rule: Set running and reset progress.
-  - boundedContext: activity-sampling
-    aggregate: timer
-    event: stopped
-    rule: Set non-running.
-  - boundedContext: activity-sampling
-    aggregate: timer
-    event: ticked
-    rule: Update progress.
-  - boundedContext: activity-sampling
-    aggregate: timer
-    event: elapsed
-    rule: Memorize timestamp and duration of current interval.
-schema:
-  type: object
-  properties:
-    isRunning:
-      type: boolean
-    elapsedTime:
-      type: string
-      format: duration
-    progress:
-      type: number
-  required: [isRunning, elapsedTime, progress]
----
-apiVersion: schema.esdm.io/core/v1
-kind: query
-name: get-current-interval
-scope:
-  domain: activity-sampling
-  boundedContext: activity-sampling
-readModel: timer
-result:
-  type: object
-  properties:
-    isRunning:
-      type: boolean
-    elapsedTime:
-      type: string
-      format: duration
-    progress:
-      type: number
-  required: [isRunning, elapsedTime, progress]
-actors:
-  - software-developer
----
-apiVersion: schema.esdm.io/core/v1
-kind: read-model
-name: settings
-scope:
-  domain: activity-sampling
-  boundedContext: activity-sampling
-projections:
-  - boundedContext: activity-sampling
-    aggregate: settings
-    event: changed
-    rule: Update the settings.
-schema:
-  type: Settings
----
-apiVersion: schema.esdm.io/core/v1
-kind: query
-name: get-settings
-scope:
-  domain: activity-sampling
-  boundedContext: activity-sampling
-readModel: settings
-result:
-  type: object
-  properties:
-    capacity:
-      type: string
-      format: duration
-    categories:
-      type: array
-      items:
-        type: string
-    firstName:
-      type: string
-    lastName:
-      type: string
-  required: [capacity, categories]
----
-apiVersion: schema.esdm.io/core/v1
-kind: read-model
 name: report
 scope:
   domain: activity-sampling
@@ -225,6 +50,279 @@ schema:
   required: [activities, categories]
 ---
 apiVersion: schema.esdm.io/core/v1
+kind: read-model
+name: settings
+scope:
+  domain: activity-sampling
+  boundedContext: activity-sampling
+projections:
+  - boundedContext: activity-sampling
+    aggregate: settings
+    event: changed
+    rule: Update the settings.
+schema:
+  type: Settings
+---
+apiVersion: schema.esdm.io/core/v1
+kind: read-model
+name: timer
+scope:
+  domain: activity-sampling
+  boundedContext: activity-sampling
+projections:
+  - boundedContext: activity-sampling
+    aggregate: timer
+    event: started
+    rule: Set running and reset progress.
+  - boundedContext: activity-sampling
+    aggregate: timer
+    event: stopped
+    rule: Set non-running.
+  - boundedContext: activity-sampling
+    aggregate: timer
+    event: ticked
+    rule: Update progress.
+  - boundedContext: activity-sampling
+    aggregate: timer
+    event: elapsed
+    rule: Memorize timestamp and duration of current interval.
+schema:
+  type: object
+  properties:
+    isRunning:
+      type: boolean
+    elapsedTime:
+      type: string
+      format: duration
+    progress:
+      type: number
+  required: [isRunning, elapsedTime, progress]
+---
+apiVersion: schema.esdm.io/core/v1
+kind: read-model
+name: timesheet
+scope:
+  domain: activity-sampling
+  boundedContext: activity-sampling
+projections:
+  - boundedContext: activity-sampling
+    aggregate: activity
+    event: logged
+    rule: Append the activity entry to the timesheet.
+  - boundedContext: activity-sampling
+    aggregate: settings
+    event: changed
+    rule: Memorize the capacity and categories.
+  - boundedContext: activity-sampling
+    aggregate: holiday
+    event: holidays-changed
+    rule: Update the holidays list used for capacity calculation.
+  - boundedContext: activity-sampling
+    aggregate: vacation
+    event: vacations-changed
+    rule: Update the vacation list used for capacity calculation.
+schema:
+  type: object
+  properties:
+    entries:
+      type: array
+      items:
+        type: TimesheetViewModel
+    holidays:
+      type: array
+      items:
+        type: Holiday
+    vacations:
+      type: array
+      items:
+        type: Vacation
+    capacity:
+      type: string
+      format: duration
+    categories:
+      type: array
+      items:
+        type: string
+  required:
+    - entries
+    - holidays
+    - vacations
+    - capacity
+    - categories
+---
+# TODO implement get-categories and replace property `categories` in queries
+apiVersion: schema.esdm.io/core/v1
+kind: query
+name: get-categories
+scope:
+  domain: activity-sampling
+  boundedContext: activity-sampling
+readModel: report
+result:
+  type: object
+  properties:
+    categories:
+      type: array
+      items:
+        type: string
+  required: [categories]
+actors:
+  - software-developer
+  - product-owner
+constraints:
+  - name: all-categories
+    rule: Determine the distinct list of all categories used in logged activities.
+---
+apiVersion: schema.esdm.io/core/v1
+kind: query
+name: get-burn-up
+scope:
+  domain: activity-sampling
+  boundedContext: activity-sampling
+readModel: report
+parameters:
+  type: object
+  properties:
+    from:
+      type: string
+      format: date
+    to:
+      type: string
+      format: date
+    categories:
+      type: array
+      items:
+        type: string
+      default: []
+    timeZone:
+      type: string
+  required: [from, to, categories, timeZone]
+result:
+  type: object
+  properties:
+    data:
+      type: array
+      items:
+        type: BurnUpData
+      default: []
+    totalThroughput:
+      type: integer
+      default: 0
+    categories:
+      type: array
+      items:
+        type: string
+      default: []
+  required: [data, totalThroughput, categories]
+actors:
+  - product-owner
+constraints:
+  - name: filter-time-range
+    rule: Filter activities by the specified time range.
+  - name: filter-category
+    rule: Filter activities by the specified categories.
+---
+apiVersion: schema.esdm.io/core/v1
+kind: query
+name: get-current-interval
+scope:
+  domain: activity-sampling
+  boundedContext: activity-sampling
+readModel: timer
+result:
+  type: object
+  properties:
+    isRunning:
+      type: boolean
+      default: false
+    interval:
+      type: string
+      format: duration
+      default: "PT30M"
+    remainingTime:
+      type: string
+      format: duration
+      default: "PT30M"
+    progress:
+      type: number
+      default: 0
+  required: [isRunning, interval, remainingTime, progress]
+actors:
+  - software-developer
+---
+apiVersion: schema.esdm.io/core/v1
+kind: query
+name: get-estimate
+scope:
+  domain: activity-sampling
+  boundedContext: activity-sampling
+readModel: report
+parameters:
+  type: object
+  properties:
+    categories:
+      type: array
+      items:
+        type: string
+    timezone:
+      type: string
+result:
+  type: object
+  properties:
+    cycleTimes:
+      type: array
+      items:
+        type: EstimateEntry
+      default: []
+    categories:
+      type: array
+      items:
+        type: string
+      default: []
+    totalCount:
+      type: integer
+      default: 0
+  required: [cycleTimes, categories, totalCount]
+actors:
+  - product-owner
+constraints:
+  - name: filter-category
+    rule: Filter activities by the specified categories.
+---
+apiVersion: schema.esdm.io/core/v1
+kind: query
+name: get-recent-activities
+scope:
+  domain: activity-sampling
+  boundedContext: activity-sampling
+readModel: timesheet
+parameters:
+  type: object
+  properties:
+    today:
+      type: string
+      format: date
+    timezone:
+      type: string
+  required: [today, timezone]
+result:
+  type: array
+  items:
+    type: object
+    properties:
+      workingDays:
+        type: array
+        items: WorkingDay
+      timeSummary:
+        type: TimeSummary
+    required: [workingDays, timeSummary]
+actors:
+  - software-developer
+constraints:
+  - name: determine-period
+    rule: The period is the last 30 days from the specified today date, inclusive.
+---
+apiVersion: schema.esdm.io/core/v1
 kind: query
 name: get-report
 scope:
@@ -259,6 +357,36 @@ result:
   required: [entries, totalHours]
 actors:
   - product-owner
+constraints:
+  - name: filter-time-range
+    rule: Filter activities by the specified time range.
+  - name: filter-scope
+    rule: Group activities by the specified scope (clients, projects, tasks, or categories).
+---
+apiVersion: schema.esdm.io/core/v1
+kind: query
+name: get-settings
+scope:
+  domain: activity-sampling
+  boundedContext: activity-sampling
+readModel: settings
+result:
+  type: object
+  properties:
+    capacity:
+      type: string
+      format: duration
+      default: "PT40H"
+    categories:
+      type: array
+      items:
+        type: string
+      default: ["", "Feature", "Rework"]
+    firstName:
+      type: string
+    lastName:
+      type: string
+  required: [capacity, categories]
 ---
 apiVersion: schema.esdm.io/core/v1
 kind: query
@@ -298,79 +426,11 @@ result:
   required: [histogram, median, categories, totalCount]
 actors:
   - product-owner
----
-apiVersion: schema.esdm.io/core/v1
-kind: query
-name: get-estimate
-scope:
-  domain: activity-sampling
-  boundedContext: activity-sampling
-readModel: report
-parameters:
-  type: object
-  properties:
-    categories:
-      type: array
-      items:
-        type: string
-    timezone:
-      type: string
-result:
-  type: object
-  properties:
-    cycleTimes:
-      type: array
-      items:
-        type: EstimateEntry
-    categories:
-      type: array
-      items:
-        type: string
-    totalCount:
-      type: integer
-  required: [cycleTimes, categories, totalCount]
-actors:
-  - product-owner
----
-apiVersion: schema.esdm.io/core/v1
-kind: query
-name: get-burn-up
-scope:
-  domain: activity-sampling
-  boundedContext: activity-sampling
-readModel: report
-parameters:
-  type: object
-  properties:
-    from:
-      type: string
-      format: date
-    to:
-      type: string
-      format: date
-    categories:
-      type: array
-      items:
-        type: string
-    timeZone:
-      type: string
-  required: [from, to, categories, timeZone]
-result:
-  type: object
-  properties:
-    data:
-      type: array
-      items:
-        type: BurnUpData
-    totalThroughput:
-      type: integer
-    categories:
-      type: array
-      items:
-        type: string
-  required: [data, totalThroughput, categories]
-actors:
-  - product-owner
+constraints:
+  - name: filter-scope
+    rule: Filter activities by the specified scope (working hours or cycle time).
+  - name: filter-category
+    rule: Filter activities by the specified categories.
 ---
 apiVersion: schema.esdm.io/core/v1
 kind: query
@@ -409,3 +469,8 @@ result:
   required: [entries, totalHours, capacity]
 actors:
   - software-developer
+constraints:
+  - name: filter-time-range
+    rule: Filter activities by the specified time range.
+  - name: determine-capacity
+    rule: Determine the capacity based on the specified today.

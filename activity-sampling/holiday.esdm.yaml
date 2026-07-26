@@ -19,6 +19,13 @@ state:
       type: string
       format: duration
   required: [date, title]
+invariants:
+  - name: unique-date
+    rule: Each holiday must have a unique date.
+  - name: non-empty-title
+    rule: The title of a holiday must not be empty.
+  - name: valid-duration
+    rule: If a duration is provided, it must be a positive and maximum of 24 hours.
 ---
 apiVersion: schema.esdm.io/core/v1
 kind: command

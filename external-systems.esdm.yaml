@@ -4,6 +4,8 @@ name: calendar
 scope:
   domain: activity-sampling
 direction: inbound
+capabilities:
+  - Provides holidays as an iCalendar feed.
 ---
 apiVersion: schema.esdm.io/core/v1
 kind: external-system
@@ -11,6 +13,8 @@ name: timesheet
 scope:
   domain: activity-sampling
 direction: outbound
+capabilities:
+  - Export timesheet to a timesheet system.
 ---
 apiVersion: schema.esdm.io/core/v1
 kind: external-system
@@ -18,3 +22,6 @@ name: notifications
 scope:
   domain: activity-sampling
 direction: bidirectional
+capabilities:
+  - Send notification to the user.
+  - Trigger an action when the user clicks on the notification.

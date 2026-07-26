@@ -13,10 +13,12 @@ state:
     capacity:
       type: string
       format: duration
+      default: "PT40H"
     categories:
       type: array
       items:
         type: string
+      default: ["", "Feature", "Rework"]
     firstName:
       type: string
     lastName:

@@ -22,7 +22,7 @@ scope:
   boundedContext: activity-sampling
 type: human
 responsibilities:
-  - Wants to analyze the effort.
+  - Want to analyze the effort.
 ---
 apiVersion: schema.esdm.io/core/v1
 kind: actor
@@ -32,7 +32,7 @@ scope:
   boundedContext: activity-sampling
 type: system
 responsibilities:
-  - Receives calendar updates from the external system and triggers synchronization commands.
+  - Import holidays.
 backedBy:
   - calendar
 ---
@@ -44,6 +44,6 @@ scope:
   boundedContext: activity-sampling
 type: system
 responsibilities:
-  - Show notification to the user when the current interval has elapsed.
+  - Send notifications to the user.
 backedBy:
   - notifications

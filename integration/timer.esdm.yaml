@@ -21,8 +21,8 @@ startsWhen:
     aggregate: timer
     event: started
 endsWhen:
-  - name: program-exit
-    condition: The program exits.
+  - name: stop-timer
+    condition: The timer is stopped.
 timers:
   - name: progress
     after:

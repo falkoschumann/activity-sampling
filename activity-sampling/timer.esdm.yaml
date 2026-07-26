@@ -23,11 +23,15 @@ data:
     interval:
       type: string
       format: duration
+      default: "PT30M"
   required: [interval]
 publishes:
   - started
 actors:
   - software-developer
+constraints:
+  - name: positive-interval
+    rule: Interval must be greater than zero.
 ---
 apiVersion: schema.esdm.io/core/v1
 kind: command
@@ -65,7 +69,8 @@ data:
 constraints:
   - name: tick-or-elapse
     rule:
-      If isElapsed is true, timestamp must be provided, otherwise progressedTime must be provided.
+      If isElapsed is true, elapsed is emitted, otherwise progressedTime must be provided and ticked
+      is emitted.
 publishes:
   - ticked
   - elapsed
@@ -80,12 +85,14 @@ scope:
 data:
   type: object
   properties:
-    timer:
-      type: string
     interval:
       type: string
       format: duration
-  required: [timer, interval]
+    timer:
+      type: string
+    notification:
+      type: string
+  required: [interval, timer, notification]
 ---
 apiVersion: schema.esdm.io/core/v1
 kind: event
@@ -111,15 +118,15 @@ scope:
 data:
   type: object
   properties:
-    timer:
-      type: string
     progressedTime:
       type: string
       format: duration
     duration:
       type: string
       format: duration
-  required: [timer, progressedTime, duration]
+    timer:
+      type: string
+  required: [progressedTime, duration, timer]
 ---
 apiVersion: schema.esdm.io/core/v1
 kind: event
@@ -131,11 +138,9 @@ scope:
 data:
   type: object
   properties:
-    timer:
-      type: string
-    notification:
-      type: string
     duration:
       type: string
       format: duration
-  required: [timer, notification, duration]
+    notification:
+      type: string
+  required: [duration, timer, notification]

@@ -29,10 +29,20 @@ functions:
             capacity:
               type: string
               format: duration
+              description: Weekly working hours capacity.
+              default: "PT40H"
             businessDays:
               type: array
               items:
                 type: integer
+                enum: [1, 2, 3, 4, 5, 6, 7]
+              description: List of business days (1=Monday, ..., 7=Sunday).
+              default: [1, 2, 3, 4, 5]
     returns:
       type: string
       format: duration
+    rules:
+      - name: daily-working-hours
+        rule: Calculate the daily working hours based on the weekly capacity and business days.
+      - name: subtract-holidays-and-vacations
+        rule: Subtract holidays and vacations from the daily capacity.

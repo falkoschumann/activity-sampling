@@ -95,7 +95,7 @@ export class TimerProcessManager extends EventTarget {
       this.#clock.instant().add(duration),
       this.#clock.zone,
     );
-    this.#tick();
+    await this.#tick();
   }
 
   #handleTimerStarted(event: TimerStartedEvent) {
@@ -116,7 +116,7 @@ export class TimerProcessManager extends EventTarget {
     );
   }
 
-  #tick() {
+  async #tick() {
     const timestamp = this.#clock.instant().toString();
     const progressedTime = this.#start.until(timestamp);
     let command;
@@ -140,7 +140,7 @@ export class TimerProcessManager extends EventTarget {
         duration: this.#interval.toString(),
       });
     }
-    this.#messageRouter.route(command);
+    await this.#messageRouter.route(command);
   }
 }
 

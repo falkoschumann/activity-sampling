@@ -12,24 +12,32 @@ state:
   properties:
     lastActivity:
       type: LoggedActivity
+    duration:
+      type: string
+      format: duration
+invariants:
+  - name: last-activity-stored
+    rule: Try reading last activity from store when no last activity is known.
+  - name: missing-last-activity
+    rule: Open the app when the user clicks on the notification and no last activity is stored.
 startsWhen:
   - boundedContext: activity-sampling
     aggregate: timer
-    event: elapsed
+    event: started
 endsWhen:
-  - name: close-notification
-    condition: The notification is closed.
+  - name: stop-timer
+    condition: The timer is stopped.
 reactions:
   - when:
       boundedContext: activity-sampling
       aggregate: activity
       event: logged
-    rule: Store last activity.
+    rule: Store last activity and hide notification.
   - when:
       boundedContext: activity-sampling
       aggregate: timer
       event: elapsed
-    rule: Show notification with last activity.
+    rule: Read current duration and show notification with last activity if any.
     emits:
       - boundedContext: activity-sampling
         aggregate: activity

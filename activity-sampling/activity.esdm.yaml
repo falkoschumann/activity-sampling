@@ -37,6 +37,15 @@ data:
     category:
       type: string
   required: [timestamp, duration, client, project, task]
+constraints:
+  - name: non-empty-client
+    rule: Client must not be empty.
+  - name: non-empty-project
+    rule: Project must not be empty.
+  - name: non-empty-task
+    rule: Task must not be empty.
+  - name: valid-duration
+    rule: Duration must be greater than zero.
 publishes:
   - logged
 actors:
@@ -93,7 +102,7 @@ data:
       type: string
     notification:
       type: string
-  required: [timestamp, duration, client, project, task]
+  required: [timestamp, duration, client, project, task, notification]
 ---
 apiVersion: schema.esdm.io/core/v1
 kind: event
