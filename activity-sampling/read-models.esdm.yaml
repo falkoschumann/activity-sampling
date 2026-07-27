@@ -193,6 +193,10 @@ constraints:
     rule: Filter activities by the specified time range.
   - name: filter-category
     rule: Filter activities by the specified categories.
+  - name: calculate-throughput
+    rule: Calculate the throughput for each day in the specified time range.
+  - name: calculate-total-throughput
+    rule: Calculate the total throughput for the specified time range.
 ---
 apiVersion: schema.esdm.io/core/v1
 kind: query
@@ -276,6 +280,10 @@ actors:
 constraints:
   - name: filter-category
     rule: Filter activities by the specified categories.
+  - name: calculate-cycle-times
+    rule: Calculate the frequency and probability of cycle times.
+  - name: determine-total-count
+    rule: Determine the total count of activities.
 ---
 apiVersion: schema.esdm.io/core/v1
 kind: query
@@ -309,6 +317,8 @@ actors:
 constraints:
   - name: determine-period
     rule: The period is the last 30 days from the specified today date, inclusive.
+  - name: calculate-summary
+    rule: Calculate the total hours worked today, yesterday, this week and this month.
 ---
 apiVersion: schema.esdm.io/core/v1
 kind: query
@@ -350,6 +360,8 @@ constraints:
     rule: Filter activities by the specified time range.
   - name: filter-scope
     rule: Group activities by the specified scope (clients, projects, tasks, or categories).
+  - name: calculate-total-hours
+    rule: Calculate the total hours worked in the specified time range.
 ---
 apiVersion: schema.esdm.io/core/v1
 kind: query
@@ -411,10 +423,14 @@ result:
 actors:
   - product-owner
 constraints:
-  - name: filter-scope
-    rule: Filter activities by the specified scope (working hours or cycle time).
   - name: filter-category
     rule: Filter activities by the specified categories.
+  - name: apply-scope-to-histogram
+    rule: Create histogram based on the specified scope (working hours or cycle time).
+  - name: apply-scope-to-median
+    rule: Calculate median based on the specified scope (working hours or cycle time).
+  - name: determine-total-count
+    rule: Determine the total count of activities.
 ---
 apiVersion: schema.esdm.io/core/v1
 kind: query
@@ -456,5 +472,9 @@ actors:
 constraints:
   - name: filter-time-range
     rule: Filter activities by the specified time range.
-  - name: determine-capacity
-    rule: Determine the capacity based on the specified today.
+  - name: summarize-hours
+    rule: Summarize the hours worked on tasks by day.
+  - name: calculate-total-hours
+    rule: Calculate the total hours worked in the specified time range.
+  - name: take-days-off-into-account
+    rule: Take into account holidays and vacations when calculating the capacity.
