@@ -2,9 +2,9 @@
 
 import type { ReportView } from "./report.read_model";
 import {
-  type Activity,
+  type ActivityState,
   selectDistinctCategories,
-} from "../value_objects/activity.value_object";
+} from "../activity/activity.aggregate";
 import {
   type BurnUpData,
   createBurnUpData,
@@ -71,7 +71,7 @@ export function getBurnUp(
   });
 }
 
-function determineThroughputs(activities: Activity[]) {
+function determineThroughputs(activities: ActivityState[]) {
   const throughputs = new Map<string, number>();
   for (const activity of activities) {
     const date = activity.finish.toString();

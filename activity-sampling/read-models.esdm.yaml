@@ -8,41 +8,14 @@ projections:
   - boundedContext: activity-sampling
     aggregate: activity
     event: logged
-    rule:
-      Join activity entries with same client, project, task and category into a single entry, update
-      start and finish, and accumulate hours.
-  - boundedContext: activity-sampling
-    aggregate: activity
-    event: logged
-    rule: Collect a list of all categories for filtering in the statistics query.
+    rule: Determine a list of activity aggregates.
 schema:
   type: object
   properties:
     activities:
       type: array
       items:
-        type: object
-        properties:
-          start:
-            type: string
-            format: date-time
-            description: The timestamp when the first activity in the entry was logged in UTC.
-          finish:
-            type: string
-            format: date-time
-            description: The timestamp when the last activity in the entry was logged in UTC.
-          client:
-            type: string
-          project:
-            type: string
-          task:
-            type: string
-          category:
-            type: string
-          hours:
-            type: string
-            format: duration
-        required: [start, finish, client, project, task, hours]
+        type: Activity
     categories:
       type: array
       items:
@@ -143,12 +116,7 @@ schema:
       type: array
       items:
         type: string
-  required:
-    - entries
-    - holidays
-    - vacations
-    - capacity
-    - categories
+  required: [entries, holidays, vacations, capacity, categories]
 ---
 apiVersion: schema.esdm.io/core/v1
 kind: query

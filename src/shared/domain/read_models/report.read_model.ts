@@ -2,12 +2,12 @@
 
 import type { ActivityLoggedEvent } from "../activity/activity_logged.event";
 import {
-  type Activity,
-  normalizeDuration,
-} from "../value_objects/activity.value_object";
+  type ActivityState,
+  createActivity,
+} from "../activity/activity.aggregate";
 
 export type ReportView = {
-  activities: Activity[];
+  activities: ActivityState[];
   categories: string[];
 };
 
@@ -31,7 +31,7 @@ export function projectReport(
 }
 
 function projectActivities(
-  activities: Activity[],
+  activities: ActivityState[],
   event: ActivityLoggedEvent,
   { timeZone }: { timeZone: Temporal.TimeZoneLike },
 ) {
@@ -69,14 +69,15 @@ function projectActivities(
       Temporal.PlainDate.compare(date, existingActivity.finish) > 0
         ? date
         : existingActivity.finish;
-    const hours = normalizeDuration(
-      Temporal.Duration.from(existingActivity.hours)
-        .add(event.data.duration)
-        .toString(),
-    );
-    const cycleTime =
-      Temporal.PlainDate.from(finish).since(start).total("days") + 1;
-    existingActivity = { ...existingActivity, start, finish, hours, cycleTime };
+    const hours = Temporal.Duration.from(existingActivity.hours)
+      .add(event.data.duration)
+      .toString();
+    existingActivity = createActivity({
+      ...existingActivity,
+      start,
+      finish,
+      hours,
+    });
     activities = activities.toSpliced(index, 1, existingActivity);
   }
   return activities;

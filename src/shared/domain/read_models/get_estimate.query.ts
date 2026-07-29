@@ -1,9 +1,9 @@
 // Copyright (c) 2026 Falko Schumann. All rights reserved. MIT license.
 
 import {
-  type Activity,
+  type ActivityState,
   selectDistinctCategories,
-} from "../value_objects/activity.value_object";
+} from "../activity/activity.aggregate";
 import type { ReportView } from "./report.read_model";
 import {
   createEstimateEntry,
@@ -63,7 +63,7 @@ export function getEstimate(
   });
 }
 
-function determineCycleTimes(activities: Activity[]) {
+function determineCycleTimes(activities: ActivityState[]) {
   const cycleTimeCounts = new Map<number, number>();
   for (const activity of activities) {
     const cycleTime =

@@ -2,9 +2,9 @@
 
 import type { ReportView } from "./report.read_model";
 import {
-  type Activity,
+  type ActivityState,
   selectDistinctCategories,
-} from "../value_objects/activity.value_object";
+} from "../activity/activity.aggregate";
 import {
   createHistogram,
   type Histogram,
@@ -88,7 +88,7 @@ export function getStatistics(
   });
 }
 
-function createDays(activities: Activity[], query: GetStatisticsQuery) {
+function createDays(activities: ActivityState[], query: GetStatisticsQuery) {
   switch (query.data.scope) {
     case StatisticsScope.WORKING_HOURS:
       return createWorkingHoursStatistics(activities);
@@ -97,7 +97,7 @@ function createDays(activities: Activity[], query: GetStatisticsQuery) {
   }
 }
 
-function createWorkingHoursStatistics(activities: Activity[]) {
+function createWorkingHoursStatistics(activities: ActivityState[]) {
   let totalCount = 0;
   let days: number[] = [];
   for (const activity of activities) {
@@ -109,7 +109,7 @@ function createWorkingHoursStatistics(activities: Activity[]) {
   return { xAxisLabel: "Duration (days)", days, totalCount };
 }
 
-function createCycleTimesStatistics(activities: Activity[]) {
+function createCycleTimesStatistics(activities: ActivityState[]) {
   let totalCount = 0;
   let days: number[] = [];
   for (const activity of activities) {

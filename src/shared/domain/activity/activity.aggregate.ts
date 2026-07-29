@@ -1,15 +1,15 @@
 // Copyright (c) 2026 Falko Schumann. All rights reserved. MIT license.
 
-export interface Activity {
-  readonly start: Temporal.PlainDateLike;
-  readonly finish: Temporal.PlainDateLike;
-  readonly client: string;
-  readonly project: string;
-  readonly task: string;
-  readonly category?: string;
-  readonly hours: Temporal.DurationLike;
-  readonly cycleTime: number;
-}
+export type ActivityState = Readonly<{
+  start: Temporal.PlainDateLike;
+  finish: Temporal.PlainDateLike;
+  client: string;
+  project: string;
+  task: string;
+  category?: string;
+  hours: Temporal.DurationLike;
+  cycleTime: number;
+}>;
 
 export function createActivity({
   start,
@@ -19,7 +19,6 @@ export function createActivity({
   task,
   category,
   hours,
-  cycleTime,
 }: {
   start: Temporal.PlainDateLike;
   finish: Temporal.PlainDateLike;
@@ -28,18 +27,20 @@ export function createActivity({
   task: string;
   category?: string;
   hours: Temporal.DurationLike;
-  cycleTime: number;
-}): Activity {
+}): ActivityState {
+  hours = normalizeDuration(hours);
+  const cycleTime =
+    Temporal.PlainDate.from(finish)
+      .since(Temporal.PlainDate.from(start))
+      .total({ unit: "days" }) + 1;
   return { start, finish, client, project, task, category, hours, cycleTime };
 }
 
-export const NO_CATEGORY = "";
-
 export function selectDistinctCategories(
-  activities: Activity[],
+  activities: ActivityState[],
   categories: string[],
-): Activity[] {
-  const merged: Activity[] = [];
+): ActivityState[] {
+  const merged: ActivityState[] = [];
   for (const activity of activities) {
     selectDistinctCategory(merged, activity, categories);
   }
@@ -47,8 +48,8 @@ export function selectDistinctCategories(
 }
 
 function selectDistinctCategory(
-  activities: Activity[],
-  activity: Activity,
+  activities: ActivityState[],
+  activity: ActivityState,
   categories: string[],
 ) {
   if (!filterCategory(categories)(activity)) {
@@ -88,14 +89,16 @@ function selectDistinctCategory(
   }
 }
 
-function filterCategory(categories: string[]) {
-  return (activity: Activity) =>
-    categories.length === 0 ||
-    categories.includes(activity.category ?? NO_CATEGORY);
-}
+const NO_CATEGORY = "";
 
-export function normalizeDuration(duration: Temporal.DurationLike) {
+function normalizeDuration(duration: Temporal.DurationLike) {
   return Temporal.Duration.from(duration)
     .round({ smallestUnit: "minute", largestUnit: "hour" })
     .toString();
+}
+
+function filterCategory(categories: string[]) {
+  return (activity: ActivityState) =>
+    categories.length === 0 ||
+    categories.includes(activity.category ?? NO_CATEGORY);
 }

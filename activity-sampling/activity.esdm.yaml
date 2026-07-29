@@ -8,7 +8,41 @@ identifiedBy:
   source: static
   value: nothing
 state:
-  type: {}
+  type: object
+  properties:
+    start:
+      type: string
+      format: date
+    finish:
+      type: string
+      format: date
+    client:
+      type: string
+    project:
+      type: string
+    task:
+      type: string
+    category:
+      type: string
+    hours:
+      type: string
+      format: duration
+    cycleTime:
+      type: number
+  required: [start, finish, client, project, task, hours, cycleTime]
+invariants:
+  - name: natural-key
+    rule: Use client, project, task and category as combined key for an activity.
+  - name: non-empty-client
+    rule: The client must not be empty or contains only whitespaces.
+  - name: non-empty-project
+    rule: The project must not be empty or contains only whitespaces.
+  - name: non-empty-task
+    rule: The task must not be empty or contains only whitespaces.
+  - name: total-hours
+    rule: Calculate the total sum of hours per task.
+  - name: cycle-time
+    rule: Calculate the cycle time for each task as difference between finish and start.
 ---
 apiVersion: schema.esdm.io/core/v1
 kind: command

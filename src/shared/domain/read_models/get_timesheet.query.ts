@@ -1,7 +1,6 @@
 // Copyright (c) 2026 Falko Schumann. All rights reserved. MIT license.
 
 import type { TimesheetView } from "./timesheet.read_model";
-import { normalizeDuration } from "../value_objects/activity.value_object";
 import {
   type Capacity,
   createCapacity,
@@ -136,4 +135,10 @@ function determineCapacity(
   const offset = Temporal.Duration.from(totalHours).subtract(businessDays);
 
   return { hours, offset: normalizeDuration(offset) };
+}
+
+function normalizeDuration(duration: Temporal.DurationLike) {
+  return Temporal.Duration.from(duration)
+    .round({ smallestUnit: "minute", largestUnit: "hour" })
+    .toString();
 }

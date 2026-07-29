@@ -13,7 +13,6 @@ import {
   createGetReportQueryResult,
   ReportScope,
 } from "../../../src/shared/domain/read_models/get_report.query";
-import { createActivity } from "../../../src/shared/domain/value_objects/activity.value_object";
 import { EventStore } from "../../../src/main/infrastructure/event_store";
 
 const testActivity: ActivityLoggedEventData = {
@@ -70,7 +69,7 @@ describe("Get report", () => {
       expect(result).toEqual(
         createGetReportQueryResult({
           entries: [
-            createActivity({
+            {
               start: "2025-06-26",
               finish: "2025-06-27",
               client: "Client 1",
@@ -78,8 +77,8 @@ describe("Get report", () => {
               task: "N/A",
               hours: "PT8H",
               cycleTime: 2,
-            }),
-            createActivity({
+            },
+            {
               start: "2025-06-25",
               finish: "2025-06-25",
               client: "Client 2",
@@ -87,7 +86,7 @@ describe("Get report", () => {
               task: "N/A",
               hours: "PT7H",
               cycleTime: 1,
-            }),
+            },
           ],
           totalHours: "PT15H",
         }),
@@ -125,7 +124,7 @@ describe("Get report", () => {
       expect(result).toEqual(
         createGetReportQueryResult({
           entries: [
-            createActivity({
+            {
               start: "2025-12-10",
               finish: "2025-12-10",
               client: "Client 1",
@@ -133,8 +132,8 @@ describe("Get report", () => {
               task: "N/A",
               hours: "PT3H",
               cycleTime: 1,
-            }),
-            createActivity({
+            },
+            {
               start: "2025-12-09",
               finish: "2025-12-09",
               client: "Client 2",
@@ -142,8 +141,8 @@ describe("Get report", () => {
               task: "N/A",
               hours: "PT5H",
               cycleTime: 1,
-            }),
-            createActivity({
+            },
+            {
               start: "2025-12-08",
               finish: "2025-12-08",
               client: "Client 3",
@@ -151,7 +150,7 @@ describe("Get report", () => {
               task: "N/A",
               hours: "PT7H",
               cycleTime: 1,
-            }),
+            },
           ],
           totalHours: "PT15H",
         }),
@@ -183,7 +182,7 @@ describe("Get report", () => {
       expect(result).toEqual(
         createGetReportQueryResult({
           entries: [
-            createActivity({
+            {
               start: "2025-12-10",
               finish: "2025-12-12",
               client: "Test client",
@@ -191,7 +190,7 @@ describe("Get report", () => {
               task: "N/A",
               hours: "PT1H30M",
               cycleTime: 3,
-            }),
+            },
           ],
           totalHours: "PT1H30M",
         }),
@@ -246,7 +245,7 @@ describe("Get report", () => {
       expect(result).toEqual(
         createGetReportQueryResult({
           entries: [
-            createActivity({
+            {
               start: "2025-12-08",
               finish: "2025-12-08",
               client: "Test client",
@@ -254,8 +253,8 @@ describe("Get report", () => {
               task: "N/A",
               hours: "PT3H",
               cycleTime: 1,
-            }),
-            createActivity({
+            },
+            {
               start: "2025-12-09",
               finish: "2025-12-10",
               client: "Test client",
@@ -263,7 +262,7 @@ describe("Get report", () => {
               task: "N/A",
               hours: "PT12H",
               cycleTime: 2,
-            }),
+            },
           ],
           totalHours: "PT15H",
         }),
@@ -318,7 +317,7 @@ describe("Get report", () => {
       expect(result).toEqual(
         createGetReportQueryResult({
           entries: [
-            createActivity({
+            {
               start: "2025-06-03",
               finish: "2025-06-05",
               project: "Project 1",
@@ -326,8 +325,8 @@ describe("Get report", () => {
               task: "N/A",
               hours: "PT18H",
               cycleTime: 3,
-            }),
-            createActivity({
+            },
+            {
               start: "2025-06-02",
               finish: "2025-06-06",
               project: "Project 2",
@@ -335,7 +334,7 @@ describe("Get report", () => {
               task: "N/A",
               hours: "PT24H",
               cycleTime: 5,
-            }),
+            },
           ],
           totalHours: "PT42H",
         }),
@@ -373,7 +372,7 @@ describe("Get report", () => {
       expect(result).toEqual(
         createGetReportQueryResult({
           entries: [
-            createActivity({
+            {
               start: "2025-12-10",
               finish: "2025-12-10",
               client: "Test client",
@@ -381,8 +380,8 @@ describe("Get report", () => {
               task: "N/A",
               hours: "PT7H",
               cycleTime: 1,
-            }),
-            createActivity({
+            },
+            {
               start: "2025-12-09",
               finish: "2025-12-09",
               client: "Test client",
@@ -390,8 +389,8 @@ describe("Get report", () => {
               task: "N/A",
               hours: "PT5H",
               cycleTime: 1,
-            }),
-            createActivity({
+            },
+            {
               start: "2025-12-08",
               finish: "2025-12-08",
               client: "Test client",
@@ -399,7 +398,7 @@ describe("Get report", () => {
               task: "N/A",
               hours: "PT3H",
               cycleTime: 1,
-            }),
+            },
           ],
           totalHours: "PT15H",
         }),
@@ -454,7 +453,7 @@ describe("Get report", () => {
       expect(result).toEqual(
         createGetReportQueryResult({
           entries: [
-            createActivity({
+            {
               start: "2025-06-26",
               finish: "2025-06-27",
               client: "Test client",
@@ -462,8 +461,8 @@ describe("Get report", () => {
               task: "Task 1",
               hours: "PT8H",
               cycleTime: 2,
-            }),
-            createActivity({
+            },
+            {
               start: "2025-06-25",
               finish: "2025-06-25",
               client: "Test client",
@@ -471,7 +470,7 @@ describe("Get report", () => {
               task: "Task 2",
               hours: "PT7H",
               cycleTime: 1,
-            }),
+            },
           ],
           totalHours: "PT15H",
         }),
@@ -511,7 +510,7 @@ describe("Get report", () => {
       expect(result).toEqual(
         createGetReportQueryResult({
           entries: [
-            createActivity({
+            {
               start: "2025-06-26",
               finish: "2025-06-27",
               client: "Test client",
@@ -520,8 +519,8 @@ describe("Get report", () => {
               category: "Feature, Rework",
               hours: "PT8H",
               cycleTime: 2,
-            }),
-            createActivity({
+            },
+            {
               start: "2025-06-25",
               finish: "2025-06-25",
               client: "Test client",
@@ -529,7 +528,7 @@ describe("Get report", () => {
               task: "Task 2",
               hours: "PT7H",
               cycleTime: 1,
-            }),
+            },
           ],
           totalHours: "PT15H",
         }),
@@ -589,7 +588,7 @@ describe("Get report", () => {
       expect(result).toEqual(
         createGetReportQueryResult({
           entries: [
-            createActivity({
+            {
               start: "2025-12-05",
               finish: "2025-12-05",
               client: "Client 1",
@@ -597,8 +596,8 @@ describe("Get report", () => {
               task: "Task 1",
               hours: "PT8H",
               cycleTime: 1,
-            }),
-            createActivity({
+            },
+            {
               start: "2025-12-03",
               finish: "2025-12-03",
               client: "Client 1",
@@ -606,8 +605,8 @@ describe("Get report", () => {
               task: "Task 1",
               hours: "PT3H",
               cycleTime: 1,
-            }),
-            createActivity({
+            },
+            {
               start: "2025-12-02",
               finish: "2025-12-02",
               client: "Client 2",
@@ -615,8 +614,8 @@ describe("Get report", () => {
               task: "Task 1",
               hours: "PT2H",
               cycleTime: 1,
-            }),
-            createActivity({
+            },
+            {
               start: "2025-12-04",
               finish: "2025-12-04",
               client: "Client 1",
@@ -624,8 +623,8 @@ describe("Get report", () => {
               task: "Task 2",
               hours: "PT5H",
               cycleTime: 1,
-            }),
-            createActivity({
+            },
+            {
               start: "2025-12-01",
               finish: "2025-12-01",
               client: "Client 2",
@@ -633,7 +632,7 @@ describe("Get report", () => {
               task: "Task 2",
               hours: "PT1H",
               cycleTime: 1,
-            }),
+            },
           ],
           totalHours: "PT19H",
         }),
@@ -690,7 +689,7 @@ describe("Get report", () => {
       expect(result).toEqual(
         createGetReportQueryResult({
           entries: [
-            createActivity({
+            {
               start: "2025-06-26",
               finish: "2025-06-27",
               client: "N/A",
@@ -699,8 +698,8 @@ describe("Get report", () => {
               category: "Feature",
               hours: "PT8H",
               cycleTime: 2,
-            }),
-            createActivity({
+            },
+            {
               start: "2025-06-25",
               finish: "2025-06-25",
               client: "N/A",
@@ -709,7 +708,7 @@ describe("Get report", () => {
               category: "Rework",
               hours: "PT7H",
               cycleTime: 1,
-            }),
+            },
           ],
           totalHours: "PT15H",
         }),
@@ -745,7 +744,7 @@ describe("Get report", () => {
       expect(result).toEqual(
         createGetReportQueryResult({
           entries: [
-            createActivity({
+            {
               start: "2025-06-26",
               finish: "2025-06-27",
               client: "N/A",
@@ -754,8 +753,8 @@ describe("Get report", () => {
               category: "N/A",
               hours: "PT8H",
               cycleTime: 2,
-            }),
-            createActivity({
+            },
+            {
               start: "2025-06-25",
               finish: "2025-06-25",
               client: "N/A",
@@ -764,7 +763,7 @@ describe("Get report", () => {
               category: "Rework",
               hours: "PT7H",
               cycleTime: 1,
-            }),
+            },
           ],
           totalHours: "PT15H",
         }),
@@ -802,7 +801,7 @@ describe("Get report", () => {
       expect(result).toEqual(
         createGetReportQueryResult({
           entries: [
-            createActivity({
+            {
               start: "2025-12-10",
               finish: "2025-12-10",
               client: "N/A",
@@ -811,8 +810,8 @@ describe("Get report", () => {
               category: "Category 1",
               hours: "PT3H",
               cycleTime: 1,
-            }),
-            createActivity({
+            },
+            {
               start: "2025-12-09",
               finish: "2025-12-09",
               client: "N/A",
@@ -821,8 +820,8 @@ describe("Get report", () => {
               category: "Category 2",
               hours: "PT5H",
               cycleTime: 1,
-            }),
-            createActivity({
+            },
+            {
               start: "2025-12-08",
               finish: "2025-12-08",
               client: "N/A",
@@ -831,7 +830,7 @@ describe("Get report", () => {
               category: "Category 3",
               hours: "PT7H",
               cycleTime: 1,
-            }),
+            },
           ],
           totalHours: "PT15H",
         }),
@@ -871,7 +870,7 @@ describe("Get report", () => {
       expect(result).toEqual(
         createGetReportQueryResult({
           entries: [
-            createActivity({
+            {
               start: "2025-06-26",
               finish: "2025-06-27",
               client: "Client 1",
@@ -879,8 +878,8 @@ describe("Get report", () => {
               task: "N/A",
               hours: "PT8H",
               cycleTime: 2,
-            }),
-            createActivity({
+            },
+            {
               start: "2025-06-25",
               finish: "2025-06-25",
               client: "Client 2",
@@ -888,7 +887,7 @@ describe("Get report", () => {
               task: "N/A",
               hours: "PT7H",
               cycleTime: 1,
-            }),
+            },
           ],
           totalHours: "PT15H",
         }),
