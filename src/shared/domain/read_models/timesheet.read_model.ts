@@ -13,7 +13,6 @@ export interface TimesheetView {
   readonly holidays: HolidayState[];
   readonly vacations: VacationState[];
   readonly capacity: Temporal.DurationLike;
-  readonly categories: string[];
 }
 
 export function createTimesheet(): TimesheetView {
@@ -22,7 +21,6 @@ export function createTimesheet(): TimesheetView {
     holidays: [],
     vacations: [],
     capacity: "PT40H",
-    categories: [],
   };
 }
 
@@ -61,7 +59,6 @@ export function projectTimesheet(
       return {
         ...view,
         capacity: event.data.capacity,
-        categories: event.data.categories,
       };
     case "vacations-changed":
       return { ...view, vacations: event.data.vacations };

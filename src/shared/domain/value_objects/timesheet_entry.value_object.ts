@@ -5,6 +5,7 @@ export interface TimesheetEntry {
   readonly client: string;
   readonly project: string;
   readonly task: string;
+  readonly category?: string;
   readonly hours: Temporal.DurationLike;
 }
 
@@ -13,15 +14,17 @@ export function createTimesheetEntry({
   client,
   project,
   task,
+  category,
   hours,
 }: {
   date: Temporal.PlainDateLike;
   client: string;
   project: string;
   task: string;
+  category?: string;
   hours: Temporal.DurationLike;
 }): TimesheetEntry {
-  return { date, client, project, task, hours };
+  return { date, client, project, task, category, hours };
 }
 
 export function compareTimesheetEntry(a: TimesheetEntry, b: TimesheetEntry) {
@@ -32,5 +35,7 @@ export function compareTimesheetEntry(a: TimesheetEntry, b: TimesheetEntry) {
     return a.client.localeCompare(b.client);
   } else if (a.project !== b.project) {
     return a.project.localeCompare(b.project);
+  } else if (a.category !== b.category) {
+    return (a.category ?? "").localeCompare(b.category ?? "");
   } else return a.task.localeCompare(b.task);
 }

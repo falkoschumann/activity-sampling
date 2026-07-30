@@ -232,6 +232,8 @@ schema:
       type: string
     task:
       type: string
+    category:
+      type: string
     hours:
       type: string
       format: duration

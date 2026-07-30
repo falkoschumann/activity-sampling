@@ -47,7 +47,7 @@ Build with `MAC_SIGN=true make`
 ## Open Issues
 
 - Create GitHub pipeline
-- Show category optionally in timesheet
+- Is get categories query usefully?
 - Export timesheet by client or project
 - Export Timesheet with category as task and task as notes
 - Reload does not update last Activity of notifier

@@ -3,7 +3,7 @@
 import type { TimesheetEntry } from "../../../../shared/domain/value_objects/timesheet_entry.value_object";
 import { formatDate, formatDuration } from "../../components/formatter";
 
-function TimesheetComponent({ entries }: { entries: TimesheetEntry[] }) {
+function TimesheetComponent({ entries, isDisplayCategory }: { entries: TimesheetEntry[]; isDisplayCategory: boolean }) {
   return (
     <table className="table">
       <thead className="sticky-top" style={{ top: "2.9375rem" }}>
@@ -12,6 +12,7 @@ function TimesheetComponent({ entries }: { entries: TimesheetEntry[] }) {
           <th scope="col">Client</th>
           <th scope="col">Project</th>
           <th scope="col">Task</th>
+          {isDisplayCategory && <th scope="col">Category</th>}
           <th scope="col">Hours</th>
         </tr>
       </thead>
@@ -32,6 +33,7 @@ function TimesheetComponent({ entries }: { entries: TimesheetEntry[] }) {
                 <i className="bi bi-copy"></i>
               </button>
             </td>
+            {isDisplayCategory && <td>{entry.category}</td>}
             <td>{formatDuration(entry.hours)}</td>
           </tr>
         ))}

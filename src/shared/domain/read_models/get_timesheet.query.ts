@@ -23,6 +23,7 @@ export type GetTimesheetQueryData = Readonly<{
   to: Temporal.PlainDateLike;
   today: Temporal.PlainDateLike;
   timeZone: Temporal.TimeZoneLike;
+  isDisplayCategory: boolean;
 }>;
 
 export function createGetTimesheetQuery({
@@ -30,15 +31,17 @@ export function createGetTimesheetQuery({
   to,
   today = Temporal.Now.plainDateISO().toString(),
   timeZone = Temporal.Now.timeZoneId(),
+  isDisplayCategory = false,
 }: {
   from: Temporal.PlainDateLike;
   to: Temporal.PlainDateLike;
   today?: Temporal.PlainDateLike;
   timeZone?: Temporal.TimeZoneLike;
+  isDisplayCategory?: boolean;
 }): GetTimesheetQuery {
   return {
     type: "get-timesheet",
-    data: { from, to, today, timeZone },
+    data: { from, to, today, timeZone, isDisplayCategory },
   };
 }
 
@@ -65,34 +68,44 @@ export function getTimesheet(
   query: GetTimesheetQuery,
 ): GetTimesheetQueryResult {
   // we assume the view is pre-filtered by from and to date
-  const entries = createEntries(view);
+  const entries = createEntries(view, query);
   const totalHours = sumTotalHours(entries);
   const capacity = determineCapacity(view, query, totalHours);
   return createGetTimesheetQueryResult({ entries, capacity, totalHours });
 }
 
-function createEntries(readModel: TimesheetView) {
+function createEntries(readModel: TimesheetView, query: GetTimesheetQuery) {
   const entries: TimesheetEntry[] = [];
   for (const entry of readModel.entries) {
-    updateEntries(entries, entry);
+    updateEntries(entries, entry, query);
   }
   entries.sort(compareTimesheetEntry);
   return entries;
 }
 
-function updateEntries(entries: TimesheetEntry[], entry: TimesheetViewEntry) {
+function updateEntries(
+  entries: TimesheetEntry[],
+  entry: TimesheetViewEntry,
+  query: GetTimesheetQuery,
+) {
   const date = Temporal.PlainDate.from(entry.timestamp).toString();
   const index = entries.findIndex(
     (e) =>
       Temporal.PlainDate.compare(e.date, date.toString()) === 0 &&
       e.client === entry.client &&
       e.project === entry.project &&
-      e.task === entry.task,
+      e.task === entry.task &&
+      (query.data.isDisplayCategory
+        ? (e.category ?? "") === (entry.category ?? "")
+        : true),
   );
   if (index === -1) {
     const newEntry = createTimesheetEntry({
-      ...entry,
       date,
+      client: entry.client,
+      project: entry.project,
+      task: entry.task,
+      category: query.data.isDisplayCategory ? entry.category : undefined,
       hours: entry.duration,
     });
     entries.push(newEntry);

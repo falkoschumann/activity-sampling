@@ -15,6 +15,7 @@ import TimesheetComponent from "./timesheet.component";
 
 export default function TimesheetPage() {
   const [state, dispatch] = useReducer(reducer, { unit: PeriodUnit.WEEK }, init);
+  const [isDisplayCategory, setDisplayCategory] = useState(false);
   const [timesheet, setTimesheet] = useState(createGetTimesheetQueryResult());
 
   useEffect(() => {
@@ -23,13 +24,14 @@ export default function TimesheetPage() {
         createGetTimesheetQuery({
           from: state.from,
           to: state.to,
+          isDisplayCategory,
         }),
       );
       setTimesheet(result);
     };
 
     void getTimesheetAsync();
-  }, [state.from, state.to]);
+  }, [state.from, state.to, isDisplayCategory]);
 
   async function handleExport() {
     const returnValue = await window.activitySampling.showSaveDialog({
@@ -73,11 +75,24 @@ export default function TimesheetPage() {
                 Export
               </button>
             </div>
+            <div>
+              <input
+                type="checkbox"
+                className="btn-check"
+                id="btn-display-category"
+                checked={isDisplayCategory}
+                onChange={(e) => setDisplayCategory(e.target.checked)}
+                autoComplete="off"
+              />
+              <label className="btn btn-outline-secondary" htmlFor="btn-display-category">
+                Display category
+              </label>
+            </div>
           </div>
         </div>
       </aside>
       <main className="container my-4" style={{ paddingTop: "6rem", paddingBottom: "3rem" }}>
-        <TimesheetComponent entries={timesheet.entries} />
+        <TimesheetComponent entries={timesheet.entries} isDisplayCategory={isDisplayCategory} />
       </main>
       <footer className="fixed-bottom bg-body">
         <div className="container py-2">

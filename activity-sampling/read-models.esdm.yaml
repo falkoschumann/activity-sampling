@@ -85,22 +85,22 @@ projections:
   - boundedContext: activity-sampling
     aggregate: settings
     event: changed
-    rule: Memorize the capacity and categories.
+    rule: Memorize the capacity.
   - boundedContext: activity-sampling
     aggregate: holiday
     event: holidays-changed
-    rule: Update the holidays list used for capacity calculation.
+    rule: Update the holidays list.
   - boundedContext: activity-sampling
     aggregate: vacation
     event: vacations-changed
-    rule: Update the vacation list used for capacity calculation.
+    rule: Update the vacation list.
 schema:
   type: object
   properties:
     entries:
       type: array
       items:
-        type: TimesheetViewModel
+        type: TimesheetViewEntry
     holidays:
       type: array
       items:
@@ -112,11 +112,7 @@ schema:
     capacity:
       type: string
       format: duration
-    categories:
-      type: array
-      items:
-        type: string
-  required: [entries, holidays, vacations, capacity, categories]
+  required: [entries, holidays, vacations, capacity]
 ---
 apiVersion: schema.esdm.io/core/v1
 kind: query
@@ -421,7 +417,10 @@ parameters:
       format: date
     timezone:
       type: string
-  required: [from, to, today, timezone]
+    isDisplayCategory:
+      type: boolean
+      default: false
+  required: [from, to, today, timezone, isDisplayCategory]
 result:
   type: object
   properties:
@@ -446,3 +445,7 @@ constraints:
     rule: Calculate the total hours worked in the specified time range.
   - name: take-days-off-into-account
     rule: Take into account holidays and vacations when calculating the capacity.
+  - name: display-category
+    rule:
+      If enabled, group activities by date, client, project, task, and category; otherwise, do not
+      group by category.

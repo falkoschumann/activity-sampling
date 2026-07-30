@@ -523,6 +523,109 @@ describe("Get timesheet", () => {
       );
     });
   });
+
+  describe("Optionally display category", () => {
+    it("should ignore category by default", async () => {
+      const { handler } = configure({
+        events: [
+          createActivityLoggedEvent({
+            ...testLoggedEvent,
+            timestamp: "2026-06-01T10:00:00Z",
+            category: "Category A",
+          }),
+          createActivityLoggedEvent({
+            ...testLoggedEvent,
+            timestamp: "2026-06-01T10:30:00Z",
+            category: "Category A",
+          }),
+          createActivityLoggedEvent({
+            ...testLoggedEvent,
+            timestamp: "2026-06-01T11:00:00Z",
+            category: "Category B",
+          }),
+          createActivityLoggedEvent({
+            ...testLoggedEvent,
+            timestamp: "2026-06-01T11:30:00Z",
+          }),
+        ],
+        holidays: [],
+        vacations: [],
+      });
+
+      const result = await handler.handle(
+        createGetTimesheetQuery({
+          from: "2026-06-01",
+          to: "2026-06-07",
+          today: "2026-06-08",
+        }),
+      );
+
+      expect(result.entries).toEqual<TimesheetEntry[]>([
+        createTimesheetEntry({
+          ...testTimesheetEntry,
+          date: "2026-06-01",
+          hours: "PT2H",
+        }),
+      ]);
+    });
+
+    it("should display category", async () => {
+      const { handler } = configure({
+        events: [
+          createActivityLoggedEvent({
+            ...testLoggedEvent,
+            timestamp: "2026-06-01T10:00:00Z",
+            category: "Category A",
+          }),
+          createActivityLoggedEvent({
+            ...testLoggedEvent,
+            timestamp: "2026-06-01T10:30:00Z",
+            category: "Category A",
+          }),
+          createActivityLoggedEvent({
+            ...testLoggedEvent,
+            timestamp: "2026-06-01T11:00:00Z",
+            category: "Category B",
+          }),
+          createActivityLoggedEvent({
+            ...testLoggedEvent,
+            timestamp: "2026-06-01T11:30:00Z",
+          }),
+        ],
+        holidays: [],
+        vacations: [],
+      });
+
+      const result = await handler.handle(
+        createGetTimesheetQuery({
+          from: "2026-06-01",
+          to: "2026-06-07",
+          today: "2026-06-08",
+          isDisplayCategory: true,
+        }),
+      );
+
+      expect(result.entries).toEqual<TimesheetEntry[]>([
+        createTimesheetEntry({
+          ...testTimesheetEntry,
+          date: "2026-06-01",
+          hours: "PT30M",
+        }),
+        createTimesheetEntry({
+          ...testTimesheetEntry,
+          date: "2026-06-01",
+          category: "Category A",
+          hours: "PT1H",
+        }),
+        createTimesheetEntry({
+          ...testTimesheetEntry,
+          date: "2026-06-01",
+          category: "Category B",
+          hours: "PT30M",
+        }),
+      ]);
+    });
+  });
 });
 
 function configure({
