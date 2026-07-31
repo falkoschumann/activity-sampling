@@ -38,10 +38,13 @@ domain:
 domain-detailed:
 	esdm view --with-details
 
-check: test check-esdm check-eslint check-stylelint check-prettier check-sheriff
+check: test check-esdm check-typing check-eslint check-stylelint check-prettier check-sheriff
 
 check-esdm:
 	esdm lint
+
+check-typing:
+	tsc --build
 
 check-eslint:
 	$(RUN) $(RUN_OPTIONS) eslint .
@@ -117,7 +120,7 @@ endif
 .PHONY: \
 	all clean distclean dist \
 	start doc domain domain-detailed \
-	check check-esdm check-eslint check-stylelint check-prettier check-sheriff \
+	check check-esdm check-typing check-eslint check-stylelint check-prettier check-sheriff \
 	fix fix-eslint fix-stylelint fix-prettier \
 	dev test watch unit-tests integration-tests e2e-tests \
 	docker-build \

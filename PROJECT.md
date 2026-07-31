@@ -44,8 +44,9 @@ activity, so that I can log it for analysis.
 - `make test`: run all tests
 - `bun run test -- {filter}`: run one or more tests with a filter (vitest)
 - `make check`: run all checks (linting, formatting, architecture rules)
-- `make check-esdm`, `make check-eslint`, `make check-stylelint`,
-  `make check-prettier` or `make check-sheriff`: run a specific check
+- `make check-esdm`, `make check-typing`, `make check-eslint`,
+  `make check-stylelint`, `make check-prettier` or `make check-sheriff`: run a
+  specific check
 - `make fix`: try to fix issues found by `make check`
 - `make fix-eslint`, `make fix-stylelint` or `make fix-prettier`: fix a specific
   issue
