@@ -14,7 +14,7 @@ The most important targets are:
 
 - `make` - Run full build
 - `make domain` - Show domain overview
-- `make format` - Apply coding style
+- `make fix` - Apply coding style
 - `make dev` - Start dev environment
 - `make doc` - Update diagrams
 
@@ -43,19 +43,3 @@ CSC_KEY_PASSWORD=<your-certificate-password>
 ```
 
 Build with `MAC_SIGN=true make`
-
-## Open Issues
-
-- Create GitHub pipeline
-- Export timesheet by client or project
-- Export Timesheet with category as task and task as notes
-- Reload does not update last Activity of notifier
-- Add feature and scenarios to domain model per command, query or process
-  manager
-- Sort all tables
-- Show read/parse error in GUI, not only in console
-- Store view parameters in URL query
-- Add return to "this month" button when period is not this month, same for
-  other units
-- Import holidays from an iCalendar file
-- Use the list of vacation days to automatically create activity entries

@@ -38,23 +38,39 @@ domain:
 domain-detailed:
 	esdm view --with-details
 
-check: test
+check: test check-esdm check-eslint check-stylelint check-prettier check-sheriff
+
+check-esdm:
 	esdm lint
+
+check-eslint:
 	$(RUN) $(RUN_OPTIONS) eslint .
+
+check-stylelint:
 	$(RUN) $(RUN_OPTIONS) stylelint "**/*.scss" --ignore-path .gitignore
+
+check-prettier:
 	$(RUN) $(RUN_OPTIONS) prettier --check .
+
+check-sheriff:
 	$(RUN) $(RUN_OPTIONS) sheriff verify
 
-format:
+fix: fix-eslint fix-stylelint fix-prettier
+
+fix-eslint:
 	$(RUN) $(RUN_OPTIONS) eslint --fix .
+
+fix-stylelint:
 	$(RUN) $(RUN_OPTIONS) stylelint "**/*.scss" --fix --ignore-path .gitignore
+
+fix-prettier:
 	$(RUN) $(RUN_OPTIONS) prettier --write .
 
 dev: prepare
 	$(PM) run $(RUN_OPTIONS) dev
 
 test: prepare
-	$(PM) run $(RUN_OPTIONS) test
+	$(PM) run $(RUN_OPTIONS) test -- --coverage
 
 watch: prepare
 	$(PM) run $(RUN_OPTIONS) watch
@@ -68,11 +84,11 @@ integration-tests: prepare
 e2e-tests: prepare
 	$(RUN) $(RUN_OPTIONS) vitest run e2e
 
-docker-build:
-	docker compose run --rm build
-
 build: prepare
 	$(PM) run $(RUN_OPTIONS) build
+
+build-docker:
+	docker compose run --rm build
 
 prepare: version
 ifdef CI
@@ -101,7 +117,8 @@ endif
 .PHONY: \
 	all clean distclean dist \
 	start doc domain domain-detailed \
-	check format \
+	check check-esdm check-eslint check-stylelint check-prettier check-sheriff \
+	fix fix-eslint fix-stylelint fix-prettier \
 	dev test watch unit-tests integration-tests e2e-tests \
 	docker-build \
 	build prepare version
