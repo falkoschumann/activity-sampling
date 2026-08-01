@@ -35,7 +35,9 @@ export function compareTimesheetEntry(a: TimesheetEntry, b: TimesheetEntry) {
     return a.client.localeCompare(b.client);
   } else if (a.project !== b.project) {
     return a.project.localeCompare(b.project);
-  } else if (a.category !== b.category) {
+  } else if (a.task !== b.task) {
+    return a.task.localeCompare(b.task);
+  } else {
     return (a.category ?? "").localeCompare(b.category ?? "");
-  } else return a.task.localeCompare(b.task);
+  }
 }
