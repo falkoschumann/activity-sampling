@@ -27,7 +27,7 @@
     "watch": "vitest watch",
     "start": "electron-vite preview",
     "dev": "electron-vite dev --watch",
-    "build": "tsc --build && electron-vite build",
+    "build": "electron-vite build",
     "build:unpack": "electron-builder --dir",
     "build:electron": "electron-builder",
     "build:win": "electron-builder --win --x64",
