@@ -74,7 +74,7 @@ export default function TimesheetPage() {
             role="toolbar"
             aria-label="Toolbar with query parameters and commands"
           >
-            <div className="btn-group btn-group-sm" role="group" aria-label="Query parameters">
+            <div>
               <div>
                 <input
                   type="checkbox"
@@ -84,13 +84,13 @@ export default function TimesheetPage() {
                   onChange={(e) => setDisplayCategory(e.target.checked)}
                   autoComplete="off"
                 />
-                <label className="btn btn-outline-secondary" htmlFor="btn-display-category">
+                <label className="btn btn-outline-secondary btn-sm" htmlFor="btn-display-category">
                   Display category
                 </label>
               </div>
             </div>
-            <div className="btn-group btn-group-sm ms-auto" role="group" aria-label="Commands">
-              <button type="button" className="btn btn-primary" onClick={handleExport}>
+            <div className="ms-auto">
+              <button type="button" className="btn btn-primary btn-sm" onClick={handleExport}>
                 Export
               </button>
             </div>

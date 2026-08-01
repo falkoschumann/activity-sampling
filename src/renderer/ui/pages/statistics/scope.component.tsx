@@ -4,9 +4,9 @@ import { StatisticsScope } from "../../../../shared/domain/read_models/get_stati
 
 function ScopeComponent({ value, onChange }: { value: StatisticsScope; onChange: (scope: StatisticsScope) => void }) {
   return (
-    <div className="btn-group btn-group-sm" role="group" aria-label="Select scope">
+    <div className="dropdown">
       <button
-        className="btn btn-outline-secondary dropdown-toggle"
+        className="btn btn-outline-secondary btn-sm dropdown-toggle"
         type="button"
         data-bs-toggle="dropdown"
         aria-expanded="false"

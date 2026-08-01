@@ -50,9 +50,9 @@ function PeriodComponent({
           </div>
         </div>
       )}
-      <div className="btn-group btn-group-sm ms-auto" role="group" aria-label="Options buttons">
+      <div className="dropdown ms-auto">
         <button
-          className="btn btn-outline-secondary dropdown-toggle"
+          className="btn btn-outline-secondary btn-sm dropdown-toggle"
           type="button"
           data-bs-toggle="dropdown"
           aria-expanded="false"

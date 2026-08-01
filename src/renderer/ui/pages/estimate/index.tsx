@@ -44,13 +44,11 @@ export default function EstimatePage() {
       <aside className="fixed-top bg-body-secondary">
         <div className="container">
           <div className="btn-toolbar py-2 gap-2" role="toolbar" aria-label="Toolbar with query parameters">
-            <div className="btn-group btn-group-sm" role="group" aria-label="Select category">
-              <CategoryComponent
-                categories={categories.categories}
-                value={categoryFilter}
-                onChange={(categories) => setCategoryFilter(categories)}
-              />
-            </div>
+            <CategoryComponent
+              categories={categories.categories}
+              value={categoryFilter}
+              onChange={(categories) => setCategoryFilter(categories)}
+            />
           </div>
         </div>
       </aside>

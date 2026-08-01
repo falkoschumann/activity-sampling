@@ -29,9 +29,9 @@ function CategoryComponent({
   }
 
   return (
-    <>
+    <div className="dropdown">
       <button
-        className="btn btn-outline-secondary dropdown-toggle"
+        className="btn btn-outline-secondary btn-sm dropdown-toggle"
         type="button"
         data-bs-toggle="dropdown"
         data-bs-auto-close="outside"
@@ -59,7 +59,7 @@ function CategoryComponent({
           </div>
         ))}
       </div>
-    </>
+    </div>
   );
 }
 
