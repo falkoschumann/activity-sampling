@@ -69,24 +69,30 @@ export default function TimesheetPage() {
             onNextPeriod={() => dispatch(goToNextPeriod({}))}
             onChangePeriod={(unit) => dispatch(changePeriod({ unit }))}
           />
-          <div className="btn-toolbar py-2 gap-2" role="toolbar" aria-label="Toolbar with query parameters">
-            <div className="btn-group btn-group-sm" role="group" aria-label="Select category">
-              <button type="button" className="btn btn-outline-secondary" onClick={handleExport}>
+          <div
+            className="btn-toolbar py-2 gap-2"
+            role="toolbar"
+            aria-label="Toolbar with query parameters and commands"
+          >
+            <div className="btn-group btn-group-sm" role="group" aria-label="Query parameters">
+              <div>
+                <input
+                  type="checkbox"
+                  className="btn-check"
+                  id="btn-display-category"
+                  checked={isDisplayCategory}
+                  onChange={(e) => setDisplayCategory(e.target.checked)}
+                  autoComplete="off"
+                />
+                <label className="btn btn-outline-secondary" htmlFor="btn-display-category">
+                  Display category
+                </label>
+              </div>
+            </div>
+            <div className="btn-group btn-group-sm ms-auto" role="group" aria-label="Commands">
+              <button type="button" className="btn btn-primary" onClick={handleExport}>
                 Export
               </button>
-            </div>
-            <div>
-              <input
-                type="checkbox"
-                className="btn-check"
-                id="btn-display-category"
-                checked={isDisplayCategory}
-                onChange={(e) => setDisplayCategory(e.target.checked)}
-                autoComplete="off"
-              />
-              <label className="btn btn-outline-secondary" htmlFor="btn-display-category">
-                Display category
-              </label>
             </div>
           </div>
         </div>
