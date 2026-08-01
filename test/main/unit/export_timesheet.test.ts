@@ -36,6 +36,7 @@ const testTimesheetEntry: TimesheetEntry = {
   client: "Test client",
   project: "Test project",
   task: "Test task",
+  category: "",
   hours: "PT2H",
 };
 
@@ -43,7 +44,8 @@ const testTimesheetDataWithoutName: TimesheetData = {
   date: "2025-06-04",
   client: "Test client",
   project: "Test project",
-  task: "Test task",
+  task: "",
+  notes: "Test task",
   hours: 2,
   firstName: "",
   lastName: "",

@@ -41,6 +41,8 @@ export function exportTimesheet(
       hours: Number(
         Temporal.Duration.from(entry.hours).total("hours").toFixed(2),
       ),
+      task: entry.category ?? "",
+      notes: entry.task,
       firstName: settings.firstName ?? "",
       lastName: settings.lastName ?? "",
     }),
