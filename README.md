@@ -1,6 +1,6 @@
 [![Build](https://github.com/falkoschumann/activity-sampling/actions/workflows/build.yml/badge.svg)](https://github.com/falkoschumann/activity-sampling/actions/workflows/build.yml)
-[![GitHub release](https://img.shields.io/github/release/falkoschumann/activity-sampling.svg)](https://github.com/falkoschumann/activity-sampling/releases/)
-[![GitHub license](https://img.shields.io/github/license/falkoschumann/activity-sampling.svg)](https://github.com/falkoschumann/activity-sampling/blob/master/LICENSE)
+[![Release](https://img.shields.io/github/release/falkoschumann/activity-sampling.svg)](https://github.com/falkoschumann/activity-sampling/releases/)
+[![License](https://img.shields.io/github/license/falkoschumann/activity-sampling.svg)](https://github.com/falkoschumann/activity-sampling/blob/master/LICENSE)
 
 # Activity Sampling
 
