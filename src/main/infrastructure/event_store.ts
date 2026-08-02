@@ -53,9 +53,14 @@ export class EventStore extends EventTarget {
     });
     const file = await this.#fs.open(this.filename, "a");
     const stream = file.createWriteStream();
-    stringifier.pipe(stream);
-    stringifier.write(event.data);
-    stringifier.end();
+    await new Promise<void>((resolve, reject) => {
+      stream.on("finish", resolve);
+      stream.on("error", reject);
+      stringifier.on("error", reject);
+      stringifier.pipe(stream);
+      stringifier.write(event.data);
+      stringifier.end();
+    });
 
     this.dispatchEvent(new CustomEvent(RECORDED_EVENT, { detail: event }));
   }
@@ -235,12 +240,6 @@ class FileHandleStub {
   }
 
   createWriteStream() {
-    return {
-      emit: () => {},
-      end: () => {},
-      on: () => {},
-      once: () => {},
-      write: () => {},
-    };
+    return new stream.PassThrough();
   }
 }
