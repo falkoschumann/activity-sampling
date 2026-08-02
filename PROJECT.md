@@ -5,9 +5,9 @@ activity, so that I can log it for analysis.
 
 ## Tech Stack
 
-- **Platform:** Electron, TypeScript
+- **Platform:** Electron 41, TypeScript
 - **Patterns:** domain-driven design, message-driven
-- **Styling & UI:** Bootstrap, Bootstrap Icons, Chart.js
+- **Styling & UI:** React 19, Bootstrap, Bootstrap Icons, Chart.js
 - **Storage:** CSV, JSON
 - **Build:** make, bun, Vite, electron-builder
 - **Testing:** Vitest
@@ -56,15 +56,16 @@ activity, so that I can log it for analysis.
 ### Done
 
 - [x] Display category optionally in timesheet
+- [x] Export timesheet/export with category as task and task as notes
+- [x] Get timesheet/filter by client or project
 
 ### In Progress
 
-- [/] Export Timesheet with category as task and task as notes
+- Currently, nothing is in progress
 
 ### Backlog
 
-- [ ] Export timesheet by client or project
-- [ ] Reload does not update last Activity of notifier
+- [ ] Reload does not update last activity of notifier
 - [ ] Create GitHub pipeline
 - [ ] Sort all tables
 - [ ] Add feature and scenarios to domain model per command, query or process
