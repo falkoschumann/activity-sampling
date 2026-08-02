@@ -90,13 +90,13 @@ Stories marked with ❗are planned for the next release.
 - [x] Compare with capacity
 - [x] Take holidays into account
 - [x] Take vacation into account
-- [ ] Filter tasks by client
-- [ ] Filter tasks by projects
+- [x] Filter tasks by client
+- [x] Filter tasks by projects
 
 ### Export Timesheet
 
 - [x] Export timesheet in Harvest format
-- [ ] Export with team member
+- [x] Export with team member
 
 ## Architecture
 
