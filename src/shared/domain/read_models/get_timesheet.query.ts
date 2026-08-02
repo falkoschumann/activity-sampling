@@ -23,6 +23,8 @@ export type GetTimesheetQueryData = Readonly<{
   to: Temporal.PlainDateLike;
   today: Temporal.PlainDateLike;
   timeZone: Temporal.TimeZoneLike;
+  client?: string;
+  project?: string;
   isDisplayCategory: boolean;
 }>;
 
@@ -31,17 +33,21 @@ export function createGetTimesheetQuery({
   to,
   today = Temporal.Now.plainDateISO().toString(),
   timeZone = Temporal.Now.timeZoneId(),
+  client,
+  project,
   isDisplayCategory = false,
 }: {
   from: Temporal.PlainDateLike;
   to: Temporal.PlainDateLike;
   today?: Temporal.PlainDateLike;
   timeZone?: Temporal.TimeZoneLike;
+  client?: string;
+  project?: string;
   isDisplayCategory?: boolean;
 }): GetTimesheetQuery {
   return {
     type: "get-timesheet",
-    data: { from, to, today, timeZone, isDisplayCategory },
+    data: { from, to, today, timeZone, client, project, isDisplayCategory },
   };
 }
 
@@ -49,18 +55,24 @@ export interface GetTimesheetQueryResult {
   readonly entries: TimesheetEntry[];
   readonly totalHours: Temporal.DurationLike;
   readonly capacity: Capacity;
+  readonly clients: string[];
+  readonly projects: string[];
 }
 
 export function createGetTimesheetQueryResult({
   entries = [],
   totalHours = "PT0S",
   capacity = createCapacity(),
+  clients = [],
+  projects = [],
 }: {
   entries?: TimesheetEntry[];
   totalHours?: Temporal.DurationLike;
   capacity?: Capacity;
+  clients?: string[];
+  projects?: string[];
 } = {}): GetTimesheetQueryResult {
-  return { entries, totalHours, capacity };
+  return { entries, totalHours, capacity, clients, projects };
 }
 
 export function getTimesheet(
@@ -71,7 +83,15 @@ export function getTimesheet(
   const entries = createEntries(view, query);
   const totalHours = sumTotalHours(entries);
   const capacity = determineCapacity(view, query, totalHours);
-  return createGetTimesheetQueryResult({ entries, capacity, totalHours });
+  const clients = findAll(view, "client");
+  const projects = findAll(view, "project");
+  return createGetTimesheetQueryResult({
+    entries,
+    capacity,
+    totalHours,
+    clients,
+    projects,
+  });
 }
 
 function createEntries(readModel: TimesheetView, query: GetTimesheetQuery) {
@@ -88,6 +108,13 @@ function updateEntries(
   entry: TimesheetViewEntry,
   query: GetTimesheetQuery,
 ) {
+  if (query.data.client && entry.client !== query.data.client) {
+    return;
+  }
+  if (query.data.project && entry.project !== query.data.project) {
+    return;
+  }
+
   const date = Temporal.PlainDate.from(entry.timestamp).toString();
   const index = entries.findIndex(
     (e) =>
@@ -148,6 +175,13 @@ function determineCapacity(
   const offset = Temporal.Duration.from(totalHours).subtract(businessDays);
 
   return { hours, offset: normalizeDuration(offset) };
+}
+
+function findAll<T extends keyof TimesheetViewEntry>(
+  view: TimesheetView,
+  property: T,
+): TimesheetViewEntry[T][] {
+  return Array.from(new Set(view.entries.map((e) => e[property]))).sort();
 }
 
 function normalizeDuration(duration: Temporal.DurationLike) {

@@ -417,6 +417,10 @@ parameters:
       format: date
     timezone:
       type: string
+    client:
+      type: string
+    project:
+      type: string
     isDisplayCategory:
       type: boolean
       default: false
@@ -433,7 +437,15 @@ result:
       format: duration
     capacity:
       type: Capacity
-  required: [entries, totalHours, capacity]
+    clients:
+      type: array
+      items:
+        type: string
+    projects:
+      type: array
+      items:
+        type: string
+  required: [entries, totalHours, capacity, clients, projects]
 actors:
   - software-developer
 constraints:
@@ -445,6 +457,10 @@ constraints:
     rule: Calculate the total hours worked in the specified time range.
   - name: take-days-off-into-account
     rule: Take into account holidays and vacations when calculating the capacity.
+  - name: filter-client
+    rule: Filter activities by the specified client.
+  - name: filter-project
+    rule: Filter activities by the specified project.
   - name: display-category
     rule:
       If enabled, group activities by date, client, project, task, and category; otherwise, do not

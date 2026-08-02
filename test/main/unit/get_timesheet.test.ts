@@ -271,6 +271,8 @@ describe("Get timesheet", () => {
             hours: "PT32H",
             offset: "PT0S",
           }),
+          clients: ["Test client"],
+          projects: ["Test project"],
         }),
       );
     });
@@ -521,6 +523,104 @@ describe("Get timesheet", () => {
       expect(result.capacity).toEqual(
         createCapacity({ hours: "PT32H", offset: "PT0S" }),
       );
+    });
+  });
+
+  describe("Filter by client", () => {
+    it("should filter activities by client", async () => {
+      const { handler } = configure({
+        events: [
+          createActivityLoggedEvent({
+            ...testLoggedEvent,
+            timestamp: "2026-06-01T10:00:00Z",
+            client: "Client A",
+            project: "Project A",
+          }),
+          createActivityLoggedEvent({
+            ...testLoggedEvent,
+            timestamp: "2026-06-01T10:30:00Z",
+            client: "Client A",
+            project: "Project A",
+          }),
+          createActivityLoggedEvent({
+            ...testLoggedEvent,
+            timestamp: "2026-06-01T11:00:00Z",
+            client: "Client B",
+            project: "Project B",
+          }),
+        ],
+        holidays: [],
+        vacations: [],
+      });
+
+      const result = await handler.handle(
+        createGetTimesheetQuery({
+          from: "2026-06-01",
+          to: "2026-06-07",
+          today: "2026-06-08",
+          client: "Client A",
+        }),
+      );
+
+      expect(result.entries).toEqual<TimesheetEntry[]>([
+        createTimesheetEntry({
+          ...testTimesheetEntry,
+          date: "2026-06-01",
+          client: "Client A",
+          project: "Project A",
+          hours: "PT1H",
+        }),
+      ]);
+      expect(result.clients).toEqual(["Client A", "Client B"]);
+    });
+  });
+
+  describe("Filter by project", () => {
+    it("should filter activities by project", async () => {
+      const { handler } = configure({
+        events: [
+          createActivityLoggedEvent({
+            ...testLoggedEvent,
+            timestamp: "2026-06-01T10:00:00Z",
+            client: "Client A",
+            project: "Project A",
+          }),
+          createActivityLoggedEvent({
+            ...testLoggedEvent,
+            timestamp: "2026-06-01T10:30:00Z",
+            client: "Client A",
+            project: "Project A",
+          }),
+          createActivityLoggedEvent({
+            ...testLoggedEvent,
+            timestamp: "2026-06-01T11:00:00Z",
+            client: "Client B",
+            project: "Project B",
+          }),
+        ],
+        holidays: [],
+        vacations: [],
+      });
+
+      const result = await handler.handle(
+        createGetTimesheetQuery({
+          from: "2026-06-01",
+          to: "2026-06-07",
+          today: "2026-06-08",
+          project: "Project B",
+        }),
+      );
+
+      expect(result.entries).toEqual<TimesheetEntry[]>([
+        createTimesheetEntry({
+          ...testTimesheetEntry,
+          date: "2026-06-01",
+          client: "Client B",
+          project: "Project B",
+          hours: "PT30M",
+        }),
+      ]);
+      expect(result.projects).toEqual(["Project A", "Project B"]);
     });
   });
 

@@ -15,6 +15,8 @@ import TimesheetComponent from "./timesheet.component";
 
 export default function TimesheetPage() {
   const [state, dispatch] = useReducer(reducer, { unit: PeriodUnit.WEEK }, init);
+  const [client, setClient] = useState<string>();
+  const [project, setProject] = useState<string>();
   const [isDisplayCategory, setDisplayCategory] = useState(false);
   const [timesheet, setTimesheet] = useState(createGetTimesheetQueryResult());
 
@@ -24,6 +26,8 @@ export default function TimesheetPage() {
         createGetTimesheetQuery({
           from: state.from,
           to: state.to,
+          client,
+          project,
           isDisplayCategory,
         }),
       );
@@ -31,7 +35,7 @@ export default function TimesheetPage() {
     };
 
     void getTimesheetAsync();
-  }, [state.from, state.to, isDisplayCategory]);
+  }, [state.from, state.to, client, project, isDisplayCategory]);
 
   async function handleExport() {
     const returnValue = await window.activitySampling.showSaveDialog({
@@ -74,6 +78,64 @@ export default function TimesheetPage() {
             role="toolbar"
             aria-label="Toolbar with query parameters and commands"
           >
+            <div className="dropdown">
+              <button
+                className="btn btn-outline-secondary btn-sm dropdown-toggle"
+                type="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+                {client != null ? client : "All clients"}
+              </button>
+              <ul className="dropdown-menu">
+                <li>
+                  <button className="dropdown-item" onClick={() => setClient(undefined)}>
+                    All clients
+                  </button>
+                </li>
+                {timesheet.clients.length > 0 && (
+                  <li>
+                    <hr className="dropdown-divider" />
+                  </li>
+                )}
+                {timesheet.clients.map((client) => (
+                  <li key={client}>
+                    <button className="dropdown-item" onClick={() => setClient(client)}>
+                      {client}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="dropdown">
+              <button
+                className="btn btn-outline-secondary btn-sm dropdown-toggle"
+                type="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+                {project != null ? project : "All projects"}
+              </button>
+              <ul className="dropdown-menu">
+                <li>
+                  <button className="dropdown-item" onClick={() => setProject(undefined)}>
+                    All projects
+                  </button>
+                </li>
+                {timesheet.projects.length > 0 && (
+                  <li>
+                    <hr className="dropdown-divider" />
+                  </li>
+                )}
+                {timesheet.projects.map((project) => (
+                  <li key={project}>
+                    <button className="dropdown-item" onClick={() => setProject(project)}>
+                      {project}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
             <div>
               <div>
                 <input
