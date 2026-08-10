@@ -1,10 +1,4 @@
 apiVersion: schema.esdm.io/core/v1
-kind: bounded-context
-name: activity-sampling
-scope:
-  domain: activity-sampling
----
-apiVersion: schema.esdm.io/core/v1
 kind: actor
 name: software-developer
 scope:

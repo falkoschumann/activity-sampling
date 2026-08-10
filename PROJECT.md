@@ -16,7 +16,7 @@ activity, so that I can log it for analysis.
 ## Folder Structure and important Files
 
 - `schemas/core/v1.yaml`: the JSON schema for all ESDM files
-- `activity-sampling.esdm.yaml`: describe the domain
+- `domain.esdm.yaml`: describe the domain
 - `external-systems.esdm.yaml`: describe external systems
 - `activity-sampling/*.esdm.yaml`: describe the bounded context
 - `integration/*.esdm.yaml`: describe the integration between bounded contexts
