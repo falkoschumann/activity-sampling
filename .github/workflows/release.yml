@@ -45,7 +45,7 @@ jobs:
       - name: Build distribution file
         shell: bash
         run: make dist
-      - name: Determine OS‑specific distribution file
+      - name: Determine OS-specific distribution file
         shell: bash
         run: |
           case $RUNNER_OS in
