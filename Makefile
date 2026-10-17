@@ -1,15 +1,19 @@
-export ASAR?=true
-export MAC_SIGN?=false
+export ASAR ?= true
+export MAC_SIGN ?= false
 
-PLANTUML_FILES=$(wildcard doc/images/*.puml)
-DIAGRAM_FILES=$(subst .puml,.png,$(PLANTUML_FILES))
-JS?=bun
-PM?=bun
-#PM_OPTIONS?=--ignore-scripts
-RUN?=bunx
-#RUN_OPTIONS?=--bun
-SHELL:=/bin/bash
-DEPENDENCY_UPDATER=dependabot[bot]
+# JavaScript configuration
+JS := bun
+PM := bun
+RUN := bunx
+
+# PlantUML configuration
+PLANTUML_FILES := $(wildcard doc/images/*.puml)
+DIAGRAM_FILES := $(subst .puml,.png,$(PLANTUML_FILES))
+
+# Make configuration
+SHELL := /bin/bash
+
+DEPENDENCY_UPDATER := dependabot[bot]
 
 all: dist doc check
 
@@ -22,13 +26,13 @@ distclean: clean
 	rm -rf node_modules
 
 dist: build
-	$(PM) run $(RUN_OPTIONS) build:electron
-#	$(PM) run $(RUN_OPTIONS) build:mac
-#	$(PM) run $(RUN_OPTIONS) build:win
-#	$(PM) run $(RUN_OPTIONS) build:linux
+	$(PM) run build:electron
+#	$(PM) run build:mac
+#	$(PM) run build:win
+#	$(PM) run build:linux
 
 start: prepare
-	$(PM) run $(RUN_OPTIONS) start
+	$(PM) run start
 
 doc: $(DIAGRAM_FILES)
 
@@ -44,51 +48,51 @@ check-esdm:
 	esdm lint
 
 check-typing:
-	tsc --build
+	$(RUN) tsc --build
 
 check-eslint:
-	$(RUN) $(RUN_OPTIONS) eslint .
+	$(RUN) eslint .
 
 check-stylelint:
-	$(RUN) $(RUN_OPTIONS) stylelint "**/*.scss" --ignore-path .gitignore
+	$(RUN) stylelint "**/*.scss" --ignore-path .gitignore
 
 check-prettier:
-	$(RUN) $(RUN_OPTIONS) prettier --check .
+	$(RUN) prettier --check .
 
 check-sheriff:
-	$(RUN) $(RUN_OPTIONS) sheriff verify
+	$(RUN) sheriff verify
 
 fix: fix-eslint fix-stylelint fix-prettier
 
 fix-eslint:
-	$(RUN) $(RUN_OPTIONS) eslint --fix .
+	$(RUN) eslint --fix .
 
 fix-stylelint:
-	$(RUN) $(RUN_OPTIONS) stylelint "**/*.scss" --fix --ignore-path .gitignore
+	$(RUN) stylelint "**/*.scss" --fix --ignore-path .gitignore
 
 fix-prettier:
-	$(RUN) $(RUN_OPTIONS) prettier --write .
+	$(RUN) prettier --write .
 
 dev: prepare
-	$(PM) run $(RUN_OPTIONS) dev
+	$(PM) run dev
 
 test: prepare
-	$(PM) run $(RUN_OPTIONS) test -- --coverage
+	$(PM) run test -- --coverage
 
 watch: prepare
-	$(PM) run $(RUN_OPTIONS) watch
+	$(PM) run watch
 
 unit-tests: prepare
-	$(RUN) $(RUN_OPTIONS) vitest run unit
+	$(RUN) vitest run unit
 
 integration-tests: prepare
-	$(RUN) $(RUN_OPTIONS) vitest run integration
+	$(RUN) vitest run integration
 
 e2e-tests: prepare
-	$(RUN) $(RUN_OPTIONS) vitest run e2e
+	$(RUN) vitest run e2e
 
 build: prepare
-	$(PM) run $(RUN_OPTIONS) build
+	$(PM) run build
 
 build-docker:
 	docker compose run --rm build
@@ -97,13 +101,13 @@ prepare: version
 ifdef CI
 ifeq ($(findstring $(DEPENDENCY_UPDATER), $(GITHUB_ACTOR)), $(DEPENDENCY_UPDATER))
 	@echo "dependency updater detected, run $(PM) install"
-	$(PM) install $(PM_OPTIONS)
+	$(PM) install
 else
 	@echo "CI detected, run $(PM) ci"
-	$(PM) ci $(PM_OPTIONS)
+	$(PM) ci
 endif
 else
-	$(PM) install $(PM_OPTIONS)
+	$(PM) install
 endif
 
 version:
@@ -111,8 +115,9 @@ version:
 	@echo "Using package manager $(PM) version $(shell $(PM) --version)"
 	@echo "Using package runner $(RUN) version $(shell $(RUN) --version)"
 
+# Do not generate diagrams in CI environment, because changes to the diagrams
+# would not be committed
 $(DIAGRAM_FILES): %.png: %.puml
-# Skip on CI because changes will not be committed
 ifndef CI
 	plantuml $^
 endif
@@ -123,5 +128,5 @@ endif
 	check check-esdm check-typing check-eslint check-stylelint check-prettier check-sheriff \
 	fix fix-eslint fix-stylelint fix-prettier \
 	dev test watch unit-tests integration-tests e2e-tests \
-	docker-build \
+	build-docker \
 	build prepare version
